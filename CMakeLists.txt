@@ -118,9 +118,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src/structure
     ${CMAKE_SOURCE_DIR}/src/structure/algorithms
     ${CMAKE_SOURCE_DIR}/src/structure/algorithms/AStar
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation/surface
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation/underground
     ${CMAKE_SOURCE_DIR}/src/structure/terrain
     ${CMAKE_SOURCE_DIR}/src/updater
     ${CMAKE_SOURCE_DIR}/src/utilities/
@@ -281,12 +278,6 @@ set(PROJECT_SRC
     ${CMAKE_SOURCE_DIR}/src/structure/coordinates.cpp
     ${CMAKE_SOURCE_DIR}/src/structure/roomFactory.cpp
     ${CMAKE_SOURCE_DIR}/src/structure/structureUtils.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation/heightMap.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation/mapWrapper.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation/mapGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation/mapConfiguration.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation/surface/surfaceGenerator.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/map_generation/underground/undergroundGenerator.cpp
     ${CMAKE_SOURCE_DIR}/src/structure/terrain/terrain.cpp
     ${CMAKE_SOURCE_DIR}/src/structure/terrain/terrainFactory.cpp
     ${CMAKE_SOURCE_DIR}/src/updater/updater.cpp

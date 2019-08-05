@@ -21,329 +21,167 @@
 
 #include "commandGodMud.hpp"
 #include "characterUtilities.hpp"
-#include "mapGenerator.hpp"
-#include "mapWrapper.hpp"
-#include "heightMap.hpp"
 #include "formatter.hpp"
 #include "mud.hpp"
 
-bool DoShutdown(Character * character, ArgumentHandler &)
+bool DoShutdown(Character *character, ArgumentHandler &)
 {
-    // Send message to all the players.
-    Mud::instance().broadcastMsg(0, character->getNameCapital() +
-                                    " has shut down the game!");
-    Mud::instance().shutDownSignal();
-    return true;
+	// Send message to all the players.
+	Mud::instance().broadcastMsg(0, character->getNameCapital() +
+										" has shut down the game!");
+	Mud::instance().shutDownSignal();
+	return true;
 }
 
-bool DoMudSave(Character * character, ArgumentHandler &)
+bool DoMudSave(Character *character, ArgumentHandler &)
 {
-    if (!Mud::instance().saveMud())
-    {
-        character->sendMsg("Something gone wrong during the saving process.\n");
-        return false;
-    }
-    // Send message to all the players.
-    Mud::instance().broadcastMsg(0, character->getNameCapital() +
-                                    " is writing the history...");
-    character->sendMsg("Ok.\n");
-    return true;
+	if (!Mud::instance().saveMud()) {
+		character->sendMsg("Something gone wrong during the saving process.\n");
+		return false;
+	}
+	// Send message to all the players.
+	Mud::instance().broadcastMsg(0, character->getNameCapital() +
+										" is writing the history...");
+	character->sendMsg("Ok.\n");
+	return true;
 }
 
-bool DoGoTo(Character * character, ArgumentHandler & args)
+bool DoGoTo(Character *character, ArgumentHandler &args)
 {
-    if (args.size() != 1)
-    {
-        character->sendMsg("You have to provide a room vnum.");
-        return false;
-    }
-    auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
-    auto destination = Mud::instance().findRoom(roomVnum);
-    if (destination == nullptr)
-    {
-        character->sendMsg("The room %s doesn't exists.\n", roomVnum);
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    // Move player.
-    MoveCharacterTo(
-        character,
-        destination,
-        character->getNameCapital() + " disappears in a puff of smoke!\n",
-        character->getNameCapital() + " appears in a puff of smoke!\n",
-        "You go to room " + destination->name + ".\n");
-    return true;
+	if (args.size() != 1) {
+		character->sendMsg("You have to provide a room vnum.");
+		return false;
+	}
+	auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
+	auto destination = Mud::instance().findRoom(roomVnum);
+	if (destination == nullptr) {
+		character->sendMsg("The room %s doesn't exists.\n", roomVnum);
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	// Move player.
+	MoveCharacterTo(
+		character, destination,
+		character->getNameCapital() + " disappears in a puff of smoke!\n",
+		character->getNameCapital() + " appears in a puff of smoke!\n",
+		"You go to room " + destination->name + ".\n");
+	return true;
 }
 
-bool DoFactionInfo(Character * character, ArgumentHandler & args)
+bool DoFactionInfo(Character *character, ArgumentHandler &args)
 {
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must insert a valide faction vnum.\n");
-        return false;
-    }
-    auto factionVnum = ToNumber<unsigned int>(args[0].getContent());
-    auto faction = Mud::instance().findFaction(factionVnum);
-    if (faction == nullptr)
-    {
-        character->sendMsg("Faction not found.\n");
-        return false;
-    }
-    // Create a table.
-    Table sheet;
-    // Get the sheet.
-    faction->getSheet(sheet);
-    // Show the seet to character.
-    character->sendMsg(sheet.getTable());
-    return true;
+	if (args.size() != 1) {
+		character->sendMsg("You must insert a valide faction vnum.\n");
+		return false;
+	}
+	auto factionVnum = ToNumber<unsigned int>(args[0].getContent());
+	auto faction = Mud::instance().findFaction(factionVnum);
+	if (faction == nullptr) {
+		character->sendMsg("Faction not found.\n");
+		return false;
+	}
+	// Create a table.
+	Table sheet;
+	// Get the sheet.
+	faction->getSheet(sheet);
+	// Show the seet to character.
+	character->sendMsg(sheet.getTable());
+	return true;
 }
 
-bool DoFactionList(Character * character, ArgumentHandler & /*args*/)
+bool DoFactionList(Character *character, ArgumentHandler & /*args*/)
 {
-    Table table;
-    table.addColumn("VNUM", align::center);
-    table.addColumn("NAME", align::left);
-    table.addDivider();
-    table.addColumnHeaders();
-    table.addDivider();
-    for (auto iterator : Mud::instance().mudFactions)
-    {
-        // Prepare the row.
-        TableRow row;
-        row.emplace_back(ToString(iterator.second->vnum));
-        row.emplace_back(iterator.second->name);
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
+	Table table;
+	table.addColumn("VNUM", align::center);
+	table.addColumn("NAME", align::left);
+	table.addDivider();
+	table.addColumnHeaders();
+	table.addDivider();
+	for (auto iterator : Mud::instance().mudFactions) {
+		// Prepare the row.
+		TableRow row;
+		row.emplace_back(ToString(iterator.second->vnum));
+		row.emplace_back(iterator.second->name);
+		// Add the row to the table.
+		table.addRow(row);
+	}
+	character->sendMsg(table.getTable());
+	return true;
 }
 
-bool DoRaceInfo(Character * character, ArgumentHandler & args)
+bool DoRaceInfo(Character *character, ArgumentHandler &args)
 {
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must insert a valide race vnum.\n");
-        return false;
-    }
-    auto vnum = ToNumber<unsigned int>(args[0].getContent());
-    auto race = Mud::instance().findRace(vnum);
-    if (race == nullptr)
-    {
-        character->sendMsg("Race not found.\n");
-        return false;
-    }
-    // Create a table.
-    Table sheet;
-    // Get the sheet.
-    race->getSheet(sheet);
-    // Show the seet to character.
-    character->sendMsg(sheet.getTable());
-    return true;
+	if (args.size() != 1) {
+		character->sendMsg("You must insert a valide race vnum.\n");
+		return false;
+	}
+	auto vnum = ToNumber<unsigned int>(args[0].getContent());
+	auto race = Mud::instance().findRace(vnum);
+	if (race == nullptr) {
+		character->sendMsg("Race not found.\n");
+		return false;
+	}
+	// Create a table.
+	Table sheet;
+	// Get the sheet.
+	race->getSheet(sheet);
+	// Show the seet to character.
+	character->sendMsg(sheet.getTable());
+	return true;
 }
 
-bool DoRaceList(Character * character, ArgumentHandler & /*args*/)
+bool DoRaceList(Character *character, ArgumentHandler & /*args*/)
 {
-    Table table;
-    table.addColumn("VNUM", align::center);
-    table.addColumn("NAME", align::left);
-    table.addColumn("ALLOWED", align::left);
-    table.addColumn("STRENGTH", align::right);
-    table.addColumn("AGILITY", align::right);
-    table.addColumn("PERCEPTION", align::right);
-    table.addColumn("CONSTITUTION", align::right);
-    table.addColumn("INTELLIGENCE", align::right);
-    table.addDivider();
-    table.addColumnHeaders();
-    table.addDivider();
-    for (auto iterator : Mud::instance().mudRaces)
-    {
-        Race * race = iterator.second;
-        // Prepare the row.
-        TableRow row;
-        row.emplace_back(ToString(race->vnum));
-        row.emplace_back(race->name);
-        row.emplace_back(ToString(race->player_allow));
-        row.emplace_back(ToString(race->getAbility(Ability::Strength)));
-        row.emplace_back(ToString(race->getAbility(Ability::Agility)));
-        row.emplace_back(ToString(race->getAbility(Ability::Perception)));
-        row.emplace_back(ToString(race->getAbility(Ability::Constitution)));
-        row.emplace_back(ToString(race->getAbility(Ability::Intelligence)));
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
+	Table table;
+	table.addColumn("VNUM", align::center);
+	table.addColumn("NAME", align::left);
+	table.addColumn("ALLOWED", align::left);
+	table.addColumn("STRENGTH", align::right);
+	table.addColumn("AGILITY", align::right);
+	table.addColumn("PERCEPTION", align::right);
+	table.addColumn("CONSTITUTION", align::right);
+	table.addColumn("INTELLIGENCE", align::right);
+	table.addDivider();
+	table.addColumnHeaders();
+	table.addDivider();
+	for (auto iterator : Mud::instance().mudRaces) {
+		Race *race = iterator.second;
+		// Prepare the row.
+		TableRow row;
+		row.emplace_back(ToString(race->vnum));
+		row.emplace_back(race->name);
+		row.emplace_back(ToString(race->player_allow));
+		row.emplace_back(ToString(race->getAbility(Ability::Strength)));
+		row.emplace_back(ToString(race->getAbility(Ability::Agility)));
+		row.emplace_back(ToString(race->getAbility(Ability::Perception)));
+		row.emplace_back(ToString(race->getAbility(Ability::Constitution)));
+		row.emplace_back(ToString(race->getAbility(Ability::Intelligence)));
+		// Add the row to the table.
+		table.addRow(row);
+	}
+	character->sendMsg(table.getTable());
+	return true;
 }
 
-bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
+bool DoSkillList(Character *character, ArgumentHandler & /*args*/)
 {
-    Table table;
-    table.addColumn("VNUM", align::center);
-    table.addColumn("NAME", align::left);
-    table.addColumn("ATTRIBUTE", align::left);
-    table.addDivider();
-    table.addColumnHeaders();
-    table.addDivider();
-    for (auto const & skill : Mud::instance().mudSkills)
-    {
-        // Prepare the row.
-        TableRow row;
-        row.emplace_back(ToString(skill->vnum));
-        row.emplace_back(skill->name);
-        row.emplace_back(skill->ability.toString());
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
-}
-
-bool DoGenerateMap(Character * character, ArgumentHandler & args)
-{
-    std::shared_ptr<HeightMap> heightMap = nullptr;
-    if (args.size() == 1)
-    {
-        heightMap = Mud::instance().findHeightMap(
-            ToNumber<unsigned int>(args[0].getContent()));
-    }
-    if (heightMap == nullptr)
-    {
-        character->sendMsg("You must provide a valid height map vnum:\n");
-        for (auto it : Mud::instance().mudHeightMaps)
-        {
-            character->sendMsg("    [%s] %s\n", it.first, it.second->name);
-        }
-        return false;
-    }
-    MapGen::MapConfiguration configuration(60, 30, 40);
-    // Instantiate the map generator.
-    MapGen::MapGenerator generator(configuration, heightMap);
-    // Generate the map.
-    if (!generator.generateMap())
-    {
-        character->sendMsg("Error while generating the map.");
-        return false;
-    }
-#if 0
-    // Draw the map.
-    std::string drawnMap;
-    for (int y = 0; y < map->getHeight(); ++y)
-    {
-        for (int x = 0; x < map->getWidth(); ++x)
-        {
-            drawnMap += map->getCell(x, y)->getTile();
-        }
-        drawnMap += "\n";
-    }
-    // First send the configuration.
-    character->sendMsg(configuration.toString());
-    character->sendMsg(drawnMap);
-    character->sendMsg(Formatter::reset());
-    // Add the map to the list of generated maps.
-    Mud::instance().addGeneratedMap(map);
-#endif
-    return true;
-}
-
-bool DoShowGenerateMap(Character * character, ArgumentHandler & args)
-{
-    if (args.empty())
-    {
-        character->sendMsg("List of generated maps:\n");
-        for (auto generatedMap : Mud::instance().mudGeneratedMaps)
-        {
-            character->sendMsg("    %s\n", generatedMap.second->vnum);
-        }
-        character->sendMsg("Arguments:\n");
-        character->sendMsg("    [vnum] The vnum of the map.\n");
-        character->sendMsg("    [type] The type of view.\n");
-        return true;
-    }
-    auto vnum = ToNumber<unsigned int>(args[0].getContent());
-    //auto type = (args.size() >= 2) ?
-    //            ToNumber<unsigned int>(args[1].getContent()) : 0;
-    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
-    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
-    {
-        character->sendMsg("Can't find the generated map '%s'.", vnum);
-        return false;
-    }
-#if 0
-    auto map = generatedMap->second;
-    // Draw the map.
-    std::string drawnMap;
-    for (int y = 0; y < map->getHeight(); ++y)
-    {
-        for (int x = 0; x < map->getWidth(); ++x)
-        {
-            if (type == 0)
-            {
-                drawnMap += map->getCell(x, y)->getTile();
-            }
-            else if (type == 1)
-            {
-                drawnMap.push_back(
-                    map->getCell(x, y)->terrain->liquidContent.first ? 'w'
-                                                                     : ' ');
-            }
-            else if (type == 2)
-            {
-                drawnMap +=
-                    Align(ToString(map->getCell(x, y)->coordinates.z),
-                          align::center, 2);
-            }
-        }
-        drawnMap += "\n";
-    }
-    // First send the configuration.
-    character->sendMsg(drawnMap);
-    character->sendMsg(Formatter::reset());
-#endif
-    return true;
-}
-
-bool DoDeleteGenerateMap(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must provide the vnum of a generated map.");
-        return false;
-    }
-    auto vnum = ToNumber<unsigned int>(args[0].getContent());
-    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
-    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
-    {
-        character->sendMsg("Can't find the generated map '%s'.", vnum);
-        return false;
-    }
-    auto map = generatedMap->second;
-    Mud::instance().mudGeneratedMaps.erase(generatedMap);
-    map->destroy();
-    return true;
-}
-
-bool DoBuildGenerateMap(Character * character, ArgumentHandler & args)
-{
-    if (args.size() != 2)
-    {
-        character->sendMsg("You must provide the vnum of a generated map and "
-                           "the name of the new map.");
-        return false;
-    }
-    auto vnum = ToNumber<unsigned int>(args[0].getContent());
-    auto mapName = args[1].getContent();
-    auto generatedMap = Mud::instance().mudGeneratedMaps.find(vnum);
-    if (generatedMap == Mud::instance().mudGeneratedMaps.end())
-    {
-        character->sendMsg("Can't find the generated map '%s'.", vnum);
-        return false;
-    }
-    if (!generatedMap->second->buildMap(mapName, character->getNameCapital()))
-    {
-        character->sendMsg("Can't build the map '%s'.", vnum);
-        return false;
-    }
-    return true;
+	Table table;
+	table.addColumn("VNUM", align::center);
+	table.addColumn("NAME", align::left);
+	table.addColumn("ATTRIBUTE", align::left);
+	table.addDivider();
+	table.addColumnHeaders();
+	table.addDivider();
+	for (auto const &skill : Mud::instance().mudSkills) {
+		// Prepare the row.
+		TableRow row;
+		row.emplace_back(ToString(skill->vnum));
+		row.emplace_back(skill->name);
+		row.emplace_back(skill->ability.toString());
+		// Add the row to the table.
+		table.addRow(row);
+	}
+	character->sendMsg(table.getTable());
+	return true;
 }

@@ -27,7 +27,7 @@
 /// MUD Minor Version.
 #define RADMUD_MINOR_VERSION 0
 /// MUD Version.
-#define RADMUD_VERSION       0
+#define RADMUD_VERSION 0
 
 /// Indicator for no socket connected.
 #define NO_SOCKET_COMMUNICATION -1
@@ -51,10 +51,6 @@
 
 class Direction;
 class HeightMap;
-namespace MapGen
-{
-class MapWrapper;
-}
 class MobileModel;
 
 #ifdef __linux__
@@ -107,399 +103,390 @@ class MobileModel;
 ///  timeout).
 /// After having managed all new connections, it handles the input/output
 ///  messages between the mud and the clients.
-class Mud
-{
+class Mud {
 private:
-    /// The port at which the mud is listening.
-    uint16_t mudPort;
-    /// Socket for accepting new connections.
-    int _servSocket;
-    /// The max descriptor, in other terms, the max socket value.
-    int _maxDesc;
-    /// When set, the MUD shuts down.
-    bool _shutdownSignal;
-    /// Contains the time when the mud has been booted.
-    time_t _bootTime;
-    /// Highest value of vnum for rooms.
-    unsigned int _maxVnumRoom;
-    /// Highest value of vnum for items.
-    unsigned int _maxVnumItem;
-    /// Highest value of vnum for mobiles.
-    unsigned int _maxVnumMobile;
+	/// The port at which the mud is listening.
+	uint16_t mudPort;
+	/// Socket for accepting new connections.
+	int _servSocket;
+	/// The max descriptor, in other terms, the max socket value.
+	int _maxDesc;
+	/// When set, the MUD shuts down.
+	bool _shutdownSignal;
+	/// Contains the time when the mud has been booted.
+	time_t _bootTime;
+	/// Highest value of vnum for rooms.
+	unsigned int _maxVnumRoom;
+	/// Highest value of vnum for items.
+	unsigned int _maxVnumItem;
+	/// Highest value of vnum for mobiles.
+	unsigned int _maxVnumMobile;
 
-    /// Mud weight measure.
-    const std::string _mudMeasure;
+	/// Mud weight measure.
+	const std::string _mudMeasure;
 
-    /// Mud database filename.
-    const std::string _mudDatabaseName;
+	/// Mud database filename.
+	const std::string _mudDatabaseName;
 
-    /// Location of system files.
-    const std::string _mudSystemDirectory;
+	/// Location of system files.
+	const std::string _mudSystemDirectory;
 
-    /// @brief Constructor.
-    Mud();
+	/// @brief Constructor.
+	Mud();
 
-    /// @brief Destructor.
-    ~Mud();
+	/// @brief Destructor.
+	~Mud();
 
 public:
-    /// @brief Disable Copy Construct.
-    Mud(Mud const &) = delete;
-
-    /// @brief Disable Move construct.
-    Mud(Mud &&) = delete;
-
-    /// @brief Disable Copy assign.
-    Mud & operator=(Mud const &) = delete;
-
-    /// @brief Disable Move assign.
-    Mud & operator=(Mud &&) = delete;
-
-    /// @brief Get the singleton istance of the Mud.
-    /// @return The static and uniquie Mud variable.
-    static Mud & instance();
-
-    /// List of all connected players.
-    std::list<Player *> mudPlayers;
-    /// List all the mobile.
-    std::vector<Mobile *> mudMobiles;
-    /// List of mobile models.
-    std::map<unsigned int, std::shared_ptr<MobileModel>> mudMobileModels;
-    /// List of all items.
-    std::map<unsigned int, Item *> mudItems;
-    /// List of all the rooms.
-    std::map<unsigned int, Room *> mudRooms;
-    /// List all the items model.
-    std::map<unsigned int, std::shared_ptr<ItemModel>> mudItemModels;
-    /// List of all the areas.
-    std::map<unsigned int, Area *> mudAreas;
-    /// List of all the races.
-    std::map<unsigned int, Race *> mudRaces;
-    /// List of all the factions.
-    std::map<unsigned int, Faction *> mudFactions;
-    /// List of all the skills.
-    std::vector<std::shared_ptr<Skill>> mudSkills;
-    /// List of all the writings.
-    std::map<unsigned int, Writing *> mudWritings;
-    /// List of all the corpses.
-    std::vector<Item *> mudCorpses;
-    /// List of all the materials.
-    std::map<unsigned int, Material *> mudMaterials;
-    /// List of all the professions.
-    std::map<unsigned int, Profession *> mudProfessions;
-    /// List of all the productions.
-    std::map<unsigned int, Production *> mudProductions;
-    /// List of all the liquids.
-    std::map<unsigned int, Liquid *> mudLiquids;
-    /// List of all the travelling points.
-    std::map<Room *, Room *> mudTravelPoints;
-    /// Blocked IP addresses.
-    std::set<std::string> blockedIPs;
-    /// Bad player names.
-    std::set<std::string> badNames;
-    /// Mud news.
-    std::map<std::string, std::string> mudNews;
-    /// List of commands (eg. look, quit, north etc.).
-    std::vector<std::shared_ptr<Command> > mudCommands;
-    /// Map of buildings schematic.
-    std::map<unsigned int, std::shared_ptr<Building>> mudBuildings;
-    /// Map of buildings schematic.
-    std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
-    /// List of all the bodyparts.
-    std::map<unsigned int, std::shared_ptr<BodyPart>> mudBodyParts;
-    /// List of all the bodyparts.
-    std::map<unsigned int, std::shared_ptr<HeightMap>> mudHeightMaps;
-    /// List of generated maps.
-    std::map<unsigned int, std::shared_ptr<MapGen::MapWrapper>> mudGeneratedMaps;
-
-    /// @brief Update all the player on the database.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool savePlayers();
-
-    /// @brief Update all the items on the database.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool saveItems();
-
-    /// @brief Update all the rooms on the database.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool saveRooms();
-
-    /// @brief Update the mud dynimic information like: Players and Items.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool saveMud();
-
-    /// @defgroup GlobalAddRemove Global Add and Remove Functions
-    /// @brief All the functions necessary to add and remove objects from their
-    ///         correspondent global list.
-    /// @{
-
-    /// Add a player to the list of connected players.
-    void addPlayer(Player * player);
-
-    /// Remove a player from the list of connected players.
-    bool remPlayer(Player * player);
-
-    /// Add the given mobile to the mud.
-    bool addMobile(Mobile * mobile);
+	/// @brief Disable Copy Construct.
+	Mud(Mud const &) = delete;
+
+	/// @brief Disable Move construct.
+	Mud(Mud &&) = delete;
+
+	/// @brief Disable Copy assign.
+	Mud &operator=(Mud const &) = delete;
+
+	/// @brief Disable Move assign.
+	Mud &operator=(Mud &&) = delete;
+
+	/// @brief Get the singleton istance of the Mud.
+	/// @return The static and uniquie Mud variable.
+	static Mud &instance();
+
+	/// List of all connected players.
+	std::list<Player *> mudPlayers;
+	/// List all the mobile.
+	std::vector<Mobile *> mudMobiles;
+	/// List of mobile models.
+	std::map<unsigned int, std::shared_ptr<MobileModel> > mudMobileModels;
+	/// List of all items.
+	std::map<unsigned int, Item *> mudItems;
+	/// List of all the rooms.
+	std::map<unsigned int, Room *> mudRooms;
+	/// List all the items model.
+	std::map<unsigned int, std::shared_ptr<ItemModel> > mudItemModels;
+	/// List of all the areas.
+	std::map<unsigned int, Area *> mudAreas;
+	/// List of all the races.
+	std::map<unsigned int, Race *> mudRaces;
+	/// List of all the factions.
+	std::map<unsigned int, Faction *> mudFactions;
+	/// List of all the skills.
+	std::vector<std::shared_ptr<Skill> > mudSkills;
+	/// List of all the writings.
+	std::map<unsigned int, Writing *> mudWritings;
+	/// List of all the corpses.
+	std::vector<Item *> mudCorpses;
+	/// List of all the materials.
+	std::map<unsigned int, Material *> mudMaterials;
+	/// List of all the professions.
+	std::map<unsigned int, Profession *> mudProfessions;
+	/// List of all the productions.
+	std::map<unsigned int, Production *> mudProductions;
+	/// List of all the liquids.
+	std::map<unsigned int, Liquid *> mudLiquids;
+	/// List of all the travelling points.
+	std::map<Room *, Room *> mudTravelPoints;
+	/// Blocked IP addresses.
+	std::set<std::string> blockedIPs;
+	/// Bad player names.
+	std::set<std::string> badNames;
+	/// Mud news.
+	std::map<std::string, std::string> mudNews;
+	/// List of commands (eg. look, quit, north etc.).
+	std::vector<std::shared_ptr<Command> > mudCommands;
+	/// Map of buildings schematic.
+	std::map<unsigned int, std::shared_ptr<Building> > mudBuildings;
+	/// Map of buildings schematic.
+	std::map<unsigned int, std::shared_ptr<Terrain> > mudTerrains;
+	/// List of all the bodyparts.
+	std::map<unsigned int, std::shared_ptr<BodyPart> > mudBodyParts;
+	/// List of all the bodyparts.
+	std::map<unsigned int, std::shared_ptr<HeightMap> > mudHeightMaps;
+
+	/// @brief Update all the player on the database.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool savePlayers();
+
+	/// @brief Update all the items on the database.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool saveItems();
+
+	/// @brief Update all the rooms on the database.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool saveRooms();
+
+	/// @brief Update the mud dynimic information like: Players and Items.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool saveMud();
+
+	/// @defgroup GlobalAddRemove Global Add and Remove Functions
+	/// @brief All the functions necessary to add and remove objects from their
+	///         correspondent global list.
+	/// @{
+
+	/// Add a player to the list of connected players.
+	void addPlayer(Player *player);
+
+	/// Remove a player from the list of connected players.
+	bool remPlayer(Player *player);
+
+	/// Add the given mobile to the mud.
+	bool addMobile(Mobile *mobile);
+
+	/// Remove the given mobile from the mud.
+	bool remMobile(unsigned int vnum);
 
-    /// Remove the given mobile from the mud.
-    bool remMobile(unsigned int vnum);
+	/// Add the given item to the mud.
+	bool addItem(Item *item);
 
-    /// Add the given item to the mud.
-    bool addItem(Item * item);
+	/// Remove the given item from the mud.
+	bool remItem(Item *item);
 
-    /// Remove the given item from the mud.
-    bool remItem(Item * item);
+	/// Add the given room to the mud.
+	bool addRoom(Room *room);
 
-    /// Add the given room to the mud.
-    bool addRoom(Room * room);
+	/// Remove the given room from the mud.
+	bool remRoom(Room *room);
 
-    /// Remove the given room from the mud.
-    bool remRoom(Room * room);
+	/// Add the given corpse to the mud.
+	bool addCorpse(Item *corpse);
 
-    /// Add the given corpse to the mud.
-    bool addCorpse(Item * corpse);
+	/// Remove the given corpse from the mud.
+	bool remCorpse(Item *corpse);
 
-    /// Remove the given corpse from the mud.
-    bool remCorpse(Item * corpse);
+	/// Add the given item model to the mud.
+	bool addItemModel(std::shared_ptr<ItemModel> model);
 
-    /// Add the given item model to the mud.
-    bool addItemModel(std::shared_ptr<ItemModel> model);
+	/// Add the given area to the mud.
+	bool addArea(Area *area);
 
-    /// Add the given area to the mud.
-    bool addArea(Area * area);
+	/// Add the given race to the mud.
+	bool addRace(Race *race);
 
-    /// Add the given race to the mud.
-    bool addRace(Race * race);
+	/// Add the given faction to the mud.
+	bool addFaction(Faction *faction);
 
-    /// Add the given faction to the mud.
-    bool addFaction(Faction * faction);
+	/// Add the given skill to the mud.
+	bool addSkill(std::shared_ptr<Skill> skill);
 
-    /// Add the given skill to the mud.
-    bool addSkill(std::shared_ptr<Skill> skill);
+	/// Add the given writing to the mud.
+	bool addWriting(Writing *writing);
 
-    /// Add the given writing to the mud.
-    bool addWriting(Writing * writing);
+	/// Add the given material to the mud.
+	bool addMaterial(Material *material);
 
-    /// Add the given material to the mud.
-    bool addMaterial(Material * material);
+	/// Add the given profession to the mud.
+	bool addProfession(Profession *profession);
 
-    /// Add the given profession to the mud.
-    bool addProfession(Profession * profession);
+	/// Add the given production to the mud.
+	bool addProduction(Production *production);
 
-    /// Add the given production to the mud.
-    bool addProduction(Production * production);
+	/// Add the given liquid to the mud.
+	bool addLiquid(Liquid *liquid);
 
-    /// Add the given liquid to the mud.
-    bool addLiquid(Liquid * liquid);
+	/// Add the given travel point to the mud.
+	bool addTravelPoint(Room *source, Room *target);
 
-    /// Add the given travel point to the mud.
-    bool addTravelPoint(Room * source, Room * target);
+	/// Add a command to the mud.
+	void addCommand(const std::shared_ptr<Command> &command);
 
-    /// Add a command to the mud.
-    void addCommand(const std::shared_ptr<Command> & command);
+	/// Add a building to the mud.
+	bool addBuilding(const std::shared_ptr<Building> &building);
 
-    /// Add a building to the mud.
-    bool addBuilding(const std::shared_ptr<Building> & building);
+	/// Add a terrain to the mud.
+	bool addTerrain(const std::shared_ptr<Terrain> &terrain);
 
-    /// Add a terrain to the mud.
-    bool addTerrain(const std::shared_ptr<Terrain> & terrain);
+	/// Add a body part to the mud.
+	bool addBodyPart(const std::shared_ptr<BodyPart> &bodyPart);
+	///@}
 
-    /// Add a body part to the mud.
-    bool addBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
+	/// @defgroup GlobalFind Global Find Functions
+	/// @brief All the functions necessary to find objects from their
+	///         correspondent global list.
+	/// @{
 
-    /// @brief Add an height map.
-    bool addHeightMap(const std::shared_ptr<HeightMap> & heightMap);
+	/// Find an item given its vnum.
+	Item *findItem(unsigned int vnum);
 
-    /// @brief Add a generated map.
-    bool addGeneratedMap(const std::shared_ptr<MapGen::MapWrapper> & mapWrapper);
-    ///@}
+	/// Find an item model given its vnum.
+	std::shared_ptr<ItemModel> findItemModel(unsigned int vnum);
 
-    /// @defgroup GlobalFind Global Find Functions
-    /// @brief All the functions necessary to find objects from their
-    ///         correspondent global list.
-    /// @{
+	/// Find a mobile given his vnum.
+	Mobile *findMobile(unsigned int vnum);
 
-    /// Find an item given its vnum.
-    Item * findItem(unsigned int vnum);
+	/// Find a mobile model given his vnum.
+	std::shared_ptr<MobileModel> findMobileModel(unsigned int vnum);
 
-    /// Find an item model given its vnum.
-    std::shared_ptr<ItemModel> findItemModel(unsigned int vnum);
+	/// Find a player given his name.
+	Player *findPlayer(const std::string &name);
 
-    /// Find a mobile given his vnum.
-    Mobile * findMobile(unsigned int vnum);
+	/// Find an area given its vnum.
+	Area *findArea(unsigned int vnum);
 
-    /// Find a mobile model given his vnum.
-    std::shared_ptr<MobileModel> findMobileModel(unsigned int vnum);
+	/// Find a room given its vnum.
+	Room *findRoom(unsigned int vnum);
 
-    /// Find a player given his name.
-    Player * findPlayer(const std::string & name);
+	/// Find a race given its vnum.
+	Race *findRace(unsigned int vnum);
 
-    /// Find an area given its vnum.
-    Area * findArea(unsigned int vnum);
+	/// Find a race given its name.
+	Race *findRace(std::string name);
 
-    /// Find a room given its vnum.
-    Room * findRoom(unsigned int vnum);
+	/// Find a faction given its vnum.
+	Faction *findFaction(unsigned int vnum);
 
-    /// Find a race given its vnum.
-    Race * findRace(unsigned int vnum);
+	/// Find a faction given its name.
+	Faction *findFaction(std::string name);
 
-    /// Find a race given its name.
-    Race * findRace(std::string name);
+	/// Find a skill given its vnum.
+	std::shared_ptr<Skill> findSkill(const unsigned int &vnum);
 
-    /// Find a faction given its vnum.
-    Faction * findFaction(unsigned int vnum);
+	/// Find a writing given its vnum.
+	Writing *findWriting(unsigned int vnum);
 
-    /// Find a faction given its name.
-    Faction * findFaction(std::string name);
+	/// Find a corpse given its vnum.
+	Item *findCorpse(unsigned int vnum);
 
-    /// Find a skill given its vnum.
-    std::shared_ptr<Skill> findSkill(const unsigned int & vnum);
+	/// Find a material given its vnum.
+	Material *findMaterial(unsigned int vnum);
 
-    /// Find a writing given its vnum.
-    Writing * findWriting(unsigned int vnum);
+	/// Find a profession given its vnum.
+	Profession *findProfession(unsigned int vnum);
 
-    /// Find a corpse given its vnum.
-    Item * findCorpse(unsigned int vnum);
+	/// Find a profession given its command.
+	Profession *findProfession(std::string command);
 
-    /// Find a material given its vnum.
-    Material * findMaterial(unsigned int vnum);
+	/// Find a production given its vnum.
+	Production *findProduction(unsigned int vnum);
 
-    /// Find a profession given its vnum.
-    Profession * findProfession(unsigned int vnum);
+	/// Find a production given its name.
+	Production *findProduction(std::string name);
 
-    /// Find a profession given its command.
-    Profession * findProfession(std::string command);
+	/// Find a liquid given its vnum.
+	Liquid *findLiquid(const unsigned int &vnum);
 
-    /// Find a production given its vnum.
-    Production * findProduction(unsigned int vnum);
+	/// Find the destination room of a travel point, given its starting room.
+	Room *findTravelPoint(Room *room);
 
-    /// Find a production given its name.
-    Production * findProduction(std::string name);
+	/// Find a building given its name.
+	std::shared_ptr<Building> findBuilding(std::string name);
 
-    /// Find a liquid given its vnum.
-    Liquid * findLiquid(const unsigned int & vnum);
+	/// Find a building given the vnum of the model to build.
+	std::shared_ptr<Building> findBuilding(unsigned int vnum);
 
-    /// Find the destination room of a travel point, given its starting room.
-    Room * findTravelPoint(Room * room);
+	/// Find a terrain given its vnum.
+	std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
 
-    /// Find a building given its name.
-    std::shared_ptr<Building> findBuilding(std::string name);
+	/// Find a body part.
+	std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
 
-    /// Find a building given the vnum of the model to build.
-    std::shared_ptr<Building> findBuilding(unsigned int vnum);
+	/// Find a height map.
+	std::shared_ptr<HeightMap> findHeightMap(const unsigned int &vnum);
+	///@}
 
-    /// Find a terrain given its vnum.
-    std::shared_ptr<Terrain> findTerrain(unsigned int vnum);
+	/// @brief Main processing loop.
+	/// @return <b>True</b> if there are no errors,<br>
+	///         <b>False</b> otherwise.
+	bool runMud();
 
-    /// Find a body part.
-    std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
+	/// @brief Activate the signal for shutting down the mud.
+	void shutDownSignal();
 
-    /// Find a height map.
-    std::shared_ptr<HeightMap> findHeightMap(const unsigned int & vnum);
-    ///@}
+	/// @brief Function which checks if the provided socket is still open.
+	/// @param socket The socket that has to be checked.
+	/// @return <b>True</b> if the socket is still open,<br>
+	///         <b>False</b> Otherwise.
+	bool checkSocket(const int &socket) const;
 
-    /// @brief Main processing loop.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool runMud();
+	/// @brief Close a socket port.
+	/// @param socket The port to close.
+	/// @return <b>True</b> if the socket has been closed,<br>
+	///         <b>False</b> Otherwise.
+	bool closeSocket(const int &socket) const;
 
-    /// @brief Activate the signal for shutting down the mud.
-    void shutDownSignal();
+	/// @brief Get the totale uptime.
+	/// @return The uptime.
+	double getUpTime() const;
 
-    /// @brief Function which checks if the provided socket is still open.
-    /// @param socket The socket that has to be checked.
-    /// @return <b>True</b> if the socket is still open,<br>
-    ///         <b>False</b> Otherwise.
-    bool checkSocket(const int & socket) const;
+	/// @brief Returns the current maximum vnum used for rooms.
+	/// @return The maximum rooms vnum.
+	unsigned int getMaxVnumRoom() const;
 
-    /// @brief Close a socket port.
-    /// @param socket The port to close.
-    /// @return <b>True</b> if the socket has been closed,<br>
-    ///         <b>False</b> Otherwise.
-    bool closeSocket(const int & socket) const;
+	/// @brief Returns the current maximum vnum used for items.
+	/// @return The maximum items vnum.
+	unsigned int getMaxVnumItem() const;
 
-    /// @brief Get the totale uptime.
-    /// @return The uptime.
-    double getUpTime() const;
+	/// @brief Returns the current maximum vnum used for mobiles.
+	/// @return The maximum mobiles vnum.
+	inline unsigned int getMaxVnumMobile() const
+	{
+		return _maxVnumMobile;
+	}
 
-    /// @brief Returns the current maximum vnum used for rooms.
-    /// @return The maximum rooms vnum.
-    unsigned int getMaxVnumRoom() const;
+	/// @brief Provides an unique vnum for an area.
+	unsigned int getUniqueAreaVnum() const;
 
-    /// @brief Returns the current maximum vnum used for items.
-    /// @return The maximum items vnum.
-    unsigned int getMaxVnumItem() const;
+	/// @brief Send message to all connected players.
+	/// @param level   The level of the player: 0 normal, 1 admin.
+	/// @param message Message to send.
+	void broadcastMsg(const int &level, const std::string &message) const;
 
-    /// @brief Returns the current maximum vnum used for mobiles.
-    /// @return The maximum mobiles vnum.
-    inline unsigned int getMaxVnumMobile() const
-    {
-        return _maxVnumMobile;
-    }
+	/// @brief Provides the name of the measure for weight.
+	std::string getWeightMeasure() const;
 
-    /// @brief Provides an unique vnum for an area.
-    unsigned int getUniqueAreaVnum() const;
+	/// @brief Provides the name of the database.
+	std::string getMudDatabaseName() const;
 
-    /// @brief Send message to all connected players.
-    /// @param level   The level of the player: 0 normal, 1 admin.
-    /// @param message Message to send.
-    void broadcastMsg(const int & level, const std::string & message) const;
-
-    /// @brief Provides the name of the measure for weight.
-    std::string getWeightMeasure() const;
-
-    /// @brief Provides the name of the database.
-    std::string getMudDatabaseName() const;
-
-    /// @brief Provides the path to the system directory.
-    std::string getMudSystemDirectory() const;
+	/// @brief Provides the path to the system directory.
+	std::string getMudSystemDirectory() const;
 
 private:
-    /// @brief Remove players that are disconnected or about to leave the MUD.
-    void removeInactivePlayers();
+	/// @brief Remove players that are disconnected or about to leave the MUD.
+	void removeInactivePlayers();
 
-    /// @brief New player has connected.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool processNewConnection();
+	/// @brief New player has connected.
+	/// @return <b>True</b> if there are no errors,<br>
+	///         <b>False</b> otherwise.
+	bool processNewConnection();
 
-    /// @brief Handle all the comunication descriptor, it's the socket value.
-    void setupDescriptor(Player * player);
+	/// @brief Handle all the comunication descriptor, it's the socket value.
+	void setupDescriptor(Player *player);
 
-    /// @brief Process player communications.
-    void processDescriptor(Player * player);
+	/// @brief Process player communications.
+	void processDescriptor(Player *player);
 
-    /// @brief Load data from the database.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool initDatabase();
+	/// @brief Load data from the database.
+	/// @return <b>True</b> if there are no errors,<br>
+	///         <b>False</b> otherwise.
+	bool initDatabase();
 
-    /// @brief Set up communications and get ready to listen for connection.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool initComunications();
+	/// @brief Set up communications and get ready to listen for connection.
+	/// @return <b>True</b> if there are no errors,<br>
+	///         <b>False</b> otherwise.
+	bool initComunications();
 
-    /// @brief Close listening port.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool closeComunications();
+	/// @brief Close listening port.
+	/// @return <b>True</b> if there are no errors,<br>
+	///         <b>False</b> otherwise.
+	bool closeComunications();
 
-    bool afterBootActions();
+	bool afterBootActions();
 
-    /// @brief Boot up the mud.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool startMud();
+	/// @brief Boot up the mud.
+	/// @return <b>True</b> if there are no errors,<br>
+	///         <b>False</b> otherwise.
+	bool startMud();
 
-    /// @brief Shut down the mud.
-    /// @return <b>True</b> if there are no errors,<br>
-    ///         <b>False</b> otherwise.
-    bool stopMud();
+	/// @brief Shut down the mud.
+	/// @return <b>True</b> if there are no errors,<br>
+	///         <b>False</b> otherwise.
+	bool stopMud();
 };
 
 /// @brief Here when a signal is raised.

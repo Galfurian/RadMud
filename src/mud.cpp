@@ -25,10 +25,7 @@
 #include "processPlayerName.hpp"
 #include "CMacroWrapper.hpp"
 #include "mobileModel.hpp"
-#include "mapWrapper.hpp"
 #include "stopwatch.hpp"
-#include "heightMap.hpp"
-
 #include <unistd.h>
 #include <signal.h>
 
@@ -384,22 +381,6 @@ bool Mud::addTerrain(const std::shared_ptr<Terrain> & terrain)
 bool Mud::addBodyPart(const std::shared_ptr<BodyPart> & bodyPart)
 {
     return mudBodyParts.insert(std::make_pair(bodyPart->vnum, bodyPart)).second;
-}
-
-bool Mud::addHeightMap(const std::shared_ptr<HeightMap> & heightMap)
-{
-    return mudHeightMaps.insert(std::make_pair(heightMap->vnum,
-                                               heightMap)).second;
-}
-
-bool Mud::addGeneratedMap(const std::shared_ptr<MapGen::MapWrapper> & mapWrapper)
-{
-    while (!mudGeneratedMaps.insert(std::make_pair(mapWrapper->vnum,
-                                                   mapWrapper)).second)
-    {
-        mapWrapper->vnum++;
-    }
-    return true;
 }
 
 Player * Mud::findPlayer(const std::string & name)
@@ -1152,8 +1133,6 @@ bool Mud::stopMud()
     Logger::log(LogLevel::Info, "");
     return true;
 }
-
-#include "mapGenerator.hpp"
 
 bool Mud::afterBootActions()
 {

@@ -28,7 +28,6 @@
 #include "modelFactory.hpp"
 #include "itemFactory.hpp"
 #include "mobileModel.hpp"
-#include "heightMap.hpp"
 #include "shopItem.hpp"
 #include "mud.hpp"
 #include "resourceModel.hpp"
@@ -1410,54 +1409,5 @@ bool LoadBodyPartWeapon(ResultSet * result)
     bodyWeapon->maxDamage = result->getNextUnsignedInteger();
     bodyWeapon->range = result->getNextInteger();
     bodyPart->weapon = bodyWeapon;
-    return true;
-}
-
-bool LoadHeightMap(ResultSet * result)
-{
-    auto vnum = result->getNextUnsignedInteger();
-    auto name = result->getNextString();
-    auto seaLevelVnum = result->getNextUnsignedInteger();
-    auto seaLevel = Mud::instance().findTerrain(seaLevelVnum);
-    if (seaLevel == nullptr)
-    {
-        throw SQLiteException(
-            "Can't find the terrain " + ToString(seaLevelVnum));
-    }
-    auto heightMap = std::make_shared<HeightMap>(vnum, name, seaLevel);
-    if (!Mud::instance().addHeightMap(heightMap))
-    {
-        throw SQLiteException(
-            "Can't add the height map " + name);
-    }
-    Logger::log(LogLevel::Debug, "\t%s%s%s",
-                Align(vnum, align::left, 25),
-                Align(name, align::left, 25),
-                Align(seaLevel->name, align::left, 25));
-    return true;
-}
-
-bool LoadHeightMapThreshold(ResultSet * result)
-{
-    auto heightMapVnum = result->getNextUnsignedInteger();
-    auto heightMap = Mud::instance().findHeightMap(heightMapVnum);
-    if (heightMap == nullptr)
-    {
-        throw SQLiteException(
-            "Can't find the height map " + ToString(heightMapVnum));
-    }
-    auto terrainVnum = result->getNextUnsignedInteger();
-    auto terrain = Mud::instance().findTerrain(terrainVnum);
-    if (terrain == nullptr)
-    {
-        throw SQLiteException(
-            "Can't find the terrain " + ToString(terrainVnum));
-    }
-    auto threshold = result->getNextInteger();
-    heightMap->addThreshold(terrain, threshold);
-    Logger::log(LogLevel::Debug, "\t%s%s%s",
-                Align(heightMap->name, align::left, 25),
-                Align(terrain->name, align::left, 25),
-                Align(threshold, align::left, 25));
     return true;
 }
