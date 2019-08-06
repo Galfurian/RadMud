@@ -183,9 +183,6 @@ bool LoadTerrainLiquidSources(ResultSet * result);
 /// @brief Function used to load body parts.
 bool LoadBodyPart(ResultSet * result);
 
-/// @brief Function used to load the body parts where a model can be equipped.
-bool LoadModelBodyPart(ResultSet * result);
-
 /// @brief Function used to load the resources produced from a body part.
 bool LoadBodyPartResources(ResultSet * result);
 

@@ -55,7 +55,6 @@ ItemModel::ItemModel() :
     shortdesc(),
     keys(),
     description(),
-    bodyParts(),
     modelFlags(),
     baseWeight(),
     basePrice(),
@@ -97,10 +96,6 @@ void ItemModel::getSheet(Table & sheet) const
     sheet.addRow({"Keys", keyGroup});
     sheet.addRow({"Description", this->description});
     sheet.addRow({"Type", this->getTypeName()});
-    for (auto bodyPart : bodyParts)
-    {
-        sheet.addRow({"Body Part", bodyPart->name});
-    }
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Material", this->material.toString()});
     sheet.addRow({"TileSet", ToString(tileSet)});
@@ -252,22 +247,6 @@ std::string ItemModel::getDescription(Material * itemMaterial,
     std::string output = description;
     replaceSymbols(output, itemMaterial, itemQuality);
     return output;
-}
-
-std::vector<std::shared_ptr<BodyPart>> ItemModel::getBodyParts(Race * race)
-{
-    std::vector<std::shared_ptr<BodyPart>> filteredBodyParts;
-    for (auto raceBodyPart: race->bodyParts)
-    {
-        for (auto bodyPart : bodyParts)
-        {
-            if (raceBodyPart->vnum == bodyPart->vnum)
-            {
-                filteredBodyParts.emplace_back(bodyPart);
-            }
-        }
-    }
-    return filteredBodyParts;
 }
 
 std::string ItemModel::getTile(int offset)

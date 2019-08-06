@@ -73,7 +73,6 @@ SQLiteDbms::SQLiteDbms() : dbConnection(), loaders()
 	loaders.emplace_back(
 		TableLoader("ProductionKnowledge", LoadProductionKnowledge));
 	loaders.emplace_back(TableLoader("Currency", LoadCurrency));
-	loaders.emplace_back(TableLoader("ModelBodyPart", LoadModelBodyPart));
 	loaders.emplace_back(TableLoader("MobileModel", LoadMobileModel));
 	loaders.emplace_back(TableLoader("MobileSpawn", LoadMobileSpawn));
 	loaders.emplace_back(

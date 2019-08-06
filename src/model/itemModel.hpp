@@ -118,8 +118,6 @@ public:
     std::vector<std::string> keys;
     /// The model description.
     std::string description;
-    /// Store here the position where the model can be equipped.
-    std::vector<std::shared_ptr<BodyPart>> bodyParts;
     /// The model flags.
     unsigned int modelFlags;
     /// The model base weight.
@@ -217,11 +215,6 @@ public:
     std::string getDescription(
         Material * itemMaterial = nullptr,
         const ItemQuality & itemQuality = ItemQuality::Normal);
-
-    /// @brief Gets the body parts in common between the model and the race.
-    /// @param race The race with which the check must be performed.
-    /// @return The body parts in common between the model and the race.
-    std::vector<std::shared_ptr<BodyPart>> getBodyParts(Race * race);
 
     /// @brief Returns the tile of the model.
     /// @param offset The ofset of the tile.

@@ -1219,6 +1219,7 @@ bool LoadShopDefaultStock(ResultSet * result)
 bool LoadCurrency(ResultSet * result)
 {
     // Retrieve the item vnum.
+	result->getNextUnsignedInteger(); // Skip ID
     auto modelVnum = result->getNextUnsignedInteger();
     auto materialVnum = result->getNextUnsignedInteger();
     auto worth = result->getNextUnsignedInteger();
@@ -1334,28 +1335,9 @@ bool LoadBodyPart(ResultSet * result)
     return true;
 }
 
-bool LoadModelBodyPart(ResultSet * result)
-{
-    auto modelVnum = result->getNextUnsignedInteger();
-    auto model = Mud::instance().findItemModel(modelVnum);
-    if (model == nullptr)
-    {
-        throw SQLiteException(
-            "Can't find the model " + ToString(modelVnum));
-    }
-    auto bodyPartVnum = result->getNextUnsignedInteger();
-    auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
-    if (bodyPart == nullptr)
-    {
-        throw SQLiteException(
-            "Can't find the body part " + ToString(bodyPartVnum));
-    }
-    model->bodyParts.emplace_back(bodyPart);
-    return true;
-}
-
 bool LoadBodyPartResources(ResultSet * result)
 {
+	result->getNextUnsignedInteger(); // Skip ID
     auto bodyPartVnum = result->getNextUnsignedInteger();
     auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
     if (bodyPart == nullptr)
@@ -1395,6 +1377,7 @@ bool LoadBodyPartResources(ResultSet * result)
 
 bool LoadBodyPartWeapon(ResultSet * result)
 {
+	result->getNextUnsignedInteger(); // Skip ID
     auto bodyPartVnum = result->getNextUnsignedInteger();
     auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
     if (bodyPart == nullptr)

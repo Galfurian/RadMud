@@ -694,34 +694,19 @@ std::vector<std::shared_ptr<BodyPart>> Character::canWield(
     // Prepare the list of occupied body parts.
     std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
     // Get the compatible body parts.
-    auto compatibleBodyParts = item->model->getBodyParts(race);
-    if (compatibleBodyParts.empty())
+    for (auto const & bodyPart : race->bodyParts)
     {
-        error = "It is not designed for your fisionomy.";
-        return occupiedBodyParts;
-    }
-    for (auto bodyPart : compatibleBodyParts)
-    {
+		Logger::log(LogLevel::Debug, "0: %d", bodyPart->flags);
         if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
-        {
             continue;
-        }
+		Logger::log(LogLevel::Debug, "1: %d", bodyPart->flags);
         if (this->findItemAtBodyPart(bodyPart) != nullptr)
-        {
             continue;
-        }
         occupiedBodyParts.emplace_back(bodyPart);
         if (!HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
-        {
             break;
-        }
-        else
-        {
-            if (occupiedBodyParts.size() == 2)
-            {
-                break;
-            }
-        }
+		if (occupiedBodyParts.size() == 2)
+			break;
     }
     if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand) &&
         (occupiedBodyParts.size() != 2))
@@ -729,9 +714,7 @@ std::vector<std::shared_ptr<BodyPart>> Character::canWield(
         occupiedBodyParts.clear();
     }
     if (occupiedBodyParts.empty())
-    {
         error = "There is no room where it can be wielded.";
-    }
     return occupiedBodyParts;
 }
 
@@ -739,32 +722,21 @@ std::vector<std::shared_ptr<BodyPart>> Character::canWear(
     Item * item,
     std::string & error) const
 {
+	(void) item;
     // Prepare the list of occupied body parts.
     std::vector<std::shared_ptr<BodyPart>> occupiedBodyParts;
     // Get the compatible body parts.
-    auto compatibleBodyParts = item->model->getBodyParts(race);
-    if (compatibleBodyParts.empty())
-    {
-        error = "It is not designed for your fisionomy.";
-        return occupiedBodyParts;
-    }
-    for (auto bodyPart : compatibleBodyParts)
+    for (auto const & bodyPart : race->bodyParts)
     {
         if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
-        {
             continue;
-        }
         if (this->findItemAtBodyPart(bodyPart) != nullptr)
-        {
             continue;
-        }
         occupiedBodyParts.emplace_back(bodyPart);
         break;
     }
     if (occupiedBodyParts.empty())
-    {
         error = "There is no room where it can be worn.";
-    }
     return occupiedBodyParts;
 }
 
@@ -774,7 +746,7 @@ bool Character::inventoryIsLit() const
     {
         if (it->getType() == ModelType::Light)
         {
-            if (static_cast<LightItem *>(it)->isActive())
+            if (dynamic_cast<LightItem *>(it)->isActive())
             {
                 return true;
             }
