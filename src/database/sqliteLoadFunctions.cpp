@@ -353,6 +353,40 @@ bool LoadRace(ResultSet *result)
     race->description = result->getNextString();
     race->height = result->getNextDouble();
     race->player_allow = (result->getNextInteger() == 1);
+    unsigned value;
+    for (Ability it = Ability::Strength; it <= Ability::Intelligence; ++ it)
+    {
+        value = result->getNextUnsignedInteger();
+        // Set the base ability value of the race.
+        race->abilities[it] = value;
+    }
+    auto corpse = std::make_shared<CorpseModel>();
+    corpse->vnum = 0;
+    corpse->name = "corpse";
+    corpse->article = "a";
+    corpse->shortdesc = "the corpse of " + race->getShortDescription();
+    for (auto key : SplitString(race->name, " "))
+    {
+        corpse->keys.emplace_back(key);
+    }
+    corpse->keys.emplace_back("corpse");
+    corpse->modelFlags = 0;
+    corpse->tileSet = race->tileSet;
+    corpse->tileId = race->tileId;
+    corpse->description = result->getNextString();
+    // Retrieve and set the values.
+    corpse->corpseRace = race;
+    auto corpseCompositionVnum = result->getNextUnsignedInteger();
+    auto corpseComposition = Mud::instance().findMaterial(
+        corpseCompositionVnum);
+    if (corpseComposition == nullptr)
+    {
+        throw SQLiteException("Cannot find the material " +
+            ToString(corpseCompositionVnum) +
+            " for a corpse.");
+    }
+    corpse->corpseComposition = corpseComposition;
+    race->corpse = corpse;
     race->tileSet = result->getNextInteger();
     race->tileId = result->getNextInteger();
     // Translate new_line.
@@ -394,45 +428,6 @@ bool LoadRaceBodyPart(ResultSet *result)
     return true;
 }
 
-bool LoadRaceCorpse(ResultSet *result)
-{
-    auto raceVnum = result->getNextUnsignedInteger();
-    auto race = Mud::instance().findRace(raceVnum);
-    if (race == nullptr)
-    {
-        throw SQLiteException("Cannot find the race " +
-            ToString(raceVnum));
-    }
-    auto corpse = std::make_shared<CorpseModel>();
-    corpse->vnum = 0;
-    corpse->name = "corpse";
-    corpse->article = "a";
-    corpse->shortdesc = "the corpse of " + race->getShortDescription();
-    for (auto key : SplitString(race->name, " "))
-    {
-        corpse->keys.emplace_back(key);
-    }
-    corpse->keys.emplace_back("corpse");
-    corpse->modelFlags = 0;
-    corpse->tileSet = race->tileSet;
-    corpse->tileId = race->tileId;
-    corpse->description = result->getNextString();
-    // Retrieve and set the values.
-    corpse->corpseRace = race;
-    auto corpseCompositionVnum = result->getNextUnsignedInteger();
-    auto corpseComposition = Mud::instance().findMaterial(
-        corpseCompositionVnum);
-    if (corpseComposition == nullptr)
-    {
-        throw SQLiteException("Cannot find the material " +
-            ToString(corpseCompositionVnum) +
-            " for a corpse.");
-    }
-    corpse->corpseComposition = corpseComposition;
-    race->corpse = corpse;
-    return true;
-}
-
 bool LoadRaceBaseSkill(ResultSet *result)
 {
     auto raceVnum = result->getNextUnsignedInteger();
@@ -459,31 +454,6 @@ bool LoadRaceBaseSkill(ResultSet *result)
                 Align(race->name, align::left, 25),
                 Align(skill->name, align::left, 25),
                 skillLevel);
-    return true;
-}
-
-bool LoadRaceBaseAbility(ResultSet *result)
-{
-    result->getNextUnsignedInteger(); // Skip ID
-    auto raceVnum = result->getNextUnsignedInteger();
-    auto race = Mud::instance().findRace(raceVnum);
-    if (race == nullptr)
-    {
-        throw SQLiteException("Cannot find the race " + ToString(raceVnum));
-    }
-    unsigned value;
-    for (Ability it = Ability::Strength; it <= Ability::Intelligence; ++ it)
-    {
-        value = result->getNextUnsignedInteger();
-        // Set the base ability value of the race.
-        race->abilities[it] = value;
-        // Log the ability.
-        Logger::log(LogLevel::Debug,
-                    "\t%s%s%s",
-                    Align(race->name, align::left, 25),
-                    Align(it.toString(), align::left, 25),
-                    value);
-    }
     return true;
 }
 

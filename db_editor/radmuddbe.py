@@ -31,6 +31,9 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mdl_building_tool = None
         self.mdl_mobile = None
         self.mdl_mobile_spawn = None
+        self.mdl_race = None
+        self.mdl_race_skill = None
+        self.mdl_race_body_part = None
 
         self.setupUi(self)
 
@@ -246,6 +249,46 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_mobile_spawn.setModel(self.mdl_mobile_spawn)
         self.tbl_mobile_spawn.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_mobile_spawn))
 
+        # === MOBILE ==========================================================
+        self.mdl_race = QtSql.QSqlRelationalTableModel()
+        self.mdl_race.setTable('race')
+        self.mdl_race.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_race.select()
+
+        self.tbl_race.setModel(self.mdl_race)
+        self.tbl_race.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_race))
+        self.tbl_race.clicked.connect(self.race_clicked)
+        self.tbl_race.keyPressEvent = self.race_key_press_event
+
+        self.mdl_race_skill = QtSql.QSqlRelationalTableModel()
+        self.mdl_race_skill.setTable('racebaseskill')
+        self.mdl_race_skill.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_race_skill.setHeaderData(self.mdl_race_skill.fieldIndex("race"), QtCore.Qt.Horizontal, "race")
+        self.mdl_race_skill.setRelation(self.mdl_race_skill.fieldIndex("race"),
+                                        QtSql.QSqlRelation("race", "vnum", "name"))
+        self.mdl_race_skill.setHeaderData(self.mdl_race_skill.fieldIndex("skill"), QtCore.Qt.Horizontal, "skill")
+        self.mdl_race_skill.setRelation(self.mdl_race_skill.fieldIndex("skill"),
+                                        QtSql.QSqlRelation("skill", "vnum", "name"))
+        self.mdl_race_skill.select()
+
+        self.tbl_race_skill.setModel(self.mdl_race_skill)
+        self.tbl_race_skill.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_race_skill))
+
+        self.mdl_race_body_part = QtSql.QSqlRelationalTableModel()
+        self.mdl_race_body_part.setTable('racebodypart')
+        self.mdl_race_body_part.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_race_body_part.setHeaderData(self.mdl_race_body_part.fieldIndex("race"), QtCore.Qt.Horizontal, "race")
+        self.mdl_race_body_part.setRelation(self.mdl_race_body_part.fieldIndex("race"),
+                                            QtSql.QSqlRelation("race", "vnum", "name"))
+        self.mdl_race_body_part.setHeaderData(self.mdl_race_body_part.fieldIndex("bodypart"), QtCore.Qt.Horizontal,
+                                              "bodypart")
+        self.mdl_race_body_part.setRelation(self.mdl_race_body_part.fieldIndex("bodypart"),
+                                            QtSql.QSqlRelation("bodypart", "vnum", "name"))
+        self.mdl_race_body_part.select()
+
+        self.tbl_race_body_part.setModel(self.mdl_race_body_part)
+        self.tbl_race_body_part.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_race_body_part))
+
     def bodypart_clicked(self, current):
         vnum = self.mdl_bodypart.data(self.mdl_bodypart.index(current.row(), 0))
         self.mdl_bodypart_resources.setFilter("BodyPartResources.bodyPart = {}".format(vnum))
@@ -299,6 +342,23 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tbl_mobile.clearSelection()
             self.mdl_mobile_spawn.setFilter("")
             self.mdl_mobile_spawn.select()
+            self.update_status_bar("")
+
+    def race_clicked(self, current):
+        vnum = self.mdl_race.data(self.mdl_race.index(current.row(), 0))
+
+        self.mdl_race_skill.setFilter("race = {}".format(vnum))
+        self.mdl_race_skill.select()
+        self.mdl_race_body_part.setFilter("race = {}".format(vnum))
+        self.mdl_race_body_part.select()
+
+        self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
+
+    def race_key_press_event(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.tbl_race.clearSelection()
+            self.mdl_race_skill.setFilter("")
+            self.mdl_race_body_part.setFilter("")
             self.update_status_bar("")
 
 

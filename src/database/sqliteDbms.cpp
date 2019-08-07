@@ -54,9 +54,7 @@ SQLiteDbms::SQLiteDbms() : dbConnection(), loaders()
 	loaders.emplace_back(TableLoader("Faction", LoadFaction));
 	loaders.emplace_back(TableLoader("Race", LoadRace));
 	loaders.emplace_back(TableLoader("RaceBaseSkill", LoadRaceBaseSkill));
-	loaders.emplace_back(TableLoader("RaceBaseAbility", LoadRaceBaseAbility));
 	loaders.emplace_back(TableLoader("RaceBodyPart", LoadRaceBodyPart));
-	loaders.emplace_back(TableLoader("RaceCorpse", LoadRaceCorpse));
 	loaders.emplace_back(TableLoader("Liquid", LoadLiquid));
 	loaders.emplace_back(TableLoader("Item", LoadItem));
 	loaders.emplace_back(TableLoader("ItemContent", LoadContent));

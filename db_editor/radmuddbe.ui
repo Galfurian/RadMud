@@ -280,37 +280,19 @@
            </widget>
           </item>
           <item>
-           <widget class="QTableView" name="tbl_race"/>
+           <widget class="QTableView" name="tbl_race">
+            <attribute name="verticalHeaderDefaultSectionSize">
+             <number>50</number>
+            </attribute>
+            <attribute name="verticalHeaderMinimumSectionSize">
+             <number>30</number>
+            </attribute>
+           </widget>
           </item>
          </layout>
         </item>
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_21">
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_17">
-            <item>
-             <widget class="QLabel" name="label_14">
-              <property name="font">
-               <font>
-                <pointsize>14</pointsize>
-               </font>
-              </property>
-              <property name="text">
-               <string>Race (Ability)</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="margin">
-               <number>2</number>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTableView" name="tbl_race_ability"/>
-            </item>
-           </layout>
-          </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_18">
             <item>
