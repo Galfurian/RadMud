@@ -74,4 +74,16 @@ public:
     /// @param _value The total ability value.
     /// @return The ability modifier.
     static unsigned int getModifier(const unsigned int & _value);
+
+    inline Ability &operator++()
+    {
+        ++value;
+        return (*this);
+    }
+
+    inline Ability &operator--()
+    {
+        --value;
+        return (*this);
+    }
 };

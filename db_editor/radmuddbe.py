@@ -76,171 +76,175 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def setup_tables(self):
         # === MODEL ===========================================================
-        mdl = self.mdl_model
-        tbl = self.tbl_model
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('model')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("type"), QtCore.Qt.Horizontal, "type")
-        mdl.setHeaderData(mdl.fieldIndex("material"), QtCore.Qt.Horizontal, "material")
-        mdl.setRelation(mdl.fieldIndex("type"), QtSql.QSqlRelation("ModelType", "id", "name"))
-        mdl.setRelation(mdl.fieldIndex("material"), QtSql.QSqlRelation("MaterialType", "id", "name"))
-        mdl.select()
+        self.mdl_model = QtSql.QSqlRelationalTableModel()
+        self.mdl_model.setTable('model')
+        self.mdl_model.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_model.setHeaderData(self.mdl_model.fieldIndex("type"), QtCore.Qt.Horizontal, "type")
+        self.mdl_model.setHeaderData(self.mdl_model.fieldIndex("material"), QtCore.Qt.Horizontal, "material")
+        self.mdl_model.setRelation(self.mdl_model.fieldIndex("type"), QtSql.QSqlRelation("ModelType", "id", "name"))
+        self.mdl_model.setRelation(self.mdl_model.fieldIndex("material"),
+                                   QtSql.QSqlRelation("MaterialType", "id", "name"))
+        self.mdl_model.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_model.setModel(self.mdl_model)
+        self.tbl_model.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_model))
 
         # === MATERIAL ========================================================
-        mdl = self.mdl_material
-        tbl = self.tbl_material
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('material')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("type"), QtCore.Qt.Horizontal, "type")
-        mdl.setRelation(mdl.fieldIndex("type"), QtSql.QSqlRelation("MaterialType", "id", "name"))
-        mdl.select()
+        self.mdl_material = QtSql.QSqlRelationalTableModel()
+        self.mdl_material.setTable('material')
+        self.mdl_material.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_material.setHeaderData(self.mdl_material.fieldIndex("type"), QtCore.Qt.Horizontal, "type")
+        self.mdl_material.setRelation(self.mdl_material.fieldIndex("type"),
+                                      QtSql.QSqlRelation("MaterialType", "id", "name"))
+        self.mdl_material.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_material.setModel(self.mdl_material)
+        self.tbl_material.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_material))
 
         # === CURRENCY ========================================================
-        mdl = self.mdl_currency
-        tbl = self.tbl_currency
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('currency')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("model"), QtCore.Qt.Horizontal, "model")
-        mdl.setHeaderData(mdl.fieldIndex("material"), QtCore.Qt.Horizontal, "material")
-        mdl.setRelation(mdl.fieldIndex("model"), QtSql.QSqlRelation("model", "vnum", "name"))
-        mdl.setRelation(mdl.fieldIndex("material"), QtSql.QSqlRelation("material", "vnum", "name"))
-        mdl.select()
+        self.mdl_currency = QtSql.QSqlRelationalTableModel()
+        self.mdl_currency.setTable('currency')
+        self.mdl_currency.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_currency.setHeaderData(self.mdl_currency.fieldIndex("model"), QtCore.Qt.Horizontal, "model")
+        self.mdl_currency.setHeaderData(self.mdl_currency.fieldIndex("material"), QtCore.Qt.Horizontal, "material")
+        self.mdl_currency.setRelation(self.mdl_currency.fieldIndex("model"),
+                                      QtSql.QSqlRelation("model", "vnum", "name"))
+        self.mdl_currency.setRelation(self.mdl_currency.fieldIndex("material"),
+                                      QtSql.QSqlRelation("material", "vnum", "name"))
+        self.mdl_currency.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_currency.setModel(self.mdl_currency)
+        self.tbl_currency.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_currency))
 
         # === BODYPART ========================================================
-        mdl = self.mdl_bodypart
-        tbl = self.tbl_bodypart
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('BodyPart')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.select()
+        self.mdl_bodypart = QtSql.QSqlRelationalTableModel()
+        self.mdl_bodypart.setTable('BodyPart')
+        self.mdl_bodypart.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_bodypart.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
-        tbl.clicked.connect(self.bodypart_clicked)
-        tbl.keyPressEvent = self.bodypart_key_press_event
+        self.tbl_bodypart.setModel(self.mdl_bodypart)
+        self.tbl_bodypart.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_bodypart))
+        self.tbl_bodypart.clicked.connect(self.bodypart_clicked)
+        self.tbl_bodypart.keyPressEvent = self.bodypart_key_press_event
 
-        mdl = self.mdl_bodypart_resources
-        tbl = self.tbl_bodypart_resources
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('BodyPartResources')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("bodyPart"), QtCore.Qt.Horizontal, "bodyPart")
-        mdl.setHeaderData(mdl.fieldIndex("resourceModel"), QtCore.Qt.Horizontal, "resourceModel")
-        mdl.setHeaderData(mdl.fieldIndex("material"), QtCore.Qt.Horizontal, "material")
-        mdl.setRelation(mdl.fieldIndex("bodyPart"), QtSql.QSqlRelation("BodyPart", "vnum", "name"))
-        mdl.setRelation(mdl.fieldIndex("resourceModel"), QtSql.QSqlRelation("Model", "vnum", "name"))
-        mdl.setRelation(mdl.fieldIndex("material"), QtSql.QSqlRelation("Material", "vnum", "name"))
-        mdl.select()
+        self.mdl_bodypart_resources = QtSql.QSqlRelationalTableModel()
+        self.mdl_bodypart_resources.setTable('BodyPartResources')
+        self.mdl_bodypart_resources.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_bodypart_resources.setHeaderData(self.mdl_bodypart_resources.fieldIndex("bodyPart"),
+                                                  QtCore.Qt.Horizontal, "bodyPart")
+        self.mdl_bodypart_resources.setHeaderData(self.mdl_bodypart_resources.fieldIndex("resourceModel"),
+                                                  QtCore.Qt.Horizontal, "resourceModel")
+        self.mdl_bodypart_resources.setHeaderData(self.mdl_bodypart_resources.fieldIndex("material"),
+                                                  QtCore.Qt.Horizontal, "material")
+        self.mdl_bodypart_resources.setRelation(self.mdl_bodypart_resources.fieldIndex("bodyPart"),
+                                                QtSql.QSqlRelation("BodyPart", "vnum", "name"))
+        self.mdl_bodypart_resources.setRelation(self.mdl_bodypart_resources.fieldIndex("resourceModel"),
+                                                QtSql.QSqlRelation("Model", "vnum", "name"))
+        self.mdl_bodypart_resources.setRelation(self.mdl_bodypart_resources.fieldIndex("material"),
+                                                QtSql.QSqlRelation("Material", "vnum", "name"))
+        self.mdl_bodypart_resources.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_bodypart_resources.setModel(self.mdl_bodypart_resources)
+        self.tbl_bodypart_resources.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_bodypart_resources))
 
-        mdl = self.mdl_bodypart_weapon
-        tbl = self.tbl_bodypart_weapon
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('BodyPartWeapon')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("bodyPart"), QtCore.Qt.Horizontal, "bodyPart")
-        mdl.setRelation(mdl.fieldIndex("bodyPart"), QtSql.QSqlRelation("BodyPart", "vnum", "name"))
-        mdl.select()
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.mdl_bodypart_weapon = QtSql.QSqlRelationalTableModel()
+        self.mdl_bodypart_weapon.setTable('BodyPartWeapon')
+        self.mdl_bodypart_weapon.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_bodypart_weapon.setHeaderData(self.mdl_bodypart_weapon.fieldIndex("bodyPart"), QtCore.Qt.Horizontal,
+                                               "bodyPart")
+        self.mdl_bodypart_weapon.setRelation(self.mdl_bodypart_weapon.fieldIndex("bodyPart"),
+                                             QtSql.QSqlRelation("BodyPart", "vnum", "name"))
+        self.mdl_bodypart_weapon.select()
+        self.tbl_bodypart_weapon.setModel(self.mdl_bodypart_weapon)
+        self.tbl_bodypart_weapon.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_bodypart_weapon))
 
         # === BUILDING ========================================================
-        mdl = self.mdl_building
-        tbl = self.tbl_building
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('building')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("model"), QtCore.Qt.Horizontal, "model")
-        mdl.setRelation(mdl.fieldIndex("model"), QtSql.QSqlRelation("Model", "vnum", "name"))
-        mdl.select()
+        self.mdl_building = QtSql.QSqlRelationalTableModel()
+        self.mdl_building.setTable('building')
+        self.mdl_building.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_building.setHeaderData(self.mdl_building.fieldIndex("model"), QtCore.Qt.Horizontal, "model")
+        self.mdl_building.setRelation(self.mdl_building.fieldIndex("model"),
+                                      QtSql.QSqlRelation("Model", "vnum", "name"))
+        self.mdl_building.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
-        tbl.clicked.connect(self.building_clicked)
-        tbl.keyPressEvent = self.building_key_press_event
+        self.tbl_building.setModel(self.mdl_building)
+        self.tbl_building.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_building))
+        self.tbl_building.clicked.connect(self.building_clicked)
+        self.tbl_building.keyPressEvent = self.building_key_press_event
 
-        mdl = self.mdl_building_ingredient
-        tbl = self.tbl_building_ingredient
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('BuildingIngredient')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("building"), QtCore.Qt.Horizontal, "building")
-        mdl.setHeaderData(mdl.fieldIndex("resource"), QtCore.Qt.Horizontal, "resource")
-        mdl.setRelation(mdl.fieldIndex("building"), QtSql.QSqlRelation("building", "vnum", "name"))
-        mdl.setRelation(mdl.fieldIndex("resource"), QtSql.QSqlRelation("resourcetype", "id", "name"))
-        mdl.select()
+        self.mdl_building_ingredient = QtSql.QSqlRelationalTableModel()
+        self.mdl_building_ingredient.setTable('BuildingIngredient')
+        self.mdl_building_ingredient.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_building_ingredient.setHeaderData(self.mdl_building_ingredient.fieldIndex("building"),
+                                                   QtCore.Qt.Horizontal, "building")
+        self.mdl_building_ingredient.setHeaderData(self.mdl_building_ingredient.fieldIndex("resource"),
+                                                   QtCore.Qt.Horizontal, "resource")
+        self.mdl_building_ingredient.setRelation(self.mdl_building_ingredient.fieldIndex("building"),
+                                                 QtSql.QSqlRelation("building", "vnum", "name"))
+        self.mdl_building_ingredient.setRelation(self.mdl_building_ingredient.fieldIndex("resource"),
+                                                 QtSql.QSqlRelation("resourcetype", "id", "name"))
+        self.mdl_building_ingredient.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_building_ingredient.setModel(self.mdl_building_ingredient)
+        self.tbl_building_ingredient.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_building_ingredient))
 
-        mdl = self.mdl_building_knowledge
-        tbl = self.tbl_building_knowledge
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('BuildingKnowledge')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("building"), QtCore.Qt.Horizontal, "building")
-        mdl.setHeaderData(mdl.fieldIndex("knowledge"), QtCore.Qt.Horizontal, "knowledge")
-        mdl.setRelation(mdl.fieldIndex("building"), QtSql.QSqlRelation("building", "vnum", "name"))
-        mdl.setRelation(mdl.fieldIndex("knowledge"), QtSql.QSqlRelation("knowledge", "id", "name"))
-        mdl.select()
+        self.mdl_building_knowledge = QtSql.QSqlRelationalTableModel()
+        self.mdl_building_knowledge.setTable('BuildingKnowledge')
+        self.mdl_building_knowledge.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_building_knowledge.setHeaderData(self.mdl_building_knowledge.fieldIndex("building"),
+                                                  QtCore.Qt.Horizontal, "building")
+        self.mdl_building_knowledge.setHeaderData(self.mdl_building_knowledge.fieldIndex("knowledge"),
+                                                  QtCore.Qt.Horizontal, "knowledge")
+        self.mdl_building_knowledge.setRelation(self.mdl_building_knowledge.fieldIndex("building"),
+                                                QtSql.QSqlRelation("building", "vnum", "name"))
+        self.mdl_building_knowledge.setRelation(self.mdl_building_knowledge.fieldIndex("knowledge"),
+                                                QtSql.QSqlRelation("knowledge", "id", "name"))
+        self.mdl_building_knowledge.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_building_knowledge.setModel(self.mdl_building_knowledge)
+        self.tbl_building_knowledge.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_building_knowledge))
 
-        mdl = self.mdl_building_tool
-        tbl = self.tbl_building_tool
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('buildingtool')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("building"), QtCore.Qt.Horizontal, "building")
-        mdl.setHeaderData(mdl.fieldIndex("tool"), QtCore.Qt.Horizontal, "tool")
-        mdl.setRelation(mdl.fieldIndex("building"), QtSql.QSqlRelation("building", "vnum", "name"))
-        mdl.setRelation(mdl.fieldIndex("tool"), QtSql.QSqlRelation("tooltype", "id", "name"))
-        mdl.select()
+        self.mdl_building_tool = QtSql.QSqlRelationalTableModel()
+        self.mdl_building_tool.setTable('buildingtool')
+        self.mdl_building_tool.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_building_tool.setHeaderData(self.mdl_building_tool.fieldIndex("building"), QtCore.Qt.Horizontal,
+                                             "building")
+        self.mdl_building_tool.setHeaderData(self.mdl_building_tool.fieldIndex("tool"), QtCore.Qt.Horizontal, "tool")
+        self.mdl_building_tool.setRelation(self.mdl_building_tool.fieldIndex("building"),
+                                           QtSql.QSqlRelation("building", "vnum", "name"))
+        self.mdl_building_tool.setRelation(self.mdl_building_tool.fieldIndex("tool"),
+                                           QtSql.QSqlRelation("tooltype", "id", "name"))
+        self.mdl_building_tool.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_building_tool.setModel(self.mdl_building_tool)
+        self.tbl_building_tool.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_building_tool))
 
         # === MOBILE ==========================================================
-        mdl = self.mdl_mobile
-        tbl = self.tbl_mobile
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('mobilemodel')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("race"), QtCore.Qt.Horizontal, "race")
-        mdl.setHeaderData(mdl.fieldIndex("faction"), QtCore.Qt.Horizontal, "faction")
-        mdl.setRelation(mdl.fieldIndex("race"), QtSql.QSqlRelation("race", "vnum", "name"))
-        mdl.setRelation(mdl.fieldIndex("faction"), QtSql.QSqlRelation("faction", "vnum", "name"))
-        mdl.select()
+        self.mdl_mobile = QtSql.QSqlRelationalTableModel()
+        self.mdl_mobile.setTable('mobilemodel')
+        self.mdl_mobile.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_mobile.setHeaderData(self.mdl_mobile.fieldIndex("race"), QtCore.Qt.Horizontal, "race")
+        self.mdl_mobile.setHeaderData(self.mdl_mobile.fieldIndex("faction"), QtCore.Qt.Horizontal, "faction")
+        self.mdl_mobile.setRelation(self.mdl_mobile.fieldIndex("race"), QtSql.QSqlRelation("race", "vnum", "name"))
+        self.mdl_mobile.setRelation(self.mdl_mobile.fieldIndex("faction"),
+                                    QtSql.QSqlRelation("faction", "vnum", "name"))
+        self.mdl_mobile.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_mobile.setModel(self.mdl_mobile)
+        self.tbl_mobile.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_mobile))
+        self.tbl_mobile.clicked.connect(self.mobile_clicked)
+        self.tbl_mobile.keyPressEvent = self.mobile_key_press_event
 
-        mdl = self.mdl_mobile_spawn
-        tbl = self.tbl_mobile_spawn
-        mdl = QtSql.QSqlRelationalTableModel()
-        mdl.setTable('mobilespawn')
-        mdl.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        mdl.setHeaderData(mdl.fieldIndex("mobile"), QtCore.Qt.Horizontal, "mobile")
-        mdl.setRelation(mdl.fieldIndex("mobile"), QtSql.QSqlRelation("mobilemodel", "vnum", "propnoun"))
-        mdl.select()
+        self.mdl_mobile_spawn = QtSql.QSqlRelationalTableModel()
+        self.mdl_mobile_spawn.setTable('mobilespawn')
+        self.mdl_mobile_spawn.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        self.mdl_mobile_spawn.setHeaderData(self.mdl_mobile_spawn.fieldIndex("mobile"), QtCore.Qt.Horizontal, "mobile")
+        self.mdl_mobile_spawn.setRelation(self.mdl_mobile_spawn.fieldIndex("mobile"),
+                                          QtSql.QSqlRelation("mobilemodel", "vnum", "propnoun"))
+        self.mdl_mobile_spawn.select()
 
-        tbl.setModel(mdl)
-        tbl.setItemDelegate(QtSql.QSqlRelationalDelegate(tbl))
+        self.tbl_mobile_spawn.setModel(self.mdl_mobile_spawn)
+        self.tbl_mobile_spawn.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_mobile_spawn))
 
     def bodypart_clicked(self, current):
         vnum = self.mdl_bodypart.data(self.mdl_bodypart.index(current.row(), 0))
@@ -280,6 +284,21 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
             self.mdl_building_knowledge.select()
             self.mdl_building_tool.setFilter("")
             self.mdl_building_tool.select()
+            self.update_status_bar("")
+
+    def mobile_clicked(self, current):
+        vnum = self.mdl_mobile.data(self.mdl_mobile.index(current.row(), 0))
+
+        self.mdl_mobile_spawn.setFilter("mobile = {}".format(vnum))
+        self.mdl_mobile_spawn.select()
+
+        self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
+
+    def mobile_key_press_event(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.tbl_mobile.clearSelection()
+            self.mdl_mobile_spawn.setFilter("")
+            self.mdl_mobile_spawn.select()
             self.update_status_bar("")
 
 
