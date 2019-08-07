@@ -232,6 +232,34 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_production.clicked.connect(self.production_clicked)
         self.tbl_production.keyPressEvent = self.race_key_press_event
 
+        self.mdl_production_ingredient = self.init_model('productioningredient')
+        self.set_relation(self.mdl_production_ingredient, "production", "production", "vnum", "name")
+        self.set_relation(self.mdl_production_ingredient, "ingredient", "resourcetype", "id", "name")
+        self.mdl_production_ingredient.select()
+        self.tbl_production_ingredient.setModel(self.mdl_production_ingredient)
+        self.tbl_production_ingredient.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_production_ingredient))
+
+        self.mdl_production_tool = self.init_model('productiontool')
+        self.set_relation(self.mdl_production_tool, "production", "production", "vnum", "name")
+        self.set_relation(self.mdl_production_tool, "tool", "tooltype", "id", "name")
+        self.mdl_production_tool.select()
+        self.tbl_production_tool.setModel(self.mdl_production_tool)
+        self.tbl_production_tool.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_production_tool))
+
+        self.mdl_production_knowledge = self.init_model('productionknowledge')
+        self.set_relation(self.mdl_production_knowledge, "production", "production", "vnum", "name")
+        self.set_relation(self.mdl_production_knowledge, "knowledge", "knowledge", "id", "name")
+        self.mdl_production_knowledge.select()
+        self.tbl_production_knowledge.setModel(self.mdl_production_knowledge)
+        self.tbl_production_knowledge.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_production_knowledge))
+
+        self.mdl_production_outcome = self.init_model('productionoutcome')
+        self.set_relation(self.mdl_production_outcome, "production", "production", "vnum", "name")
+        self.set_relation(self.mdl_production_outcome, "outcome", "model", "vnum", "name")
+        self.mdl_production_outcome.select()
+        self.tbl_production_outcome.setModel(self.mdl_production_outcome)
+        self.tbl_production_outcome.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_production_outcome))
+
     def bodypart_clicked(self, current):
         vnum = self.mdl_bodypart.data(self.mdl_bodypart.index(current.row(), 0))
         self.mdl_bodypart_resources.setFilter("BodyPartResources.bodyPart = {}".format(vnum))
@@ -306,13 +334,19 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def production_clicked(self, current):
         vnum = self.mdl_production.data(self.mdl_production.index(current.row(), 0))
-        # self.mdl_race_skill.setFilter("production = {}".format(vnum))
+        self.mdl_production_ingredient.setFilter("production = {}".format(vnum))
+        self.mdl_production_tool.setFilter("production = {}".format(vnum))
+        self.mdl_production_knowledge.setFilter("production = {}".format(vnum))
+        self.mdl_production_outcome.setFilter("production = {}".format(vnum))
         self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
 
     def production_key_press_event(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             self.tbl_production.clearSelection()
-            # self.mdl_production_skill.setFilter("")
+            self.mdl_production_ingredient.setFilter("")
+            self.mdl_production_tool.setFilter("")
+            self.mdl_production_knowledge.setFilter("")
+            self.mdl_production_outcome.setFilter("")
             self.update_status_bar("")
 
 

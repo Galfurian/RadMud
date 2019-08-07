@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>5</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="tab_1">
        <attribute name="title">
@@ -281,11 +281,11 @@
           </item>
           <item>
            <widget class="QTableView" name="tbl_race">
-            <attribute name="verticalHeaderDefaultSectionSize">
-             <number>50</number>
-            </attribute>
             <attribute name="verticalHeaderMinimumSectionSize">
              <number>30</number>
+            </attribute>
+            <attribute name="verticalHeaderDefaultSectionSize">
+             <number>50</number>
             </attribute>
            </widget>
           </item>
@@ -651,7 +651,7 @@
      <x>0</x>
      <y>0</y>
      <width>1283</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
