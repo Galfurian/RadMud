@@ -165,12 +165,13 @@ ProcessNewAttributes::advance(Character * character, const std::string & error)
     };
     std::string msg;
     msg += "# " + Bold("Character's Attributes.") + "\n";
-    for (auto ability : player->abilities)
+    for (auto const & ability : player->abilities)
     {
         msg += "#    [" + ToString(ability.first.toUInt()) + "]";
         msg += Align(ability.first.toString(), align::left, 15);
         msg += " : ";
         msg += ToString(player->getAbility(Ability::Strength, false));
+        msg += "\n";
     }
     msg += "#\n";
     msg += "# Remaining Points: ";
