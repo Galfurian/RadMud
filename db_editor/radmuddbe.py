@@ -48,6 +48,10 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mdl_production_knowledge = None
         self.mdl_production_outcome = None
 
+        self.mdl_profession = None
+
+        self.mdl_skill = None
+
         # Setup UI
         self.setupUi(self)
 
@@ -230,7 +234,7 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_production.setModel(self.mdl_production)
         self.tbl_production.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_production))
         self.tbl_production.clicked.connect(self.production_clicked)
-        self.tbl_production.keyPressEvent = self.race_key_press_event
+        self.tbl_production.keyPressEvent = self.production_key_press_event
 
         self.mdl_production_ingredient = self.init_model('productioningredient')
         self.set_relation(self.mdl_production_ingredient, "production", "production", "vnum", "name")
@@ -259,6 +263,21 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mdl_production_outcome.select()
         self.tbl_production_outcome.setModel(self.mdl_production_outcome)
         self.tbl_production_outcome.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_production_outcome))
+
+        # === PROFESSION ======================================================
+        self.mdl_profession = self.init_model('profession')
+        self.mdl_profession.select()
+        self.tbl_profession.setModel(self.mdl_profession)
+        self.tbl_profession.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_profession))
+
+        # === SKILL ===========================================================
+        self.mdl_skill = self.init_model('skill')
+        self.set_relation(self.mdl_skill, "ability", "abilitytype", "id", "name")
+        self.mdl_skill.select()
+        self.tbl_skill.setModel(self.mdl_skill)
+        self.tbl_skill.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_skill))
+        self.tbl_skill.clicked.connect(self.skill_clicked)
+        self.tbl_skill.keyPressEvent = self.skill_key_press_event
 
     def bodypart_clicked(self, current):
         vnum = self.mdl_bodypart.data(self.mdl_bodypart.index(current.row(), 0))
@@ -347,6 +366,15 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
             self.mdl_production_tool.setFilter("")
             self.mdl_production_knowledge.setFilter("")
             self.mdl_production_outcome.setFilter("")
+            self.update_status_bar("")
+
+    def skill_clicked(self, current):
+        vnum = self.mdl_skill.data(self.mdl_skill.index(current.row(), 0))
+        self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
+
+    def skill_key_press_event(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.tbl_skill.clearSelection()
             self.update_status_bar("")
 
 
