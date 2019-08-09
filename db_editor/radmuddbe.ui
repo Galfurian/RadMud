@@ -23,7 +23,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>10</number>
+       <number>11</number>
       </property>
       <widget class="QWidget" name="tab_1">
        <attribute name="title">
@@ -191,9 +191,6 @@
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
-          <property name="margin">
-           <number>2</number>
-          </property>
          </widget>
         </item>
         <item row="0" column="1">
@@ -208,9 +205,6 @@
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
-          </property>
-          <property name="margin">
-           <number>2</number>
           </property>
          </widget>
         </item>
@@ -353,9 +347,6 @@
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <property name="margin">
-             <number>2</number>
-            </property>
            </widget>
           </item>
           <item>
@@ -398,9 +389,6 @@
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
-              <property name="margin">
-               <number>2</number>
-              </property>
              </widget>
             </item>
             <item row="2" column="0" colspan="2">
@@ -436,9 +424,6 @@
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
-              <property name="margin">
-               <number>2</number>
-              </property>
              </widget>
             </item>
            </layout>
@@ -459,9 +444,6 @@
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
-              <property name="margin">
-               <number>2</number>
-              </property>
              </widget>
             </item>
             <item row="1" column="0">
@@ -478,9 +460,6 @@
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
-              <property name="margin">
-               <number>2</number>
-              </property>
              </widget>
             </item>
             <item row="1" column="1">
@@ -496,9 +475,6 @@
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
-              </property>
-              <property name="margin">
-               <number>2</number>
               </property>
              </widget>
             </item>
@@ -559,9 +535,6 @@
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <property name="margin">
-             <number>2</number>
-            </property>
            </widget>
           </item>
           <item>
@@ -588,9 +561,6 @@
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <property name="margin">
-             <number>2</number>
-            </property>
            </widget>
           </item>
           <item row="3" column="0">
@@ -613,9 +583,6 @@
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <property name="margin">
-             <number>2</number>
-            </property>
            </widget>
           </item>
           <item row="1" column="1">
@@ -637,9 +604,6 @@
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
-            </property>
-            <property name="margin">
-             <number>2</number>
             </property>
            </widget>
           </item>
@@ -669,9 +633,6 @@
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
-            </property>
-            <property name="margin">
-             <number>2</number>
             </property>
            </widget>
           </item>
@@ -727,9 +688,6 @@
             <property name="alignment">
              <set>Qt::AlignCenter</set>
             </property>
-            <property name="margin">
-             <number>2</number>
-            </property>
            </widget>
           </item>
           <item>
@@ -758,9 +716,6 @@
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
-              <property name="margin">
-               <number>2</number>
-              </property>
              </widget>
             </item>
             <item>
@@ -783,9 +738,6 @@
               <property name="alignment">
                <set>Qt::AlignCenter</set>
               </property>
-              <property name="margin">
-               <number>2</number>
-              </property>
              </widget>
             </item>
             <item>
@@ -807,9 +759,6 @@
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
-              </property>
-              <property name="margin">
-               <number>2</number>
               </property>
              </widget>
             </item>
@@ -939,6 +888,139 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>Player</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="10,5">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_14">
+          <item>
+           <widget class="QLabel" name="label_32">
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Player</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_player">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_15">
+          <item>
+           <widget class="QLabel" name="label_33">
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Skill</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_player_skill">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_35">
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Item</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <widget class="QLabel" name="label_36">
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Model:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_player_item_model">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_player_item">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_34">
+            <property name="font">
+             <font>
+              <pointsize>14</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Variable</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_player_variable">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -949,7 +1031,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>27</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -957,10 +1039,6 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
-    <addaction name="separator"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionClose"/>
-    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -976,6 +1054,9 @@
    <property name="text">
     <string>Open</string>
    </property>
+   <property name="statusTip">
+    <string>Open database</string>
+   </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
    </property>
@@ -983,6 +1064,9 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="statusTip">
+    <string>Close the editor</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>

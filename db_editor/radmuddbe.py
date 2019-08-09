@@ -61,15 +61,16 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mdl_area_list = None
         self.mdl_room = None
 
+        self.mdl_player = None
+        self.mdl_player_skill = None
+        self.mdl_player_item = None
+        self.mdl_player_variable = None
+
+        self.item_player_pindex = QtCore.QModelIndex()
+
         # Setup UI
         self.setupUi(self)
-
-        self.actionExit.setShortcut("Ctrl+Q")
-        self.actionExit.setStatusTip('Close the editor')
         self.actionExit.triggered.connect(self.close_application)
-
-        self.actionOpen.setShortcut("Ctrl+O")
-        self.actionOpen.setStatusTip('Open database')
         self.actionOpen.triggered.connect(self.on_click_open_database)
 
         self.open_database("../system/radmud.db")
@@ -108,6 +109,13 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
     def init_model(name):
         model = QtSql.QSqlRelationalTableModel()
         model.setTable(name)
+        model.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        return model
+
+    @staticmethod
+    def init_model_query(query):
+        model = QtSql.QSqlRelationalTableModel()
+        model.setQuery(query)
         model.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
         return model
 
@@ -345,6 +353,37 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_room.setModel(self.mdl_room)
         self.tbl_room.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_room))
 
+        # === PLAYER ==========================================================
+        self.mdl_player = self.init_model('player')
+        self.mdl_player.select()
+        self.tbl_player.setModel(self.mdl_player)
+        self.tbl_player.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_player))
+        self.tbl_player.clicked.connect(self.player_clicked)
+        self.tbl_player.keyPressEvent = self.player_key_press_event
+
+        self.mdl_player_skill = self.init_model('playerskill')
+        self.set_relation(self.mdl_player_skill, "skill", "skill", "vnum", "name")
+        self.mdl_player_skill.select()
+        self.tbl_player_skill.setModel(self.mdl_player_skill)
+        self.tbl_player_skill.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_player_skill))
+
+        self.mdl_player_item = self.init_model('itemplayer')
+        self.set_relation(self.mdl_player_item, "position", "bodypart", "vnum", "name")
+        self.mdl_player_item.select()
+        self.tbl_player_item.setModel(self.mdl_player_item)
+        self.tbl_player_item.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_player_item))
+        # self.tbl_player_item.clicked.connect(self.player_item_clicked)
+        self.tbl_player_item.setMouseTracking(True)
+        self.tbl_player_item.mouseMoveEvent = self.item_player_mouse_move_event
+
+        self.mdl_player_variable = self.init_model('playervariable')
+        self.mdl_player_variable.select()
+        self.tbl_player_variable.setModel(self.mdl_player_variable)
+        self.tbl_player_variable.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_player_variable))
+
+    def handleItemEntered(self, item):
+        print("casso")
+
     def bodypart_clicked(self, current):
         vnum = self.mdl_bodypart.data(self.mdl_bodypart.index(current.row(), 0))
         self.mdl_bodypart_resources.setFilter("BodyPartResources.bodyPart = {}".format(vnum))
@@ -463,6 +502,32 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
             self.mdl_area_list.setFilter("")
             self.mdl_room.setFilter("")
             self.update_status_bar("")
+
+    def player_clicked(self, current):
+        name = self.mdl_player.data(self.mdl_player.index(current.row(), 0))
+        self.mdl_player_skill.setFilter("player = '{}'".format(name))
+        self.mdl_player_item.setFilter("owner = '{}'".format(name))
+        self.mdl_player_variable.setFilter("player = '{}'".format(name))
+        self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
+
+    def player_key_press_event(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.tbl_player.clearSelection()
+            self.mdl_player_skill.setFilter("")
+            self.mdl_player_item.setFilter("")
+            self.mdl_player_variable.setFilter("")
+            self.update_status_bar("")
+
+    def item_player_mouse_move_event(self, event):
+        index = QtCore.QModelIndex(QtCore.QPersistentModelIndex(self.tbl_player_item.indexAt(event.pos())))
+        if index != self.item_player_pindex:
+            self.item_player_pindex = index
+            item_index = self.mdl_player_item.fieldIndex("item")
+            vnum = self.mdl_player_item.data(self.mdl_player_item.index(index.row(), item_index))
+            query = QtSql.QSqlQuery()
+            query.exec("SELECT name FROM Model WHERE vnum = (SELECT model FROM Item WHERE Item.vnum = {})".format(vnum))
+            if query.next():
+                self.label_player_item_model.setText("{}".format(query.value(0)))
 
 
 if __name__ == "__main__":
