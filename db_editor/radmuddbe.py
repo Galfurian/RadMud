@@ -57,6 +57,10 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mdl_skill_ability_modifier = None
         self.mdl_skill_status_modifier = None
 
+        self.mdl_area = None
+        self.mdl_area_list = None
+        self.mdl_room = None
+
         # Setup UI
         self.setupUi(self)
 
@@ -321,6 +325,26 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_skill_status_modifier.setModel(self.mdl_skill_status_modifier)
         self.tbl_skill_status_modifier.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_skill_status_modifier))
 
+        # === AREA ============================================================
+        self.mdl_area = self.init_model('area')
+        self.mdl_area.select()
+        self.tbl_area.setModel(self.mdl_area)
+        self.tbl_area.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_area))
+        self.tbl_area.clicked.connect(self.area_clicked)
+        self.tbl_area.keyPressEvent = self.area_key_press_event
+
+        self.mdl_area_list = self.init_model('arealist')
+        self.set_relation(self.mdl_area_list, "area", "area", "vnum", "name")
+        self.mdl_area_list.select()
+        self.tbl_area_list.setModel(self.mdl_area_list)
+        self.tbl_area_list.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_area_list))
+
+        self.mdl_room = self.init_model('room')
+        self.set_relation(self.mdl_room, "terrain", "terrain", "vnum", "name")
+        self.mdl_room.select()
+        self.tbl_room.setModel(self.mdl_room)
+        self.tbl_room.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_room))
+
     def bodypart_clicked(self, current):
         vnum = self.mdl_bodypart.data(self.mdl_bodypart.index(current.row(), 0))
         self.mdl_bodypart_resources.setFilter("BodyPartResources.bodyPart = {}".format(vnum))
@@ -378,12 +402,10 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def race_clicked(self, current):
         vnum = self.mdl_race.data(self.mdl_race.index(current.row(), 0))
-
         self.mdl_race_skill.setFilter("race = {}".format(vnum))
         self.mdl_race_skill.select()
         self.mdl_race_body_part.setFilter("race = {}".format(vnum))
         self.mdl_race_body_part.select()
-
         self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
 
     def race_key_press_event(self, event):
@@ -427,6 +449,19 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
             self.mdl_skill_combat_modifier.setFilter("")
             self.mdl_skill_ability_modifier.setFilter("")
             self.mdl_skill_status_modifier.setFilter("")
+            self.update_status_bar("")
+
+    def area_clicked(self, current):
+        vnum = self.mdl_area.data(self.mdl_area.index(current.row(), 0))
+        self.mdl_area_list.setFilter("area = {}".format(vnum))
+        self.mdl_room.setFilter("room.vnum IN (SELECT room AS vnum FROM AreaList WHERE area = {})".format(vnum))
+        self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
+
+    def area_key_press_event(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.tbl_area.clearSelection()
+            self.mdl_area_list.setFilter("")
+            self.mdl_room.setFilter("")
             self.update_status_bar("")
 
 
