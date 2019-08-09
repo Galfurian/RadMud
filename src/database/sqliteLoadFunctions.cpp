@@ -61,7 +61,7 @@ bool LoadNews(ResultSet *result)
     return true;
 }
 
-bool LoadContent(ResultSet *result)
+bool LoadItemContent(ResultSet *result)
 {
     auto container = Mud::instance().findItem(result->getNextUnsignedInteger());
     if (container == nullptr)
@@ -955,7 +955,7 @@ bool LoadLiquid(ResultSet *result)
     return true;
 }
 
-bool LoadContentLiq(ResultSet *result)
+bool LoadItemLiquidContent(ResultSet *result)
 {
     auto containerVnum = result->getNextUnsignedInteger();
     auto container = Mud::instance().findItem(containerVnum);

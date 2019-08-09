@@ -39,7 +39,7 @@ bool LoadBlockedIp(ResultSet * result);
 bool LoadNews(ResultSet * result);
 
 /// @brief Function used to retrieve information about items inside containers.
-bool LoadContent(ResultSet * result);
+bool LoadItemContent(ResultSet * result);
 
 /// @brief Function used to retrieve information about all the items.
 bool LoadItem(ResultSet * result);
@@ -136,7 +136,7 @@ bool LoadLiquid(ResultSet * result);
 
 /// @brief Function used to retrieve information about liquids
 ///         inside containers.
-bool LoadContentLiq(ResultSet * result);
+bool LoadItemLiquidContent(ResultSet * result);
 
 /// @brief Function used to retrieve information about all the travelling point.
 bool LoadTravelPoint(ResultSet * result);

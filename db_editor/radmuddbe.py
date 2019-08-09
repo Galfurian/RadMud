@@ -17,7 +17,7 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         super(RadMudEditor, self).__init__()
 
         self.db_filename = ""
-        self.db = None
+        self.db = QtSql.QSqlDatabase.addDatabase('QSQLITE')
 
         # === MODELS ==========================================================
         self.mdl_model = None
@@ -66,40 +66,78 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mdl_player_item = None
         self.mdl_player_variable = None
 
+        self.mdl_item = None
+        self.mdl_item_content = None
+        self.mdl_item_liquid_content = None
+        self.mdl_item_player = None
+        self.mdl_item_room = None
+
+        # === SUPPORT VARIABLES ===============================================
         self.item_player_pindex = QtCore.QModelIndex()
 
-        # Setup UI
+        # === UI SETUP ========================================================
         self.setupUi(self)
-        self.actionExit.triggered.connect(self.close_application)
         self.actionOpen.triggered.connect(self.on_click_open_database)
+        self.actionClose.triggered.connect(self.close_database)
+        self.actionSave.triggered.connect(self.save_database)
+        self.actionExit.triggered.connect(self.close_application)
 
+        # === OPEN DATABASE CONNECTION ========================================
         self.open_database("../system/radmud.db")
-
-        # query = QtSql.QSqlQuery()
-        # query.exec("insert into MaterialType values (1, 'Metal')")
+        self.open_database("../system/radmud.db")
 
         self.show()
 
     def close_application(self):
+        self.close_database()
         exit(0)
 
     def open_database(self, filename):
-        if filename:
-            self.db = QtSql.QSqlDatabase.addDatabase('QSQLITE')
-            self.db.setDatabaseName(filename)
-            if self.db.open():
-                self.db_filename = filename
-                self.update_status_bar("Successfully opened database '%s'" % filename)
-                self.setup_tables()
-            else:
-                self.update_status_bar("Cannot connecto to database '%s'" % filename)
+        if not filename:
+            self.update_status_bar("You need to provide a filename!")
+            return False
+        if self.db.isOpen():
+            self.update_status_bar("You are already connected to database '%s'" % filename)
+            return False
+        self.db.setDatabaseName(filename)
+        if not self.db.open():
+            self.update_status_bar("Cannot connect to database '%s'" % filename)
+            return False
+        self.db_filename = filename
+        self.setup_tables()
+        self.db.transaction()
+        self.update_status_bar("Successfully opened database '%s'" % filename)
+        return True
+
+    def save_database(self):
+        if not self.db.isOpen():
+            self.update_status_bar("You are not connected to any database!")
+            return False
+        if not self.db.commit():
+            self.update_status_bar(self.db.lastError())
+            return False
+        if not self.db.transaction():
+            self.update_status_bar(self.db.lastError())
+            return False
+        self.update_status_bar("Database '%s' saved." % self.db_filename)
+        return True
+
+    def close_database(self):
+        if not self.db.isOpen():
+            self.update_status_bar("The database is already closed!")
+            return False
+        self.db.close()
+        if self.db.isOpen():
+            self.update_status_bar("You failed to close the database '%s'!" % self.db_filename)
+            return False
+        self.update_status_bar("Successfully closed database '%s'" % self.db_filename)
+        return True
 
     def on_click_open_database(self):
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
-        filename, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Open database", "",
-            "Database Files (*.db);;All Files (*)", options=options)
+        filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, "Open database", "",
+                                                            "Database Files (*.db);;All Files (*)", options=options)
         self.open_database(filename)
 
     def update_status_bar(self, msg):
@@ -109,13 +147,6 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
     def init_model(name):
         model = QtSql.QSqlRelationalTableModel()
         model.setTable(name)
-        model.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
-        return model
-
-    @staticmethod
-    def init_model_query(query):
-        model = QtSql.QSqlRelationalTableModel()
-        model.setQuery(query)
         model.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
         return model
 
@@ -381,6 +412,36 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_player_variable.setModel(self.mdl_player_variable)
         self.tbl_player_variable.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_player_variable))
 
+        # === ITEM ============================================================
+        self.mdl_item = self.init_model('item')
+        self.set_relation(self.mdl_item, "model", "model", "vnum", "name")
+        self.mdl_item.select()
+        self.tbl_item.setModel(self.mdl_item)
+        self.tbl_item.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_item))
+        self.tbl_item.clicked.connect(self.item_clicked)
+        self.tbl_item.keyPressEvent = self.item_key_press_event
+
+        self.mdl_item_content = self.init_model('itemcontent')
+        self.mdl_item_content.select()
+        self.tbl_item_content.setModel(self.mdl_item_content)
+        self.tbl_item_content.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_item_content))
+
+        self.mdl_item_liquid_content = self.init_model('itemliquidcontent')
+        self.mdl_item_liquid_content.select()
+        self.tbl_item_liquid_content.setModel(self.mdl_item_liquid_content)
+        self.tbl_item_liquid_content.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_item_liquid_content))
+
+        self.mdl_item_player = self.init_model('itemplayer')
+        self.set_relation(self.mdl_item_player, "position", "bodypart", "vnum", "name")
+        self.mdl_item_player.select()
+        self.tbl_item_player.setModel(self.mdl_item_player)
+        self.tbl_item_player.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_item_player))
+
+        self.mdl_item_room = self.init_model('itemroom')
+        self.mdl_item_room.select()
+        self.tbl_item_room.setModel(self.mdl_item_room)
+        self.tbl_item_room.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_item_content))
+
     def handleItemEntered(self, item):
         print("casso")
 
@@ -528,6 +589,23 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
             query.exec("SELECT name FROM Model WHERE vnum = (SELECT model FROM Item WHERE Item.vnum = {})".format(vnum))
             if query.next():
                 self.label_player_item_model.setText("{}".format(query.value(0)))
+
+    def item_clicked(self, current):
+        name = self.mdl_item.data(self.mdl_item.index(current.row(), 0))
+        self.mdl_item_content.setFilter("container = '{}' or item = '{}'".format(name, name))
+        self.mdl_item_liquid_content.setFilter("container = '{}'".format(name))
+        self.mdl_item_player.setFilter("item = '{}'".format(name))
+        self.mdl_item_room.setFilter("item = '{}'".format(name))
+        self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
+
+    def item_key_press_event(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.tbl_item.clearSelection()
+            self.mdl_item_content.setFilter("")
+            self.mdl_item_liquid_content.setFilter("")
+            self.mdl_item_player.setFilter("")
+            self.mdl_item_room.setFilter("")
+            self.update_status_bar("")
 
 
 if __name__ == "__main__":

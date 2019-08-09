@@ -10,11 +10,6 @@
     <height>768</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <pointsize>12</pointsize>
-   </font>
-  </property>
   <property name="windowTitle">
    <string>RadMud Db Editor</string>
   </property>
@@ -22,8 +17,14 @@
    <layout class="QHBoxLayout" name="horizontalLayout_6">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="tabShape">
+       <enum>QTabWidget::Triangular</enum>
+      </property>
       <property name="currentIndex">
-       <number>11</number>
+       <number>12</number>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
       </property>
       <widget class="QWidget" name="tab_1">
        <attribute name="title">
@@ -34,7 +35,7 @@
          <widget class="QLabel" name="label_6">
           <property name="font">
            <font>
-            <pointsize>14</pointsize>
+            <pointsize>10</pointsize>
            </font>
           </property>
           <property name="text">
@@ -66,7 +67,7 @@
          <widget class="QLabel" name="label_5">
           <property name="font">
            <font>
-            <pointsize>14</pointsize>
+            <pointsize>10</pointsize>
            </font>
           </property>
           <property name="text">
@@ -97,7 +98,7 @@
            <widget class="QLabel" name="label">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -123,7 +124,7 @@
            <widget class="QLabel" name="label_2">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -145,7 +146,7 @@
            <widget class="QLabel" name="label_3">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -182,7 +183,7 @@
          <widget class="QLabel" name="label_11">
           <property name="font">
            <font>
-            <pointsize>14</pointsize>
+            <pointsize>10</pointsize>
            </font>
           </property>
           <property name="text">
@@ -197,7 +198,7 @@
          <widget class="QLabel" name="label_12">
           <property name="font">
            <font>
-            <pointsize>14</pointsize>
+            <pointsize>10</pointsize>
            </font>
           </property>
           <property name="text">
@@ -235,7 +236,7 @@
            <widget class="QLabel" name="label_13">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -272,7 +273,7 @@
              <widget class="QLabel" name="label_15">
               <property name="font">
                <font>
-                <pointsize>14</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -297,7 +298,7 @@
              <widget class="QLabel" name="label_16">
               <property name="font">
                <font>
-                <pointsize>14</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -338,7 +339,7 @@
            <widget class="QLabel" name="label_22">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -380,7 +381,7 @@
              <widget class="QLabel" name="label_26">
               <property name="font">
                <font>
-                <pointsize>14</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -395,7 +396,7 @@
              <widget class="QLabel" name="label_28">
               <property name="font">
                <font>
-                <pointsize>14</pointsize>
+                <pointsize>10</pointsize>
                 <weight>50</weight>
                 <bold>false</bold>
                </font>
@@ -415,7 +416,7 @@
              <widget class="QLabel" name="label_25">
               <property name="font">
                <font>
-                <pointsize>14</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -526,7 +527,7 @@
            <widget class="QLabel" name="label_14">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -552,7 +553,7 @@
            <widget class="QLabel" name="label_19">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -574,7 +575,7 @@
            <widget class="QLabel" name="label_20">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -596,7 +597,7 @@
            <widget class="QLabel" name="label_17">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -625,7 +626,7 @@
            <widget class="QLabel" name="label_18">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -649,7 +650,7 @@
          <widget class="QLabel" name="label_21">
           <property name="font">
            <font>
-            <pointsize>14</pointsize>
+            <pointsize>10</pointsize>
            </font>
           </property>
           <property name="text">
@@ -679,7 +680,7 @@
            <widget class="QLabel" name="label_7">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -707,7 +708,7 @@
              <widget class="QLabel" name="label_9">
               <property name="font">
                <font>
-                <pointsize>14</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -729,7 +730,7 @@
              <widget class="QLabel" name="label_8">
               <property name="font">
                <font>
-                <pointsize>14</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -751,7 +752,7 @@
              <widget class="QLabel" name="label_10">
               <property name="font">
                <font>
-                <pointsize>14</pointsize>
+                <pointsize>10</pointsize>
                </font>
               </property>
               <property name="text">
@@ -784,7 +785,7 @@
          <widget class="QLabel" name="label_4">
           <property name="font">
            <font>
-            <pointsize>14</pointsize>
+            <pointsize>10</pointsize>
            </font>
           </property>
           <property name="text">
@@ -818,7 +819,7 @@
            <widget class="QLabel" name="label_29">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -840,7 +841,7 @@
            <widget class="QLabel" name="label_30">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -866,7 +867,7 @@
            <widget class="QLabel" name="label_31">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -899,7 +900,7 @@
            <widget class="QLabel" name="label_32">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -925,7 +926,7 @@
            <widget class="QLabel" name="label_33">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -947,7 +948,7 @@
            <widget class="QLabel" name="label_35">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -999,7 +1000,7 @@
            <widget class="QLabel" name="label_34">
             <property name="font">
              <font>
-              <pointsize>14</pointsize>
+              <pointsize>10</pointsize>
              </font>
             </property>
             <property name="text">
@@ -1014,6 +1015,131 @@
            <widget class="QTableView" name="tbl_player_variable">
             <property name="sortingEnabled">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_11">
+       <attribute name="title">
+        <string>Item</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="10,7">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_19">
+          <item>
+           <widget class="QLabel" name="label_37">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Item</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTableView" name="tbl_item">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="1" column="0">
+           <widget class="QTableView" name="tbl_item_content">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="label_41">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Dropped in Room</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QTableView" name="tbl_item_room">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_39">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Liquid</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QTableView" name="tbl_item_liquid_content">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QTableView" name="tbl_item_player">
+            <property name="sortingEnabled">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_38">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Content</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_40">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>Owned by Player</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1039,6 +1165,10 @@
      <string>File</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionClose"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
    <addaction name="menuFile"/>
@@ -1046,7 +1176,7 @@
   <widget class="QStatusBar" name="statusbar">
    <property name="font">
     <font>
-     <pointsize>14</pointsize>
+     <pointsize>10</pointsize>
     </font>
    </property>
   </widget>
@@ -1072,20 +1202,17 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
-   </property>
-  </action>
-  <action name="actionClose">
-   <property name="text">
-    <string>Close</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+C</string>
    </property>
   </action>
  </widget>
