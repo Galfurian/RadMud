@@ -51,6 +51,11 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.mdl_profession = None
 
         self.mdl_skill = None
+        self.mdl_skill_prerequisite = None
+        self.mdl_skill_knowledge = None
+        self.mdl_skill_combat_modifier = None
+        self.mdl_skill_ability_modifier = None
+        self.mdl_skill_status_modifier = None
 
         # Setup UI
         self.setupUi(self)
@@ -271,6 +276,8 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_profession.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_profession))
 
         # === SKILL ===========================================================
+        # self.tbl_skill.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        # setSectionResizeMode(QHeaderView::Stretch);
         self.mdl_skill = self.init_model('skill')
         self.set_relation(self.mdl_skill, "ability", "abilitytype", "id", "name")
         self.mdl_skill.select()
@@ -278,6 +285,41 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_skill.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_skill))
         self.tbl_skill.clicked.connect(self.skill_clicked)
         self.tbl_skill.keyPressEvent = self.skill_key_press_event
+
+        self.mdl_skill_prerequisite = self.init_model('skillprerequisite')
+        self.set_relation(self.mdl_skill_prerequisite, "skill", "skill", "vnum", "name")
+        self.set_relation(self.mdl_skill_prerequisite, "requiredskill", "skill", "vnum", "name")
+        self.mdl_skill_prerequisite.select()
+        self.tbl_skill_prerequisite.setModel(self.mdl_skill_prerequisite)
+        self.tbl_skill_prerequisite.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_skill_prerequisite))
+
+        self.mdl_skill_knowledge = self.init_model('skillknowledge')
+        self.set_relation(self.mdl_skill_knowledge, "skill", "skill", "vnum", "name")
+        self.set_relation(self.mdl_skill_knowledge, "knowledge", "knowledge", "id", "name")
+        self.mdl_skill_knowledge.select()
+        self.tbl_skill_knowledge.setModel(self.mdl_skill_knowledge)
+        self.tbl_skill_knowledge.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_skill_knowledge))
+
+        self.mdl_skill_combat_modifier = self.init_model('skillcombatmodifier')
+        self.set_relation(self.mdl_skill_combat_modifier, "skill", "skill", "vnum", "name")
+        self.set_relation(self.mdl_skill_combat_modifier, "modifier", "combatmodifier", "id", "name")
+        self.mdl_skill_combat_modifier.select()
+        self.tbl_skill_combat_modifier.setModel(self.mdl_skill_combat_modifier)
+        self.tbl_skill_combat_modifier.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_skill_combat_modifier))
+
+        self.mdl_skill_ability_modifier = self.init_model('skillabilitymodifier')
+        self.set_relation(self.mdl_skill_ability_modifier, "skill", "skill", "vnum", "name")
+        self.set_relation(self.mdl_skill_ability_modifier, "ability", "abilitytype", "id", "name")
+        self.mdl_skill_ability_modifier.select()
+        self.tbl_skill_ability_modifier.setModel(self.mdl_skill_ability_modifier)
+        self.tbl_skill_ability_modifier.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_skill_ability_modifier))
+
+        self.mdl_skill_status_modifier = self.init_model('skillstatusmodifier')
+        self.set_relation(self.mdl_skill_status_modifier, "skill", "skill", "vnum", "name")
+        self.set_relation(self.mdl_skill_status_modifier, "status", "statusmodifier", "id", "name")
+        self.mdl_skill_status_modifier.select()
+        self.tbl_skill_status_modifier.setModel(self.mdl_skill_status_modifier)
+        self.tbl_skill_status_modifier.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_skill_status_modifier))
 
     def bodypart_clicked(self, current):
         vnum = self.mdl_bodypart.data(self.mdl_bodypart.index(current.row(), 0))
@@ -370,11 +412,21 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def skill_clicked(self, current):
         vnum = self.mdl_skill.data(self.mdl_skill.index(current.row(), 0))
+        self.mdl_skill_prerequisite.setFilter("skill = {}".format(vnum))
+        self.mdl_skill_knowledge.setFilter("skill = {}".format(vnum))
+        self.mdl_skill_combat_modifier.setFilter("skill = {}".format(vnum))
+        self.mdl_skill_ability_modifier.setFilter("skill = {}".format(vnum))
+        self.mdl_skill_status_modifier.setFilter("skill = {}".format(vnum))
         self.update_status_bar("Filtering activated: Click on the table again and press ESC to reset filtering.")
 
     def skill_key_press_event(self, event):
         if event.key() == QtCore.Qt.Key_Escape:
             self.tbl_skill.clearSelection()
+            self.mdl_skill_prerequisite.setFilter("")
+            self.mdl_skill_knowledge.setFilter("")
+            self.mdl_skill_combat_modifier.setFilter("")
+            self.mdl_skill_ability_modifier.setFilter("")
+            self.mdl_skill_status_modifier.setFilter("")
             self.update_status_bar("")
 
 

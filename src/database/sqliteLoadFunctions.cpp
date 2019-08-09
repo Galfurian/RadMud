@@ -140,6 +140,7 @@ bool LoadSkill(ResultSet *result)
 
 bool LoadSkillPrerequisite(ResultSet *result)
 {
+    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -166,6 +167,7 @@ bool LoadSkillPrerequisite(ResultSet *result)
 
 bool LoadSkillAbilityModifier(ResultSet *result)
 {
+    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -192,6 +194,7 @@ bool LoadSkillAbilityModifier(ResultSet *result)
 
 bool LoadSkillStatusModifier(ResultSet *result)
 {
+    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -218,6 +221,7 @@ bool LoadSkillStatusModifier(ResultSet *result)
 
 bool LoadSkillCombatModifier(ResultSet *result)
 {
+    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -244,6 +248,7 @@ bool LoadSkillCombatModifier(ResultSet *result)
 
 bool LoadSkillKnowledge(ResultSet *result)
 {
+    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
