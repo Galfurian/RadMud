@@ -152,7 +152,7 @@ bool LiquidContainerItem::pourIn(Liquid * newLiquidContent,
     if (updateDB)
     {
         SQLiteDbms::instance().insertInto(
-            "ItemContentLiq",
+            "ItemLiquidContent",
             {
                 ToString(vnum),
                 ToString(liquidContent->vnum),
@@ -192,7 +192,7 @@ LiquidContainerItem::pourOut(const double & quantityToPourOut, bool updateDB)
                                                ToString(liquidContent->vnum)));
                 // If the container is empty, remove the entry from
                 //  the liquid contained table.
-                SQLiteDbms::instance().deleteFrom("ItemContentLiq", where);
+                SQLiteDbms::instance().deleteFrom("ItemLiquidContent", where);
                 // Erase the key of the liquid.
                 liquidContent = nullptr;
                 liquidQuantity = 0.0;
@@ -200,7 +200,7 @@ LiquidContainerItem::pourOut(const double & quantityToPourOut, bool updateDB)
             else
             {
                 SQLiteDbms::instance().insertInto(
-                    "ItemContentLiq",
+                    "ItemLiquidContent",
                     {
                         ToString(vnum),
                         ToString(liquidContent->vnum),

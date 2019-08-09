@@ -69,11 +69,13 @@ bool DoLiquidList(Character * character, ArgumentHandler & /*args*/)
 
 bool DoLiquidCreate(Character * character, ArgumentHandler & args)
 {
-    if (args.size() != 3)
+    if (args.empty())
     {
         character->sendMsg("Usage: [Container] [Liquid Vnum] [Quantity].\n");
         return false;
     }
+    // Get the number of arguments.
+    auto argv(args.size());
     // Find the container.
     auto item = character->findNearbyItem(args[0].getContent(),
                                           args[0].getIndex());
@@ -88,6 +90,17 @@ bool DoLiquidCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("The item is not a container of liquids.\n");
         return false;
     }
+    if (argv == 1)
+    {
+        character->sendMsg("You can fill %s with:\n", item->getName());
+        for (auto const & it : Mud::instance().mudLiquids)
+        {
+            character->sendMsg("    [%s] %s\n",
+                Align(it.first, align::right, 4),
+                it.second->name);
+        }
+        return false;
+    }
     // Find the liquid.
     auto liquidVnum = ToNumber<unsigned int>(args[1].getContent());
     auto liquid = Mud::instance().findLiquid(liquidVnum);
@@ -96,15 +109,24 @@ bool DoLiquidCreate(Character * character, ArgumentHandler & args)
         character->sendMsg("Can't find the desire liquid '%s'.\n", liquidVnum);
         return false;
     }
+    if (argv == 2)
+    {
+        character->sendMsg("You should provide the amount:\n");
+        character->sendMsg("    [ 0 ] Fill completely.\n");
+        character->sendMsg("    [Any] Fill the amount specified.\n");
+        return false;
+    }
     // Get the quantity.
     auto quantity = ToNumber<double>(args[2].getContent());
-    if ((quantity <= 0) || (quantity >= 100))
+    if ((quantity < 0) || (quantity >= 100))
     {
-        character->sendMsg("Accepted quantity of liquids (from 1 to 99).\n");
+        character->sendMsg("Accepted quantity of liquids (from 0 to 99).\n");
         return false;
     }
     // Cast the item to liquid container.
-    auto liquidContainer = static_cast<LiquidContainerItem *>(item);
+    auto liquidContainer = dynamic_cast<LiquidContainerItem *>(item);
+    if (static_cast<long>(quantity) == 0)
+        quantity = liquidContainer->getFreeSpace();
     if (!liquidContainer->pourIn(liquid, quantity))
     {
         character->sendMsg("Item can't contain that quantity of liquid.\n");

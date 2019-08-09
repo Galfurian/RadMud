@@ -277,7 +277,7 @@ bool SQLiteDbms::loadPlayerItems(Player * player)
                 break;
             }
         }
-        if (bodyPart == nullptr)
+        if ((bodyPart == nullptr) || (bodyPart->vnum == 0))
         {
             // Add the item to the inventory.
             player->inventory.emplace_back_item(item);

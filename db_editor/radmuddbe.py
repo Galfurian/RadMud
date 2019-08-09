@@ -10,62 +10,52 @@
 from radmuddbe_gui import *
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSql
+from qtmodern import styles
 
 
 class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(RadMudEditor, self).__init__()
 
+        # === DATABASE ========================================================
         self.db_filename = ""
         self.db = QtSql.QSqlDatabase.addDatabase('QSQLITE')
 
         # === MODELS ==========================================================
         self.mdl_model = None
-
         self.mdl_material = None
-
-        self.mdl_currency = None
-
         self.mdl_bodypart = None
         self.mdl_bodypart_resources = None
         self.mdl_bodypart_weapon = None
-
-        self.mdl_building = None
-        self.mdl_building_ingredient = None
-        self.mdl_building_knowledge = None
-        self.mdl_building_tool = None
-
         self.mdl_mobile = None
         self.mdl_mobile_spawn = None
-
         self.mdl_race = None
         self.mdl_race_skill = None
         self.mdl_race_body_part = None
-
-        self.mdl_production = None
-        self.mdl_production_ingredient = None
-        self.mdl_production_tool = None
-        self.mdl_production_knowledge = None
-        self.mdl_production_outcome = None
-
-        self.mdl_profession = None
-
         self.mdl_skill = None
         self.mdl_skill_prerequisite = None
         self.mdl_skill_knowledge = None
         self.mdl_skill_combat_modifier = None
         self.mdl_skill_ability_modifier = None
         self.mdl_skill_status_modifier = None
-
+        self.mdl_production = None
+        self.mdl_production_ingredient = None
+        self.mdl_production_tool = None
+        self.mdl_production_knowledge = None
+        self.mdl_production_outcome = None
+        self.mdl_profession = None
+        self.mdl_building = None
+        self.mdl_building_ingredient = None
+        self.mdl_building_knowledge = None
+        self.mdl_building_tool = None
+        self.mdl_currency = None
         self.mdl_area = None
         self.mdl_area_list = None
         self.mdl_room = None
-
         self.mdl_player = None
         self.mdl_player_skill = None
         self.mdl_player_item = None
         self.mdl_player_variable = None
-
         self.mdl_item = None
         self.mdl_item_content = None
         self.mdl_item_liquid_content = None
@@ -82,11 +72,48 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionSave.triggered.connect(self.save_database)
         self.actionExit.triggered.connect(self.close_application)
 
+        self.tbl_model.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_material.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_bodypart.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_bodypart_resources.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_bodypart_weapon.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_mobile.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_mobile_spawn.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_race.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_race_skill.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_race_body_part.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_skill.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_skill_prerequisite.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_skill_knowledge.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_skill_combat_modifier.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_skill_ability_modifier.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_skill_status_modifier.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_production.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_production_ingredient.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_production_tool.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_production_knowledge.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_production_outcome.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_profession.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_building.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_building_knowledge.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_building_tool.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_building_ingredient.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_currency.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_area.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_area_list.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_room.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_player.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_player_skill.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_player_item.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_player_variable.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_item.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_item_content.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_item_liquid_content.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_item_player.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        self.tbl_item_room.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+
         # === OPEN DATABASE CONNECTION ========================================
         self.open_database("../system/radmud.db")
-        self.open_database("../system/radmud.db")
-
-        self.show()
 
     def close_application(self):
         self.close_database()
@@ -130,6 +157,46 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.db.isOpen():
             self.update_status_bar("You failed to close the database '%s'!" % self.db_filename)
             return False
+        # === UPDATE MODELS ===================================================
+        self.mdl_model.select()
+        self.mdl_material.select()
+        self.mdl_bodypart.select()
+        self.mdl_bodypart_resources.select()
+        self.mdl_bodypart_weapon.select()
+        self.mdl_mobile.select()
+        self.mdl_mobile_spawn.select()
+        self.mdl_race.select()
+        self.mdl_race_skill.select()
+        self.mdl_race_body_part.select()
+        self.mdl_skill.select()
+        self.mdl_skill_prerequisite.select()
+        self.mdl_skill_knowledge.select()
+        self.mdl_skill_combat_modifier.select()
+        self.mdl_skill_ability_modifier.select()
+        self.mdl_skill_status_modifier.select()
+        self.mdl_production.select()
+        self.mdl_production_ingredient.select()
+        self.mdl_production_tool.select()
+        self.mdl_production_knowledge.select()
+        self.mdl_production_outcome.select()
+        self.mdl_profession.select()
+        self.mdl_building.select()
+        self.mdl_building_ingredient.select()
+        self.mdl_building_knowledge.select()
+        self.mdl_building_tool.select()
+        self.mdl_currency.select()
+        self.mdl_area.select()
+        self.mdl_area_list.select()
+        self.mdl_room.select()
+        self.mdl_player.select()
+        self.mdl_player_skill.select()
+        self.mdl_player_item.select()
+        self.mdl_player_variable.select()
+        self.mdl_item.select()
+        self.mdl_item_content.select()
+        self.mdl_item_liquid_content.select()
+        self.mdl_item_player.select()
+        self.mdl_item_room.select()
         self.update_status_bar("Successfully closed database '%s'" % self.db_filename)
         return True
 
@@ -427,6 +494,7 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tbl_item_content.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_item_content))
 
         self.mdl_item_liquid_content = self.init_model('itemliquidcontent')
+        self.set_relation(self.mdl_item_liquid_content, "content", "liquid", "vnum", "name")
         self.mdl_item_liquid_content.select()
         self.tbl_item_liquid_content.setModel(self.mdl_item_liquid_content)
         self.tbl_item_liquid_content.setItemDelegate(QtSql.QSqlRelationalDelegate(self.tbl_item_liquid_content))
@@ -612,5 +680,7 @@ if __name__ == "__main__":
     import sys
 
     app = QtWidgets.QApplication(sys.argv)
+    styles.apply_dark_theme(app)
     editor = RadMudEditor()
+    editor.show()
     sys.exit(app.exec_())
