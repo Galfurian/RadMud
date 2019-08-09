@@ -21,11 +21,52 @@
        <enum>QTabWidget::Triangular</enum>
       </property>
       <property name="currentIndex">
-       <number>12</number>
+       <number>0</number>
       </property>
       <property name="movable">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
+      <widget class="QWidget" name="tab_12">
+       <attribute name="title">
+        <string>Welcome</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_42">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>RadMud Database Editor</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextBrowser" name="textBrowser">
+          <property name="html">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;Welcome to the RadMud database editor.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:16pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;Here some information you need to know before using it:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:16pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;# &lt;/span&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;Editing&lt;/span&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt; and &lt;/span&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;Saving&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;Everything you do is inside a &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Transaction&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt; and editing tables will not affect the database immediately until you hit &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Save&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;. When you &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Save&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;, you close a &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Transaction&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt; with a &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Commit&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;, and you open a new &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Transaction&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:16pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;# &lt;/span&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;Tables &lt;/span&gt;&lt;span style=&quot; font-size:18pt; font-weight:600;&quot;&gt;Filtering&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;The &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;main table&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt; of some sections allows you to filter &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;secondary tables&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;. For instance: You click a row of the &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Mobile&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt; table inside the &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Mobile&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt; tab. Automatically, the &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;Spawn&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt; table will show &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;only&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt; the spawn points &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;referring&lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt; to the &lt;/span&gt;&lt;span style=&quot; font-size:16pt; font-weight:600;&quot;&gt;mobile &lt;/span&gt;&lt;span style=&quot; font-size:16pt;&quot;&gt;of the row you have selected.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tab_1">
        <attribute name="title">
         <string>Model</string>
