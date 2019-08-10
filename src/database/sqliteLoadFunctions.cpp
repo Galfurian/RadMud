@@ -1050,6 +1050,7 @@ bool LoadBuilding(ResultSet *result)
 
 bool LoadBuildingTool(ResultSet *result)
 {
+    result->getNextUnsignedInteger(); // Skip ID
     auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
@@ -1074,6 +1075,7 @@ bool LoadBuildingTool(ResultSet *result)
 
 bool LoadBuildingIngredient(ResultSet *result)
 {
+    result->getNextUnsignedInteger(); // Skip ID
     auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
@@ -1102,6 +1104,7 @@ bool LoadBuildingIngredient(ResultSet *result)
 
 bool LoadBuildingKnowledge(ResultSet *result)
 {
+    result->getNextUnsignedInteger(); // Skip ID
     auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
@@ -1118,10 +1121,10 @@ bool LoadBuildingKnowledge(ResultSet *result)
     }
     building->requiredKnowledge.emplace_back(knowledge);
     Logger::log(LogLevel::Debug,
-                "\t%s%s",
+                "\t[%s] %s%s",
+                Align(knowledgeId, align::left, 4),
                 Align(building->name, align::left, 25),
-                Align(knowledge.toString(),
-                      align::left, 35));
+                Align(knowledge.toString(), align::left, 35));
     return true;
 }
 

@@ -55,7 +55,7 @@ public:
     }
 
     /// @brief Constructor from unsigned int.
-    MaterialType(const unsigned int & _value) :
+    explicit MaterialType(const unsigned int & _value) :
         BaseEnumerator(_value)
     {
         // Nothing to do.

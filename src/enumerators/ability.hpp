@@ -48,7 +48,7 @@ public:
     }
 
     /// @brief Constructor from unsigned int.
-    Ability(const unsigned int & _value) :
+    explicit Ability(const unsigned int & _value) :
         BaseEnumerator(_value)
     {
         // Nothing to do.

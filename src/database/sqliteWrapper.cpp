@@ -102,6 +102,22 @@ bool SQLiteWrapper::openConnection(const std::string & dbName,
     return true;
 }
 
+bool SQLiteWrapper::updateInMemoryDatabase()
+{
+    if (!dbDetails.dbIsInMemory)
+        return true;
+    auto dbPath = dbDetails.dbDirectory + dbDetails.dbName;
+    errorCode = this->loadOrSaveDb(true);
+    errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
+    if (errorCode != SQLITE_OK)
+    {
+        Logger::log(LogLevel::Error, "Error while saving the "
+                                     "in-memory database to file.");
+        return false;
+    }
+    return true;
+}
+
 bool SQLiteWrapper::closeConnection()
 {
     if (dbDetails.dbConnection)
@@ -111,17 +127,8 @@ bool SQLiteWrapper::closeConnection()
         do
         {
             // If the database has been opened in memory, save it to the file.
-            if (dbDetails.dbIsInMemory)
-            {
-                auto dbPath = dbDetails.dbDirectory + dbDetails.dbName;
-                errorCode = this->loadOrSaveDb(true);
-                errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
-                if (errorCode != SQLITE_OK)
-                {
-                    Logger::log(LogLevel::Error, "Error while saving the "
-                        "in-memory database to file.");
-                }
-            }
+            this->updateInMemoryDatabase();
+
             errorCode = sqlite3_close(dbDetails.dbConnection);
             if (errorCode == SQLITE_OK)
             {

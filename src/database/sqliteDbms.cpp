@@ -276,6 +276,11 @@ bool SQLiteDbms::updateRooms()
 	return true;
 }
 
+bool SQLiteDbms::updateInMemoryDatabase()
+{
+    return dbConnection.updateInMemoryDatabase();
+}
+
 void SQLiteDbms::beginTransaction()
 {
 	dbConnection.beginTransaction();

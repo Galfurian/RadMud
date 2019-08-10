@@ -56,7 +56,7 @@ public:
     }
 
     /// @brief Constructor from unsigned int.
-    SkillRank(const unsigned int & _value) :
+    explicit SkillRank(const unsigned int & _value) :
         BaseEnumerator(_value)
     {
         // Nothing to do.

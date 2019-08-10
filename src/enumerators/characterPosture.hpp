@@ -49,13 +49,12 @@ public:
     }
 
     /// @brief Constructor from unsigned int.
-    CharacterPosture(const unsigned int & _value) :
+    explicit CharacterPosture(const unsigned int & _value) :
         BaseEnumerator(_value)
     {
         // Nothing to do.
     }
 
-    /// @brief Constructor from enum.
     CharacterPosture(const Enum & _value) :
         BaseEnumerator(_value)
     {

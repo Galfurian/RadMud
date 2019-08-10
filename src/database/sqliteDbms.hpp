@@ -129,6 +129,9 @@ public:
     /// Update all the rooms.
     bool updateRooms();
 
+    /// Update all the rooms.
+    bool updateInMemoryDatabase();
+
     /// @brief Begin a transaction.
     void beginTransaction();
 

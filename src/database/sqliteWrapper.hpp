@@ -79,6 +79,8 @@ public:
                         const std::string & dbDirectory,
                         const bool & openInMemory);
 
+    bool updateInMemoryDatabase();
+
     /// @brief Close database connection.
     /// @return <b>True</b> if the operations succeeded,<br>
     ///         <b>False</b> Otherwise.

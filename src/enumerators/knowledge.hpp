@@ -63,7 +63,7 @@ public:
     }
 
     /// @brief Constructor from unsigned int.
-    Knowledge(const unsigned int & _value) :
+    explicit Knowledge(const unsigned int & _value) :
         BaseEnumerator(_value)
     {
         // Nothing to do.

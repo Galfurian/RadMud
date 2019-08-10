@@ -44,10 +44,12 @@ ShopItem::~ShopItem()
 
 bool ShopItem::updateOnDB()
 {
+    // First, update the item.
     if (!Item::updateOnDB())
-    {
         return false;
-    }
+    // Check if the shop has being built.
+    if (!HasFlag(flags, ItemFlag::Built))
+        return false;
     // Prepare the vector used to insert into the database.
     std::vector<std::string> arguments;
     arguments.emplace_back(ToString(vnum));

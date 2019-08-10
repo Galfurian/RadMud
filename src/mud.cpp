@@ -86,67 +86,67 @@ Mud::Mud() :
 Mud::~Mud()
 {
     Logger::log(LogLevel::Global, "Freeing memory occupied by players...");
-    for (auto iterator : Mud::instance().mudPlayers)
+    for (auto iterator : mudPlayers)
     {
         delete (iterator);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by mobiles...");
-    for (auto iterator : Mud::instance().mudMobiles)
+    for (auto iterator : mudMobiles)
     {
         delete (iterator);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by items...");
-    for (auto iterator : Mud::instance().mudItems)
+    for (auto iterator : mudItems)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by rooms...");
-    for (auto iterator : Mud::instance().mudRooms)
+    for (auto iterator : mudRooms)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by areas...");
-    for (auto iterator : Mud::instance().mudAreas)
+    for (auto iterator : mudAreas)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by writings...");
-    for (auto iterator : Mud::instance().mudWritings)
+    for (auto iterator : mudWritings)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by corpses...");
-    for (auto iterator : Mud::instance().mudCorpses)
+    for (auto iterator : mudCorpses)
     {
         delete (iterator);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by races...");
-    for (auto iterator : Mud::instance().mudRaces)
+    for (auto iterator : mudRaces)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by factions...");
-    for (auto iterator : Mud::instance().mudFactions)
+    for (auto iterator : mudFactions)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by liquids...");
-    for (auto iterator : Mud::instance().mudLiquids)
+    for (auto iterator : mudLiquids)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by professions...");
-    for (auto iterator : Mud::instance().mudProfessions)
+    for (auto iterator : mudProfessions)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by productions...");
-    for (auto iterator : Mud::instance().mudProductions)
+    for (auto iterator : mudProductions)
     {
         delete (iterator.second);
     }
     Logger::log(LogLevel::Global, "Freeing memory occupied by materials...");
-    for (auto iterator : Mud::instance().mudMaterials)
+    for (auto iterator : mudMaterials)
     {
         delete (iterator.second);
     }
@@ -179,15 +179,14 @@ bool Mud::saveRooms()
 bool Mud::saveMud()
 {
     bool result = true;
-    Logger::log(LogLevel::Global,
-                "Saving information on Database for : Players...");
-    result &= Mud::instance().savePlayers();
-    Logger::log(LogLevel::Global,
-                "Saving information on Database for : Items...");
-    result &= Mud::instance().saveItems();
-    Logger::log(LogLevel::Global,
-                "Saving information on Database for : Rooms...");
-    result &= Mud::instance().saveRooms();
+    Logger::log(LogLevel::Global, "Saving information on Database for : Players...");
+    result &= this->savePlayers();
+    Logger::log(LogLevel::Global, "Saving information on Database for : Items...");
+    result &= this->saveItems();
+    Logger::log(LogLevel::Global, "Saving information on Database for : Rooms...");
+    result &= this->saveRooms();
+    // Save, if necessary the database.
+    result &= SQLiteDbms::instance().updateInMemoryDatabase();
     return result;
 }
 
@@ -573,7 +572,7 @@ bool Mud::runMud()
 {
     // Open logging file.
     if (!Logger::instance().openLog(
-        Mud::instance().getMudSystemDirectory() + GetDate() + ".log"))
+        this->getMudSystemDirectory() + GetDate() + ".log"))
     {
         std::cerr << "Can't create the logging file." << std::endl;
         return false;
@@ -1095,14 +1094,14 @@ bool Mud::stopMud()
 
     Logger::log(LogLevel::Global, "Shutting down RadMud...");
     Logger::log(LogLevel::Global, "Closing Communications...");
-    if (!Mud::instance().closeComunications())
+    if (!this->closeComunications())
     {
         Logger::log(LogLevel::Error,
                     "The communication has not been closed correctly.");
     }
 
     Logger::log(LogLevel::Global, "Saving Mud Information...");
-    if (!Mud::instance().saveMud())
+    if (!this->saveMud())
     {
         Logger::log(LogLevel::Error,
                     "Somwthing has gone wrong during data saving.");
@@ -1137,7 +1136,7 @@ bool Mud::stopMud()
 bool Mud::afterBootActions()
 {
 #if 0
-    auto heightMap = Mud::instance().findHeightMap(1);
+    auto heightMap = this->findHeightMap(1);
     if (heightMap == nullptr)
     {
         return false;

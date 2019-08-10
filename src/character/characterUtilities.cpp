@@ -330,8 +330,13 @@ bool HasRequiredKnowledge(Character * character,
         required.begin(), required.end(),
         [&character](Knowledge const & k)
         {
-            return (character->skillManager.getKnowledge(k) > 0) ||
-                   (character->effectManager.getKnowledge(k) > 0);
+            if(!((character->skillManager.getKnowledge(k) > 0) ||
+                (character->effectManager.getKnowledge(k) > 0)))
+            {
+                Logger::log(LogLevel::Debug, "Missing: %s", k.toString());
+                return false;
+            }
+            return true;
         }) != required.end();
 }
 

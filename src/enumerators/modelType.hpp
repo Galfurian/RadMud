@@ -66,7 +66,7 @@ public:
     }
 
     /// @brief Constructor from unsigned int.
-    ModelType(const unsigned int & _value) :
+    explicit ModelType(const unsigned int & _value) :
         BaseEnumerator(_value)
     {
         // Nothing to do.

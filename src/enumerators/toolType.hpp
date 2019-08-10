@@ -56,14 +56,7 @@ public:
     }
 
     /// @brief Constructor from unsigned int.
-    ToolType(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    ToolType(const Enum & _value) :
+    explicit ToolType(const unsigned int & _value) :
         BaseEnumerator(_value)
     {
         // Nothing to do.
