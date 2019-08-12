@@ -49,7 +49,7 @@ bool ShopItem::updateOnDB()
         return false;
     // Check if the shop has being built.
     if (!HasFlag(flags, ItemFlag::Built))
-        return false;
+        return true;
     // Prepare the vector used to insert into the database.
     std::vector<std::string> arguments;
     arguments.emplace_back(ToString(vnum));
@@ -61,21 +61,36 @@ bool ShopItem::updateOnDB()
                            ToString(shopKeeper->vnum) : "");
     arguments.emplace_back(ToString(openingHour));
     arguments.emplace_back(ToString(closingHour));
-    return SQLiteDbms::instance().insertInto("Shop", arguments, false, true);
+    if(SQLiteDbms::instance().insertInto("Shop", arguments, false, true))
+        return true;
+    Logger::log(LogLevel::Error, "Failed INSERT Shop '%s'", this->getName());
+    return false;
 }
 
 bool ShopItem::removeOnDB()
 {
-    if (Item::removeOnDB())
+    static bool status;
+    static WhereClause item_pair = std::make_pair("item", "-1");
+    static WhereClause stock_pair = std::make_pair("shop", "-1");
+    // Initialize variables.
+    status = true;
+    item_pair.second = ToString(vnum);
+    stock_pair.second = ToString(vnum);
+    // Call parent function.
+    status &= Item::removeOnDB();
+    if (!SQLiteDbms::instance().deleteFrom("Shop", {item_pair}))
     {
-        if (SQLiteDbms::instance().deleteFrom(
-            "Shop", {std::make_pair("item", ToString(vnum))}))
-        {
-            return true;
-        }
+        Logger::log(LogLevel::Error, "Remove from table 'Shop'.");
+        SQLiteDbms::instance().showLastError();
+        status = false;
     }
-    Logger::log(LogLevel::Error, "Error during item removal from table Shop.");
-    return false;
+    if (!SQLiteDbms::instance().deleteFrom("ShopDefaultStock", {stock_pair}))
+    {
+        Logger::log(LogLevel::Error, "Remove from table 'ShopDefaultStock'.");
+        SQLiteDbms::instance().showLastError();
+        status = false;
+    }
+    return status;
 }
 
 void ShopItem::getSheet(Table & sheet) const

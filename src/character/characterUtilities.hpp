@@ -108,12 +108,17 @@ public:
     bool randomIfNoLight;
 
     /// @brief Constructor.
-    explicit SearchOptionsCharacter() :
-        searchInRoom(),
-        searchInInventory(),
-        searchInEquipment(),
-        checkLightLevels(),
-        randomIfNoLight()
+    explicit SearchOptionsCharacter(
+        bool _searchInRoom = false,
+        bool _searchInInventory = false,
+        bool _searchInEquipment = false,
+        bool _checkLightLevels = false,
+        bool _randomIfNoLight = false) :
+        searchInRoom(_searchInRoom),
+        searchInInventory(_searchInInventory),
+        searchInEquipment(_searchInEquipment),
+        checkLightLevels(_checkLightLevels),
+        randomIfNoLight(_randomIfNoLight)
     {
         // Nothing to do.
     }
@@ -150,7 +155,8 @@ bool FindNearbyResouces(
     Character * character,
     std::map<ResourceType, unsigned int> requiredResources,
     std::vector<std::pair<Item *, unsigned int>> & foundResources,
-    const SearchOptionsCharacter & searchOptions);
+    const SearchOptionsCharacter & searchOptions,
+    ResourceType & missing);
 
 /// @brief Search the given type of tool in the proximity of the character.
 /// @param character        The target character.

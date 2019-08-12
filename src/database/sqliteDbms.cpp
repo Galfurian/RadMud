@@ -156,7 +156,8 @@ bool SQLiteDbms::loadTables()
 	return status;
 }
 
-bool SQLiteDbms::insertInto(std::string table, std::vector<std::string> args,
+bool SQLiteDbms::insertInto(std::string const & table,
+                            std::vector<std::string> const & args,
 							bool orIgnore, bool orReplace)
 {
 	std::stringstream stream;
@@ -179,7 +180,7 @@ bool SQLiteDbms::insertInto(std::string table, std::vector<std::string> args,
 	return (dbConnection.executeQuery(stream.str().c_str()) != 0);
 }
 
-bool SQLiteDbms::deleteFrom(std::string table, QueryList where)
+bool SQLiteDbms::deleteFrom(std::string const & table, QueryList const & where)
 {
 	std::stringstream stream;
 	stream << "DELETE FROM " << table << std::endl;
@@ -197,7 +198,8 @@ bool SQLiteDbms::deleteFrom(std::string table, QueryList where)
 	return (dbConnection.executeQuery(stream.str().c_str()) != 0);
 }
 
-bool SQLiteDbms::updateInto(std::string table, QueryList value, QueryList where)
+bool SQLiteDbms::updateInto(std::string const & table,
+    QueryList const & value, QueryList const & where)
 {
 	std::stringstream stream;
 	stream << "UPDATE " << table << std::endl;

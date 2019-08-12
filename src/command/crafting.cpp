@@ -130,13 +130,16 @@ bool DoProfession(Character * character,
     searchOptions.searchInRoom = true;
     searchOptions.searchInEquipment = false;
     searchOptions.searchInInventory = true;
+    ResourceType missing(ResourceType::None);
     // Search the resources nearby.
     if (!FindNearbyResouces(character,
                             production->ingredients,
                             usedIngredients,
-                            searchOptions))
+                            searchOptions,
+                            missing))
     {
-        character->sendMsg("You don't have enough material.\n");
+        character->sendMsg("You don't have enough material (%s).\n",
+                           missing.toString());
         return false;
     }
     // Search the needed workbench.
@@ -205,7 +208,7 @@ bool DoBuild(Character * character, ArgumentHandler & args)
         buildingTable.addDivider();
         buildingTable.addColumn("Building", align::left);
         buildingTable.addColumn("Difficulty", align::right);
-        for (auto it : Mud::instance().mudBuildings)
+        for (auto const & it : Mud::instance().mudBuildings)
         {
             auto building = it.second;
             if (!HasRequiredKnowledge(character, building->requiredKnowledge))
@@ -215,6 +218,7 @@ bool DoBuild(Character * character, ArgumentHandler & args)
             buildingTable.addRow({building->getNameCapital(),
                                   std::to_string(building->difficulty)});
         }
+        buildingTable.addDivider();
         character->sendMsg(buildingTable.getTable() + "\n");
         return true;
     }
@@ -244,15 +248,10 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     }
     // Search the needed tools.
     ItemVector usedTools;
-    // Prepare a structure to set the options of the search.
-    SearchOptionsCharacter searchOptions;
-    searchOptions.searchInRoom = true;
-    searchOptions.searchInEquipment = true;
-    searchOptions.searchInInventory = true;
     if (!FindNearbyTools(character,
                          schematics->tools,
                          usedTools,
-                         searchOptions))
+                         SearchOptionsCharacter::allOptions()))
     {
         character->sendMsg("You don't have the right tools.\n");
         return false;
@@ -260,25 +259,25 @@ bool DoBuild(Character * character, ArgumentHandler & args)
     // Search the needed ingredients.
     std::vector<std::pair<Item *, unsigned int>> usedIngredients;
     // Do not search the ingredients inside the equipment.
-    searchOptions.searchInRoom = true;
-    searchOptions.searchInEquipment = false;
-    searchOptions.searchInInventory = true;
+    // Keep the previous search options and search the building.
+    auto building = FindNearbyBuilding(character,
+                                       schematics->buildingModel,
+                                       SearchOptionsCharacter(true, true));
+    if (building == nullptr)
+    {
+        character->sendMsg("You don't have the item to build.\n");
+        return false;
+    }
+    ResourceType missing(ResourceType::None);
     // Search the resources nearby.
     if (!FindNearbyResouces(character,
                             schematics->ingredients,
                             usedIngredients,
-                            searchOptions))
+                            SearchOptionsCharacter(true, true),
+                            missing))
     {
-        character->sendMsg("You don't have enough material.\n");
-        return false;
-    }
-    // Keep the previous search options and search the building.
-    auto building = FindNearbyBuilding(character,
-                                       schematics->buildingModel,
-                                       searchOptions);
-    if (building == nullptr)
-    {
-        character->sendMsg("You don't have the required item.\n");
+        character->sendMsg("You don't have enough material (%s).\n",
+                           missing.toString());
         return false;
     }
     // Prepare the action.

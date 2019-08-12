@@ -107,7 +107,7 @@ bool BuildAction::check(std::string & error) const
         return false;
     }
     // Check if the actor has enough ingredients.
-    for (auto it : schematics->ingredients)
+    for (auto const & it : schematics->ingredients)
     {
         auto required = it.second;
         for (auto it2 : ingredients)
@@ -128,7 +128,7 @@ bool BuildAction::check(std::string & error) const
         }
         if (required > 0)
         {
-            error = "You don't have enough materials.";
+            error = "You don't have enough materials ("+it.first.toString()+").";
             return false;
         }
     }

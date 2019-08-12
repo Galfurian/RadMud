@@ -183,6 +183,7 @@ int SQLiteWrapper::executeQuery(const char * query)
 {
     if (!isConnected())
     {
+        Logger::log(LogLevel::Error, "Cannot execute query, db is not connected!");
         return 0;
     }
     errorCode = sqlite3_exec(dbDetails.dbConnection, query, NULL, NULL, NULL);

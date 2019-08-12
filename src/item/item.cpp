@@ -130,30 +130,63 @@ bool Item::updateOnDB()
     arguments.emplace_back(ToString(this->composition->vnum));
     arguments.emplace_back(ToString(this->quality.toUInt()));
     arguments.emplace_back(ToString(this->flags));
-    return SQLiteDbms::instance().insertInto("Item", arguments, false, true);
+    if(SQLiteDbms::instance().insertInto("Item", arguments, false, true))
+        return true;
+    Logger::log(LogLevel::Error, "Failed INSERT Item '%s'", this->getName());
+    return false;
 }
 
 bool Item::removeOnDB()
 {
-    Logger::log(LogLevel::Debug, "Removing '%s' from DB...",
-                this->getName(true));
-    if (SQLiteDbms::instance().deleteFrom(
-        "Item", {std::make_pair("vnum", ToString(vnum))}))
+    static bool status;
+    static WhereClause vnum_pair = std::make_pair("vnum", "-1");
+    static WhereClause item_pair = std::make_pair("item", "-1");
+    static WhereClause container_pair = std::make_pair("container", "-1");
+    // Log.
+    Logger::log(LogLevel::Debug, "Removing '%s' from DB...", this->getName(true));
+    // Update/Prepare variables.
+    status = true;
+    vnum_pair.second = ToString(vnum);
+    item_pair.second = ToString(vnum);
+    container_pair.second = ToString(vnum);
+    // Remove from DB.
+    if (! SQLiteDbms::instance().deleteFrom("Item", {vnum_pair}))
     {
-        // Remove the item from everywhere.
-        SQLiteDbms::instance().deleteFrom(
-            "ItemPlayer", {std::make_pair("item", ToString(vnum))});
-        SQLiteDbms::instance().deleteFrom(
-            "ItemRoom", {std::make_pair("item", ToString(vnum))});
-        SQLiteDbms::instance().deleteFrom(
-            "ItemContent", {std::make_pair("container", ToString(vnum))});
-        SQLiteDbms::instance().deleteFrom(
-            "ItemContent", {std::make_pair("item", ToString(vnum))});
-        return true;
+        Logger::log(LogLevel::Error, "Remove from table 'Item'.");
+        SQLiteDbms::instance().showLastError();
+        status = false;
     }
-    Logger::log(LogLevel::Error, "Can't delete the item from the database!");
-    SQLiteDbms::instance().showLastError();
-    return false;
+    if (! SQLiteDbms::instance().deleteFrom("ItemPlayer", {item_pair}))
+    {
+        Logger::log(LogLevel::Error, "Remove from table 'ItemPlayer'.");
+        SQLiteDbms::instance().showLastError();
+        status = false;
+    }
+    if (! SQLiteDbms::instance().deleteFrom("ItemRoom", {item_pair}))
+    {
+        Logger::log(LogLevel::Error, "Remove from table 'ItemRoom'.");
+        SQLiteDbms::instance().showLastError();
+        status = false;
+    }
+    if (! SQLiteDbms::instance().deleteFrom("ItemContent", {item_pair}))
+    {
+        Logger::log(LogLevel::Error, "Remove from table 'ItemContent'.");
+        SQLiteDbms::instance().showLastError();
+        status = false;
+    }
+    if (! SQLiteDbms::instance().deleteFrom("ItemContent", {container_pair}))
+    {
+        Logger::log(LogLevel::Error, "Remove from table 'ItemContent'.");
+        SQLiteDbms::instance().showLastError();
+        status = false;
+    }
+    if (! SQLiteDbms::instance().deleteFrom("ItemLiquidContent", {container_pair}))
+    {
+        Logger::log(LogLevel::Error, "Remove from table 'ItemLiquidContent'.");
+        SQLiteDbms::instance().showLastError();
+        status = false;
+    }
+    return status;
 }
 
 void Item::getSheet(Table & sheet) const
@@ -488,6 +521,7 @@ bool Item::canContain(Item * item, const unsigned int & amount) const
 
 void Item::putInside(Item *& item, bool updateDB)
 {
+    static WhereClause prep_pair = std::make_pair("item", "-1");
     // Put the item inside the container.
     content.emplace_back_item(item);
     // Set the container value to the content item.

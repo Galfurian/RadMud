@@ -30,8 +30,11 @@
 
 class Player;
 
+///
+using WhereClause = std::pair<std::string, std::string>;
+
 /// @brief A query list of FIELD+VALUE.
-using QueryList = std::vector<std::pair<std::string, std::string> >;
+using QueryList = std::vector<WhereClause>;
 
 /// @brief It's used to connect to a database and retrieve information
 ///         as well as update them.
@@ -100,8 +103,8 @@ public:
     /// @param orReplace Flag used to enable the OR REPLACE option.
     /// @return <b>True</b> if the operations succeeded,<br>
     ///         <b>False</b> Otherwise.
-    bool insertInto(std::string table,
-                    std::vector<std::string> args,
+    bool insertInto(std::string const & table,
+                    std::vector<std::string> const & args,
                     bool orIgnore = true,
                     bool orReplace = false);
 
@@ -110,7 +113,7 @@ public:
     /// @param where Vector of where clause.
     /// @return <b>True</b> if the operations succeeded,<br>
     ///         <b>False</b> Otherwise.
-    bool deleteFrom(std::string table, QueryList where);
+    bool deleteFrom(std::string const & table, QueryList const & where);
 
     /// @brief Execute an Update query.
     /// @param table The name of the table.
@@ -118,7 +121,7 @@ public:
     /// @param where Vector of where clause.
     /// @return <b>True</b> if the operations succeeded,<br>
     ///         <b>False</b> Otherwise.
-    bool updateInto(std::string table, QueryList value, QueryList where);
+    bool updateInto(std::string const & table, QueryList const & value, QueryList const & where);
 
     /// Updates all the connected players.
     bool updatePlayers();

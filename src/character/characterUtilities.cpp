@@ -128,7 +128,8 @@ bool FindNearbyResouces(
     Character * character,
     std::map<ResourceType, unsigned int> requiredResources,
     std::vector<std::pair<Item *, unsigned int>> & foundResources,
-    const SearchOptionsCharacter & searchOptions)
+    const SearchOptionsCharacter & searchOptions,
+    ResourceType & missing)
 {
     // Create a function which reduces the required quantity and checks if
     // the zero has been reached.
@@ -143,7 +144,7 @@ bool FindNearbyResouces(
         // Returns if we've reached the needed quantity.
         return (requiredQuantity == 0);
     };
-    for (auto resource : requiredResources)
+    for (auto const & resource : requiredResources)
     {
         // Quantity of ingredients that has to be found.
         auto quantityNeeded = resource.second;
@@ -186,7 +187,10 @@ bool FindNearbyResouces(
         }
         // If the ingredients are still not enough, return false.
         if (quantityNeeded > 0)
+        {
+            missing = resource.first;
             return false;
+        }
     }
     return true;
 }
