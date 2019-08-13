@@ -112,6 +112,9 @@ public:
     /// @return The stopping description.
     virtual std::string stop();
 
+	/// @brief Starts the action, and performs all the checks.
+	virtual bool start();
+
     /// @brief Performs the current action.
     /// @return the status after performing the action.
     virtual ActionStatus perform();

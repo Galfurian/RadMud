@@ -26,79 +26,58 @@
 #include "room.hpp"
 #include "dismemberAction.hpp"
 
-bool DoDismember(Character * character, ArgumentHandler & args)
+bool DoDismember(Character *character, ArgumentHandler &args)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    // If the character is a Player, check if the character has the required
-    // knowledge.
-    if (character->isPlayer())
-    {
-        // Transform the character to player.
-        auto player = character->toPlayer();
-        // Check if the player can butcher animals.
-        if (!player->effectManager.getKnowledge(Knowledge::Butchery))
-        {
-            character->sendMsg("You don't know how to dismember corpses.\n");
-            return false;
-        }
-    }
-    // Check the arguments.
-    if (args.size() != 1)
-    {
-        character->sendMsg("What do you want to dismember?\n");
-        return false;
-    }
-    // Check if the room is NOT lit.
-    if (!character->room->isLit())
-    {
-        character->sendMsg("You cannot do that without light.\n");
-        return false;
-    }
-    auto item = character->findNearbyItem(args[0].getContent(),
-                                          args[0].getIndex());
-    if (item == nullptr)
-    {
-        character->sendMsg("You cannot find '%s'.\n", args[0].getContent());
-        return false;
-    }
-    if (item->getType() != ModelType::Corpse)
-    {
-        character->sendMsg("%s is not a corpse.\n",
-                           item->getNameCapital(true));
-        return false;
-    }
-    // Cast the item to corpse.
-    auto corpse = static_cast<CorpseItem *>(item);
-    // Get a valid body part.
-    auto bodyPart = corpse->getAvailableBodyPart();
-    if (bodyPart == nullptr)
-    {
-        character->sendMsg("%s does not contain anything useful.\n",
-                           item->getNameCapital(true));
-        return false;
-    }
-    auto dismemberAction = std::make_shared<DismemberAction>(character,
-                                                             corpse,
-                                                             bodyPart);
-    std::string error;
-    if (!dismemberAction->check(error))
-    {
-        character->sendMsg(error + "\n");
-        return false;
-    }
-    character->pushAction(dismemberAction);
-    character->sendMsg("You start dismembering %s...\n",
-                       corpse->getName(true));
-    character->room->sendToAll("%s starts dismembering %s...\n",
-                               {character},
-                               character->getNameCapital(),
-                               corpse->getName(true));
-    return true;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	// If the character is a Player, check if the character has the required
+	// knowledge.
+	if (character->isPlayer()) {
+		// Transform the character to player.
+		auto player = character->toPlayer();
+		// Check if the player can butcher animals.
+		if (!player->effectManager.getKnowledge(Knowledge::Butchery)) {
+			character->sendMsg("You don't know how to dismember corpses.\n");
+			return false;
+		}
+	}
+	// Check the arguments.
+	if (args.size() != 1) {
+		character->sendMsg("What do you want to dismember?\n");
+		return false;
+	}
+	// Check if the room is NOT lit.
+	if (!character->room->isLit()) {
+		character->sendMsg("You cannot do that without light.\n");
+		return false;
+	}
+	auto item =
+		character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+	if (item == nullptr) {
+		character->sendMsg("You cannot find '%s'.\n", args[0].getContent());
+		return false;
+	}
+	if (item->getType() != ModelType::Corpse) {
+		character->sendMsg("%s is not a corpse.\n", item->getNameCapital(true));
+		return false;
+	}
+	// Cast the item to corpse.
+	auto corpse = dynamic_cast<CorpseItem *>(item);
+	// Get a valid body part.
+	auto bodyPart = corpse->getAvailableBodyPart();
+	if (bodyPart == nullptr) {
+		character->sendMsg("%s does not contain anything useful.\n",
+						   item->getNameCapital(true));
+		return false;
+	}
+	auto act = std::make_shared<DismemberAction>(character, corpse, bodyPart);
+	if (act->start()) {
+		character->pushAction(act);
+	}
+	return true;
 }

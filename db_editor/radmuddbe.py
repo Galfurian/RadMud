@@ -12,6 +12,10 @@ from radmuddbe_gui import *
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSql
 from qtmodern import styles
 import gc
+import sys
+import logging
+from logging import debug
+from functools import partial
 
 
 class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -98,11 +102,41 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         # Prepare all the table.
         for obj in gc.get_objects():
             if isinstance(obj, QtWidgets.QTableView):
-                obj.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+                # obj.resizeColumnsToContents()
+                obj.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+                obj.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
                 obj.setItemDelegate(QtSql.QSqlRelationalDelegate(obj))
+                obj.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+                obj.customContextMenuRequested.connect(self.table_menu)
 
         # === OPEN DATABASE CONNECTION ========================================
         self.open_database("../system/radmud.db")
+
+    def table_menu(self, position):
+        debug("RadMudEditor:table_menu(position={})".format(position))
+        widget = self.sender()
+        if not isinstance(widget, QtWidgets.QTableView):
+            debug("RadMudEditor:table_menu: Sender is not QtWidgets.QTableView.")
+            return
+        try:
+            row = QtCore.QModelIndex(QtCore.QPersistentModelIndex(widget.indexAt(position))).row()
+        except Exception as err:
+            debug("RadMudEditor:table_menu: Cannot get item at the given position.")
+            debug(str(err))
+            return
+        menu = QtWidgets.QMenu("Menu", self)
+        menu.addAction("Insert", partial(self.table_action_insert, table=widget))
+        menu.addAction("Delete", partial(self.table_action_delete, table=widget, index=row))
+        # Show the context menu.
+        menu.exec_(QtGui.QCursor.pos())
+
+    def table_action_insert(self, table):
+        debug("RadMudEditor:table_action_insert(table={})".format(table))
+        table.model().insertRow(table.model().rowCount())
+
+    def table_action_delete(self, table, index):
+        debug("RadMudEditor:table_action_delete_entry(table={}, index={})".format(table, index))
+        table.model().removeRow(index)
 
     def close_application(self):
         self.close_database()
@@ -183,7 +217,7 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
     def init_model(name):
         model = QtSql.QSqlRelationalTableModel()
         model.setTable(name)
-        model.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
+        model.setEditStrategy(QtSql.QSqlRelationalTableModel.OnManualSubmit)
         return model
 
     @staticmethod
@@ -206,7 +240,6 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # === CURRENCY ========================================================
         self.mdl_currency = self.init_model('currency')
-        self.mdl_currency.setEditStrategy(QtSql.QSqlRelationalTableModel.OnFieldChange)
         self.set_relation(self.mdl_currency, "model", "model", "vnum", "name")
         self.set_relation(self.mdl_currency, "material", "material", "vnum", "name")
         self.tbl_currency.setModel(self.mdl_currency)
@@ -481,8 +514,7 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
 
 if __name__ == "__main__":
-    import sys
-
+    logging.basicConfig(level=logging.DEBUG)
     app = QtWidgets.QApplication(sys.argv)
     styles.apply_dark_theme(app)
     editor = RadMudEditor()

@@ -53,6 +53,8 @@ public:
 
     std::string stop() override;
 
+	bool start() override;
+
     ActionStatus perform() override;
 
     unsigned int getCooldown() override;

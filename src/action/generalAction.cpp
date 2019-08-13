@@ -83,6 +83,11 @@ std::string GeneralAction::stop()
     return "Excuse me sir, but you are doing nothing.";
 }
 
+bool GeneralAction::start()
+{
+	return true;
+}
+
 ActionStatus GeneralAction::perform()
 {
     return ActionStatus::Finished;

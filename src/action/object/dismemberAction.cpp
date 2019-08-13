@@ -27,131 +27,132 @@
 
 #include <cassert>
 
-DismemberAction::DismemberAction(Character * _actor,
-                                 CorpseItem * _corpse,
-                                 const std::shared_ptr<BodyPart> & _bodyPart) :
-    GeneralAction(_actor),
-    corpse(_corpse),
-    bodyPart(_bodyPart)
+DismemberAction::DismemberAction(Character *_actor, CorpseItem *_corpse,
+								 const std::shared_ptr<BodyPart> &_bodyPart) :
+	GeneralAction(_actor),
+	corpse(_corpse),
+	bodyPart(_bodyPart)
 {
-    // Debugging message.
-    Logger::log(LogLevel::Debug, "Created DismemberAction.");
-    // Reset the cooldown of the action.
-    this->resetCooldown(this->getCooldown());
+	// Debugging message.
+	Logger::log(LogLevel::Debug, "Created DismemberAction.");
+	// Reset the cooldown of the action.
+	this->resetCooldown(this->getCooldown());
 }
 
 DismemberAction::~DismemberAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted DismemberAction.");
+	Logger::log(LogLevel::Debug, "Deleted DismemberAction.");
 }
 
-bool DismemberAction::check(std::string & error) const
+bool DismemberAction::check(std::string &error) const
 {
-    if (!GeneralAction::check(error))
-    {
-        return false;
-    }
-    if (corpse == nullptr)
-    {
-        error = "You cannot find the corpse you want to dismember.";
-        return false;
-    }
-    if (bodyPart == nullptr)
-    {
-        error = "You were not able to dismember the corpse.";
-        return false;
-    }
-    return true;
+	if (!GeneralAction::check(error)) {
+		return false;
+	}
+	if (corpse == nullptr) {
+		error = "You cannot find the corpse you want to dismember.";
+		return false;
+	}
+	if (bodyPart == nullptr) {
+		error = "You were not able to dismember the corpse.";
+		return false;
+	}
+	return true;
 }
 
 ActionType DismemberAction::getType() const
 {
-    return ActionType::Dismember;
+	return ActionType::Dismember;
 }
 
 std::string DismemberAction::getDescription() const
 {
-    return "dismembering";
+	return "dismembering";
 }
 
 std::string DismemberAction::stop()
 {
-    return "You stop dismembering.";
+	return "You stop dismembering.";
+}
+
+bool DismemberAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n");
+		return false;
+	}
+	actor->sendMsg("You start dismembering %s...\n", corpse->getName(true));
+	actor->room->sendToAll("%s starts dismembering %s...\n", { actor },
+						   actor->getNameCapital(), corpse->getName(true));
+	return true;
 }
 
 ActionStatus DismemberAction::perform()
 {
-    // First try to remove the body part.
-    if (!corpse->removeBodyPart(bodyPart))
-    {
-        actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
-        return ActionStatus::Error;
-    }
-    // Get the skill rank of the actor.
-    auto butchery = actor->effectManager.getKnowledge(Knowledge::Butchery);
-    // Create the resources of the given body part.
-    bool dismemberedSomthing = false;
-    for (auto resources : bodyPart->resources)
-    {
-        // Roll the DC and check if the action is a success. However, the
-        // actor can keep all the things he has dismembered til now.
-        auto DCRoll = TRand<int>(1, 20) + butchery;
-        Logger::log(LogLevel::Debug, "DC: %s vs %s", DCRoll,
-                    resources.difficulty);
-        if (DCRoll < resources.difficulty)
-        {
-            actor->sendMsg("You stop to dismember %s.", corpse->getName(true));
-            return ActionStatus::Error;
-        }
-        auto item = resources.resource->createItem(
-            actor->getName(),
-            resources.material,
-            false,
-            ItemQuality::Normal,
-            static_cast<unsigned int>(resources.quantity));
-        if (item == nullptr)
-        {
-            actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
-            return ActionStatus::Error;
-        }
-        actor->skillManager.improveKnowledge(Knowledge::Butchery);
-        actor->sendMsg("You successfully butcher %s and produce %s.\n\n",
-                       corpse->getName(true),
-                       item->getName(true));
-        if (actor->canCarry(item, item->quantity))
-        {
-            actor->addInventoryItem(item);
-        }
-        else if (actor->room != nullptr)
-        {
-            actor->sendMsg("%s has been placed on the ground.",
-                           corpse->getNameCapital(true));
-            actor->room->addItem(item);
-        }
-        else
-        {
-            actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
-            return ActionStatus::Error;
-        }
-        dismemberedSomthing = true;
-    }
-    if (!dismemberedSomthing)
-    {
-        actor->sendMsg("You produced nothing from %s.", corpse->getName(true));
-        return ActionStatus::Error;
-    }
-    return ActionStatus::Finished;
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n");
+		return ActionStatus::Error;
+	}
+	// First try to remove the body part.
+	if (!corpse->removeBodyPart(bodyPart)) {
+		actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
+		return ActionStatus::Error;
+	}
+	// Get the skill rank of the actor.
+	auto butchery = actor->effectManager.getKnowledge(Knowledge::Butchery);
+	// Create the resources of the given body part.
+	bool dismemberedSomthing = false;
+	for (auto const &resources : bodyPart->resources) {
+		// Roll the DC and check if the action is a success. However, the
+		// actor can keep all the things he has dismembered til now.
+		auto DCRoll = TRand<int>(1, 20) + butchery;
+		Logger::log(LogLevel::Debug, "DC: %s vs %s", DCRoll,
+					resources.difficulty);
+		if (DCRoll < resources.difficulty) {
+			actor->sendMsg("You stop to dismember %s.", corpse->getName(true));
+			return ActionStatus::Error;
+		}
+		auto item = resources.resource->createItem(
+			actor->getName(), resources.material, false, ItemQuality::Normal,
+			static_cast<unsigned int>(resources.quantity));
+		if (item == nullptr) {
+			actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
+			return ActionStatus::Error;
+		}
+		actor->skillManager.improveKnowledge(Knowledge::Butchery);
+		actor->sendMsg("You successfully butcher %s and produce %s.\n\n",
+					   corpse->getName(true), item->getName(true));
+		if (actor->canCarry(item, item->quantity)) {
+			actor->addInventoryItem(item);
+		} else if (actor->room != nullptr) {
+			actor->sendMsg("%s has been placed on the ground.",
+						   corpse->getNameCapital(true));
+			actor->room->addItem(item);
+		} else {
+			actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
+			return ActionStatus::Error;
+		}
+		dismemberedSomthing = true;
+	}
+	if (!dismemberedSomthing) {
+		actor->sendMsg("You produced nothing from %s.", corpse->getName(true));
+		return ActionStatus::Error;
+	}
+	return ActionStatus::Finished;
 }
 
 unsigned int DismemberAction::getCooldown()
 {
-    assert(actor && "Actor is nullptr");
-    assert(corpse && "Corpse is nullptr");
-    assert(bodyPart && "BodyPart is nullptr");
-    double required = 6;
-    Logger::log(LogLevel::Debug, "Base time  :%s", required);
-    required -=
-        (required * actor->effectManager.getKnowledge(Knowledge::Butchery)) / 100;
-    Logger::log(LogLevel::Debug, "With skill :%s", required);
-    return static_cast<unsigned int>(required);
+	assert(actor && "Actor is nullptr");
+	assert(corpse && "Corpse is nullptr");
+	assert(bodyPart && "BodyPart is nullptr");
+	double required = 6;
+	Logger::log(LogLevel::Debug, "Base time  :%s", required);
+	required -=
+		(required * actor->effectManager.getKnowledge(Knowledge::Butchery)) /
+		100;
+	Logger::log(LogLevel::Debug, "With skill :%s", required);
+	return static_cast<unsigned int>(required);
 }
