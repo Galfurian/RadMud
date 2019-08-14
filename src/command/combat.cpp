@@ -116,25 +116,22 @@ bool DoKill(Character *character, ArgumentHandler &args)
 			return true;
 		}
 		character->sendMsg("You have already your share of troubles!\n");
-	} else {
-		// Check if the character is attacking a target
-		//  which is already in combat.
-		// Let the characters enter the combat.
-		auto basicAttack = std::make_shared<BasicAttack>(character);
-		std::string error;
-		if (basicAttack->check(error)) {
-			// Add the target to the list of opponents.
-			character->combatHandler.addOpponent(target);
-			// Add the action to the character's combat queue.
-			character->pushAction(basicAttack);
-			// Set the predefined target.
-			character->combatHandler.setPredefinedTarget(target);
-			// Notify the character.
-			character->sendMsg("You attack %s.\n", target->getName());
-			return true;
-		}
-		character->sendMsg("You were not able to attack %s.\n",
-						   target->getName());
+		return false;
+	}
+	// Check if the character is attacking a target
+	//  which is already in combat.
+	// Let the characters enter the combat.
+	auto basicAttack = std::make_shared<BasicAttack>(character);
+	if (basicAttack->start()) {
+		// Add the target to the list of opponents.
+		character->combatHandler.addOpponent(target);
+		// Add the action to the character's combat queue.
+		character->pushAction(basicAttack);
+		// Set the predefined target.
+		character->combatHandler.setPredefinedTarget(target);
+		// Notify the character.
+		character->sendMsg("You attack %s.\n", target->getName());
+		return true;
 	}
 	return false;
 }
@@ -155,16 +152,11 @@ bool DoFlee(Character *character, ArgumentHandler & /*args*/)
 			return false;
 		}
 	}
-	auto flee = std::make_shared<Flee>(character);
-	std::string error;
-	if (flee->check(error)) {
-		// Add the action to the character's combat queue.
-		character->pushAction(flee);
-		// Notify the character.
-		character->sendMsg("You prepare to flee...\n");
+	auto act = std::make_shared<Flee>(character);
+	if (act->start()) {
+		character->pushAction(act);
 		return true;
 	}
-	character->sendMsg(error + "\n");
 	return false;
 }
 
@@ -235,8 +227,8 @@ bool DoLoad(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Create the load action.
-	auto act = std::make_shared<LoadAction>(character, magazine,
-												  projectile, amountToLoad);
+	auto act = std::make_shared<LoadAction>(character, magazine, projectile,
+											amountToLoad);
 	if (act->start()) {
 		character->pushAction(act);
 		return true;
@@ -336,7 +328,8 @@ bool DoReload(Character *character, ArgumentHandler &args)
 						   magazine->getName(true));
 		return false;
 	}
-	auto act = std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
+	auto act =
+		std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
 	if (act->start()) {
 		character->pushAction(act);
 		return true;
@@ -406,19 +399,12 @@ bool DoAim(Character *character, ArgumentHandler &args)
 						   aimedCharacter->getNameCapital());
 		return false;
 	}
-	auto newAction = std::make_shared<AimAction>(character, aimedCharacter);
-	// Check the new action.
-	std::string error;
-	if (!newAction->check(error)) {
-		character->sendMsg("%s\n", error);
-		return false;
+	auto act = std::make_shared<AimAction>(character, aimedCharacter);
+	if (act->start()) {
+		character->pushAction(act);
+		return true;
 	}
-	// Send the starting message.
-	character->sendMsg("You start aiming at %s...\n",
-					   aimedCharacter->getName());
-	// Set the new action.
-	character->pushAction(newAction);
-	return true;
+	return false;
 }
 
 bool DoFire(Character *character, ArgumentHandler & /*args*/)

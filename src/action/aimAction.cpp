@@ -73,11 +73,24 @@ std::string AimAction::getDescription() const
 	return "aiming";
 }
 
+bool AimAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the starting message.
+	actor->sendMsg("You start aiming at %s...\n", target->getName());
+	actor->room->sendToAll("%s starts aiming...\n", { actor },
+						   actor->getNameCapital());
+	return true;
+}
+
 std::string AimAction::stop()
 {
-	if (target != nullptr) {
+	if (target != nullptr)
 		return "You stop aiming at " + target->getName() + ".";
-	}
 	return "You stop aiming.";
 }
 

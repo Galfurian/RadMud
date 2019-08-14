@@ -79,7 +79,8 @@ bool ScoutAction::start()
 	}
 	// Send the starting message.
 	actor->sendMsg("You start scouting the area...\n");
-	actor->room->sendToAll("%s starts scouting the area...\n", { actor });
+	actor->room->sendToAll("%s starts scouting the area...\n", { actor },
+						   actor->getNameCapital());
 	return true;
 }
 

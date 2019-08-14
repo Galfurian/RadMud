@@ -41,6 +41,8 @@ public:
 
 	std::string getDescription() const override;
 
+	bool start() override;
+
 	std::string stop() override;
 
 	ActionStatus perform() override;

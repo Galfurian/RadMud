@@ -89,7 +89,8 @@ bool ReloadAction::start()
 	actor->sendMsg("You start reloading %s with %s.\n", weapon->getName(true),
 				   magazine->getName(true));
 	actor->room->sendToAll("%s starts reloading %s with %s...\n", { actor },
-						   weapon->getName(true), magazine->getName(true));
+						   actor->getNameCapital(), weapon->getName(true),
+						   magazine->getName(true));
 	return true;
 }
 

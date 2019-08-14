@@ -69,7 +69,18 @@ ActionType Chase::getType() const
 
 std::string Chase::getDescription() const
 {
-	return "Chasing";
+	return "chasing";
+}
+
+bool Chase::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the starting message.
+	return true;
 }
 
 std::string Chase::stop()

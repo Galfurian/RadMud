@@ -93,6 +93,7 @@ bool UnloadAction::start()
 	// Send the starting message.
 	actor->sendMsg("You start unloading %s.\n", item->getName(true));
 	actor->room->sendToAll("%s starts unloading %s...\n", { actor },
+						   actor->getNameCapital(),
 						   item->getName(true));
 	return true;
 }

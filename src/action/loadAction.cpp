@@ -100,7 +100,7 @@ bool LoadAction::start()
 	actor->sendMsg("You start loading %s with %s.\n", magazine->getName(true),
 				   projectile->getName(true));
 	actor->room->sendToAll("%s starts loading %s with %s...\n", { actor },
-						   magazine->getName(true),
+						   actor->getNameCapital(), magazine->getName(true),
 						   projectile->getName(true));
 	return true;
 }

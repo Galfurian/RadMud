@@ -59,6 +59,17 @@ std::string BasicAttack::getDescription() const
 	return "fighting";
 }
 
+bool BasicAttack::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the starting message.
+	return true;
+}
+
 std::string BasicAttack::stop()
 {
 	return "You stop fighting.";

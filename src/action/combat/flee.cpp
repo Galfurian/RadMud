@@ -67,6 +67,19 @@ std::string Flee::getDescription() const
 	return "fleeing";
 }
 
+bool Flee::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Notify the character.
+	character->sendMsg("You prepare to flee...\n");
+	// Send the starting message.
+	return true;
+}
+
 std::string Flee::stop()
 {
 	return "You stop fleeing.";
