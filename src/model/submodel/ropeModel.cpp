@@ -24,57 +24,52 @@
 
 #include "logger.hpp"
 
-RopeModel::RopeModel() :
-    difficulty(),
-    ropeType()
+RopeModel::RopeModel() : difficulty(), ropeType()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 RopeModel::~RopeModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType RopeModel::getType() const
 {
-    return ModelType::Rope;
+	return ModelType::Rope;
 }
 
 std::string RopeModel::getTypeName() const
 {
-    return "Rope";
+	return "Rope";
 }
 
-bool RopeModel::setModel(const std::string & source)
+bool RopeModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 2)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Rope Model (%s).",
-                    this->name);
-        return false;
-    }
-    this->difficulty = ToNumber<unsigned int>(functionList[0]);
-    this->ropeType = ToNumber<unsigned int>(functionList[1]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 2) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Rope Model (%s).",
+					this->name);
+		return false;
+	}
+	this->difficulty = ToNumber<unsigned int>(functionList[0]);
+	this->ropeType = ToNumber<unsigned int>(functionList[1]);
+	return true;
 }
 
-void RopeModel::getSheet(Table & sheet) const
+void RopeModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Untie Difficulty", ToString(this->difficulty)});
-    sheet.addRow({"Rope Type", ToString(this->ropeType)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Untie Difficulty", ToString(this->difficulty) });
+	sheet.addRow({ "Rope Type", ToString(this->ropeType) });
 }

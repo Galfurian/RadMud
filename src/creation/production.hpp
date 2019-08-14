@@ -38,62 +38,61 @@ class ItemModel;
 #include <map>
 
 /// @brief Holds details about a production.
-class Production
-{
+class Production {
 public:
-    /// The virtual number of the production.
-    unsigned int vnum;
-    /// The name of the production.
-    std::string name;
-    /// The profession needed to perform the production.
-    Profession * profession;
-    /// The difficulty of the production.
-    unsigned int difficulty;
-    /// The time required to perform the production.
-    double time;
-    /// A flag which indicates if the maker can be assisted by someone.
-    bool assisted;
-    /// A pointer to the outcome model.
-    std::shared_ptr<ItemModel> outcome;
-    /// The quantity of the outcome.
-    unsigned int quantity;
-    /// The list of needed type of tools.
-    std::vector<ToolType> tools;
-    /// The list of needed type of ingredients and their quantity.
-    std::map<ResourceType, unsigned int> ingredients;
-    /// The type of the workbench.
-    ToolType workbench;
-    /// The required knowledge levels for the given production.
-    std::vector<Knowledge> requiredKnowledge;
+	/// The virtual number of the production.
+	unsigned int vnum;
+	/// The name of the production.
+	std::string name;
+	/// The profession needed to perform the production.
+	Profession *profession;
+	/// The difficulty of the production.
+	unsigned int difficulty;
+	/// The time required to perform the production.
+	double time;
+	/// A flag which indicates if the maker can be assisted by someone.
+	bool assisted;
+	/// A pointer to the outcome model.
+	std::shared_ptr<ItemModel> outcome;
+	/// The quantity of the outcome.
+	unsigned int quantity;
+	/// The list of needed type of tools.
+	std::vector<ToolType> tools;
+	/// The list of needed type of ingredients and their quantity.
+	std::map<ResourceType, unsigned int> ingredients;
+	/// The type of the workbench.
+	ToolType workbench;
+	/// The required knowledge levels for the given production.
+	std::vector<Knowledge> requiredKnowledge;
 
-    /// @brief Constructor.
-    Production();
+	/// @brief Constructor.
+	Production();
 
-    /// @brief Disable Copy Construct.
-    Production(Production const &) = delete;
+	/// @brief Disable Copy Construct.
+	Production(Production const &) = delete;
 
-    /// @brief Disable Move construct.
-    Production(Production &&) = delete;
+	/// @brief Disable Move construct.
+	Production(Production &&) = delete;
 
-    /// @brief Disable Copy assign.
-    Production & operator=(Production const &) = delete;
+	/// @brief Disable Copy assign.
+	Production &operator=(Production const &) = delete;
 
-    /// @brief Disable Move assign.
-    Production & operator=(Production &&) = delete;
+	/// @brief Disable Move assign.
+	Production &operator=(Production &&) = delete;
 
-    /// @brief Destructor.
-    ~Production();
+	/// @brief Destructor.
+	~Production();
 
-    /// @brief Check the correctness of the production.
-    /// @return <b>True</b> if the profession has correct values,<br>
-    ///         <b>False</b> otherwise.
-    bool check();
+	/// @brief Check the correctness of the production.
+	/// @return <b>True</b> if the profession has correct values,<br>
+	///         <b>False</b> otherwise.
+	bool check();
 
-    /// @brief Return the name of the production.
-    /// @return The name of the production.
-    std::string getName();
+	/// @brief Return the name of the production.
+	/// @return The name of the production.
+	std::string getName();
 
-    /// @brief Return the name with the first letter capitalized.
-    /// @return The name of the production capitalized.
-    std::string getNameCapital();
+	/// @brief Return the name with the first letter capitalized.
+	/// @return The name of the production capitalized.
+	std::string getNameCapital();
 };

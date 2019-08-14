@@ -26,79 +26,64 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessNewWeight::process(Character * character, ArgumentHandler & args)
+bool ProcessNewWeight::process(Character *character, ArgumentHandler &args)
 {
-    auto player = character->toPlayer();
-    auto input = args.getOriginal();
-    // Check if the player has typed BACK.
-    if (ToLower(input) == "back")
-    {
-        // Create a shared pointer to the previous step.
-        auto newStep = std::make_shared<ProcessNewDescription>();
-        // Set the handler.
-        player->inputProcessor = newStep;
-        // Advance to the next step.
-        newStep->rollBack(character);
-        return true;
-    }
-    else if (!IsNumber(input))
-    {
-        this->advance(character, "Not a valid weight.");
-    }
-    else
-    {
-        int weight = ToNumber<int>(input);
-        if (weight < 40)
-        {
-            this->advance(character, "You can't be a feather.");
-        }
-        else if (weight > 120)
-        {
-            this->advance(character, "Too much.");
-        }
-        else
-        {
-            player->weight = static_cast<unsigned int>(weight);
-            // Create a shared pointer to the next step.
-            auto newStep = std::make_shared<ProcessNewConfirm>();
-            // Set the handler.
-            player->inputProcessor = newStep;
-            // Advance to the next step.
-            newStep->advance(character);
-            return true;
-        }
-    }
-    return false;
+	auto player = character->toPlayer();
+	auto input = args.getOriginal();
+	// Check if the player has typed BACK.
+	if (ToLower(input) == "back") {
+		// Create a shared pointer to the previous step.
+		auto newStep = std::make_shared<ProcessNewDescription>();
+		// Set the handler.
+		player->inputProcessor = newStep;
+		// Advance to the next step.
+		newStep->rollBack(character);
+		return true;
+	} else if (!IsNumber(input)) {
+		this->advance(character, "Not a valid weight.");
+	} else {
+		int weight = ToNumber<int>(input);
+		if (weight < 40) {
+			this->advance(character, "You can't be a feather.");
+		} else if (weight > 120) {
+			this->advance(character, "Too much.");
+		} else {
+			player->weight = static_cast<unsigned int>(weight);
+			// Create a shared pointer to the next step.
+			auto newStep = std::make_shared<ProcessNewConfirm>();
+			// Set the handler.
+			player->inputProcessor = newStep;
+			// Advance to the next step.
+			newStep->advance(character);
+			return true;
+		}
+	}
+	return false;
 }
 
-void ProcessNewWeight::advance(Character * character,
-                               const std::string & error)
+void ProcessNewWeight::advance(Character *character, const std::string &error)
 {
-    // Print the choices.
-    this->printChoices(character);
-    auto Bold = [](const std::string & s)
-    {
-        return Formatter::magenta() + s + Formatter::reset();
-    };
-    auto Magenta = [](const std::string & s)
-    {
-        return Formatter::magenta() + s + Formatter::reset();
-    };
-    std::string msg;
-    msg += "# " + Bold("Character's Weight.") + "\n";
-    msg += "# Choose the weight of your character.\n";
-    msg += "# Type [" + Magenta("back") +
-           "] to return to the previous step.\n";
-    if (!error.empty())
-    {
-        msg += "# " + error + "\n";
-    }
-    character->sendMsg(msg);
+	// Print the choices.
+	this->printChoices(character);
+	auto Bold = [](const std::string &s) {
+		return Formatter::magenta() + s + Formatter::reset();
+	};
+	auto Magenta = [](const std::string &s) {
+		return Formatter::magenta() + s + Formatter::reset();
+	};
+	std::string msg;
+	msg += "# " + Bold("Character's Weight.") + "\n";
+	msg += "# Choose the weight of your character.\n";
+	msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
+	if (!error.empty()) {
+		msg += "# " + error + "\n";
+	}
+	character->sendMsg(msg);
 }
 
-void ProcessNewWeight::rollBack(Character * character)
+void ProcessNewWeight::rollBack(Character *character)
 {
-    auto player = character->toPlayer();
-    player->weight = 0;
-    this->advance(character);
+	auto player = character->toPlayer();
+	player->weight = 0;
+	this->advance(character);
 }

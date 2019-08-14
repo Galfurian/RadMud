@@ -27,12 +27,12 @@
 /// @{
 
 /// Organize the items in the room.
-bool DoOrganize(Character * character, ArgumentHandler & args);
+bool DoOrganize(Character *character, ArgumentHandler &args);
 
 /// Open a door if not unlocked.
-bool DoOpen(Character * character, ArgumentHandler & args);
+bool DoOpen(Character *character, ArgumentHandler &args);
 
 /// Close a door.
-bool DoClose(Character * character, ArgumentHandler & args);
+bool DoClose(Character *character, ArgumentHandler &args);
 
 ///@}

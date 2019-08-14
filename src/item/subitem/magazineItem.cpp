@@ -25,122 +25,107 @@
 
 MagazineItem::MagazineItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 MagazineItem::~MagazineItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-void MagazineItem::getSheet(Table & sheet) const
+void MagazineItem::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    Item::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    if (!this->isEmpty())
-    {
-        // Get the already loaded projectile.
-        auto loadedProjectile = this->getAlreadyLoadedProjectile();
-        if (loadedProjectile == nullptr)
-        {
-            sheet.addRow({"Projectile", "NULL"});
-        }
-        else
-        {
-            sheet.addRow({"Projectile", loadedProjectile->getName(false)});
-        }
-    }
+	// Call the function of the father class.
+	Item::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	if (!this->isEmpty()) {
+		// Get the already loaded projectile.
+		auto loadedProjectile = this->getAlreadyLoadedProjectile();
+		if (loadedProjectile == nullptr) {
+			sheet.addRow({ "Projectile", "NULL" });
+		} else {
+			sheet.addRow({ "Projectile", loadedProjectile->getName(false) });
+		}
+	}
 }
 
 std::string MagazineItem::lookContent()
 {
-    // Get the already loaded projectile.
-    auto loadedProjectile = this->getAlreadyLoadedProjectile();
-    if (content.empty() || (loadedProjectile == nullptr))
-    {
-        return Formatter::italic("It does not contain any projectiles.\n");
-    }
-    std::stringstream ss;
-    ss << Formatter::italic();
-    ss << "It contains " << loadedProjectile->getName(true);
-    ss << "[" << ToString(loadedProjectile->quantity) + "].\n";
-    ss << Formatter::reset();
-    return ss.str();
+	// Get the already loaded projectile.
+	auto loadedProjectile = this->getAlreadyLoadedProjectile();
+	if (content.empty() || (loadedProjectile == nullptr)) {
+		return Formatter::italic("It does not contain any projectiles.\n");
+	}
+	std::stringstream ss;
+	ss << Formatter::italic();
+	ss << "It contains " << loadedProjectile->getName(true);
+	ss << "[" << ToString(loadedProjectile->quantity) + "].\n";
+	ss << Formatter::reset();
+	return ss.str();
 }
 
 bool MagazineItem::isAContainer() const
 {
-    return true;
+	return true;
 }
 
-bool MagazineItem::canLoadWith(Item * _projectile, std::string & error) const
+bool MagazineItem::canLoadWith(Item *_projectile, std::string &error) const
 {
-    if (_projectile->getType() != ModelType::Projectile)
-    {
-        error = "You can't load " + this->getName(true) + " with " +
-                _projectile->getName(true);
-        return false;
-    }
-    // Retrieve any already loaded projectiles.
-    auto loadedProjectile = this->getAlreadyLoadedProjectile();
-    if (loadedProjectile != nullptr)
-    {
-        // If there are projectiles inside, check if the two types of
-        //  projectiles are compatible.
-        if (!loadedProjectile->canStackWith(_projectile))
-        {
-            error = "The magazine already contains a different"
-                " type of projectiles";
-            return false;
-        }
-    }
-    return true;
+	if (_projectile->getType() != ModelType::Projectile) {
+		error = "You can't load " + this->getName(true) + " with " +
+				_projectile->getName(true);
+		return false;
+	}
+	// Retrieve any already loaded projectiles.
+	auto loadedProjectile = this->getAlreadyLoadedProjectile();
+	if (loadedProjectile != nullptr) {
+		// If there are projectiles inside, check if the two types of
+		//  projectiles are compatible.
+		if (!loadedProjectile->canStackWith(_projectile)) {
+			error = "The magazine already contains a different"
+					" type of projectiles";
+			return false;
+		}
+	}
+	return true;
 }
 
-bool MagazineItem::getAmountToLoad(Item * _projectile,
-                                   unsigned int & amount,
-                                   std::string & error) const
+bool MagazineItem::getAmountToLoad(Item *_projectile, unsigned int &amount,
+								   std::string &error) const
 {
-    if (!this->canLoadWith(_projectile, error))
-    {
-        return false;
-    }
-    // Set by default the amount to load to the maximum.
-    amount = this->model->to<MagazineModel>()->maxAmount;
-    unsigned int amountAlreadyLoaded = 0;
-    // Retrieve any already loaded projectiles.
-    auto loadedProjectile = this->getAlreadyLoadedProjectile();
-    if (loadedProjectile != nullptr)
-    {
-        // Set the amount of already loaded projectiles.
-        amountAlreadyLoaded = loadedProjectile->quantity;
-        if (amount <= amountAlreadyLoaded)
-        {
-            error = this->getNameCapital(true) +
-                    " is already at full capacity.";
-            return false;
-        }
-        amount -= amountAlreadyLoaded;
-    }
-    return true;
+	if (!this->canLoadWith(_projectile, error)) {
+		return false;
+	}
+	// Set by default the amount to load to the maximum.
+	amount = this->model->to<MagazineModel>()->maxAmount;
+	unsigned int amountAlreadyLoaded = 0;
+	// Retrieve any already loaded projectiles.
+	auto loadedProjectile = this->getAlreadyLoadedProjectile();
+	if (loadedProjectile != nullptr) {
+		// Set the amount of already loaded projectiles.
+		amountAlreadyLoaded = loadedProjectile->quantity;
+		if (amount <= amountAlreadyLoaded) {
+			error =
+				this->getNameCapital(true) + " is already at full capacity.";
+			return false;
+		}
+		amount -= amountAlreadyLoaded;
+	}
+	return true;
 }
 
-Item * MagazineItem::getAlreadyLoadedProjectile() const
+Item *MagazineItem::getAlreadyLoadedProjectile() const
 {
-    if (!this->isEmpty())
-    {
-        // Get the first element of the content.
-        auto projectile = content.front();
-        if (projectile != nullptr)
-        {
-            if (projectile->getType() == ModelType::Projectile)
-            {
-                return projectile;
-            }
-        }
-    }
-    return nullptr;
+	if (!this->isEmpty()) {
+		// Get the first element of the content.
+		auto projectile = content.front();
+		if (projectile != nullptr) {
+			if (projectile->getType() == ModelType::Projectile) {
+				return projectile;
+			}
+		}
+	}
+	return nullptr;
 }

@@ -25,48 +25,46 @@
 #include "magazineItem.hpp"
 
 /// @brief Holds details about a ranged weapon.
-class RangedWeaponItem :
-    public Item
-{
+class RangedWeaponItem : public Item {
 public:
-    /// @brief Constructor.
-    RangedWeaponItem();
+	/// @brief Constructor.
+	RangedWeaponItem();
 
-    /// @brief Destructor.
-    virtual ~RangedWeaponItem();
+	/// @brief Destructor.
+	virtual ~RangedWeaponItem();
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    std::string lookContent() override;
+	std::string lookContent() override;
 
-    bool isAContainer() const override;
+	bool isAContainer() const override;
 
-    /// Randomly roll the weapon damage.
-    unsigned int rollDamage() const;
+	/// Randomly roll the weapon damage.
+	unsigned int rollDamage() const;
 
-    /// Provides the minimum damage.
-    unsigned int getMinDamage() const;
+	/// Provides the minimum damage.
+	unsigned int getMinDamage() const;
 
-    /// Provides the maximum damage.
-    unsigned int getMaxDamage() const;
+	/// Provides the maximum damage.
+	unsigned int getMaxDamage() const;
 
-    /// Provides the range of this weapon.
-    int getRange() const;
+	/// Provides the range of this weapon.
+	int getRange() const;
 
-    /// @brief Checks if the current weapon can be reloaded with the given item.
-    /// @param magazine The magazine to check.
-    /// @return <b>True</b> if the ranged weapon can be reloaded with the
-    ///                      given magazine,<br>
-    ///         <b>False</b> otherwise.
-    bool canBeReloadedWith(Item * magazine) const;
+	/// @brief Checks if the current weapon can be reloaded with the given item.
+	/// @param magazine The magazine to check.
+	/// @return <b>True</b> if the ranged weapon can be reloaded with the
+	///                      given magazine,<br>
+	///         <b>False</b> otherwise.
+	bool canBeReloadedWith(Item *magazine) const;
 
-    /// @brief Search for an already loaded magazine.
-    /// @return A magazine already loaded if there is one.
-    MagazineItem * getAlreadyLoadedMagazine() const;
+	/// @brief Search for an already loaded magazine.
+	/// @return A magazine already loaded if there is one.
+	MagazineItem *getAlreadyLoadedMagazine() const;
 
-    /// @brief Retrieves the projectiles used by the weapon.
-    /// @param error The error message if the function has not found any
-    ///               projectiles inside.
-    /// @return The projectiles contained inside the weapon.
-    Item * retrieveProjectile(std::string & error) const;
+	/// @brief Retrieves the projectiles used by the weapon.
+	/// @param error The error message if the function has not found any
+	///               projectiles inside.
+	/// @return The projectiles contained inside the weapon.
+	Item *retrieveProjectile(std::string &error) const;
 };

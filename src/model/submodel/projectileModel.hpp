@@ -25,26 +25,24 @@
 #include "rangedWeaponModel.hpp"
 
 /// @brief Model of a projectile.
-class ProjectileModel :
-    public ItemModel
-{
+class ProjectileModel : public ItemModel {
 public:
-    /// The type of projectile.
-    RangedWeaponType projectileType;
-    /// The increment to the damage dealt.
-    unsigned int damageBonus;
-    /// The increment to the range of the weapon.
-    int rangeBonus;
+	/// The type of projectile.
+	RangedWeaponType projectileType;
+	/// The increment to the damage dealt.
+	unsigned int damageBonus;
+	/// The increment to the range of the weapon.
+	int rangeBonus;
 
-    ProjectileModel();
+	ProjectileModel();
 
-    virtual ~ProjectileModel();
+	virtual ~ProjectileModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

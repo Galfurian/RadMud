@@ -25,22 +25,20 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a book.
-class BookModel :
-    public ItemModel
-{
+class BookModel : public ItemModel {
 public:
-    /// Maximum number of parchments.
-    unsigned int maxParchments;
+	/// Maximum number of parchments.
+	unsigned int maxParchments;
 
-    BookModel();
+	BookModel();
 
-    virtual ~BookModel();
+	virtual ~BookModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

@@ -27,12 +27,12 @@
 /// @{
 
 /// Allows to turn on and off an activatable item.
-bool DoTurn(Character * character, ArgumentHandler & args);
+bool DoTurn(Character *character, ArgumentHandler &args);
 
 /// Allows to kindle a light source.
-bool DoKindle(Character * character, ArgumentHandler & args);
+bool DoKindle(Character *character, ArgumentHandler &args);
 
 /// Allows to refill a light source.
-bool DoRefill(Character * character, ArgumentHandler & args);
+bool DoRefill(Character *character, ArgumentHandler &args);
 
 ///@}

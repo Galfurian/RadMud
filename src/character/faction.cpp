@@ -25,53 +25,51 @@
 #include "currencyModel.hpp"
 #include "logger.hpp"
 
-Faction::Faction() :
-    vnum(),
-    name(),
-    description(),
-    currency()
+Faction::Faction() : vnum(), name(), description(), currency()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Faction::~Faction()
 {
-//    Logger::log(LogLevel::Debug,
-//                "Deleted faction\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+	//    Logger::log(LogLevel::Debug,
+	//                "Deleted faction\t[%s]\t\t(%s)",
+	//                ToString(this->vnum),
+	//                this->name);
 }
 
 bool Faction::check()
 {
-    if (vnum == 0) return false;
-    if (name.empty()) return false;
-    if (description.empty()) return false;
-    if (currency == nullptr) return false;
-    return true;
+	if (vnum == 0)
+		return false;
+	if (name.empty())
+		return false;
+	if (description.empty())
+		return false;
+	if (currency == nullptr)
+		return false;
+	return true;
 }
 
-void Faction::getSheet(Table & sheet) const
+void Faction::getSheet(Table &sheet) const
 {
-    // Add the columns.
-    sheet.addColumn("Attribute", align::left);
-    sheet.addColumn("Value", align::left);
-    // Set the values.
-    sheet.addRow({"Vnum", ToString(this->vnum)});
-    sheet.addRow({"Name", this->name});
-    sheet.addRow({"Description", this->description});
-    sheet.addRow({
-                     "Currency",
-                     currency->getName() + " (" + ToString(currency->vnum) + ")"
-                 });
+	// Add the columns.
+	sheet.addColumn("Attribute", align::left);
+	sheet.addColumn("Value", align::left);
+	// Set the values.
+	sheet.addRow({ "Vnum", ToString(this->vnum) });
+	sheet.addRow({ "Name", this->name });
+	sheet.addRow({ "Description", this->description });
+	sheet.addRow({ "Currency", currency->getName() + " (" +
+								   ToString(currency->vnum) + ")" });
 }
 
 std::string Faction::getName()
 {
-    return ToLower(name);
+	return ToLower(name);
 }
 
 std::string Faction::getNameCapital()
 {
-    return name;
+	return name;
 }

@@ -25,49 +25,44 @@
 #include "baseEnumerator.hpp"
 
 /// The postures of a character.
-class CharacterPosture :
-    public BaseEnumerator
-{
+class CharacterPosture : public BaseEnumerator {
 public:
-    /// List of possible character's posture.
-    enum Enum
-    {
-        None,   ///< The character has no posture.
-        Stand,  ///< The character it's standing.
-        Crouch, ///< The character it's crouched.
-        Prone,  ///< The character it's prone.
-        Sit,    ///< The character it's sitting.
-        Rest,   ///< The character it's lying down.
-        Sleep,  ///< The character is sleeping.
-    };
+	/// List of possible character's posture.
+	enum Enum {
+		None, ///< The character has no posture.
+		Stand, ///< The character it's standing.
+		Crouch, ///< The character it's crouched.
+		Prone, ///< The character it's prone.
+		Sit, ///< The character it's sitting.
+		Rest, ///< The character it's lying down.
+		Sleep, ///< The character is sleeping.
+	};
 
-    /// @brief Constructor.
-    CharacterPosture() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	CharacterPosture() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit CharacterPosture(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit CharacterPosture(const unsigned int &_value) :
+		BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    CharacterPosture(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	CharacterPosture(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the character posture as string.
-    std::string toString() const override;
+	/// @brief Returns the character posture as string.
+	std::string toString() const override;
 
-    /// @brief Returns the action describing the posture.
-    std::string getAction() const;
+	/// @brief Returns the action describing the posture.
+	std::string getAction() const;
 
-    uint32_t getSpeed() const;
+	uint32_t getSpeed() const;
 
-    uint32_t getRegainModifier() const;
+	uint32_t getRegainModifier() const;
 };

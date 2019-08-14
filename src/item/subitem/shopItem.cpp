@@ -26,255 +26,230 @@
 #include "mud.hpp"
 
 ShopItem::ShopItem() :
-    shopName(),
-    shopBuyTax(1),
-    shopSellTax(1),
-    balance(),
-    shopKeeper(),
-    openingHour(6),
-    closingHour(18)
+	shopName(),
+	shopBuyTax(1),
+	shopSellTax(1),
+	balance(),
+	shopKeeper(),
+	openingHour(6),
+	closingHour(18)
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ShopItem::~ShopItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 bool ShopItem::updateOnDB()
 {
-    // First, update the item.
-    if (!Item::updateOnDB())
-        return false;
-    // Check if the shop has being built.
-    if (!HasFlag(flags, ItemFlag::Built))
-        return true;
-    // Prepare the vector used to insert into the database.
-    std::vector<std::string> arguments;
-    arguments.emplace_back(ToString(vnum));
-    arguments.emplace_back(shopName);
-    arguments.emplace_back(ToString(shopBuyTax));
-    arguments.emplace_back(ToString(shopSellTax));
-    arguments.emplace_back(ToString(balance));
-    arguments.emplace_back((shopKeeper != nullptr) ?
-                           ToString(shopKeeper->vnum) : "");
-    arguments.emplace_back(ToString(openingHour));
-    arguments.emplace_back(ToString(closingHour));
-    if(SQLiteDbms::instance().insertInto("Shop", arguments, false, true))
-        return true;
-    Logger::log(LogLevel::Error, "Failed INSERT Shop '%s'", this->getName());
-    return false;
+	// First, update the item.
+	if (!Item::updateOnDB())
+		return false;
+	// Check if the shop has being built.
+	if (!HasFlag(flags, ItemFlag::Built))
+		return true;
+	// Prepare the vector used to insert into the database.
+	std::vector<std::string> arguments;
+	arguments.emplace_back(ToString(vnum));
+	arguments.emplace_back(shopName);
+	arguments.emplace_back(ToString(shopBuyTax));
+	arguments.emplace_back(ToString(shopSellTax));
+	arguments.emplace_back(ToString(balance));
+	arguments.emplace_back(
+		(shopKeeper != nullptr) ? ToString(shopKeeper->vnum) : "");
+	arguments.emplace_back(ToString(openingHour));
+	arguments.emplace_back(ToString(closingHour));
+	if (SQLiteDbms::instance().insertInto("Shop", arguments, false, true))
+		return true;
+	Logger::log(LogLevel::Error, "Failed INSERT Shop '%s'", this->getName());
+	return false;
 }
 
 bool ShopItem::removeOnDB()
 {
-    static bool status;
-    static WhereClause item_pair = std::make_pair("item", "-1");
-    static WhereClause stock_pair = std::make_pair("shop", "-1");
-    // Initialize variables.
-    status = true;
-    item_pair.second = ToString(vnum);
-    stock_pair.second = ToString(vnum);
-    // Call parent function.
-    status &= Item::removeOnDB();
-    if (!SQLiteDbms::instance().deleteFrom("Shop", {item_pair}))
-    {
-        Logger::log(LogLevel::Error, "Remove from table 'Shop'.");
-        SQLiteDbms::instance().showLastError();
-        status = false;
-    }
-    if (!SQLiteDbms::instance().deleteFrom("ShopDefaultStock", {stock_pair}))
-    {
-        Logger::log(LogLevel::Error, "Remove from table 'ShopDefaultStock'.");
-        SQLiteDbms::instance().showLastError();
-        status = false;
-    }
-    return status;
+	static bool status;
+	static WhereClause item_pair = std::make_pair("item", "-1");
+	static WhereClause stock_pair = std::make_pair("shop", "-1");
+	// Initialize variables.
+	status = true;
+	item_pair.second = ToString(vnum);
+	stock_pair.second = ToString(vnum);
+	// Call parent function.
+	status &= Item::removeOnDB();
+	if (!SQLiteDbms::instance().deleteFrom("Shop", { item_pair })) {
+		Logger::log(LogLevel::Error, "Remove from table 'Shop'.");
+		SQLiteDbms::instance().showLastError();
+		status = false;
+	}
+	if (!SQLiteDbms::instance().deleteFrom("ShopDefaultStock",
+										   { stock_pair })) {
+		Logger::log(LogLevel::Error, "Remove from table 'ShopDefaultStock'.");
+		SQLiteDbms::instance().showLastError();
+		status = false;
+	}
+	return status;
 }
 
-void ShopItem::getSheet(Table & sheet) const
+void ShopItem::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    Item::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Shop Name", shopName});
-    sheet.addRow({"Buy Tax", ToString(shopBuyTax)});
-    sheet.addRow({"Sell Tax", ToString(shopSellTax)});
-    sheet.addRow({"Balance", ToString(this->getBalance())});
-    sheet.addRow({"ShopKeeper",
-                  (shopKeeper) ? shopKeeper->getNameCapital() : "None"});
-    sheet.addRow({"Opening Hour", ToString(openingHour)});
-    sheet.addRow({"Closing Hour", ToString(closingHour)});
+	// Call the function of the father class.
+	Item::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Shop Name", shopName });
+	sheet.addRow({ "Buy Tax", ToString(shopBuyTax) });
+	sheet.addRow({ "Sell Tax", ToString(shopSellTax) });
+	sheet.addRow({ "Balance", ToString(this->getBalance()) });
+	sheet.addRow(
+		{ "ShopKeeper", (shopKeeper) ? shopKeeper->getNameCapital() : "None" });
+	sheet.addRow({ "Opening Hour", ToString(openingHour) });
+	sheet.addRow({ "Closing Hour", ToString(closingHour) });
 }
 
-bool ShopItem::canDeconstruct(std::string & error) const
+bool ShopItem::canDeconstruct(std::string &error) const
 {
-    if (!Item::canDeconstruct(error))
-    {
-        return false;
-    }
-    if (this->getBalance() != 0)
-    {
-        error = "You must withdraw all the coin first.";
-        return false;
-    }
-    return true;
+	if (!Item::canDeconstruct(error)) {
+		return false;
+	}
+	if (this->getBalance() != 0) {
+		error = "You must withdraw all the coin first.";
+		return false;
+	}
+	return true;
 }
 
 std::string ShopItem::lookContent()
 {
-    // If the shop is not built, show the item normal content.
-    if (!HasFlag(flags, ItemFlag::Built))
-    {
-        return "";
-    }
-    std::stringstream ss;
-    if (HasFlag(flags, ItemFlag::Closed))
-    {
-        ss << Formatter::italic("It is closed.\n");
-    }
-    std::string error;
-    if (!this->canUse(error))
-    {
-        // Show the error.
-        ss << Formatter::italic(error) + "\n\n";
-        // Show the content.
-        ss << "Looking inside you see:\n";
-        for (auto it : content)
-        {
-            ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
-            ss << it->getNameCapital() << "\n";
-        }
-    }
-    else
-    {
-        // Show who is managing the shop.
-        ss << shopKeeper->getNameCapital();
-        ss << " is currently managing the shop.\n";
-        if (content.empty())
-        {
-            ss << Formatter::italic("There is nothing on sale.\n\n");
-            return ss.str();
-        }
-        Table saleTable;
-        saleTable.addColumn("Good", align::left);
-        saleTable.addColumn("Quantity", align::center);
-        saleTable.addColumn("Weight (Single)", align::right);
-        saleTable.addColumn("Weight (stack)", align::right);
-        saleTable.addColumn("Buy", align::right);
-        saleTable.addColumn("Sell (Single)", align::right);
-        saleTable.addColumn("Sell (stack)", align::right);
+	// If the shop is not built, show the item normal content.
+	if (!HasFlag(flags, ItemFlag::Built)) {
+		return "";
+	}
+	std::stringstream ss;
+	if (HasFlag(flags, ItemFlag::Closed)) {
+		ss << Formatter::italic("It is closed.\n");
+	}
+	std::string error;
+	if (!this->canUse(error)) {
+		// Show the error.
+		ss << Formatter::italic(error) + "\n\n";
+		// Show the content.
+		ss << "Looking inside you see:\n";
+		for (auto it : content) {
+			ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
+			ss << it->getNameCapital() << "\n";
+		}
+	} else {
+		// Show who is managing the shop.
+		ss << shopKeeper->getNameCapital();
+		ss << " is currently managing the shop.\n";
+		if (content.empty()) {
+			ss << Formatter::italic("There is nothing on sale.\n\n");
+			return ss.str();
+		}
+		Table saleTable;
+		saleTable.addColumn("Good", align::left);
+		saleTable.addColumn("Quantity", align::center);
+		saleTable.addColumn("Weight (Single)", align::right);
+		saleTable.addColumn("Weight (stack)", align::right);
+		saleTable.addColumn("Buy", align::right);
+		saleTable.addColumn("Sell (Single)", align::right);
+		saleTable.addColumn("Sell (stack)", align::right);
 
-        saleTable.addHeader(shopName);
-        for (auto iterator : content)
-        {
-            // Prepare the row.
-            TableRow row;
-            row.emplace_back(iterator->getNameCapital());
-            row.emplace_back(ToString(iterator->quantity));
-            row.emplace_back(ToString(iterator->getWeight(false)));
-            if (iterator->quantity > 1)
-            {
-                row.emplace_back(ToString(iterator->getWeight(true)));
-            }
-            else
-            {
-                row.emplace_back("");
-            }
-            row.emplace_back(ToString(this->evaluateBuyPrice(iterator)));
-            row.emplace_back(ToString(this->evaluateSellPrice(iterator)));
-            if (iterator->quantity > 1)
-            {
-                row.emplace_back(ToString(
-                    this->evaluateSellPrice(iterator) *
-                    iterator->quantity));
-            }
-            else
-            {
-                row.emplace_back("");
-            }
-            // Add the row to the table.
-            saleTable.addRow(row);
-        }
-        ss << saleTable.getTable();
-    }
-    ss << "Has been used " << Formatter::yellow(ToString(getUsedSpace()));
-    ss << " out of " << Formatter::yellow(ToString(getTotalSpace())) << ' ';
-    ss << Mud::instance().getWeightMeasure() << ".\n";
-    return ss.str();
+		saleTable.addHeader(shopName);
+		for (auto iterator : content) {
+			// Prepare the row.
+			TableRow row;
+			row.emplace_back(iterator->getNameCapital());
+			row.emplace_back(ToString(iterator->quantity));
+			row.emplace_back(ToString(iterator->getWeight(false)));
+			if (iterator->quantity > 1) {
+				row.emplace_back(ToString(iterator->getWeight(true)));
+			} else {
+				row.emplace_back("");
+			}
+			row.emplace_back(ToString(this->evaluateBuyPrice(iterator)));
+			row.emplace_back(ToString(this->evaluateSellPrice(iterator)));
+			if (iterator->quantity > 1) {
+				row.emplace_back(ToString(this->evaluateSellPrice(iterator) *
+										  iterator->quantity));
+			} else {
+				row.emplace_back("");
+			}
+			// Add the row to the table.
+			saleTable.addRow(row);
+		}
+		ss << saleTable.getTable();
+	}
+	ss << "Has been used " << Formatter::yellow(ToString(getUsedSpace()));
+	ss << " out of " << Formatter::yellow(ToString(getTotalSpace())) << ' ';
+	ss << Mud::instance().getWeightMeasure() << ".\n";
+	return ss.str();
 }
 
 bool ShopItem::isAContainer() const
 {
-    // The shop can be considered a container only if built.
-    return HasFlag(flags, ItemFlag::Built);
+	// The shop can be considered a container only if built.
+	return HasFlag(flags, ItemFlag::Built);
 }
 
 double ShopItem::getTotalSpace() const
 {
-    // The base space.
-    double spaceBase = model->to<ShopModel>()->maxWeight;
-    // Evaluate the result.
-    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
+	// The base space.
+	double spaceBase = model->to<ShopModel>()->maxWeight;
+	// Evaluate the result.
+	return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
 
-void ShopItem::setNewShopKeeper(Mobile * _shopKeeper)
+void ShopItem::setNewShopKeeper(Mobile *_shopKeeper)
 {
-    if (shopKeeper == nullptr)
-    {
-        _shopKeeper->doCommand("say let's get to work!");
-    }
-    else if (shopKeeper != _shopKeeper)
-    {
-        _shopKeeper->doCommand("say let's get to work!");
-        shopKeeper->doCommand("say let's get some rest.");
-    }
-    shopKeeper = _shopKeeper;
+	if (shopKeeper == nullptr) {
+		_shopKeeper->doCommand("say let's get to work!");
+	} else if (shopKeeper != _shopKeeper) {
+		_shopKeeper->doCommand("say let's get to work!");
+		shopKeeper->doCommand("say let's get some rest.");
+	}
+	shopKeeper = _shopKeeper;
 }
 
 unsigned int ShopItem::getBalance() const
 {
-    return balance;
+	return balance;
 }
 
-bool ShopItem::canUse(std::string & error)
+bool ShopItem::canUse(std::string &error)
 {
-    if (shopKeeper == nullptr)
-    {
-        error = "Nobody is managing the shop.";
-        return false;
-    }
-    if (!shopKeeper->isAlive())
-    {
-        error = "The shopkeeper's probably ill.";
-        return false;
-    }
-    if (room->vnum != shopKeeper->room->vnum)
-    {
-        error = "The shopkeeper's is elsewhere.";
-        return false;
-    }
-    auto hour = MudUpdater::instance().getMudHour();
-    if (((openingHour < closingHour) && ((hour < openingHour) ||
-                                         (hour > closingHour))) ||
-        ((closingHour < openingHour) && ((hour < closingHour) ||
-                                         (hour > openingHour))))
-    {
-        error = "The shopkeeper's probably taking a nap.";
-        return false;
-    }
-    return true;
+	if (shopKeeper == nullptr) {
+		error = "Nobody is managing the shop.";
+		return false;
+	}
+	if (!shopKeeper->isAlive()) {
+		error = "The shopkeeper's probably ill.";
+		return false;
+	}
+	if (room->vnum != shopKeeper->room->vnum) {
+		error = "The shopkeeper's is elsewhere.";
+		return false;
+	}
+	auto hour = MudUpdater::instance().getMudHour();
+	if (((openingHour < closingHour) &&
+		 ((hour < openingHour) || (hour > closingHour))) ||
+		((closingHour < openingHour) &&
+		 ((hour < closingHour) || (hour > openingHour)))) {
+		error = "The shopkeeper's probably taking a nap.";
+		return false;
+	}
+	return true;
 }
 
-unsigned int ShopItem::evaluateBuyPrice(Item * item)
+unsigned int ShopItem::evaluateBuyPrice(Item *item)
 {
-    return shopBuyTax * item->getPrice(false);
+	return shopBuyTax * item->getPrice(false);
 }
 
-unsigned int ShopItem::evaluateSellPrice(Item * item)
+unsigned int ShopItem::evaluateSellPrice(Item *item)
 {
-    return shopSellTax * item->getPrice(false);
+	return shopSellTax * item->getPrice(false);
 }

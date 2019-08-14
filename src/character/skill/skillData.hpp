@@ -25,71 +25,64 @@
 #include "effect.hpp"
 #include "skillRank.hpp"
 
-class SkillData
-{
+class SkillData {
 public:
-    /// The skill vnum.
-    unsigned int skillVnum;
-    /// The skill level.
-    unsigned int skillLevel;
-    /// A pointer to the skill.
-    std::shared_ptr<Skill> skill;
+	/// The skill vnum.
+	unsigned int skillVnum;
+	/// The skill level.
+	unsigned int skillLevel;
+	/// A pointer to the skill.
+	std::shared_ptr<Skill> skill;
 
-    /// @brief Constructor.
-    SkillData(const unsigned int & _skillVnum,
-              const unsigned int & _skillLevel,
-              std::shared_ptr<Skill> _skill) :
-        skillVnum(_skillVnum),
-        skillLevel(_skillLevel),
-        skill(std::move(_skill))
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	SkillData(const unsigned int &_skillVnum, const unsigned int &_skillLevel,
+			  std::shared_ptr<Skill> _skill) :
+		skillVnum(_skillVnum),
+		skillLevel(_skillLevel),
+		skill(std::move(_skill))
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor.
-    SkillData(std::shared_ptr<Skill> _skill,
-              const unsigned int & _skillLevel) :
-        skillVnum(_skill->vnum),
-        skillLevel(_skillLevel),
-        skill(std::move(_skill))
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	SkillData(std::shared_ptr<Skill> _skill, const unsigned int &_skillLevel) :
+		skillVnum(_skill->vnum),
+		skillLevel(_skillLevel),
+		skill(std::move(_skill))
+	{
+		// Nothing to do.
+	}
 
-    inline SkillRank getSkillRank() const
-    {
-        return SkillRank::getSkillRank(skillLevel);
-    }
+	inline SkillRank getSkillRank() const
+	{
+		return SkillRank::getSkillRank(skillLevel);
+	}
 
-    inline void improveSkill(const unsigned int & skillImprovement)
-    {
-        skillLevel += skillImprovement;
-        if (skillLevel > SkillRank::getSkillCap())
-        {
-            skillLevel = SkillRank::getSkillCap();
-        }
-    }
+	inline void improveSkill(const unsigned int &skillImprovement)
+	{
+		skillLevel += skillImprovement;
+		if (skillLevel > SkillRank::getSkillCap()) {
+			skillLevel = SkillRank::getSkillCap();
+		}
+	}
 };
 
-class SkillEffect :
-    public ModifierManager
-{
+class SkillEffect : public ModifierManager {
 public:
-    /// The character affected by the effect.
-    Character * affected;
-    /// Name of the modifier.
-    std::string name;
-    /// The skill which produces the effect.
-    std::shared_ptr<SkillData> skillData;
+	/// The character affected by the effect.
+	Character *affected;
+	/// Name of the modifier.
+	std::string name;
+	/// The skill which produces the effect.
+	std::shared_ptr<SkillData> skillData;
 
-    /// @brief Constructor.
-    SkillEffect(Character * _affected,
-                std::string _name,
-                std::shared_ptr<SkillData> _skillData) :
-        affected(_affected),
-        name(std::move(_name)),
-        skillData(std::move(_skillData))
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	SkillEffect(Character *_affected, std::string _name,
+				std::shared_ptr<SkillData> _skillData) :
+		affected(_affected),
+		name(std::move(_name)),
+		skillData(std::move(_skillData))
+	{
+		// Nothing to do.
+	}
 };

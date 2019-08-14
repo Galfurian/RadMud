@@ -28,80 +28,68 @@
 
 namespace ItemUtils
 {
-
 /// @brief Search for the item inside the given container.
 /// @param container The container.
 /// @param key       The key of the item to search.
 /// @param number    Position of the item we want to look for.
 /// @return The item, if it's in the character's inventory.
-Item * FindItemIn(std::vector<Item *> const & container,
-                  std::string const & key,
-                  int & number)
+Item *FindItemIn(std::vector<Item *> const &container, std::string const &key,
+				 int &number)
 {
-    for (auto item : container)
-    {
-        if (!item->hasKey(ToLower(key))) continue;
-        if (number == 1) return item;
-        --number;
-    }
-    return nullptr;
+	for (auto item : container) {
+		if (!item->hasKey(ToLower(key)))
+			continue;
+		if (number == 1)
+			return item;
+		--number;
+	}
+	return nullptr;
 }
 
-bool IsValidTool(Item * item,
-                 ItemVector const & exceptions,
-                 ToolType const & toolType)
+bool IsValidTool(Item *item, ItemVector const &exceptions,
+				 ToolType const &toolType)
 {
-    // Check the pointer to the model.
-    if (item->model == nullptr)
-    {
-        return false;
-    }
-    // Check if the item is inside the exception list.
-    if (std::find_if(exceptions.begin(), exceptions.end(),
-                     [item](Item * exception)
-                     {
-                         return (item->vnum == exception->vnum);
-                     }) != exceptions.end())
-    {
-        return false;
-    }
-    // Check if the item is actually a tool.
-    if (item->model->getType() == ModelType::Tool)
-    {
-        // Check if the type of tool is the same.
-        return item->model->to<ToolModel>()->toolType == toolType;
-    }
-    if ((toolType == ToolType::CookingFire) &&
-        (item->model->getType() == ModelType::Light))
-    {
-        // Check if the light source can be used to cook.
-        return HasFlag(item->model->to<LightModel>()->lightSourceFlags,
-                       LightModelFlags::CanUseToCook);
-    }
-    return false;
+	// Check the pointer to the model.
+	if (item->model == nullptr) {
+		return false;
+	}
+	// Check if the item is inside the exception list.
+	if (std::find_if(exceptions.begin(), exceptions.end(),
+					 [item](Item *exception) {
+						 return (item->vnum == exception->vnum);
+					 }) != exceptions.end()) {
+		return false;
+	}
+	// Check if the item is actually a tool.
+	if (item->model->getType() == ModelType::Tool) {
+		// Check if the type of tool is the same.
+		return item->model->to<ToolModel>()->toolType == toolType;
+	}
+	if ((toolType == ToolType::CookingFire) &&
+		(item->model->getType() == ModelType::Light)) {
+		// Check if the light source can be used to cook.
+		return HasFlag(item->model->to<LightModel>()->lightSourceFlags,
+					   LightModelFlags::CanUseToCook);
+	}
+	return false;
 }
 
-bool IsValidResource(Item * item,
-                     const ResourceType & resourceType)
+bool IsValidResource(Item *item, const ResourceType &resourceType)
 {
-    // Check the pointer to the model.
-    if (item->model == nullptr)
-    {
-        return false;
-    }
-    // Check if the item is a resource.
-    if (item->model->getType() == ModelType::Resource)
-    {
-        // Check if the type of resource is the same.
-        return (item->model->to<ResourceModel>()->resourceType == resourceType);
-    }
-    else if ((resourceType == ResourceType::Meat) &&
-             (item->model->getType() == ModelType::Food))
-    {
-        // Check if the type of resource is the same.
-        return HasFlag(item->model->to<FoodModel>()->foodFlags, FoodFlag::Raw);
-    }
-    return false;
+	// Check the pointer to the model.
+	if (item->model == nullptr) {
+		return false;
+	}
+	// Check if the item is a resource.
+	if (item->model->getType() == ModelType::Resource) {
+		// Check if the type of resource is the same.
+		return (item->model->to<ResourceModel>()->resourceType == resourceType);
+	} else if ((resourceType == ResourceType::Meat) &&
+			   (item->model->getType() == ModelType::Food)) {
+		// Check if the type of resource is the same.
+		return HasFlag(item->model->to<FoodModel>()->foodFlags, FoodFlag::Raw);
+	}
+	return false;
 }
 
 }

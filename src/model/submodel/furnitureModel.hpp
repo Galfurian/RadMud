@@ -25,19 +25,17 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a furniture.
-class FurnitureModel :
-    public ItemModel
-{
+class FurnitureModel : public ItemModel {
 public:
-    FurnitureModel();
+	FurnitureModel();
 
-    virtual ~FurnitureModel();
+	virtual ~FurnitureModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

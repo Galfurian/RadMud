@@ -25,311 +25,263 @@
 #include "room.hpp"
 #include "area.hpp"
 
-CombatHandler::CombatHandler(Character * _owner) :
-    owner(_owner),
-    opponents(),
-    predefinedTarget(),
-    aimedCharacter(),
-    charactersInSight()
+CombatHandler::CombatHandler(Character *_owner) :
+	owner(_owner),
+	opponents(),
+	predefinedTarget(),
+	aimedCharacter(),
+	charactersInSight()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 CombatHandler::~CombatHandler()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-bool CombatHandler::addOpponent(Character * character, unsigned int initAggro)
+bool CombatHandler::addOpponent(Character *character, unsigned int initAggro)
 {
-    if (!this->hasOpponent(character))
-    {
-        if (initAggro == 0)
-        {
-            initAggro = this->getInitialAggro(character);
-        }
-        // Add the aggressor.
-        opponents.push_back(std::make_shared<Aggression>(character, initAggro));
-        // Sort the list.
-        this->sortList();
-        Logger::log(LogLevel::Debug, "%s engage %s with %s.",
-                    owner->getNameCapital(),
-                    character->getName(),
-                    initAggro);
-        this->printList();
-        return true;
-    }
-    return false;
+	if (!this->hasOpponent(character)) {
+		if (initAggro == 0) {
+			initAggro = this->getInitialAggro(character);
+		}
+		// Add the aggressor.
+		opponents.push_back(std::make_shared<Aggression>(character, initAggro));
+		// Sort the list.
+		this->sortList();
+		Logger::log(LogLevel::Debug, "%s engage %s with %s.",
+					owner->getNameCapital(), character->getName(), initAggro);
+		this->printList();
+		return true;
+	}
+	return false;
 }
 
-bool CombatHandler::remOpponent(Character * character)
+bool CombatHandler::remOpponent(Character *character)
 {
-    for (auto it = opponents.begin(); it != opponents.end(); ++it)
-    {
-        auto aggression = (*it);
-        if (aggression->aggressor->name == character->name)
-        {
-            // Remove the opponent.
-            opponents.erase(it);
-            // Check if the opponent is currently the aimed character.
-            if (aimedCharacter != nullptr)
-            {
-                if (aimedCharacter->name == aggression->aggressor->name)
-                {
-                    aimedCharacter = nullptr;
-                }
-            }
-            // Check if the opponent is currently the predefined target.
-            if (predefinedTarget != nullptr)
-            {
-                if (predefinedTarget->name == aggression->aggressor->name)
-                {
-                    predefinedTarget = nullptr;
-                }
-            }
-            Logger::log(LogLevel::Debug,
-                        "%s disengages %s",
-                        owner->getNameCapital(),
-                        character->getName());
-            this->printList();
-            // If the list of opponents is empty, stop the fighting.
-            if (this->empty())
-            {
-                auto action = owner->getAction();
-                if (action->getType() == ActionType::Combat)
-                {
-                    auto combatAction = action->toCombatAction();
-                    combatAction->handleStop();
-                }
-            }
-            return true;
-        }
-    }
-    Logger::log(LogLevel::Debug,
-                "Cannot find %s among the aggressors of %s",
-                character->getName(),
-                owner->getNameCapital());
-    this->printList();
-    return false;
+	for (auto it = opponents.begin(); it != opponents.end(); ++it) {
+		auto aggression = (*it);
+		if (aggression->aggressor->name == character->name) {
+			// Remove the opponent.
+			opponents.erase(it);
+			// Check if the opponent is currently the aimed character.
+			if (aimedCharacter != nullptr) {
+				if (aimedCharacter->name == aggression->aggressor->name) {
+					aimedCharacter = nullptr;
+				}
+			}
+			// Check if the opponent is currently the predefined target.
+			if (predefinedTarget != nullptr) {
+				if (predefinedTarget->name == aggression->aggressor->name) {
+					predefinedTarget = nullptr;
+				}
+			}
+			Logger::log(LogLevel::Debug, "%s disengages %s",
+						owner->getNameCapital(), character->getName());
+			this->printList();
+			// If the list of opponents is empty, stop the fighting.
+			if (this->empty()) {
+				auto action = owner->getAction();
+				if (action->getType() == ActionType::Combat) {
+					auto combatAction = action->toCombatAction();
+					combatAction->handleStop();
+				}
+			}
+			return true;
+		}
+	}
+	Logger::log(LogLevel::Debug, "Cannot find %s among the aggressors of %s",
+				character->getName(), owner->getNameCapital());
+	this->printList();
+	return false;
 }
 
-bool CombatHandler::hasOpponent(Character * character)
+bool CombatHandler::hasOpponent(Character *character)
 {
-    return std::find_if(
-        opponents.begin(), opponents.end(),
-        [&](std::shared_ptr<Aggression> const & element)
-        {
-            return element->aggressor->name == character->name;
-        }) != opponents.end();
+	return std::find_if(opponents.begin(), opponents.end(),
+						[&](std::shared_ptr<Aggression> const &element) {
+							return element->aggressor->name == character->name;
+						}) != opponents.end();
 }
 
 void CombatHandler::updateCharactersInSight()
 {
-    // Get the characters in sight.
-    CharacterVector exceptions;
-    exceptions.emplace_back(owner);
-    charactersInSight = owner->room->area->getCharactersInSight(
-        exceptions,
-        owner->room->coord,
-        owner->getViewDistance());
+	// Get the characters in sight.
+	CharacterVector exceptions;
+	exceptions.emplace_back(owner);
+	charactersInSight = owner->room->area->getCharactersInSight(
+		exceptions, owner->room->coord, owner->getViewDistance());
 }
 
-void CombatHandler::setPredefinedTarget(Character * character)
+void CombatHandler::setPredefinedTarget(Character *character)
 {
-    predefinedTarget = character;
+	predefinedTarget = character;
 }
 
-Character * CombatHandler::getPredefinedTarget()
+Character *CombatHandler::getPredefinedTarget()
 {
-    return predefinedTarget;
+	return predefinedTarget;
 }
 
-void CombatHandler::setAimedTarget(Character * character)
+void CombatHandler::setAimedTarget(Character *character)
 {
-    aimedCharacter = character;
+	aimedCharacter = character;
 }
 
-Character * CombatHandler::getAimedTarget()
+Character *CombatHandler::getAimedTarget()
 {
-    return aimedCharacter;
+	return aimedCharacter;
 }
 
-bool CombatHandler::setAggro(Character * character, unsigned int newAggression)
+bool CombatHandler::setAggro(Character *character, unsigned int newAggression)
 {
-    bool ret = false;
-    auto it = std::find_if(
-        opponents.begin(), opponents.end(),
-        [&](std::shared_ptr<Aggression> const & p)
-        {
-            return p->aggressor->name == character->name;
-        });
-    if (it != opponents.end())
-    {
-        // Set the new aggro.
-        (*it)->aggression = newAggression;
-        // Sort the list.
-        this->sortList();
-        this->printList();
-        // Set return value to success.
-        ret = true;
-    }
-    return ret;
+	bool ret = false;
+	auto it = std::find_if(opponents.begin(), opponents.end(),
+						   [&](std::shared_ptr<Aggression> const &p) {
+							   return p->aggressor->name == character->name;
+						   });
+	if (it != opponents.end()) {
+		// Set the new aggro.
+		(*it)->aggression = newAggression;
+		// Sort the list.
+		this->sortList();
+		this->printList();
+		// Set return value to success.
+		ret = true;
+	}
+	return ret;
 }
 
 std::shared_ptr<CombatHandler::Aggression> CombatHandler::getTopAggro()
 {
-    if (opponents.empty())
-    {
-        return nullptr;
-    }
-    return opponents.front();
+	if (opponents.empty()) {
+		return nullptr;
+	}
+	return opponents.front();
 }
 
-bool CombatHandler::moveToTopAggro(Character * character)
+bool CombatHandler::moveToTopAggro(Character *character)
 {
-    // Check if the character is a valid opponent.
-    if (!this->hasOpponent(character))
-    {
-        return false;
-    }
-    auto topAggressor = this->getTopAggro();
-    if (topAggressor == nullptr)
-    {
-        return false;
-    }
-    // Check if the character is already the top aggro.
-    if (topAggressor->aggressor == character)
-    {
-        return false;
-    }
-    // Retrieve the top aggro.
-    auto currentAggro = this->getAggro(character);
-    auto topAggro = currentAggro;
-    for (auto it : opponents)
-    {
-        if (it->aggression > topAggro)
-        {
-            topAggro = it->aggression;
-        }
-    }
-    // Just set the aggro of the character enough to be put on the first place.
-    this->setAggro(character, topAggro + 1);
-    return true;
+	// Check if the character is a valid opponent.
+	if (!this->hasOpponent(character)) {
+		return false;
+	}
+	auto topAggressor = this->getTopAggro();
+	if (topAggressor == nullptr) {
+		return false;
+	}
+	// Check if the character is already the top aggro.
+	if (topAggressor->aggressor == character) {
+		return false;
+	}
+	// Retrieve the top aggro.
+	auto currentAggro = this->getAggro(character);
+	auto topAggro = currentAggro;
+	for (auto it : opponents) {
+		if (it->aggression > topAggro) {
+			topAggro = it->aggression;
+		}
+	}
+	// Just set the aggro of the character enough to be put on the first place.
+	this->setAggro(character, topAggro + 1);
+	return true;
 }
 
-unsigned int CombatHandler::getInitialAggro(Character * character)
+unsigned int CombatHandler::getInitialAggro(Character *character)
 {
-    if (owner->level > character->level)
-    {
-        return (owner->level - character->level);
-    }
-    return (character->level - owner->level);
+	if (owner->level > character->level) {
+		return (owner->level - character->level);
+	}
+	return (character->level - owner->level);
 }
 
-unsigned int CombatHandler::getAggro(Character * character)
+unsigned int CombatHandler::getAggro(Character *character)
 {
-    for (auto it : opponents)
-    {
-        if (it->aggressor == character)
-        {
-            return it->aggression;
-        }
-    }
-    return 0;
+	for (auto it : opponents) {
+		if (it->aggressor == character) {
+			return it->aggression;
+		}
+	}
+	return 0;
 }
 
 std::size_t CombatHandler::getSize()
 {
-    return opponents.size();
+	return opponents.size();
 }
 
 bool CombatHandler::empty()
 {
-    return opponents.empty();
+	return opponents.empty();
 }
 
 void CombatHandler::checkList()
 {
-    auto temporaryList = opponents;
-    for (auto it = temporaryList.begin(); it != temporaryList.end(); ++it)
-    {
-        // Check if the aggressor is null.
-        if ((*it)->aggressor == nullptr)
-        {
-            this->remOpponent((*it)->aggressor);
-        }
-            // Check if the aggressor is nowhere.
-        else if ((*it)->aggressor->room == nullptr)
-        {
-            this->remOpponent((*it)->aggressor);
-        }
-    }
+	auto temporaryList = opponents;
+	for (auto it = temporaryList.begin(); it != temporaryList.end(); ++it) {
+		// Check if the aggressor is null.
+		if ((*it)->aggressor == nullptr) {
+			this->remOpponent((*it)->aggressor);
+		}
+		// Check if the aggressor is nowhere.
+		else if ((*it)->aggressor->room == nullptr) {
+			this->remOpponent((*it)->aggressor);
+		}
+	}
 }
 
 void CombatHandler::resetList()
 {
-    for (auto it : opponents)
-    {
-        if (it->aggressor == nullptr)
-        {
-            Logger::log(LogLevel::Error, "Found a nullptr aggressor.");
-        }
-        else
-        {
-            // Remove the owner from its list.
-            if (it->aggressor->combatHandler.remOpponent(owner))
-            {
-                Logger::log(LogLevel::Debug,
-                            "%s disengages %s",
-                            owner->getNameCapital(),
-                            it->aggressor->getName());
-            }
-            else
-            {
-                Logger::log(LogLevel::Error,
-                            "Could not remove %s from opponents of %s.",
-                            owner->getName(),
-                            it->aggressor->getName());
-            }
-        }
-    }
-    opponents.clear();
-    // Clear the predefined target.
-    this->setPredefinedTarget(nullptr);
-    // Clear the aimed character.
-    this->setAimedTarget(nullptr);
+	for (auto it : opponents) {
+		if (it->aggressor == nullptr) {
+			Logger::log(LogLevel::Error, "Found a nullptr aggressor.");
+		} else {
+			// Remove the owner from its list.
+			if (it->aggressor->combatHandler.remOpponent(owner)) {
+				Logger::log(LogLevel::Debug, "%s disengages %s",
+							owner->getNameCapital(), it->aggressor->getName());
+			} else {
+				Logger::log(LogLevel::Error,
+							"Could not remove %s from opponents of %s.",
+							owner->getName(), it->aggressor->getName());
+			}
+		}
+	}
+	opponents.clear();
+	// Clear the predefined target.
+	this->setPredefinedTarget(nullptr);
+	// Clear the aimed character.
+	this->setAimedTarget(nullptr);
 }
 
 std::vector<std::shared_ptr<CombatHandler::Aggression> >::iterator
 CombatHandler::begin()
 {
-    return opponents.begin();
+	return opponents.begin();
 }
 
 std::vector<std::shared_ptr<CombatHandler::Aggression> >::iterator
 CombatHandler::end()
 {
-    return opponents.end();
+	return opponents.end();
 }
 
 void CombatHandler::sortList()
 {
-    std::sort(
-        opponents.begin(), opponents.end(),
-        [](const std::shared_ptr<Aggression> & a,
-           const std::shared_ptr<Aggression> & b)
-        {
-            return a->aggression > b->aggression;
-        });
+	std::sort(opponents.begin(), opponents.end(),
+			  [](const std::shared_ptr<Aggression> &a,
+				 const std::shared_ptr<Aggression> &b) {
+				  return a->aggression > b->aggression;
+			  });
 }
 
 void CombatHandler::printList()
 {
-    std::cout << "Aggro List:" << std::endl;
-    for (auto it : opponents)
-    {
-        std::cout
-            << "  [" + (*it).aggressor->name + "] " + ToString((*it).aggression)
-            << std::endl;
-    }
+	std::cout << "Aggro List:" << std::endl;
+	for (auto it : opponents) {
+		std::cout
+			<< "  [" + (*it).aggressor->name + "] " + ToString((*it).aggression)
+			<< std::endl;
+	}
 }

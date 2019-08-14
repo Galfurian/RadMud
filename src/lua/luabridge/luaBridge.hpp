@@ -48,9 +48,9 @@
 #include <type_traits>
 #include <memory>
 
-#define LUABRIDGE_MAJOR_VERSION   2
-#define LUABRIDGE_MINOR_VERSION   0
-#define LUABRIDGE_VERSION       200
+#define LUABRIDGE_MAJOR_VERSION 2
+#define LUABRIDGE_MINOR_VERSION 0
+#define LUABRIDGE_VERSION 200
 
 #include "luaHelpers.hpp"
 #include "stack.hpp"

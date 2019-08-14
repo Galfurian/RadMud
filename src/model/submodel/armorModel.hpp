@@ -25,37 +25,34 @@
 #include "itemModel.hpp"
 
 /// Sizes of armor.
-enum class ArmorSize
-{
-    All,    ///< [0] All kind of size.
-    Light,  ///< [1] Light Armor
-    Medium, ///< [2] Medium Armor
-    Heavy   ///< [3] Heavy Armor
+enum class ArmorSize {
+	All, ///< [0] All kind of size.
+	Light, ///< [1] Light Armor
+	Medium, ///< [2] Medium Armor
+	Heavy ///< [3] Heavy Armor
 };
 
 /// @brief Model of an armor.
-class ArmorModel :
-    public ItemModel
-{
+class ArmorModel : public ItemModel {
 public:
-    /// The size of the armor.
-    ArmorSize size;
-    /// The Armor Class (AC).
-    unsigned int armorClass;
-    /// The anatomy which a character must have in order to wear this armor.
-    unsigned int allowedAnatomy;
+	/// The size of the armor.
+	ArmorSize size;
+	/// The Armor Class (AC).
+	unsigned int armorClass;
+	/// The anatomy which a character must have in order to wear this armor.
+	unsigned int allowedAnatomy;
 
-    ArmorModel();
+	ArmorModel();
 
-    virtual ~ArmorModel();
+	virtual ~ArmorModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup EnumToString

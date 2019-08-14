@@ -24,61 +24,55 @@
 
 #include "logger.hpp"
 
-ResourceModel::ResourceModel() :
-    resourceType()
+ResourceModel::ResourceModel() : resourceType()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ResourceModel::~ResourceModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType ResourceModel::getType() const
 {
-    return ModelType::Resource;
+	return ModelType::Resource;
 }
 
 std::string ResourceModel::getTypeName() const
 {
-    return "Resource";
+	return "Resource";
 }
 
-bool ResourceModel::setModel(const std::string & source)
+bool ResourceModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 1)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Resource Model (%s).",
-                    this->name);
-        return false;
-    }
-    this->resourceType = ResourceType(ToNumber<unsigned int>(functionList[0]));
-    if (this->resourceType == ResourceType::None)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong type of resource (%s).",
-                    this->name);
-        return false;
-    }
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 1) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Resource Model (%s).",
+					this->name);
+		return false;
+	}
+	this->resourceType = ResourceType(ToNumber<unsigned int>(functionList[0]));
+	if (this->resourceType == ResourceType::None) {
+		Logger::log(LogLevel::Error, "Wrong type of resource (%s).",
+					this->name);
+		return false;
+	}
+	return true;
 }
 
-void ResourceModel::getSheet(Table & sheet) const
+void ResourceModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Resource Type", resourceType.toString()});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Resource Type", resourceType.toString() });
 }

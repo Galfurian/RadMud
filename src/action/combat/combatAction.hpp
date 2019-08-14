@@ -26,42 +26,39 @@
 #include "generalAction.hpp"
 
 /// The list of possible combat actions.
-enum class CombatActionType
-{
-    NoAction,    ///< The combat move is to do nothing.
-    BasicAttack, ///< The action is a basic melee attack.
-    Flee,        ///< The character tries to flee.
-    Chase        ///< The character is chasing someone.
+enum class CombatActionType {
+	NoAction, ///< The combat move is to do nothing.
+	BasicAttack, ///< The action is a basic melee attack.
+	Flee, ///< The character tries to flee.
+	Chase ///< The character is chasing someone.
 };
 
 /// @brief An action executed by characters when fighting.
-class CombatAction :
-    public GeneralAction
-{
+class CombatAction : public GeneralAction {
 public:
-    /// @brief Constructor.
-    /// @param _actor The actor who is doing the action.
-    CombatAction(Character * _actor);
+	/// @brief Constructor.
+	/// @param _actor The actor who is doing the action.
+	CombatAction(Character *_actor);
 
-    /// @brief Destructor.
-    virtual ~CombatAction();
+	/// @brief Destructor.
+	virtual ~CombatAction();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 
-    /// @brief Unset all the variables used for combat.
-    void handleStop();
+	/// @brief Unset all the variables used for combat.
+	void handleStop();
 
-    /// @brief Provides the type of combat action.
-    /// @return The type of combat action.
-    virtual CombatActionType getCombatActionType() const = 0;
+	/// @brief Provides the type of combat action.
+	/// @return The type of combat action.
+	virtual CombatActionType getCombatActionType() const = 0;
 };

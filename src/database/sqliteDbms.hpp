@@ -38,128 +38,127 @@ using QueryList = std::vector<WhereClause>;
 
 /// @brief It's used to connect to a database and retrieve information
 ///         as well as update them.
-class SQLiteDbms
-{
+class SQLiteDbms {
 private:
-    /// The connection, used to communicate with the database.
-    SQLiteWrapper dbConnection;
-    /// List of the tables with their loader.
-    std::vector<TableLoader> loaders;
+	/// The connection, used to communicate with the database.
+	SQLiteWrapper dbConnection;
+	/// List of the tables with their loader.
+	std::vector<TableLoader> loaders;
 
-    /// @brief Constructor.
-    SQLiteDbms();
+	/// @brief Constructor.
+	SQLiteDbms();
 
-    /// @brief Destructor.
-    ~SQLiteDbms();
+	/// @brief Destructor.
+	~SQLiteDbms();
 
 public:
-    /// @brief Disable Copy Construct.
-    SQLiteDbms(SQLiteDbms const &) = delete;
+	/// @brief Disable Copy Construct.
+	SQLiteDbms(SQLiteDbms const &) = delete;
 
-    /// @brief Disable Move construct.
-    SQLiteDbms(SQLiteDbms &&) = delete;
+	/// @brief Disable Move construct.
+	SQLiteDbms(SQLiteDbms &&) = delete;
 
-    /// @brief Disable Copy assign.
-    SQLiteDbms & operator=(SQLiteDbms const &) = delete;
+	/// @brief Disable Copy assign.
+	SQLiteDbms &operator=(SQLiteDbms const &) = delete;
 
-    /// @brief Disable Move assign.
-    SQLiteDbms & operator=(SQLiteDbms &&) = delete;
+	/// @brief Disable Move assign.
+	SQLiteDbms &operator=(SQLiteDbms &&) = delete;
 
-    /// @brief Get the singleton istance of the DBMS.
-    /// @return The static and uniquie DBMS variable.
-    static SQLiteDbms & instance();
+	/// @brief Get the singleton istance of the DBMS.
+	/// @return The static and uniquie DBMS variable.
+	static SQLiteDbms &instance();
 
-    /// @brief Open database connection.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool openDatabase();
+	/// @brief Open database connection.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool openDatabase();
 
-    /// @brief Close database connection.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool closeDatabase();
+	/// @brief Close database connection.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool closeDatabase();
 
-    /// @brief Load tables values.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool loadTables();
+	/// @brief Load tables values.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool loadTables();
 
-    /// @brief Load all the vital information about the player.
-    /// @param player The player.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool loadPlayer(Player * player);
+	/// @brief Load all the vital information about the player.
+	/// @param player The player.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool loadPlayer(Player *player);
 
-    /// @brief Search for the player in the table.
-    /// @param name The name of the player.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool searchPlayer(const std::string & name);
+	/// @brief Search for the player in the table.
+	/// @param name The name of the player.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool searchPlayer(const std::string &name);
 
-    /// @brief Execute an Insert Into query.
-    /// @param table     Name of the table.
-    /// @param args      Vector of arguments.
-    /// @param orIgnore  Flag used to enable the OR IGNORE option.
-    /// @param orReplace Flag used to enable the OR REPLACE option.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool insertInto(std::string const & table,
-                    std::vector<std::string> const & args,
-                    bool orIgnore = true,
-                    bool orReplace = false);
+	/// @brief Execute an Insert Into query.
+	/// @param table     Name of the table.
+	/// @param args      Vector of arguments.
+	/// @param orIgnore  Flag used to enable the OR IGNORE option.
+	/// @param orReplace Flag used to enable the OR REPLACE option.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool insertInto(std::string const &table,
+					std::vector<std::string> const &args, bool orIgnore = true,
+					bool orReplace = false);
 
-    /// @brief Execute a Delete From query.
-    /// @param table The name of the table.
-    /// @param where Vector of where clause.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool deleteFrom(std::string const & table, QueryList const & where);
+	/// @brief Execute a Delete From query.
+	/// @param table The name of the table.
+	/// @param where Vector of where clause.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool deleteFrom(std::string const &table, QueryList const &where);
 
-    /// @brief Execute an Update query.
-    /// @param table The name of the table.
-    /// @param value Vector of values.
-    /// @param where Vector of where clause.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool updateInto(std::string const & table, QueryList const & value, QueryList const & where);
+	/// @brief Execute an Update query.
+	/// @param table The name of the table.
+	/// @param value Vector of values.
+	/// @param where Vector of where clause.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool updateInto(std::string const &table, QueryList const &value,
+					QueryList const &where);
 
-    /// Updates all the connected players.
-    bool updatePlayers();
+	/// Updates all the connected players.
+	bool updatePlayers();
 
-    /// Updates all the items.
-    bool updateItems();
+	/// Updates all the items.
+	bool updateItems();
 
-    /// Update all the rooms.
-    bool updateRooms();
+	/// Update all the rooms.
+	bool updateRooms();
 
-    /// Update all the rooms.
-    bool updateInMemoryDatabase();
+	/// Update all the rooms.
+	bool updateInMemoryDatabase();
 
-    /// @brief Begin a transaction.
-    void beginTransaction();
+	/// @brief Begin a transaction.
+	void beginTransaction();
 
-    /// @brief Rollback a transaction.
-    void rollbackTransection();
+	/// @brief Rollback a transaction.
+	void rollbackTransection();
 
-    /// @brief End a Transaction.
-    void endTransaction();
+	/// @brief End a Transaction.
+	void endTransaction();
 
-    /// @brief Prints last error message and code.
-    void showLastError() const;
+	/// @brief Prints last error message and code.
+	void showLastError() const;
 
 private:
-    /// @brief Function used to retrieve information about Player.
-    bool loadPlayerInformation(ResultSet * result, Player * player);
+	/// @brief Function used to retrieve information about Player.
+	bool loadPlayerInformation(ResultSet *result, Player *player);
 
-    /// @brief Function used to retrieve information about the item
-    ///         possessed by the player.
-    bool loadPlayerItems(Player * player);
+	/// @brief Function used to retrieve information about the item
+	///         possessed by the player.
+	bool loadPlayerItems(Player *player);
 
-    /// @brief Function used to retrieve information about the
-    ///         skills of the player.
-    bool loadPlayerSkill(Player * player);
+	/// @brief Function used to retrieve information about the
+	///         skills of the player.
+	bool loadPlayerSkill(Player *player);
 
-    /// @brief Function used to retrieve information about the
-    ///         lua variables of the player.
-    bool loadPlayerLuaVariables(Player * player);
+	/// @brief Function used to retrieve information about the
+	///         lua variables of the player.
+	bool loadPlayerLuaVariables(Player *player);
 };

@@ -24,57 +24,50 @@
 #include "processNewStory.hpp"
 #include "formatter.hpp"
 
-bool ProcessNewPasswordConfirm::process(Character * character,
-                                        ArgumentHandler & args)
+bool ProcessNewPasswordConfirm::process(Character *character,
+										ArgumentHandler &args)
 {
-    auto player = character->toPlayer();
-    auto input = args.getOriginal();
-    // Check if the player has typed BACK.
-    if (ToLower(input) == "back")
-    {
-        // Create a shared pointer to the previous step.
-        auto newStep = std::make_shared<ProcessNewPassword>();
-        // Set the handler.
-        player->inputProcessor = newStep;
-        // Advance to the next step.
-        newStep->rollBack(character);
-        return true;
-    }
-    else if (input != player->password)
-    {
-        this->advance(character, "Password and confirmation do not agree.");
-    }
-    else
-    {
-        // Create a shared pointer to the next step.
-        auto newStep = std::make_shared<ProcessNewStory>();
-        // Set the handler.
-        player->inputProcessor = newStep;
-        // Advance to the next step.
-        newStep->advance(character);
-        return true;
-    }
-    return false;
+	auto player = character->toPlayer();
+	auto input = args.getOriginal();
+	// Check if the player has typed BACK.
+	if (ToLower(input) == "back") {
+		// Create a shared pointer to the previous step.
+		auto newStep = std::make_shared<ProcessNewPassword>();
+		// Set the handler.
+		player->inputProcessor = newStep;
+		// Advance to the next step.
+		newStep->rollBack(character);
+		return true;
+	} else if (input != player->password) {
+		this->advance(character, "Password and confirmation do not agree.");
+	} else {
+		// Create a shared pointer to the next step.
+		auto newStep = std::make_shared<ProcessNewStory>();
+		// Set the handler.
+		player->inputProcessor = newStep;
+		// Advance to the next step.
+		newStep->advance(character);
+		return true;
+	}
+	return false;
 }
 
-void ProcessNewPasswordConfirm::advance(Character * character,
-                                        const std::string & error)
+void ProcessNewPasswordConfirm::advance(Character *character,
+										const std::string &error)
 {
-    // Print the choices.
-    this->printChoices(character);
-    character->sendMsg("%sRe-enter the password...%s\n",
-                       Formatter::green(),
-                       Formatter::reset());
-    if (!error.empty())
-    {
-        character->sendMsg("# " + error + "\n");
-    }
+	// Print the choices.
+	this->printChoices(character);
+	character->sendMsg("%sRe-enter the password...%s\n", Formatter::green(),
+					   Formatter::reset());
+	if (!error.empty()) {
+		character->sendMsg("# " + error + "\n");
+	}
 }
 
-void ProcessNewPasswordConfirm::rollBack(Character * character)
+void ProcessNewPasswordConfirm::rollBack(Character *character)
 {
-    // Do not stop this step, just go back to ProcessNewPassword.
-    auto newStep = std::make_shared<ProcessNewPassword>();
-    character->inputProcessor = newStep;
-    newStep->rollBack(character);
+	// Do not stop this step, just go back to ProcessNewPassword.
+	auto newStep = std::make_shared<ProcessNewPassword>();
+	character->inputProcessor = newStep;
+	newStep->rollBack(character);
 }

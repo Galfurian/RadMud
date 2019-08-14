@@ -27,33 +27,33 @@
 /// @{
 
 /// Provide all the information regarding the given material.
-bool DoMaterialInfo(Character * character, ArgumentHandler & args);
+bool DoMaterialInfo(Character *character, ArgumentHandler &args);
 
 /// Get the list of materials.
-bool DoMaterialList(Character * character, ArgumentHandler & args);
+bool DoMaterialList(Character *character, ArgumentHandler &args);
 
 /// Provides information about a building.
-bool DoBuildingInfo(Character * character, ArgumentHandler & args);
+bool DoBuildingInfo(Character *character, ArgumentHandler &args);
 
 /// Get the list of buildings.
-bool DoBuildingList(Character * character, ArgumentHandler & args);
+bool DoBuildingList(Character *character, ArgumentHandler &args);
 
 /// Provide all the information regarding the given profession.
-bool DoProfessionInfo(Character * character, ArgumentHandler & args);
+bool DoProfessionInfo(Character *character, ArgumentHandler &args);
 
 /// Get the list of all the professions.
-bool DoProfessionList(Character * character, ArgumentHandler & args);
+bool DoProfessionList(Character *character, ArgumentHandler &args);
 
 /// Provide all the information regarding the given production.
-bool DoProductionInfo(Character * character, ArgumentHandler & args);
+bool DoProductionInfo(Character *character, ArgumentHandler &args);
 
 /// Get the list of all the productions.
-bool DoProductionList(Character * character, ArgumentHandler & args);
+bool DoProductionList(Character *character, ArgumentHandler &args);
 
 /// Get the list of all the body parts.
-bool DoBodyPartList(Character * character, ArgumentHandler & args);
+bool DoBodyPartList(Character *character, ArgumentHandler &args);
 
 /// Provide all the information regarding the given body part.
-bool DoBodyPartInfo(Character * character, ArgumentHandler & args);
+bool DoBodyPartInfo(Character *character, ArgumentHandler &args);
 
 /// @}

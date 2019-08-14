@@ -29,50 +29,45 @@ class Building;
 class Item;
 
 /// @brief An action executed by characters during building.
-class BuildAction :
-    public GeneralAction
-{
+class BuildAction : public GeneralAction {
 private:
-    /// The schematics associated with the action.
-    std::shared_ptr<Building> schematics;
-    /// The item, target of the action.
-    Item * building;
-    /// The tool used by the actor for the action.
-    ItemVector tools;
-    /// The ingredients used by the actor for the action.
-    std::vector<std::pair<Item *, unsigned int>> ingredients;
+	/// The schematics associated with the action.
+	std::shared_ptr<Building> schematics;
+	/// The item, target of the action.
+	Item *building;
+	/// The tool used by the actor for the action.
+	ItemVector tools;
+	/// The ingredients used by the actor for the action.
+	std::vector<std::pair<Item *, unsigned int> > ingredients;
 
 public:
-    /// @brief Constructor.
-    /// @param _actor       The actor who is doing the action.
-    /// @param _schematics  A pointer to the schematic of the building.
-    /// @param _building    A pointer to the item which has to be built.
-    /// @param _tools       The list of used tools.
-    /// @param _ingredients The list of used ingredients.
-    BuildAction(
-        Character * _actor,
-        const std::shared_ptr<Building> & _schematics,
-        Item * _building,
-        ItemVector & _tools,
-        std::vector<std::pair<Item *, unsigned int>> & _ingredients);
+	/// @brief Constructor.
+	/// @param _actor       The actor who is doing the action.
+	/// @param _schematics  A pointer to the schematic of the building.
+	/// @param _building    A pointer to the item which has to be built.
+	/// @param _tools       The list of used tools.
+	/// @param _ingredients The list of used ingredients.
+	BuildAction(Character *_actor, const std::shared_ptr<Building> &_schematics,
+				Item *_building, ItemVector &_tools,
+				std::vector<std::pair<Item *, unsigned int> > &_ingredients);
 
-    /// @brief Destructor.
-    virtual ~BuildAction();
+	/// @brief Destructor.
+	virtual ~BuildAction();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 
-    /// @brief Returns the stamina required to execute the action.
-    /// @param character The actor.
-    /// @return The required stamina.
-    static unsigned int getConsumedStamina(Character * character);
+	/// @brief Returns the stamina required to execute the action.
+	/// @param character The actor.
+	/// @return The required stamina.
+	static unsigned int getConsumedStamina(Character *character);
 };

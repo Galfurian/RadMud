@@ -23,118 +23,105 @@
 #include "liquidContainerItem.hpp"
 #include "mud.hpp"
 
-bool DoLiquidInfo(Character * character, ArgumentHandler & args)
+bool DoLiquidInfo(Character *character, ArgumentHandler &args)
 {
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must provide a liquid vnum.\n");
-        return false;
-    }
-    auto liquidVnum = ToNumber<unsigned int>(args[0].getContent());
-    auto liquid = Mud::instance().findLiquid(liquidVnum);
-    if (liquid == nullptr)
-    {
-        character->sendMsg("Can't find the desire liquid '%s'.\n", liquidVnum);
-        return false;
-    }
-    std::string msg;
-    msg += "Vnum  : " + ToString(liquid->vnum) + "\n";
-    msg += "Type  : " + liquid->type.toString() + "\n";
-    msg += "Name  : " + liquid->getNameCapital() + "\n";
-    msg += "Descr : " + liquid->description + "\n";
-    msg += "Worth : " + ToString(liquid->worth) + "\n";
-    character->sendMsg(msg);
-    return true;
+	if (args.size() != 1) {
+		character->sendMsg("You must provide a liquid vnum.\n");
+		return false;
+	}
+	auto liquidVnum = ToNumber<unsigned int>(args[0].getContent());
+	auto liquid = Mud::instance().findLiquid(liquidVnum);
+	if (liquid == nullptr) {
+		character->sendMsg("Can't find the desire liquid '%s'.\n", liquidVnum);
+		return false;
+	}
+	std::string msg;
+	msg += "Vnum  : " + ToString(liquid->vnum) + "\n";
+	msg += "Type  : " + liquid->type.toString() + "\n";
+	msg += "Name  : " + liquid->getNameCapital() + "\n";
+	msg += "Descr : " + liquid->description + "\n";
+	msg += "Worth : " + ToString(liquid->worth) + "\n";
+	character->sendMsg(msg);
+	return true;
 }
 
-bool DoLiquidList(Character * character, ArgumentHandler & /*args*/)
+bool DoLiquidList(Character *character, ArgumentHandler & /*args*/)
 {
-    Table table;
-    table.addColumn("VNUM", align::center);
-    table.addColumn("NAME", align::right);
-    table.addColumn("WORTH", align::right);
-    for (auto iterator : Mud::instance().mudLiquids)
-    {
-        // Prepare the row.
-        TableRow row;
-        row.emplace_back(ToString(iterator.second->vnum));
-        row.emplace_back(iterator.second->getNameCapital());
-        row.emplace_back(ToString(iterator.second->worth));
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
+	Table table;
+	table.addColumn("VNUM", align::center);
+	table.addColumn("NAME", align::right);
+	table.addColumn("WORTH", align::right);
+	for (auto iterator : Mud::instance().mudLiquids) {
+		// Prepare the row.
+		TableRow row;
+		row.emplace_back(ToString(iterator.second->vnum));
+		row.emplace_back(iterator.second->getNameCapital());
+		row.emplace_back(ToString(iterator.second->worth));
+		// Add the row to the table.
+		table.addRow(row);
+	}
+	character->sendMsg(table.getTable());
+	return true;
 }
 
-bool DoLiquidCreate(Character * character, ArgumentHandler & args)
+bool DoLiquidCreate(Character *character, ArgumentHandler &args)
 {
-    if (args.empty())
-    {
-        character->sendMsg("Usage: [Container] [Liquid Vnum] [Quantity].\n");
-        return false;
-    }
-    // Get the number of arguments.
-    auto argv(args.size());
-    // Find the container.
-    auto item = character->findNearbyItem(args[0].getContent(),
-                                          args[0].getIndex());
-    if (item == nullptr)
-    {
-        character->sendMsg("Can't find the desire container '%s'.\n",
-                           args[0].getContent());
-        return false;
-    }
-    if (item->model->getType() != ModelType::LiquidContainer)
-    {
-        character->sendMsg("The item is not a container of liquids.\n");
-        return false;
-    }
-    if (argv == 1)
-    {
-        character->sendMsg("You can fill %s with:\n", item->getName());
-        for (auto const & it : Mud::instance().mudLiquids)
-        {
-            character->sendMsg("    [%s] %s\n",
-                Align(it.first, align::right, 4),
-                it.second->name);
-        }
-        return false;
-    }
-    // Find the liquid.
-    auto liquidVnum = ToNumber<unsigned int>(args[1].getContent());
-    auto liquid = Mud::instance().findLiquid(liquidVnum);
-    if (liquid == nullptr)
-    {
-        character->sendMsg("Can't find the desire liquid '%s'.\n", liquidVnum);
-        return false;
-    }
-    if (argv == 2)
-    {
-        character->sendMsg("You should provide the amount:\n");
-        character->sendMsg("    [ 0 ] Fill completely.\n");
-        character->sendMsg("    [Any] Fill the amount specified.\n");
-        return false;
-    }
-    // Get the quantity.
-    auto quantity = ToNumber<double>(args[2].getContent());
-    if ((quantity < 0) || (quantity >= 100))
-    {
-        character->sendMsg("Accepted quantity of liquids (from 0 to 99).\n");
-        return false;
-    }
-    // Cast the item to liquid container.
-    auto liquidContainer = dynamic_cast<LiquidContainerItem *>(item);
-    if (static_cast<long>(quantity) == 0)
-        quantity = liquidContainer->getFreeSpace();
-    if (!liquidContainer->pourIn(liquid, quantity))
-    {
-        character->sendMsg("Item can't contain that quantity of liquid.\n");
-        return false;
-    }
-    character->sendMsg("You materialise %s units of %s inside %s.\n",
-                       ToString(quantity),
-                       liquid->getName(),
-                       item->getName(true));
-    return true;
+	if (args.empty()) {
+		character->sendMsg("Usage: [Container] [Liquid Vnum] [Quantity].\n");
+		return false;
+	}
+	// Get the number of arguments.
+	auto argv(args.size());
+	// Find the container.
+	auto item =
+		character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+	if (item == nullptr) {
+		character->sendMsg("Can't find the desire container '%s'.\n",
+						   args[0].getContent());
+		return false;
+	}
+	if (item->model->getType() != ModelType::LiquidContainer) {
+		character->sendMsg("The item is not a container of liquids.\n");
+		return false;
+	}
+	if (argv == 1) {
+		character->sendMsg("You can fill %s with:\n", item->getName());
+		for (auto const &it : Mud::instance().mudLiquids) {
+			character->sendMsg("    [%s] %s\n",
+							   Align(it.first, align::right, 4),
+							   it.second->name);
+		}
+		return false;
+	}
+	// Find the liquid.
+	auto liquidVnum = ToNumber<unsigned int>(args[1].getContent());
+	auto liquid = Mud::instance().findLiquid(liquidVnum);
+	if (liquid == nullptr) {
+		character->sendMsg("Can't find the desire liquid '%s'.\n", liquidVnum);
+		return false;
+	}
+	if (argv == 2) {
+		character->sendMsg("You should provide the amount:\n");
+		character->sendMsg("    [ 0 ] Fill completely.\n");
+		character->sendMsg("    [Any] Fill the amount specified.\n");
+		return false;
+	}
+	// Get the quantity.
+	auto quantity = ToNumber<double>(args[2].getContent());
+	if ((quantity < 0) || (quantity >= 100)) {
+		character->sendMsg("Accepted quantity of liquids (from 0 to 99).\n");
+		return false;
+	}
+	// Cast the item to liquid container.
+	auto liquidContainer = dynamic_cast<LiquidContainerItem *>(item);
+	if (static_cast<long>(quantity) == 0)
+		quantity = liquidContainer->getFreeSpace();
+	if (!liquidContainer->pourIn(liquid, quantity)) {
+		character->sendMsg("Item can't contain that quantity of liquid.\n");
+		return false;
+	}
+	character->sendMsg("You materialise %s units of %s inside %s.\n",
+					   ToString(quantity), liquid->getName(),
+					   item->getName(true));
+	return true;
 }

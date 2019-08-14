@@ -1,5 +1,5 @@
 /// @file   resultSet.cpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   09/12/2016
 /// @copyright
@@ -24,10 +24,10 @@
 
 ResultSet::ResultSet()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ResultSet::~ResultSet()
 {
-    // Nothing to do.
+	// Nothing to do.
 }

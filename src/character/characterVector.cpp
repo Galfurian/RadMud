@@ -24,75 +24,69 @@
 #include "player.hpp"
 #include "mobile.hpp"
 
-static inline bool IsAnException(
-    Character * character,
-    std::vector<Character *> const & ex)
+static inline bool IsAnException(Character *character,
+								 std::vector<Character *> const &ex)
 {
-    return
-        std::find_if(
-            ex.begin(), ex.end(), [&character](Character * other)
-            { return other->getName() == character->getName(); }) != ex.end();
+	return std::find_if(ex.begin(), ex.end(), [&character](Character *other) {
+			   return other->getName() == character->getName();
+		   }) != ex.end();
 }
 
 CharacterVector::CharacterVector()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-Character * CharacterVector::findCharacter(const std::string & target,
-                                           int & number,
-                                           const std::vector<Character *> & exceptions,
-                                           bool skipMobile,
-                                           bool skipPlayer) const
+Character *
+CharacterVector::findCharacter(const std::string &target, int &number,
+							   const std::vector<Character *> &exceptions,
+							   bool skipMobile, bool skipPlayer) const
 {
-    for (auto character : (*this))
-    {
-        if ((skipMobile && character->isMobile()) ||
-            (skipPlayer && character->isPlayer()))
-        {
-            continue;
-        }
-        if (IsAnException(character, exceptions)) continue;
-        // Check if the character is a mobile or a player.
-        if (character->isMobile())
-        {
-            if (character->toMobile()->hasKey(ToLower(target)))
-            {
-                if (number == 1) return character->toMobile();
-                --number;
-            }
-        }
-        else
-        {
-            if (character->toPlayer()->isPlaying())
-            {
-                if (BeginWith(character->toPlayer()->getName(),
-                              ToLower(target)))
-                {
-                    if (number == 1) return character->toPlayer();
-                    --number;
-                }
-            }
-        }
-    }
-    return nullptr;
+	for (auto character : (*this)) {
+		if ((skipMobile && character->isMobile()) ||
+			(skipPlayer && character->isPlayer())) {
+			continue;
+		}
+		if (IsAnException(character, exceptions))
+			continue;
+		// Check if the character is a mobile or a player.
+		if (character->isMobile()) {
+			if (character->toMobile()->hasKey(ToLower(target))) {
+				if (number == 1)
+					return character->toMobile();
+				--number;
+			}
+		} else {
+			if (character->toPlayer()->isPlaying()) {
+				if (BeginWith(character->toPlayer()->getName(),
+							  ToLower(target))) {
+					if (number == 1)
+						return character->toPlayer();
+					--number;
+				}
+			}
+		}
+	}
+	return nullptr;
 }
 
-bool CharacterVector::containsCharacter(Character * character) const
+bool CharacterVector::containsCharacter(Character *character) const
 {
-    for (auto it : (*this))
-    {
-        if (it->getName() == character->getName()) return true;
-    }
-    return false;
+	for (auto it : (*this)) {
+		if (it->getName() == character->getName())
+			return true;
+	}
+	return false;
 }
 
-void CharacterVector::emplace_back_character(Character * character)
+void CharacterVector::emplace_back_character(Character *character)
 {
-    if (!this->containsCharacter(character)) emplace_back(character);
+	if (!this->containsCharacter(character))
+		emplace_back(character);
 }
 
-void CharacterVector::addUnique(const CharacterVector & other)
+void CharacterVector::addUnique(const CharacterVector &other)
 {
-    for (auto character : other) emplace_back_character(character);
+	for (auto character : other)
+		emplace_back_character(character);
 }

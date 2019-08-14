@@ -25,19 +25,17 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a key.
-class KeyModel :
-    public ItemModel
-{
+class KeyModel : public ItemModel {
 public:
-    KeyModel();
+	KeyModel();
 
-    virtual ~KeyModel();
+	virtual ~KeyModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

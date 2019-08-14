@@ -33,27 +33,27 @@ void LoadCombatCommands();
 /// @{
 
 /// Engage in combat the desired target.
-bool DoKill(Character * character, ArgumentHandler & args);
+bool DoKill(Character *character, ArgumentHandler &args);
 
 /// Try to flee from combat.
-bool DoFlee(Character * character, ArgumentHandler & args);
+bool DoFlee(Character *character, ArgumentHandler &args);
 
 /// Provides information about the surrounding area.
-bool DoScout(Character * character, ArgumentHandler & args);
+bool DoScout(Character *character, ArgumentHandler &args);
 
 /// Allows to load a magazine with projectiles.
-bool DoLoad(Character * character, ArgumentHandler & args);
+bool DoLoad(Character *character, ArgumentHandler &args);
 
 /// Allows to unload a magazine with projectiles.
-bool DoUnload(Character * character, ArgumentHandler & args);
+bool DoUnload(Character *character, ArgumentHandler &args);
 
 /// Allows to reload a firearm.
-bool DoReload(Character * character, ArgumentHandler & args);
+bool DoReload(Character *character, ArgumentHandler &args);
 
 /// Allows to aim at a target.
-bool DoAim(Character * character, ArgumentHandler & args);
+bool DoAim(Character *character, ArgumentHandler &args);
 
 /// Allows to shot with an equipped ranged weapon to an aimed target.
-bool DoFire(Character * character, ArgumentHandler & args);
+bool DoFire(Character *character, ArgumentHandler &args);
 
 ///@}

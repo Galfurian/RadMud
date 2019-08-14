@@ -27,257 +27,216 @@
 
 void LoadMovementCommands()
 {
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoTravel, "travel", "",
-        "Allow the character to travel between areas.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoStop, "stop", "",
-        "Stop the current character action.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoStand, "stand", "",
-        "Stand up.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoCrouch, "crouch", "",
-        "The character crouches down himself, it's a good stance for hiding.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoSit, "sit", "",
-        "The player sits down, ideal for a quick break.",
-        false, false, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoProne, "prone", "",
-        "The player starts prone, a perfect position to shoot long distance.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoRest, "rest", "",
-        "The player lies down and begin to rest.",
-        false, false, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoSleep, "sleep", "",
-        "The player lies down, closes its eyes and sleep.",
-        false, false, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoWake, "wake", "",
-        "The player wake up.",
-        false, false, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoTravel, "travel", "", "Allow the character to travel between areas.",
+		false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoStop, "stop", "", "Stop the current character action.", false, true,
+		false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoStand, "stand", "", "Stand up.", false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoCrouch, "crouch", "",
+		"The character crouches down himself, it's a good stance for hiding.",
+		false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoSit, "sit", "", "The player sits down, ideal for a quick break.",
+		false, false, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoProne, "prone", "",
+		"The player starts prone, a perfect position to shoot long distance.",
+		false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoRest, "rest", "", "The player lies down and begin to rest.", false,
+		false, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoSleep, "sleep", "",
+		"The player lies down, closes its eyes and sleep.", false, false,
+		false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoWake, "wake", "", "The player wake up.", false, false, false));
 }
 
-bool DoDirection(Character * character, Direction direction)
+bool DoDirection(Character *character, Direction direction)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    // Prepare the movement options.
-    MovementOptions options;
-    options.character = character;
-    options.allowedInCloseCombat = false;
-    options.requiredStamina = MoveAction::getConsumedStamina(character);
-    // Prepare a string for the error.
-    std::string error;
-    // Check if the character can move to the destination.
-    if (!StructUtils::checkConnection(options, character->room, direction, error))
-    {
-        character->sendMsg(error + "\n");
-        return false;
-    }
-    // Get the destination.
-    auto destination = character->room->findExit(direction)->destination;
-    // Create the move action.
-    auto moveAction = std::make_shared<MoveAction>(character,
-                                                   destination,
-                                                   direction);
-    // Check the new action.
-    if (moveAction->check(error))
-    {
-        // Set the new action.
-        character->pushAction(moveAction);
-        // Calculate the time needed to move.
-        if (character->posture == CharacterPosture::Stand)
-        {
-            character->sendMsg("You start to go %s...\n",
-                               direction.toString());
-        }
-        else if (character->posture == CharacterPosture::Crouch)
-        {
-            character->sendMsg("You move crouching towards %s...\n",
-                               direction.toString());
-        }
-        else if (character->posture == CharacterPosture::Prone)
-        {
-            character->sendMsg("You begin to crawl to %s...\n",
-                               direction.toString());
-        }
-        return true;
-    }
-    character->sendMsg("%s\n", error);
-    return false;
+	// Stop any action the character is executing.
+	StopAction(character);
+	// Prepare the movement options.
+	MovementOptions options;
+	options.character = character;
+	options.allowedInCloseCombat = false;
+	options.requiredStamina = MoveAction::getConsumedStamina(character);
+	// Prepare a string for the error.
+	std::string error;
+	// Check if the character can move to the destination.
+	if (!StructUtils::checkConnection(options, character->room, direction,
+									  error)) {
+		character->sendMsg(error + "\n");
+		return false;
+	}
+	// Get the destination.
+	auto destination = character->room->findExit(direction)->destination;
+	// Create the move action.
+	auto moveAction =
+		std::make_shared<MoveAction>(character, destination, direction);
+	// Check the new action.
+	if (moveAction->check(error)) {
+		// Set the new action.
+		character->pushAction(moveAction);
+		// Calculate the time needed to move.
+		if (character->posture == CharacterPosture::Stand) {
+			character->sendMsg("You start to go %s...\n", direction.toString());
+		} else if (character->posture == CharacterPosture::Crouch) {
+			character->sendMsg("You move crouching towards %s...\n",
+							   direction.toString());
+		} else if (character->posture == CharacterPosture::Prone) {
+			character->sendMsg("You begin to crawl to %s...\n",
+							   direction.toString());
+		}
+		return true;
+	}
+	character->sendMsg("%s\n", error);
+	return false;
 }
 
-bool DoTravel(Character * character, ArgumentHandler & /*args*/)
+bool DoTravel(Character *character, ArgumentHandler & /*args*/)
 {
-    // Stop any ongoing action.
-    StopAction(character);
-    // Check if the room is a travel point.
-    if (!HasFlag(character->room->flags, RoomFlag::TravelPoint))
-    {
-        character->sendMsg("You can't travel from here.\n");
-        return false;
-    }
-    auto destination = Mud::instance().findTravelPoint(character->room);
-    if (destination == nullptr)
-    {
-        character->sendMsg("You can't find an exit from here.\n");
-        return false;
-    }
-    auto msgDepart = character->getNameCapital() + " goes outside.\n";
-    auto msgArrive = character->getNameCapital() + " enter the room.\n";
-    auto msgChar = "You begin to travel...";
-    // Move character.
-    MoveCharacterTo(character, destination, msgDepart, msgArrive, msgChar);
-    return true;
+	// Stop any ongoing action.
+	StopAction(character);
+	// Check if the room is a travel point.
+	if (!HasFlag(character->room->flags, RoomFlag::TravelPoint)) {
+		character->sendMsg("You can't travel from here.\n");
+		return false;
+	}
+	auto destination = Mud::instance().findTravelPoint(character->room);
+	if (destination == nullptr) {
+		character->sendMsg("You can't find an exit from here.\n");
+		return false;
+	}
+	auto msgDepart = character->getNameCapital() + " goes outside.\n";
+	auto msgArrive = character->getNameCapital() + " enter the room.\n";
+	auto msgChar = "You begin to travel...";
+	// Move character.
+	MoveCharacterTo(character, destination, msgDepart, msgArrive, msgChar);
+	return true;
 }
 
-bool DoStop(Character * character, ArgumentHandler & /*args*/)
+bool DoStop(Character *character, ArgumentHandler & /*args*/)
 {
-    if (character->getAction() != ActionType::Combat)
-    {
-        character->sendMsg(character->getAction()->stop() + "\n");
-        return true;
-    }
-    return false;
+	if (character->getAction() != ActionType::Combat) {
+		character->sendMsg(character->getAction()->stop() + "\n");
+		return true;
+	}
+	return false;
 }
 
-bool DoStand(Character * character, ArgumentHandler & /*args*/)
+bool DoStand(Character *character, ArgumentHandler & /*args*/)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Stand)
-    {
-        character->sendMsg("You are already standing.\n");
-        return false;
-    }
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("You wake and stand up.\n");
-    }
-    else
-    {
-        character->sendMsg("You stand up.\n");
-    }
-    character->posture = CharacterPosture::Stand;
-    return true;
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (character->posture == CharacterPosture::Stand) {
+		character->sendMsg("You are already standing.\n");
+		return false;
+	}
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("You wake and stand up.\n");
+	} else {
+		character->sendMsg("You stand up.\n");
+	}
+	character->posture = CharacterPosture::Stand;
+	return true;
 }
 
-bool DoCrouch(Character * character, ArgumentHandler & /*args*/)
+bool DoCrouch(Character *character, ArgumentHandler & /*args*/)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Crouch)
-    {
-        character->sendMsg("You are already crouched.\n");
-        return false;
-    }
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("You wake up and put yourself crouched.\n");
-    }
-    else
-    {
-        character->sendMsg("You put yourself crouched.\n");
-    }
-    character->posture = CharacterPosture::Crouch;
-    return true;
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (character->posture == CharacterPosture::Crouch) {
+		character->sendMsg("You are already crouched.\n");
+		return false;
+	}
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("You wake up and put yourself crouched.\n");
+	} else {
+		character->sendMsg("You put yourself crouched.\n");
+	}
+	character->posture = CharacterPosture::Crouch;
+	return true;
 }
 
-bool DoSit(Character * character, ArgumentHandler & /*args*/)
+bool DoSit(Character *character, ArgumentHandler & /*args*/)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Sit)
-    {
-        character->sendMsg("You are already seated.\n");
-        return false;
-    }
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("You wake up and sit.\n");
-    }
-    else
-    {
-        character->sendMsg("You sit down.\n");
-    }
-    character->posture = CharacterPosture::Sit;
-    return true;
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (character->posture == CharacterPosture::Sit) {
+		character->sendMsg("You are already seated.\n");
+		return false;
+	}
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("You wake up and sit.\n");
+	} else {
+		character->sendMsg("You sit down.\n");
+	}
+	character->posture = CharacterPosture::Sit;
+	return true;
 }
 
-bool DoProne(Character * character, ArgumentHandler & /*args*/)
+bool DoProne(Character *character, ArgumentHandler & /*args*/)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Prone)
-    {
-        character->sendMsg("You are already prone.\n");
-        return false;
-    }
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("You wake up and put yourself prone.\n");
-    }
-    else
-    {
-        character->sendMsg("You put yourself prone.\n");
-    }
-    character->posture = CharacterPosture::Prone;
-    return true;
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (character->posture == CharacterPosture::Prone) {
+		character->sendMsg("You are already prone.\n");
+		return false;
+	}
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("You wake up and put yourself prone.\n");
+	} else {
+		character->sendMsg("You put yourself prone.\n");
+	}
+	character->posture = CharacterPosture::Prone;
+	return true;
 }
 
-bool DoRest(Character * character, ArgumentHandler & /*args*/)
+bool DoRest(Character *character, ArgumentHandler & /*args*/)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Rest)
-    {
-        character->sendMsg("You are already resting.\n");
-        return false;
-    }
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("You wake up and begin to rest.\n");
-    }
-    else
-    {
-        character->sendMsg("You lie down.\n");
-    }
-    character->posture = CharacterPosture::Rest;
-    return true;
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (character->posture == CharacterPosture::Rest) {
+		character->sendMsg("You are already resting.\n");
+		return false;
+	}
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("You wake up and begin to rest.\n");
+	} else {
+		character->sendMsg("You lie down.\n");
+	}
+	character->posture = CharacterPosture::Rest;
+	return true;
 }
 
-bool DoSleep(Character * character, ArgumentHandler & /*args*/)
+bool DoSleep(Character *character, ArgumentHandler & /*args*/)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("You are already sleeping.\n");
-        return false;
-    }
-    character->sendMsg("You lie down and begin to sleep.\n");
-    character->posture = CharacterPosture::Sleep;
-    return true;
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("You are already sleeping.\n");
+		return false;
+	}
+	character->sendMsg("You lie down and begin to sleep.\n");
+	character->posture = CharacterPosture::Sleep;
+	return true;
 }
 
-bool DoWake(Character * character, ArgumentHandler & /*args*/)
+bool DoWake(Character *character, ArgumentHandler & /*args*/)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (character->posture != CharacterPosture::Sleep)
-    {
-        character->sendMsg("You are already awaken.\n");
-        return false;
-    }
-    character->posture = CharacterPosture::Sit;
-    character->sendMsg("You wake up and sit.\n");
-    return true;
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (character->posture != CharacterPosture::Sleep) {
+		character->sendMsg("You are already awaken.\n");
+		return false;
+	}
+	character->posture = CharacterPosture::Sit;
+	character->sendMsg("You wake up and sit.\n");
+	return true;
 }

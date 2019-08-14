@@ -24,67 +24,72 @@
 
 std::string Ability::toString() const
 {
-    if (value == Ability::Strength) return "Strength";
-    else if (value == Ability::Agility) return "Agility";
-    else if (value == Ability::Perception) return "Perception";
-    else if (value == Ability::Constitution) return "Constitution";
-    else if (value == Ability::Intelligence) return "Intelligence";
-    else return "none";
+	if (value == Ability::Strength)
+		return "Strength";
+	else if (value == Ability::Agility)
+		return "Agility";
+	else if (value == Ability::Perception)
+		return "Perception";
+	else if (value == Ability::Constitution)
+		return "Constitution";
+	else if (value == Ability::Intelligence)
+		return "Intelligence";
+	else
+		return "none";
 }
 
 std::string Ability::getAbbreviation() const
 {
-    if (value == Ability::Strength) return "Str";
-    else if (value == Ability::Agility) return "Agi";
-    else if (value == Ability::Perception) return "Per";
-    else if (value == Ability::Constitution) return "Con";
-    else if (value == Ability::Intelligence) return "Int";
-    else return "Nil";
+	if (value == Ability::Strength)
+		return "Str";
+	else if (value == Ability::Agility)
+		return "Agi";
+	else if (value == Ability::Perception)
+		return "Per";
+	else if (value == Ability::Constitution)
+		return "Con";
+	else if (value == Ability::Intelligence)
+		return "Int";
+	else
+		return "Nil";
 }
 
 std::string Ability::getDescription() const
 {
-    if (value == Ability::Strength)
-    {
-        return std::string() +
-               "Strength is important for increasing the" +
-               " Carrying Weight and satisfying the minimum" +
-               " Strength requirements for some weapons and armors.";
-    }
-    if (value == Ability::Agility)
-    {
-        return std::string() +
-               "Besides increasing mobility in combat, it increases" +
-               " the recharge speed of all the weapons, as well as" +
-               " the ability to use light armor.";
-    }
-    if (value == Ability::Perception)
-    {
-        return std::string() +
-               "The ability to see, hear, taste and notice unusual" +
-               " things. A high Perception is important for a" +
-               " sharpshooter.";
-    }
-    if (value == Ability::Constitution)
-    {
-        return std::string() +
-               "Stamina and physical toughness. A character with" +
-               " a high Endurance will survive where others may not.";
-    }
-    if (value == Ability::Intelligence)
-    {
-        return std::string() +
-               "Knowledge, wisdom and the value to think quickly," +
-               " this attribute is important for any character.";
-    }
-    return "none";
+	if (value == Ability::Strength) {
+		return std::string() + "Strength is important for increasing the" +
+			   " Carrying Weight and satisfying the minimum" +
+			   " Strength requirements for some weapons and armors.";
+	}
+	if (value == Ability::Agility) {
+		return std::string() +
+			   "Besides increasing mobility in combat, it increases" +
+			   " the recharge speed of all the weapons, as well as" +
+			   " the ability to use light armor.";
+	}
+	if (value == Ability::Perception) {
+		return std::string() +
+			   "The ability to see, hear, taste and notice unusual" +
+			   " things. A high Perception is important for a" +
+			   " sharpshooter.";
+	}
+	if (value == Ability::Constitution) {
+		return std::string() +
+			   "Stamina and physical toughness. A character with" +
+			   " a high Endurance will survive where others may not.";
+	}
+	if (value == Ability::Intelligence) {
+		return std::string() +
+			   "Knowledge, wisdom and the value to think quickly," +
+			   " this attribute is important for any character.";
+	}
+	return "none";
 }
 
-unsigned int Ability::getModifier(const unsigned int & _value)
+unsigned int Ability::getModifier(const unsigned int &_value)
 {
-    if (_value <= 10)
-    {
-        return 0;
-    }
-    return (_value - 10) / 2;
+	if (_value <= 10) {
+		return 0;
+	}
+	return (_value - 10) / 2;
 }

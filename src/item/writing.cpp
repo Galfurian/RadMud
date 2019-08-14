@@ -21,16 +21,12 @@
 
 #include "writing.hpp"
 
-Writing::Writing() :
-    vnum(),
-    title(),
-    author(),
-    content()
+Writing::Writing() : vnum(), title(), author(), content()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Writing::~Writing()
 {
-    // Nothing to do.
+	// Nothing to do.
 }

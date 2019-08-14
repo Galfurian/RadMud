@@ -58,7 +58,8 @@ SQLiteDbms::SQLiteDbms() : dbConnection(), loaders()
 	loaders.emplace_back(TableLoader("Liquid", LoadLiquid));
 	loaders.emplace_back(TableLoader("Item", LoadItem));
 	loaders.emplace_back(TableLoader("ItemContent", LoadItemContent));
-	loaders.emplace_back(TableLoader("ItemLiquidContent", LoadItemLiquidContent));
+	loaders.emplace_back(
+		TableLoader("ItemLiquidContent", LoadItemLiquidContent));
 	loaders.emplace_back(TableLoader("ItemRoom", LoadItemRoom));
 	loaders.emplace_back(TableLoader("Writings", LoadWriting));
 	loaders.emplace_back(TableLoader("Profession", LoadProfession));
@@ -156,9 +157,9 @@ bool SQLiteDbms::loadTables()
 	return status;
 }
 
-bool SQLiteDbms::insertInto(std::string const & table,
-                            std::vector<std::string> const & args,
-							bool orIgnore, bool orReplace)
+bool SQLiteDbms::insertInto(std::string const &table,
+							std::vector<std::string> const &args, bool orIgnore,
+							bool orReplace)
 {
 	std::stringstream stream;
 	stream << "INSERT";
@@ -180,7 +181,7 @@ bool SQLiteDbms::insertInto(std::string const & table,
 	return (dbConnection.executeQuery(stream.str().c_str()) != 0);
 }
 
-bool SQLiteDbms::deleteFrom(std::string const & table, QueryList const & where)
+bool SQLiteDbms::deleteFrom(std::string const &table, QueryList const &where)
 {
 	std::stringstream stream;
 	stream << "DELETE FROM " << table << std::endl;
@@ -198,8 +199,8 @@ bool SQLiteDbms::deleteFrom(std::string const & table, QueryList const & where)
 	return (dbConnection.executeQuery(stream.str().c_str()) != 0);
 }
 
-bool SQLiteDbms::updateInto(std::string const & table,
-    QueryList const & value, QueryList const & where)
+bool SQLiteDbms::updateInto(std::string const &table, QueryList const &value,
+							QueryList const &where)
 {
 	std::stringstream stream;
 	stream << "UPDATE " << table << std::endl;
@@ -280,7 +281,7 @@ bool SQLiteDbms::updateRooms()
 
 bool SQLiteDbms::updateInMemoryDatabase()
 {
-    return dbConnection.updateInMemoryDatabase();
+	return dbConnection.updateInMemoryDatabase();
 }
 
 void SQLiteDbms::beginTransaction()

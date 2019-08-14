@@ -23,10 +23,15 @@
 
 std::string LiquidType::toString() const
 {
-    if (value == Normal) return "Normal";
-    if (value == Alcohol) return "Alcohol";
-    if (value == Poison) return "Poison";
-    if (value == Blood) return "Blood";
-    if (value == Lava) return "Lava";
-    return "None";
+	if (value == Normal)
+		return "Normal";
+	if (value == Alcohol)
+		return "Alcohol";
+	if (value == Poison)
+		return "Poison";
+	if (value == Blood)
+		return "Blood";
+	if (value == Lava)
+		return "Lava";
+	return "None";
 }

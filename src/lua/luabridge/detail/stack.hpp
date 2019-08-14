@@ -28,28 +28,24 @@
 
 namespace luabridge
 {
-
 /// Forward declaration.
-template<class T>
-struct Stack;
+template <class T> struct Stack;
 
 /// @brief Push an object onto the Lua stack.
-template<class T>
-inline void push(lua_State * L, T t)
+template <class T> inline void push(lua_State *L, T t)
 {
-    Stack<T>::push(L, t);
+	Stack<T>::push(L, t);
 }
 
 /// @brief Set a global value in the lua_State.
 /// @note This works on any type specialized by `Stack`,
 ///        including `LuaRef` and its table proxies.
-template<class T>
-inline void setGlobal(lua_State * L, T t, char const * name)
+template <class T> inline void setGlobal(lua_State *L, T t, char const *name)
 {
-    push(L, t);
-    lua_setglobal(L, name);
+	push(L, t);
+	lua_setglobal(L, name);
 }
 
-}
+} // namespace luabridge
 
 #include "stack.i.hpp"

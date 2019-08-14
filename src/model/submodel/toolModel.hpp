@@ -26,22 +26,20 @@
 #include "toolType.hpp"
 
 /// @brief Model of a tool.
-class ToolModel :
-    public ItemModel
-{
+class ToolModel : public ItemModel {
 public:
-    /// The type of the tool.
-    ToolType toolType;
+	/// The type of the tool.
+	ToolType toolType;
 
-    ToolModel();
+	ToolModel();
 
-    virtual ~ToolModel();
+	virtual ~ToolModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

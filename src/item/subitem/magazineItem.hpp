@@ -24,40 +24,37 @@
 #include "containerItem.hpp"
 
 /// @brief Holds details about a magazine.
-class MagazineItem :
-    public ContainerItem
-{
+class MagazineItem : public ContainerItem {
 public:
-    MagazineItem();
+	MagazineItem();
 
-    virtual ~MagazineItem();
+	virtual ~MagazineItem();
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    std::string lookContent() override;
+	std::string lookContent() override;
 
-    bool isAContainer() const override;
+	bool isAContainer() const override;
 
-    /// @brief Checks if the current magazine can be loaded with the given item.
-    /// @param _projectile The projectile to load.
-    /// @param error       An error string, set when the projectile
-    ///                    cannot be loaded.
-    /// @return <b>True</b> if the projectile can be loaded,<br>
-    ///         <b>False</b> otherwise.
-    bool canLoadWith(Item * _projectile, std::string & error) const;
+	/// @brief Checks if the current magazine can be loaded with the given item.
+	/// @param _projectile The projectile to load.
+	/// @param error       An error string, set when the projectile
+	///                    cannot be loaded.
+	/// @return <b>True</b> if the projectile can be loaded,<br>
+	///         <b>False</b> otherwise.
+	bool canLoadWith(Item *_projectile, std::string &error) const;
 
-    /// @brief Evaluates the amount of projectiles which can be loaded.
-    /// @param _projectile The projectile to load.
-    /// @param amount      The amount to load.
-    /// @param error       An error string, set when the projectile cannot
-    ///                    be loaded.
-    /// @return <b>True</b> if the projectile can be loaded,<br>
-    ///         <b>False</b> otherwise.
-    bool getAmountToLoad(Item * _projectile,
-                         unsigned int & amount,
-                         std::string & error) const;
+	/// @brief Evaluates the amount of projectiles which can be loaded.
+	/// @param _projectile The projectile to load.
+	/// @param amount      The amount to load.
+	/// @param error       An error string, set when the projectile cannot
+	///                    be loaded.
+	/// @return <b>True</b> if the projectile can be loaded,<br>
+	///         <b>False</b> otherwise.
+	bool getAmountToLoad(Item *_projectile, unsigned int &amount,
+						 std::string &error) const;
 
-    /// @brief Provides the list of already loaded projectiles.
-    /// @return The contained projectiles.
-    Item * getAlreadyLoadedProjectile() const;
+	/// @brief Provides the list of already loaded projectiles.
+	/// @return The contained projectiles.
+	Item *getAlreadyLoadedProjectile() const;
 };

@@ -24,9 +24,11 @@
 #include "processInput.hpp"
 
 /// Player names must consist of characters from this list.
-#define  VALID_CHARACTERS_NAME "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
+#define VALID_CHARACTERS_NAME                                                  \
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
 /// Player descriptions must consist of characters from this list.
-#define  VALID_CHARACTERS_DESC "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
+#define VALID_CHARACTERS_DESC                                                  \
+	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
 
 /// @brief The abstract class used for implementing an initialization step.
 /// @details
@@ -38,27 +40,25 @@
 /// In details, if I want to add a "Choose Skin Color" step, after the
 ///  "Chose Description" and "Chose Weight", I just need to go inside those
 ///  classes and simply change their "next" and "previous" step.
-class ProcessInitialization :
-    public ProcessInput
-{
+class ProcessInitialization : public ProcessInput {
 public:
-    /// @brief Constructor.
-    ProcessInitialization();
+	/// @brief Constructor.
+	ProcessInitialization();
 
-    /// @brief Destructor.
-    virtual ~ProcessInitialization();
+	/// @brief Destructor.
+	virtual ~ProcessInitialization();
 
-    /// @brief Print the values inserted until now.
-    /// @param character The player whose creating a new character.
-    void printChoices(Character * character);
+	/// @brief Print the values inserted until now.
+	/// @param character The player whose creating a new character.
+	void printChoices(Character *character);
 
-    /// @brief Print the advancement in the character creation.
-    /// @param character The player whose creating a new character.
-    /// @param error     An optional message used only during error handling.
-    virtual void advance(Character * character,
-                         const std::string & error = std::string()) = 0;
+	/// @brief Print the advancement in the character creation.
+	/// @param character The player whose creating a new character.
+	/// @param error     An optional message used only during error handling.
+	virtual void advance(Character *character,
+						 const std::string &error = std::string()) = 0;
 
-    /// @brief Reset the informations inserted in the previous state.
-    /// @param character The player whose creating a new character.
-    virtual void rollBack(Character * character) = 0;
+	/// @brief Reset the informations inserted in the previous state.
+	/// @param character The player whose creating a new character.
+	virtual void rollBack(Character *character) = 0;
 };

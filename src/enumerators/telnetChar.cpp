@@ -24,41 +24,76 @@
 
 std::string TelnetChar::toString() const
 {
-    if (value == MSDP_VAR) return "MSDP_VAR";
-    if (value == MSDP_VAL) return "MSDP_VAL";
-    if (value == MSDP_TABLE_OPEN) return "MSDP_TABLE_OPEN";
-    if (value == MSDP_TABLE_CLOSE) return "MSDP_TABLE_CLOSE";
-    if (value == MSDP_ARRAY_OPEN) return "MSDP_ARRAY_OPEN";
-    if (value == MSDP_ARRAY_CLOSE) return "MSDP_ARRAY_CLOSE";
-    if (value == TerminalType) return "TerminalType";
-    if (value == NegotiateAboutWindowSize) return "NegotiateAboutWindowSize";
-    if (value == TerminalSpeed) return "TerminalSpeed";
-    if (value == RemoteFlowControl) return "RemoteFlowControl";
-    if (value == LineMode) return "LineMode";
-    if (value == EnvironmentVariables) return "EnvironmentVariables";
-    if (value == NewEnvironmentOption) return "NewEnvironmentOption";
-    //if (value == TTYPE) return "TTYPE";
-    if (value == MSDP) return "MSDP";
-    if (value == MSSP) return "MSSP";
-    if (value == MCCP) return "MCCP";
-    if (value == SubNegotiationEnd) return "SubNegotiationEnd";
-    if (value == NoOperation) return "NoOperation";
-    if (value == DataMark) return "DataMark";
-    if (value == Break) return "Break";
-    if (value == InterruptProcess) return "InterruptProcess";
-    if (value == AbortOutput) return "AbortOutput";
-    if (value == AreYouThere) return "AreYouThere";
-    if (value == EraseCharacter) return "EraseCharacter";
-    if (value == EraseLine) return "EraseLine";
-    if (value == GoAhead) return "GoAhead";
-    if (value == SubnegotiationBegin) return "SubnegotiationBegin";
-    if (value == WILL) return "WILL";
-    if (value == WONT) return "WONT";
-    if (value == DO) return "DO";
-    if (value == DONT) return "DONT";
-    if (value == IAC) return "IAC";
-    if (value == DRAW_MAP) return "DRAW_MAP";
-    if (value == DRAW_MAP) return "DRAW_MAP";
-    if (value == FORMAT) return "FORMAT";
-    return "NONE";
+	if (value == MSDP_VAR)
+		return "MSDP_VAR";
+	if (value == MSDP_VAL)
+		return "MSDP_VAL";
+	if (value == MSDP_TABLE_OPEN)
+		return "MSDP_TABLE_OPEN";
+	if (value == MSDP_TABLE_CLOSE)
+		return "MSDP_TABLE_CLOSE";
+	if (value == MSDP_ARRAY_OPEN)
+		return "MSDP_ARRAY_OPEN";
+	if (value == MSDP_ARRAY_CLOSE)
+		return "MSDP_ARRAY_CLOSE";
+	if (value == TerminalType)
+		return "TerminalType";
+	if (value == NegotiateAboutWindowSize)
+		return "NegotiateAboutWindowSize";
+	if (value == TerminalSpeed)
+		return "TerminalSpeed";
+	if (value == RemoteFlowControl)
+		return "RemoteFlowControl";
+	if (value == LineMode)
+		return "LineMode";
+	if (value == EnvironmentVariables)
+		return "EnvironmentVariables";
+	if (value == NewEnvironmentOption)
+		return "NewEnvironmentOption";
+	//if (value == TTYPE) return "TTYPE";
+	if (value == MSDP)
+		return "MSDP";
+	if (value == MSSP)
+		return "MSSP";
+	if (value == MCCP)
+		return "MCCP";
+	if (value == SubNegotiationEnd)
+		return "SubNegotiationEnd";
+	if (value == NoOperation)
+		return "NoOperation";
+	if (value == DataMark)
+		return "DataMark";
+	if (value == Break)
+		return "Break";
+	if (value == InterruptProcess)
+		return "InterruptProcess";
+	if (value == AbortOutput)
+		return "AbortOutput";
+	if (value == AreYouThere)
+		return "AreYouThere";
+	if (value == EraseCharacter)
+		return "EraseCharacter";
+	if (value == EraseLine)
+		return "EraseLine";
+	if (value == GoAhead)
+		return "GoAhead";
+	if (value == SubnegotiationBegin)
+		return "SubnegotiationBegin";
+	if (value == WILL)
+		return "WILL";
+	if (value == WONT)
+		return "WONT";
+	if (value == DO)
+		return "DO";
+	if (value == DONT)
+		return "DONT";
+	if (value == IAC)
+		return "IAC";
+	if (value == DRAW_MAP)
+		return "DRAW_MAP";
+	if (value == DRAW_MAP)
+		return "DRAW_MAP";
+	if (value == FORMAT)
+		return "FORMAT";
+	return "NONE";
 }

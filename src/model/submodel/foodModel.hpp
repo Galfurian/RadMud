@@ -25,34 +25,31 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the food.
-enum class FoodFlag
-{
-    None = 0,       ///< No flag.
-    Poisoned = 1,   ///< Food is poisoned.
-    Raw = 2,        ///< Food is not cocked.
+enum class FoodFlag {
+	None = 0, ///< No flag.
+	Poisoned = 1, ///< Food is poisoned.
+	Raw = 2, ///< Food is not cocked.
 };
 
 /// @brief Model of food.
-class FoodModel :
-    public ItemModel
-{
+class FoodModel : public ItemModel {
 public:
-    /// Percentage restored.
-    unsigned int nurishment;
-    /// The food flags.
-    unsigned int foodFlags;
+	/// Percentage restored.
+	unsigned int nurishment;
+	/// The food flags.
+	unsigned int foodFlags;
 
-    FoodModel();
+	FoodModel();
 
-    virtual ~FoodModel();
+	virtual ~FoodModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup FlagsToList

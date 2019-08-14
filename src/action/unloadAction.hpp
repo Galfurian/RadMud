@@ -27,29 +27,27 @@
 class Item;
 
 /// @brief Allows to load something.
-class UnloadAction :
-    public GeneralAction
-{
+class UnloadAction : public GeneralAction {
 private:
-    /// The item which has to be unloaded.
-    Item * item;
+	/// The item which has to be unloaded.
+	Item *item;
 
 public:
-    /// @brief Constructor.
-    UnloadAction(Character * _actor, Item * _item);
+	/// @brief Constructor.
+	UnloadAction(Character *_actor, Item *_item);
 
-    /// @brief Destructor.
-    virtual ~UnloadAction();
+	/// @brief Destructor.
+	virtual ~UnloadAction();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 };

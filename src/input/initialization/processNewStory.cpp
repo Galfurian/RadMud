@@ -24,69 +24,58 @@
 #include "processNewRace.hpp"
 #include "formatter.hpp"
 
-bool ProcessNewStory::process(Character * character, ArgumentHandler & args)
+bool ProcessNewStory::process(Character *character, ArgumentHandler &args)
 {
-    auto player = character->toPlayer();
-    auto input = args.getOriginal();
-    // Player_password can't be blank.
-    if (input.empty())
-    {
-        this->advance(character, "Invalid input.");
-    }
-    else if (ToLower(input) == "back")
-    {
-        // Create a shared pointer to the previous step.
-        auto newStep = std::make_shared<ProcessNewPassword>();
-        // Set the handler.
-        player->inputProcessor = newStep;
-        // Advance to the next step.
-        newStep->rollBack(character);
-        return true;
-    }
-    else if (input != "continue")
-    {
-        this->advance(character,
-                      "Write 'continue' after you have reade the story.");
-    }
-    else
-    {
-        // Create a shared pointer to the next step.
-        auto newStep = std::make_shared<ProcessNewRace>();
-        // Set the handler.
-        player->inputProcessor = newStep;
-        // Advance to the next step.
-        newStep->advance(character);
-        return true;
-    }
-    return false;
+	auto player = character->toPlayer();
+	auto input = args.getOriginal();
+	// Player_password can't be blank.
+	if (input.empty()) {
+		this->advance(character, "Invalid input.");
+	} else if (ToLower(input) == "back") {
+		// Create a shared pointer to the previous step.
+		auto newStep = std::make_shared<ProcessNewPassword>();
+		// Set the handler.
+		player->inputProcessor = newStep;
+		// Advance to the next step.
+		newStep->rollBack(character);
+		return true;
+	} else if (input != "continue") {
+		this->advance(character,
+					  "Write 'continue' after you have reade the story.");
+	} else {
+		// Create a shared pointer to the next step.
+		auto newStep = std::make_shared<ProcessNewRace>();
+		// Set the handler.
+		player->inputProcessor = newStep;
+		// Advance to the next step.
+		newStep->advance(character);
+		return true;
+	}
+	return false;
 }
 
-void ProcessNewStory::advance(Character * character,
-                              const std::string & error)
+void ProcessNewStory::advance(Character *character, const std::string &error)
 {
-    // Print the choices.
-    this->printChoices(character);
-    auto Magenta = [](const std::string & s)
-    {
-        return Formatter::magenta() + s + Formatter::reset();
-    };
-    std::string msg;
-    msg += "# The story of the Wasteland.\n";
-    msg += "#\n";
-    msg += "Year 374\n";
-    msg += "#\n";
-    msg += "# Type [" + Magenta("continue") +
-           "] to continue to the next step.\n";
-    msg += "# Type [" + Magenta("back") +
-           "] to return to the previous step.\n";
-    if (!error.empty())
-    {
-        msg += "# " + error + "\n";
-    }
-    character->sendMsg(msg);
+	// Print the choices.
+	this->printChoices(character);
+	auto Magenta = [](const std::string &s) {
+		return Formatter::magenta() + s + Formatter::reset();
+	};
+	std::string msg;
+	msg += "# The story of the Wasteland.\n";
+	msg += "#\n";
+	msg += "Year 374\n";
+	msg += "#\n";
+	msg +=
+		"# Type [" + Magenta("continue") + "] to continue to the next step.\n";
+	msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
+	if (!error.empty()) {
+		msg += "# " + error + "\n";
+	}
+	character->sendMsg(msg);
 }
 
-void ProcessNewStory::rollBack(Character * character)
+void ProcessNewStory::rollBack(Character *character)
 {
-    this->advance(character);
+	this->advance(character);
 }

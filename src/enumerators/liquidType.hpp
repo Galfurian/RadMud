@@ -24,42 +24,36 @@
 #include "baseEnumerator.hpp"
 
 /// @brief Used to determine the type of the model.
-class LiquidType :
-    public BaseEnumerator
-{
+class LiquidType : public BaseEnumerator {
 public:
-    /// The possible types of model.
-    enum Enum
-    {
-        None,       ///< [0] No type of liquid.
-        Normal,     ///< [1] Normal liquid.
-        Alcohol,    ///< [2] The liquid is alcohol.
-        Poison,     ///< [3] The liquid is poison.
-        Blood,      ///< [4] The liquid is blood.
-        Lava,       ///< [5] The liquid is laval.
-    };
+	/// The possible types of model.
+	enum Enum {
+		None, ///< [0] No type of liquid.
+		Normal, ///< [1] Normal liquid.
+		Alcohol, ///< [2] The liquid is alcohol.
+		Poison, ///< [3] The liquid is poison.
+		Blood, ///< [4] The liquid is blood.
+		Lava, ///< [5] The liquid is laval.
+	};
 
-    /// @brief Constructor.
-    LiquidType() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	LiquidType() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit LiquidType(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit LiquidType(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    LiquidType(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	LiquidType(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the type of model as string.
-    std::string toString() const override;
+	/// @brief Returns the type of model as string.
+	std::string toString() const override;
 };

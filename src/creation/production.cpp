@@ -26,58 +26,67 @@
 #include "character.hpp"
 
 Production::Production() :
-    vnum(),
-    name(),
-    profession(),
-    difficulty(),
-    time(),
-    assisted(),
-    outcome(),
-    quantity(),
-    tools(),
-    ingredients(),
-    workbench(ToolType::None),
-    requiredKnowledge()
+	vnum(),
+	name(),
+	profession(),
+	difficulty(),
+	time(),
+	assisted(),
+	outcome(),
+	quantity(),
+	tools(),
+	ingredients(),
+	workbench(ToolType::None),
+	requiredKnowledge()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Production::~Production()
 {
-//    Logger::log(LogLevel::Debug,
-//                "Deleted production\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+	//    Logger::log(LogLevel::Debug,
+	//                "Deleted production\t[%s]\t\t(%s)",
+	//                ToString(this->vnum),
+	//                this->name);
 }
 
 bool Production::check()
 {
-    if (vnum == 0) return false;
-    if (name.empty()) return false;
-    if (profession == nullptr) return false;
-    if (difficulty <= 0) return false;
-    if (time <= 0) return false;
-    if (outcome == nullptr) return false;
-    if (quantity <= 0) return false;
-    if (tools.empty()) return false;
-    for (auto const & it : tools)
-    {
-        if (it == ToolType::None) return false;
-    }
-    for (auto const & it : ingredients)
-    {
-        if (it.first == ResourceType::None) return false;
-        if (it.second <= 0) return false;
-    }
-    return true;
+	if (vnum == 0)
+		return false;
+	if (name.empty())
+		return false;
+	if (profession == nullptr)
+		return false;
+	if (difficulty <= 0)
+		return false;
+	if (time <= 0)
+		return false;
+	if (outcome == nullptr)
+		return false;
+	if (quantity <= 0)
+		return false;
+	if (tools.empty())
+		return false;
+	for (auto const &it : tools) {
+		if (it == ToolType::None)
+			return false;
+	}
+	for (auto const &it : ingredients) {
+		if (it.first == ResourceType::None)
+			return false;
+		if (it.second <= 0)
+			return false;
+	}
+	return true;
 }
 
 std::string Production::getName()
 {
-    return ToLower(name);
+	return ToLower(name);
 }
 
 std::string Production::getNameCapital()
 {
-    return name;
+	return name;
 }

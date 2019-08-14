@@ -27,39 +27,39 @@
 /// @{
 
 /// Transfer a character from room to room.
-bool DoTransfer(Character * character, ArgumentHandler & args);
+bool DoTransfer(Character *character, ArgumentHandler &args);
 
 /// Hurt the desired target.
-bool DoHurt(Character * character, ArgumentHandler & args);
+bool DoHurt(Character *character, ArgumentHandler &args);
 
 /// Get information about a character.
-bool DoGodInfo(Character * character, ArgumentHandler & args);
+bool DoGodInfo(Character *character, ArgumentHandler &args);
 
 /// Provides the list of opponents of the given target.
-bool DoAggroList(Character * character, ArgumentHandler & args);
+bool DoAggroList(Character *character, ArgumentHandler &args);
 
 /// Regain completely health and stamina.
-bool DoFeast(Character * character, ArgumentHandler & args);
+bool DoFeast(Character *character, ArgumentHandler &args);
 
 /// Became invisible.
-bool DoInvisible(Character * character, ArgumentHandler & args);
+bool DoInvisible(Character *character, ArgumentHandler &args);
 
 /// Return visible.
-bool DoVisible(Character * character, ArgumentHandler & args);
+bool DoVisible(Character *character, ArgumentHandler &args);
 
 /// List all the players.
-bool DoPlayerList(Character * character, ArgumentHandler & args);
+bool DoPlayerList(Character *character, ArgumentHandler &args);
 
 /// Set a flag to a character.
-bool DoPlayerSetFlag(Character * character, ArgumentHandler & args);
+bool DoPlayerSetFlag(Character *character, ArgumentHandler &args);
 
 /// Remove a flag from the character.
-bool DoPlayerClearFlag(Character * character, ArgumentHandler & args);
+bool DoPlayerClearFlag(Character *character, ArgumentHandler &args);
 
 /// Modify the value of the player skill.
-bool DoPlayerModSkill(Character * character, ArgumentHandler & args);
+bool DoPlayerModSkill(Character *character, ArgumentHandler &args);
 
 /// Modify the value of the player attribute.
-bool DoPlayerModAttr(Character * character, ArgumentHandler & args);
+bool DoPlayerModAttr(Character *character, ArgumentHandler &args);
 
 /// @}

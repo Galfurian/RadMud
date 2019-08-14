@@ -66,216 +66,195 @@
 
 #pragma once
 
-#include <stddef.h>       // for size_t
-#include <iosfwd>         // for wstring
-#include <memory>         // for unique_ptr
-#include <stack>          // for stack
-#include <string>         // for string
-#include <unordered_map>  // for unordered_map
-#include <vector>         // for vector
+#include <stddef.h> // for size_t
+#include <iosfwd> // for wstring
+#include <memory> // for unique_ptr
+#include <stack> // for stack
+#include <string> // for string
+#include <unordered_map> // for unordered_map
+#include <vector> // for vector
 
 /// @brief Contains the classes used to generate a random name from a pattern.
 namespace namegen
 {
-
 /// @brief Used to generate random names given a pattern.
-class NameGenerator
-{
+class NameGenerator {
 public:
-    /// @brief Constructor.
-    NameGenerator();
+	/// @brief Constructor.
+	NameGenerator();
 
-    /// @brief Constructor.
-    NameGenerator(const std::string & pattern, bool collapse_triples = true);
+	/// @brief Constructor.
+	NameGenerator(const std::string &pattern, bool collapse_triples = true);
 
-    /// @brief Constructor.
-    NameGenerator(std::vector<std::unique_ptr<NameGenerator>> && _generators);
+	/// @brief Constructor.
+	NameGenerator(std::vector<std::unique_ptr<NameGenerator> > &&_generators);
 
-    /// @brief Destructor.
-    virtual ~NameGenerator() = default;
+	/// @brief Destructor.
+	virtual ~NameGenerator() = default;
 
-    /// @brief Returns the total number of combinations.
-    virtual size_t combinations();
+	/// @brief Returns the total number of combinations.
+	virtual size_t combinations();
 
-    /// @brief Returns the minimum length of the generated name.
-    virtual size_t min();
+	/// @brief Returns the minimum length of the generated name.
+	virtual size_t min();
 
-    /// @brief Returns the maximum length of the generated name.
-    virtual size_t max();
+	/// @brief Returns the maximum length of the generated name.
+	virtual size_t max();
 
-    /// @brief Prints the generated name.
-    virtual std::string toString();
+	/// @brief Prints the generated name.
+	virtual std::string toString();
 
-    /// @brief Adds a new generator to the list of generators.
-    void add(std::unique_ptr<NameGenerator> && g);
+	/// @brief Adds a new generator to the list of generators.
+	void add(std::unique_ptr<NameGenerator> &&g);
 
 protected:
-    /// The internal list of generators.
-    std::vector<std::unique_ptr<NameGenerator>> generators;
+	/// The internal list of generators.
+	std::vector<std::unique_ptr<NameGenerator> > generators;
 
-    /// The type of the map of symbols.
-    using SymbolMap = std::unordered_map<std::string, const std::vector<std::string>>;
+	/// The type of the map of symbols.
+	using SymbolMap =
+		std::unordered_map<std::string, const std::vector<std::string> >;
 
-    /// @brief Returns the symbol map.
-    static const SymbolMap & getSymbolMap();
+	/// @brief Returns the symbol map.
+	static const SymbolMap &getSymbolMap();
 
 private:
+	/// Allows to manipulate an element.
+	enum class Manipulator {
+		None, ///< No manipulation
+		Capitalize, ///< Capitalize the next element.
+		Reverse ///< Reverse the next element.
+	};
 
-    /// Allows to manipulate an element.
-    enum class Manipulator
-    {
-        None,       ///< No manipulation
-        Capitalize, ///< Capitalize the next element.
-        Reverse     ///< Reverse the next element.
-    };
+	/// Determines the type of a group of letters.
+	enum class GroupType {
+		None, ///< No manipulation
+		Symbol, ///< Capitalize the next element.
+		Literal ///< Reverse the next element.
+	};
 
-    /// Determines the type of a group of letters.
-    enum class GroupType
-    {
-        None,       ///< No manipulation
-        Symbol,     ///< Capitalize the next element.
-        Literal     ///< Reverse the next element.
-    };
+	/// @brief Class used to group letters.
+	class Group {
+	public:
+		/// @brief The type of the group.
+		GroupType groupType;
 
-    /// @brief Class used to group letters.
-    class Group
-    {
-    public:
-        /// @brief The type of the group.
-        GroupType groupType;
+		/// @brief Constructor.
+		Group(const GroupType &_groupType);
 
-        /// @brief Constructor.
-        Group(const GroupType & _groupType);
+		/// @brief Returns the content of the group.
+		std::unique_ptr<NameGenerator> emit();
 
-        /// @brief Returns the content of the group.
-        std::unique_ptr<NameGenerator> emit();
+		/// @brief Split the group.
+		void split();
 
-        /// @brief Split the group.
-        void split();
+		/// @brief Wrap the group with the given manipulator.
+		void wrap(const Manipulator &manipulator);
 
-        /// @brief Wrap the group with the given manipulator.
-        void wrap(const Manipulator & manipulator);
+		/// @brief Add a generator to the internal set.
+		void add(std::unique_ptr<NameGenerator> &&g);
 
-        /// @brief Add a generator to the internal set.
-        void add(std::unique_ptr<NameGenerator> && g);
+		/// @brief Creates a new generator with a single Literal in it (i.e. c).
+		virtual void add(char c);
 
-        /// @brief Creates a new generator with a single Literal in it (i.e. c).
-        virtual void add(char c);
+	private:
+		/// @brief List of manipulators which need to be applied.
+		std::stack<Manipulator> manipulators;
+		/// @brief A vectors of generators.
+		std::vector<std::unique_ptr<NameGenerator> > set;
+	};
 
-    private:
-        /// @brief List of manipulators which need to be applied.
-        std::stack<Manipulator> manipulators;
-        /// @brief A vectors of generators.
-        std::vector<std::unique_ptr<NameGenerator>> set;
-    };
+	/// @brief A group of symbols.
+	class GroupSymbol : public Group {
+	public:
+		/// @brief Constructor.
+		GroupSymbol();
 
-    /// @brief A group of symbols.
-    class GroupSymbol :
-        public Group
-    {
-    public:
-        /// @brief Constructor.
-        GroupSymbol();
+		/// @brief Retrieves the set of strings associated with the given
+		/// symbol and add all of them as Literals to the list of generators.
+		void add(char c);
+	};
 
-        /// @brief Retrieves the set of strings associated with the given
-        /// symbol and add all of them as Literals to the list of generators.
-        void add(char c);
-    };
-
-    /// @brief A group of literals.
-    class GroupLiteral :
-        public Group
-    {
-    public:
-        /// @brief Constructor.
-        GroupLiteral();
-    };
+	/// @brief A group of literals.
+	class GroupLiteral : public Group {
+	public:
+		/// @brief Constructor.
+		GroupLiteral();
+	};
 };
 
 /// @brief Used to pick a generator randomly from the internal list of
 /// generator.
-class Random :
-    public NameGenerator
-{
+class Random : public NameGenerator {
 public:
-    /// @brief Constructor.
-    Random();
+	/// @brief Constructor.
+	Random();
 
-    /// @brief Constructor which takes a list of generators.
-    Random(std::vector<std::unique_ptr<NameGenerator>> && generators_);
+	/// @brief Constructor which takes a list of generators.
+	Random(std::vector<std::unique_ptr<NameGenerator> > &&generators_);
 
-    size_t combinations() override;
+	size_t combinations() override;
 
-    size_t min() override;
+	size_t min() override;
 
-    size_t max() override;
+	size_t max() override;
 
-    std::string toString() override;
+	std::string toString() override;
 };
 
 /// @brief Class used to store a sequence of generators.
-class Sequence :
-    public NameGenerator
-{
+class Sequence : public NameGenerator {
 public:
-    /// @brief Constructor.
-    Sequence();
+	/// @brief Constructor.
+	Sequence();
 
-    /// @brief Constructor which takes a list of generators.
-    Sequence(std::vector<std::unique_ptr<NameGenerator>> && generators_);
+	/// @brief Constructor which takes a list of generators.
+	Sequence(std::vector<std::unique_ptr<NameGenerator> > &&generators_);
 };
 
 /// @brief Class used to store a literal.
-class Literal :
-    public NameGenerator
-{
-    /// The string containing the single literal.
-    std::string value;
+class Literal : public NameGenerator {
+	/// The string containing the single literal.
+	std::string value;
 
 public:
-    /// @brief Constructor which takes the string containing the literal.
-    Literal(const std::string & value_);
+	/// @brief Constructor which takes the string containing the literal.
+	Literal(const std::string &value_);
 
-    size_t combinations() override;
+	size_t combinations() override;
 
-    size_t min() override;
+	size_t min() override;
 
-    size_t max() override;
+	size_t max() override;
 
-    std::string toString() override;
+	std::string toString() override;
 };
 
 /// @brief Class used to reverse a string.
-class Reverser :
-    public NameGenerator
-{
+class Reverser : public NameGenerator {
 public:
-    /// @brief Constructor which takes a generator.
-    Reverser(std::unique_ptr<NameGenerator> && g);
+	/// @brief Constructor which takes a generator.
+	Reverser(std::unique_ptr<NameGenerator> &&g);
 
-    std::string toString() override;
+	std::string toString() override;
 };
 
 /// @brief Class used to capitalize a string.
-class Capitalizer :
-    public NameGenerator
-{
+class Capitalizer : public NameGenerator {
 public:
-    /// @brief Constructor which takes a generator.
-    Capitalizer(std::unique_ptr<NameGenerator> && g);
+	/// @brief Constructor which takes a generator.
+	Capitalizer(std::unique_ptr<NameGenerator> &&g);
 
-    std::string toString() override;
+	std::string toString() override;
 };
 
 /// @brief Class used to collapse a string.
-class Collapser :
-    public NameGenerator
-{
+class Collapser : public NameGenerator {
 public:
-    /// @brief Constructor which takes a generator.
-    Collapser(std::unique_ptr<NameGenerator> && g);
+	/// @brief Constructor which takes a generator.
+	Collapser(std::unique_ptr<NameGenerator> &&g);
 
-    std::string toString() override;
+	std::string toString() override;
 };
 
-}
+} // namespace namegen

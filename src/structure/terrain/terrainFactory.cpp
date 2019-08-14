@@ -25,47 +25,44 @@
 
 std::shared_ptr<Terrain> TerrainFactory::getAir()
 {
-    static std::shared_ptr<Terrain> terrain;
-    if (terrain == nullptr)
-    {
-        terrain = std::make_shared<Terrain>();
-        terrain->name = "Air";
-        terrain->flags = 0;
-        terrain->generationFlags = 0;
-        terrain->space = 1000;
-        terrain->symbol = " ";
-    }
-    return terrain;
+	static std::shared_ptr<Terrain> terrain;
+	if (terrain == nullptr) {
+		terrain = std::make_shared<Terrain>();
+		terrain->name = "Air";
+		terrain->flags = 0;
+		terrain->generationFlags = 0;
+		terrain->space = 1000;
+		terrain->symbol = " ";
+	}
+	return terrain;
 }
 
 /// @brief Produces a terrain representing a cave.
 std::shared_ptr<Terrain> TerrainFactory::getCave()
 {
-    static std::shared_ptr<Terrain> terrain;
-    if (terrain == nullptr)
-    {
-        terrain = std::make_shared<Terrain>();
-        terrain->name = "Cave";
-        terrain->flags = static_cast<unsigned int>(TerrainFlag::Indoor);
-        terrain->generationFlags = 0;
-        terrain->space = 500;
-        terrain->symbol = Formatter::darkGray(".");
-    }
-    return terrain;
+	static std::shared_ptr<Terrain> terrain;
+	if (terrain == nullptr) {
+		terrain = std::make_shared<Terrain>();
+		terrain->name = "Cave";
+		terrain->flags = static_cast<unsigned int>(TerrainFlag::Indoor);
+		terrain->generationFlags = 0;
+		terrain->space = 500;
+		terrain->symbol = Formatter::darkGray(".");
+	}
+	return terrain;
 }
 
 /// @brief Produces a terrain representing soil.
 std::shared_ptr<Terrain> TerrainFactory::getSoil()
 {
-    static std::shared_ptr<Terrain> terrain;
-    if (terrain == nullptr)
-    {
-        terrain = std::make_shared<Terrain>();
-        terrain->name = "Soil";
-        terrain->flags = static_cast<unsigned int>(TerrainFlag::Indoor);
-        terrain->generationFlags = 0;
-        terrain->space = 0;
-        terrain->symbol = Formatter::darkGray(" ");
-    }
-    return terrain;
+	static std::shared_ptr<Terrain> terrain;
+	if (terrain == nullptr) {
+		terrain = std::make_shared<Terrain>();
+		terrain->name = "Soil";
+		terrain->flags = static_cast<unsigned int>(TerrainFlag::Indoor);
+		terrain->generationFlags = 0;
+		terrain->space = 0;
+		terrain->symbol = Formatter::darkGray(" ");
+	}
+	return terrain;
 }

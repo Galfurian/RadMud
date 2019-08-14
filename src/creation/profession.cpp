@@ -25,52 +25,60 @@
 #include "utils.hpp"
 
 Profession::Profession() :
-    vnum(),
-    command(),
-    action(),
-    description(),
-    startMessage(),
-    finishMessage(),
-    successMessage(),
-    failureMessage(),
-    interruptMessage(),
-    notFoundMessage(),
-    productions()
+	vnum(),
+	command(),
+	action(),
+	description(),
+	startMessage(),
+	finishMessage(),
+	successMessage(),
+	failureMessage(),
+	interruptMessage(),
+	notFoundMessage(),
+	productions()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Profession::~Profession()
 {
-//    Logger::log(LogLevel::Debug,
-//                "Deleted profession\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+	//    Logger::log(LogLevel::Debug,
+	//                "Deleted profession\t[%s]\t\t(%s)",
+	//                ToString(this->vnum),
+	//                this->name);
 }
 
 bool Profession::check()
 {
-    if (vnum <= 0) return false;
-    if (command.empty()) return false;
-    if (description.empty()) return false;
-    if (action.empty()) return false;
-    if (startMessage.empty()) return false;
-    if (finishMessage.empty()) return false;
-    if (successMessage.empty()) return false;
-    if (failureMessage.empty()) return false;
-    if (interruptMessage.empty()) return false;
-    if (notFoundMessage.empty()) return false;
-    return true;
+	if (vnum <= 0)
+		return false;
+	if (command.empty())
+		return false;
+	if (description.empty())
+		return false;
+	if (action.empty())
+		return false;
+	if (startMessage.empty())
+		return false;
+	if (finishMessage.empty())
+		return false;
+	if (successMessage.empty())
+		return false;
+	if (failureMessage.empty())
+		return false;
+	if (interruptMessage.empty())
+		return false;
+	if (notFoundMessage.empty())
+		return false;
+	return true;
 }
 
-Production * Profession::findProduction(std::string const & name)
+Production *Profession::findProduction(std::string const &name)
 {
-    for (auto production : productions)
-    {
-        if (BeginWith(ToLower(production->name), ToLower(name)))
-        {
-            return production;
-        }
-    }
-    return nullptr;
+	for (auto production : productions) {
+		if (BeginWith(ToLower(production->name), ToLower(name))) {
+			return production;
+		}
+	}
+	return nullptr;
 }

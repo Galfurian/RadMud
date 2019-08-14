@@ -24,62 +24,60 @@
 
 #include "logger.hpp"
 
-SeedModel::SeedModel() :
-    seedType()
+SeedModel::SeedModel() : seedType()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 SeedModel::~SeedModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType SeedModel::getType() const
 {
-    return ModelType::Seed;
+	return ModelType::Seed;
 }
 
 std::string SeedModel::getTypeName() const
 {
-    return "Seed";
+	return "Seed";
 }
 
-bool SeedModel::setModel(const std::string & source)
+bool SeedModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 1)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Seed Model (%s).",
-                    this->name);
-        return false;
-    }
-    this->seedType = static_cast<SeedType>(ToNumber<unsigned int>(
-        functionList[0]));
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 1) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Seed Model (%s).",
+					this->name);
+		return false;
+	}
+	this->seedType =
+		static_cast<SeedType>(ToNumber<unsigned int>(functionList[0]));
+	return true;
 }
 
-void SeedModel::getSheet(Table & sheet) const
+void SeedModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Seed Type", GetSeedTypeName(this->seedType)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Seed Type", GetSeedTypeName(this->seedType) });
 }
 
 std::string GetSeedTypeName(SeedType type)
 {
-    if (type == SeedType::Plant) return "Plant Seed";
-    if (type == SeedType::Tree) return "Tree Seed";
-    return "No Seed Type";
+	if (type == SeedType::Plant)
+		return "Plant Seed";
+	if (type == SeedType::Tree)
+		return "Tree Seed";
+	return "No Seed Type";
 }

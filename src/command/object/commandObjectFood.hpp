@@ -27,6 +27,6 @@
 /// @{
 
 /// Eats food.
-bool DoEat(Character * character, ArgumentHandler & args);
+bool DoEat(Character *character, ArgumentHandler &args);
 
 ///@}

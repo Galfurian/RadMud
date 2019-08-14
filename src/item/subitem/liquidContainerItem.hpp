@@ -24,61 +24,57 @@
 #include "item.hpp"
 
 /// @brief Holds details about a container of liquids.
-class LiquidContainerItem :
-    public Item
-{
+class LiquidContainerItem : public Item {
 public:
-    /// The liquid inside the container.
-    Liquid * liquidContent;
-    /// The quantity.
-    double liquidQuantity;
+	/// The liquid inside the container.
+	Liquid *liquidContent;
+	/// The quantity.
+	double liquidQuantity;
 
-    LiquidContainerItem();
+	LiquidContainerItem();
 
-    virtual ~LiquidContainerItem();
+	virtual ~LiquidContainerItem();
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    double getWeight(bool entireStack) const override;
+	double getWeight(bool entireStack) const override;
 
-    std::string lookContent() override;
+	std::string lookContent() override;
 
-    bool isAContainer() const override;
+	bool isAContainer() const override;
 
-    bool isEmpty() const override;
+	bool isEmpty() const override;
 
-    double getTotalSpace() const override;
+	double getTotalSpace() const override;
 
-    double getUsedSpace() const override;
+	double getUsedSpace() const override;
 
-    /// @brief Check if this item can contain the passed one.
-    /// @param newLiquidContent The liquid to pour in.
-    /// @param newLiquidAmount  The amount of liquid.
-    /// @return <b>True</b> if it can be contained,<br>
-    ///         <b>False</b> otherwise.
-    bool canContainLiquid(Liquid * newLiquidContent,
-                          const double & newLiquidAmount) const;
+	/// @brief Check if this item can contain the passed one.
+	/// @param newLiquidContent The liquid to pour in.
+	/// @param newLiquidAmount  The amount of liquid.
+	/// @return <b>True</b> if it can be contained,<br>
+	///         <b>False</b> otherwise.
+	bool canContainLiquid(Liquid *newLiquidContent,
+						  const double &newLiquidAmount) const;
 
-    /// @brief Load some liquid inside the container and update the database.
-    /// @param newLiquidContent The liquid to pour in.
-    /// @param quantityToPourIn The amount of liquid.
-    /// @param updateDB         If the action has to be updated on the database.
-    /// @return <b>True</b> if the operation is a success,<br>
-    ///         <b>False</b> otherwise.
-    bool pourIn(Liquid * newLiquidContent,
-                const double & quantityToPourIn,
-                bool updateDB = true);
+	/// @brief Load some liquid inside the container and update the database.
+	/// @param newLiquidContent The liquid to pour in.
+	/// @param quantityToPourIn The amount of liquid.
+	/// @param updateDB         If the action has to be updated on the database.
+	/// @return <b>True</b> if the operation is a success,<br>
+	///         <b>False</b> otherwise.
+	bool pourIn(Liquid *newLiquidContent, const double &quantityToPourIn,
+				bool updateDB = true);
 
-    /// @brief Extract some liquid from the container and update the database.
-    /// @param amount   The amount of liquid.
-    /// @param updateDB If the action has to be updated on the database.
-    /// @return <b>True</b> if the operation is a success,<br>
-    ///         <b>False</b> otherwise.
-    bool pourOut(const double & amount, bool updateDB = true);
+	/// @brief Extract some liquid from the container and update the database.
+	/// @param amount   The amount of liquid.
+	/// @param updateDB If the action has to be updated on the database.
+	/// @return <b>True</b> if the operation is a success,<br>
+	///         <b>False</b> otherwise.
+	bool pourOut(const double &amount, bool updateDB = true);
 
 protected:
-    void updateTicImpl() override;
+	void updateTicImpl() override;
 
-    void updateHourImpl() override;
-
+	void updateHourImpl() override;
 };

@@ -23,32 +23,37 @@
 #include "skill.hpp"
 
 Skill::Skill() :
-    vnum(),
-    name(),
-    description(),
-    ability(),
-    stage(),
-    requiredSkill(),
-    usedForSkill(),
-    modifierManager(std::make_shared<ModifierManager>())
+	vnum(),
+	name(),
+	description(),
+	ability(),
+	stage(),
+	requiredSkill(),
+	usedForSkill(),
+	modifierManager(std::make_shared<ModifierManager>())
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Skill::~Skill()
 {
-//    Logger::log(LogLevel::Debug,
-//                "Deleted skill\t\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+	//    Logger::log(LogLevel::Debug,
+	//                "Deleted skill\t\t[%s]\t\t(%s)",
+	//                ToString(this->vnum),
+	//                this->name);
 }
 
 bool Skill::check()
 {
-    if (vnum <= 0) return false;
-    if (name.empty())return false;
-    if (description.empty())return false;
-    if (ability == Ability::None)return false;
-    if (stage <= 0)return false;
-    return true;
+	if (vnum <= 0)
+		return false;
+	if (name.empty())
+		return false;
+	if (description.empty())
+		return false;
+	if (ability == Ability::None)
+		return false;
+	if (stage <= 0)
+		return false;
+	return true;
 }

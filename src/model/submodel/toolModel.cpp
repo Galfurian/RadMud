@@ -24,55 +24,51 @@
 
 #include "logger.hpp"
 
-ToolModel::ToolModel() :
-    toolType()
+ToolModel::ToolModel() : toolType()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ToolModel::~ToolModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType ToolModel::getType() const
 {
-    return ModelType::Tool;
+	return ModelType::Tool;
 }
 
 std::string ToolModel::getTypeName() const
 {
-    return "Tool";
+	return "Tool";
 }
 
-bool ToolModel::setModel(const std::string & source)
+bool ToolModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 1)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Tool Model (%s).",
-                    this->name);
-        return false;
-    }
-    this->toolType = static_cast<ToolType>(ToNumber<unsigned int>(
-        functionList[0]));
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 1) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Tool Model (%s).",
+					this->name);
+		return false;
+	}
+	this->toolType =
+		static_cast<ToolType>(ToNumber<unsigned int>(functionList[0]));
+	return true;
 }
 
-void ToolModel::getSheet(Table & sheet) const
+void ToolModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Tool Type", this->toolType.toString()});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Tool Type", this->toolType.toString() });
 }

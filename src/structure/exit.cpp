@@ -23,78 +23,73 @@
 #include "exit.hpp"
 #include "room.hpp"
 
-Exit::Exit() :
-    source(),
-    destination(),
-    direction(Direction::None),
-    flags()
+Exit::Exit() : source(), destination(), direction(Direction::None), flags()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-Exit::Exit(Room * _source,
-           Room * _destination,
-           Direction _direction,
-           unsigned int _flags) :
-    source(_source),
-    destination(_destination),
-    direction(_direction),
-    flags(_flags)
+Exit::Exit(Room *_source, Room *_destination, Direction _direction,
+		   unsigned int _flags) :
+	source(_source),
+	destination(_destination),
+	direction(_direction),
+	flags(_flags)
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Exit::~Exit()
 {
-//    Logger::log(LogLevel::Debug, "Deleted: Exit.");
+	//    Logger::log(LogLevel::Debug, "Deleted: Exit.");
 }
 
 bool Exit::check() const
 {
-    if (source == nullptr) return false;
-    if (destination == nullptr) return false;
-    if (direction == Direction::None) return false;
-    return true;
+	if (source == nullptr)
+		return false;
+	if (destination == nullptr)
+		return false;
+	if (direction == Direction::None)
+		return false;
+	return true;
 }
 
 std::shared_ptr<Exit> Exit::getOppositeExit() const
 {
-    if (destination != nullptr)
-    {
-        for (auto it : destination->exits)
-        {
-            if (it->destination == this->source)
-            {
-                return it;
-            }
-        }
-    }
-    return nullptr;
+	if (destination != nullptr) {
+		for (auto it : destination->exits) {
+			if (it->destination == this->source) {
+				return it;
+			}
+		}
+	}
+	return nullptr;
 }
 
 bool Exit::unlink() const
 {
-    if (source != nullptr)
-    {
-        if (source->removeExit(this->direction))
-        {
-            return true;
-        }
-    }
-    return false;
+	if (source != nullptr) {
+		if (source->removeExit(this->direction)) {
+			return true;
+		}
+	}
+	return false;
 }
 
-bool Exit::operator==(const Exit & right) const
+bool Exit::operator==(const Exit &right) const
 {
-    return (this->direction == right.direction);
+	return (this->direction == right.direction);
 }
 
 std::string GetExitFlagString(unsigned int flags)
 {
-    std::string flagList;
-    if (HasFlag(flags, ExitFlag::NoMob)) flagList += "|NoMob";
-    if (HasFlag(flags, ExitFlag::Hidden)) flagList += "|Hidden";
-    if (HasFlag(flags, ExitFlag::Stairs)) flagList += "|Stairs";
-    flagList += "|";
-    return flagList;
+	std::string flagList;
+	if (HasFlag(flags, ExitFlag::NoMob))
+		flagList += "|NoMob";
+	if (HasFlag(flags, ExitFlag::Hidden))
+		flagList += "|Hidden";
+	if (HasFlag(flags, ExitFlag::Stairs))
+		flagList += "|Stairs";
+	flagList += "|";
+	return flagList;
 }

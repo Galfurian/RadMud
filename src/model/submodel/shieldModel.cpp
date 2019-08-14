@@ -24,68 +24,66 @@
 
 #include "logger.hpp"
 
-ShieldModel::ShieldModel() :
-    size(),
-    parryChance()
+ShieldModel::ShieldModel() : size(), parryChance()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ShieldModel::~ShieldModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType ShieldModel::getType() const
 {
-    return ModelType::Shield;
+	return ModelType::Shield;
 }
 
 std::string ShieldModel::getTypeName() const
 {
-    return "Shield";
+	return "Shield";
 }
 
-bool ShieldModel::setModel(const std::string & source)
+bool ShieldModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 2)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Shield Model (%s).",
-            this->name);
-        return false;
-    }
-    this->size = static_cast<ShieldSize>(ToNumber<unsigned int>(
-        functionList[0]));
-    this->parryChance = ToNumber<unsigned int>(functionList[1]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 2) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Shield Model (%s).",
+					this->name);
+		return false;
+	}
+	this->size =
+		static_cast<ShieldSize>(ToNumber<unsigned int>(functionList[0]));
+	this->parryChance = ToNumber<unsigned int>(functionList[1]);
+	return true;
 }
 
-void ShieldModel::getSheet(Table & sheet) const
+void ShieldModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Size", GetShieldSizeName(this->size)});
-    sheet.addRow({"Parry Change", ToString(this->parryChance)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Size", GetShieldSizeName(this->size) });
+	sheet.addRow({ "Parry Change", ToString(this->parryChance) });
 }
 
 std::string GetShieldSizeName(ShieldSize shieldSize)
 {
-    if (shieldSize == ShieldSize::All) return "Universal Shield";
-    if (shieldSize == ShieldSize::Light) return "Light Shield";
-    if (shieldSize == ShieldSize::Medium) return "Medium Shield";
-    if (shieldSize == ShieldSize::Heavy) return "Heavy Shield";
-    return "No Armor Size";
+	if (shieldSize == ShieldSize::All)
+		return "Universal Shield";
+	if (shieldSize == ShieldSize::Light)
+		return "Light Shield";
+	if (shieldSize == ShieldSize::Medium)
+		return "Medium Shield";
+	if (shieldSize == ShieldSize::Heavy)
+		return "Heavy Shield";
+	return "No Armor Size";
 }

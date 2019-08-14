@@ -25,22 +25,21 @@
 /// @brief Interface class for objects that has to be updated.
 /// @details A class extending this interface can be handled by the Updater
 ///           class by means of the two functions: updateTic and updateHour.
-class UpdateInterface
-{
+class UpdateInterface {
 public:
-    /// @brief Destructor.
-    virtual ~UpdateInterface();
+	/// @brief Destructor.
+	virtual ~UpdateInterface();
 
-    /// @brief Function called by the Updated at each TIC.
-    void updateTic();
+	/// @brief Function called by the Updated at each TIC.
+	void updateTic();
 
-    /// @brief Function called by the Updated at hour.
-    void updateHour();
+	/// @brief Function called by the Updated at hour.
+	void updateHour();
 
 private:
-    /// @brief Behavior executed at each TIC.
-    virtual void updateTicImpl() = 0;
+	/// @brief Behavior executed at each TIC.
+	virtual void updateTicImpl() = 0;
 
-    /// @brief Behavior executed at each Hour.
-    virtual void updateHourImpl() = 0;
+	/// @brief Behavior executed at each Hour.
+	virtual void updateHourImpl() = 0;
 };

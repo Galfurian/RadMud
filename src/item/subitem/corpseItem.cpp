@@ -25,98 +25,89 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-CorpseItem::CorpseItem() :
-    remainingBodyParts()
+CorpseItem::CorpseItem() : remainingBodyParts()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 CorpseItem::~CorpseItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 void CorpseItem::removeFromMud()
 {
-    Item::removeFromMud();
-    if (Mud::instance().remCorpse(this))
-    {
-        Logger::log(LogLevel::Debug,
-                    "Removing item '%s' from MUD corpses.",
-                    this->getName());
-    }
+	Item::removeFromMud();
+	if (Mud::instance().remCorpse(this)) {
+		Logger::log(LogLevel::Debug, "Removing item '%s' from MUD corpses.",
+					this->getName());
+	}
 }
 
 bool CorpseItem::updateOnDB()
 {
-    return true;
+	return true;
 }
 
 bool CorpseItem::removeOnDB()
 {
-    return true;
+	return true;
 }
 
-void CorpseItem::getSheet(Table & sheet) const
+void CorpseItem::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    Item::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    for (auto it : remainingBodyParts)
-    {
-        sheet.addRow({"Body Part", it->name});
-    }
+	// Call the function of the father class.
+	Item::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	for (auto it : remainingBodyParts) {
+		sheet.addRow({ "Body Part", it->name });
+	}
 }
 
 std::string CorpseItem::lookContent()
 {
-    if (content.empty())
-    {
-        return Formatter::italic("The corpse does not contain anything.\n");
-    }
-    std::stringstream ss;
-    ss << "Looking inside the corpse you see:\n";
-    for (auto it : content)
-    {
-        ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
-        ss << it->getNameCapital() << "\n";
-    }
-    return ss.str();
+	if (content.empty()) {
+		return Formatter::italic("The corpse does not contain anything.\n");
+	}
+	std::stringstream ss;
+	ss << "Looking inside the corpse you see:\n";
+	for (auto it : content) {
+		ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
+		ss << it->getNameCapital() << "\n";
+	}
+	return ss.str();
 }
 
 bool CorpseItem::isAContainer() const
 {
-    return true;
+	return true;
 }
 
 std::shared_ptr<BodyPart> CorpseItem::getAvailableBodyPart()
 {
-    // Lock the access to the item.
-    std::lock_guard<std::mutex> lock(itemMutex);
-    // Proceed with the function.
-    if (remainingBodyParts.empty())
-    {
-        return nullptr;
-    }
-    return remainingBodyParts.front();
+	// Lock the access to the item.
+	std::lock_guard<std::mutex> lock(itemMutex);
+	// Proceed with the function.
+	if (remainingBodyParts.empty()) {
+		return nullptr;
+	}
+	return remainingBodyParts.front();
 }
 
-bool CorpseItem::removeBodyPart(const std::shared_ptr<BodyPart> & bodyPart)
+bool CorpseItem::removeBodyPart(const std::shared_ptr<BodyPart> &bodyPart)
 {
-    // Lock the access to the item.
-    std::lock_guard<std::mutex> lock(itemMutex);
-    // Proceed with the function.
-    for (auto it = remainingBodyParts.begin();
-         it != remainingBodyParts.end(); ++it)
-    {
-        if ((*it)->vnum == bodyPart->vnum)
-        {
-            remainingBodyParts.erase(it);
-            remainingBodyParts.shrink_to_fit();
-            return true;
-        }
-    }
-    return false;
+	// Lock the access to the item.
+	std::lock_guard<std::mutex> lock(itemMutex);
+	// Proceed with the function.
+	for (auto it = remainingBodyParts.begin(); it != remainingBodyParts.end();
+		 ++it) {
+		if ((*it)->vnum == bodyPart->vnum) {
+			remainingBodyParts.erase(it);
+			remainingBodyParts.shrink_to_fit();
+			return true;
+		}
+	}
+	return false;
 }

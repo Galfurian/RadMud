@@ -23,25 +23,24 @@
 
 #include "commandObject.hpp"
 
-
 /// @defgroup ComInterfaces Commands List Interface.
 /// @brief All the functions necessary to handle the commands that a player
 ///         can execute.
 /// @{
 
 /// List all the item equipped by the character.
-bool DoEquipments(Character * character, ArgumentHandler & args);
+bool DoEquipments(Character *character, ArgumentHandler &args);
 
 /// Wield a object, if it can be wielded.
-bool DoWield(Character * character, ArgumentHandler & args);
+bool DoWield(Character *character, ArgumentHandler &args);
 
 /// Wear a object, if it can be worn.
-bool DoWear(Character * character, ArgumentHandler & args);
+bool DoWear(Character *character, ArgumentHandler &args);
 
 /// Remove an equipped or wielded item.
-bool DoRemove(Character * character, ArgumentHandler & args);
+bool DoRemove(Character *character, ArgumentHandler &args);
 
 /// List the character's inventory.
-bool DoInventory(Character * character, ArgumentHandler & args);
+bool DoInventory(Character *character, ArgumentHandler &args);
 
 ///@}

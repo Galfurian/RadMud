@@ -24,91 +24,99 @@
 #include "baseEnumerator.hpp"
 
 /// Represents the ranks of a skill.
-class SkillRank :
-    public BaseEnumerator
-{
+class SkillRank : public BaseEnumerator {
 public:
-    /// The ranks of a skill.
-    enum Enum
-    {
-        None,           ///< [0]
-        Newbie,         ///< [1]
-        Novice,         ///< [2]
-        Rookie,         ///< [3]
-        Beginner,       ///< [4]
-        Talented,       ///< [5]
-        Skilled,        ///< [6]
-        Intermediate,   ///< [7]
-        Seasoned,       ///< [8]
-        Proficient,     ///< [9]
-        Experienced,    ///< [10]
-        Advanced,       ///< [11]
-        Expert,         ///< [12]
-        Specialist,     ///< [13]
-        Master          ///< [14]
-    };
+	/// The ranks of a skill.
+	enum Enum {
+		None, ///< [0]
+		Newbie, ///< [1]
+		Novice, ///< [2]
+		Rookie, ///< [3]
+		Beginner, ///< [4]
+		Talented, ///< [5]
+		Skilled, ///< [6]
+		Intermediate, ///< [7]
+		Seasoned, ///< [8]
+		Proficient, ///< [9]
+		Experienced, ///< [10]
+		Advanced, ///< [11]
+		Expert, ///< [12]
+		Specialist, ///< [13]
+		Master ///< [14]
+	};
 
-    /// @brief Constructor.
-    SkillRank() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	SkillRank() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit SkillRank(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit SkillRank(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    SkillRank(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	SkillRank(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the skill rank as string.
-    std::string toString() const override;
+	/// @brief Returns the skill rank as string.
+	std::string toString() const override;
 
-    /// @brief Given a value, provides the corresponding skill rank.
-    static inline SkillRank getSkillRank(const unsigned int & _value)
-    {
-        unsigned int rankThreshold = (1000 + (1000 * Newbie));
-        if (_value <= rankThreshold) return Newbie;         // 2000
-        rankThreshold += (1000 + (1000 * Novice));
-        if (_value <= rankThreshold) return Novice;         // 5000
-        rankThreshold += (1000 + (1000 * Rookie));
-        if (_value <= rankThreshold) return Rookie;         // 9000
-        rankThreshold += (1000 + (1000 * Beginner));
-        if (_value <= rankThreshold) return Beginner;       // 14000
-        rankThreshold += (1000 + (1000 * Talented));
-        if (_value <= rankThreshold) return Talented;       // 20000
-        rankThreshold += (1000 + (1000 * Skilled));
-        if (_value <= rankThreshold) return Skilled;        // 27000
-        rankThreshold += (1000 + (1000 * Intermediate));
-        if (_value <= rankThreshold) return Intermediate;   // 35000
-        rankThreshold += (1000 + (1000 * Seasoned));
-        if (_value <= rankThreshold) return Seasoned;       // 44000
-        rankThreshold += (1000 + (1000 * Proficient));
-        if (_value <= rankThreshold) return Proficient;     // 54000
-        rankThreshold += (1000 + (1000 * Experienced));
-        if (_value <= rankThreshold) return Experienced;    // 65000
-        rankThreshold += (1000 + (1000 * Advanced));
-        if (_value <= rankThreshold) return Advanced;       // 77000
-        rankThreshold += (1000 + (1000 * Expert));
-        if (_value <= rankThreshold) return Expert;         // 90000
-        rankThreshold += (1000 + (1000 * Specialist));
-        if (_value <= rankThreshold) return Specialist;     // 104000
-        rankThreshold += (1000 + (1000 * Master));
-        if (_value <= rankThreshold) return Master;         // 119000
-        return Newbie;
-    }
+	/// @brief Given a value, provides the corresponding skill rank.
+	static inline SkillRank getSkillRank(const unsigned int &_value)
+	{
+		unsigned int rankThreshold = (1000 + (1000 * Newbie));
+		if (_value <= rankThreshold)
+			return Newbie; // 2000
+		rankThreshold += (1000 + (1000 * Novice));
+		if (_value <= rankThreshold)
+			return Novice; // 5000
+		rankThreshold += (1000 + (1000 * Rookie));
+		if (_value <= rankThreshold)
+			return Rookie; // 9000
+		rankThreshold += (1000 + (1000 * Beginner));
+		if (_value <= rankThreshold)
+			return Beginner; // 14000
+		rankThreshold += (1000 + (1000 * Talented));
+		if (_value <= rankThreshold)
+			return Talented; // 20000
+		rankThreshold += (1000 + (1000 * Skilled));
+		if (_value <= rankThreshold)
+			return Skilled; // 27000
+		rankThreshold += (1000 + (1000 * Intermediate));
+		if (_value <= rankThreshold)
+			return Intermediate; // 35000
+		rankThreshold += (1000 + (1000 * Seasoned));
+		if (_value <= rankThreshold)
+			return Seasoned; // 44000
+		rankThreshold += (1000 + (1000 * Proficient));
+		if (_value <= rankThreshold)
+			return Proficient; // 54000
+		rankThreshold += (1000 + (1000 * Experienced));
+		if (_value <= rankThreshold)
+			return Experienced; // 65000
+		rankThreshold += (1000 + (1000 * Advanced));
+		if (_value <= rankThreshold)
+			return Advanced; // 77000
+		rankThreshold += (1000 + (1000 * Expert));
+		if (_value <= rankThreshold)
+			return Expert; // 90000
+		rankThreshold += (1000 + (1000 * Specialist));
+		if (_value <= rankThreshold)
+			return Specialist; // 104000
+		rankThreshold += (1000 + (1000 * Master));
+		if (_value <= rankThreshold)
+			return Master; // 119000
+		return Newbie;
+	}
 
-    /// @brief Provides the maximum skill value.
-    static inline unsigned int getSkillCap()
-    {
-        return 119000;
-    }
+	/// @brief Provides the maximum skill value.
+	static inline unsigned int getSkillCap()
+	{
+		return 119000;
+	}
 };

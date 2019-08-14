@@ -24,18 +24,16 @@
 #include "item.hpp"
 
 /// @brief Holds details about armors.
-class ArmorItem :
-    public Item
-{
+class ArmorItem : public Item {
 public:
-    ArmorItem();
+	ArmorItem();
 
-    virtual ~ArmorItem();
+	virtual ~ArmorItem();
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    /// @brief Provides the AC of the armor based on its quality,
-    ///         material and condition.
-    /// @return the armor class.
-    unsigned int getArmorClass() const;
+	/// @brief Provides the AC of the armor based on its quality,
+	///         material and condition.
+	/// @return the armor class.
+	unsigned int getArmorClass() const;
 };

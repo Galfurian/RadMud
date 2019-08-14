@@ -26,49 +26,45 @@
 
 VehicleModel::VehicleModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 VehicleModel::~VehicleModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType VehicleModel::getType() const
 {
-    return ModelType::Vehicle;
+	return ModelType::Vehicle;
 }
 
 std::string VehicleModel::getTypeName() const
 {
-    return "Vehicle";
+	return "Vehicle";
 }
 
-void VehicleModel::getSheet(Table & sheet) const
+void VehicleModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    //sheet.addDivider();
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	//sheet.addDivider();
 }
 
-bool VehicleModel::setModel(const std::string & source)
+bool VehicleModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 0)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Vehicle Model (%s).",
-            this->name);
-        return false;
-    }
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 0) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Vehicle Model (%s).",
+					this->name);
+		return false;
+	}
+	return true;
 }

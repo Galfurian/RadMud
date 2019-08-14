@@ -25,31 +25,28 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the resource.
-enum class SeedType
-{
-    Plant,  ///< A generic seed.
-    Tree,   ///< A seed used to plant a tree.
+enum class SeedType {
+	Plant, ///< A generic seed.
+	Tree, ///< A seed used to plant a tree.
 };
 
 /// @brief Model of a seed.
-class SeedModel :
-    public ItemModel
-{
+class SeedModel : public ItemModel {
 public:
-    /// Type of seed.
-    SeedType seedType;
+	/// Type of seed.
+	SeedType seedType;
 
-    SeedModel();
+	SeedModel();
 
-    virtual ~SeedModel();
+	virtual ~SeedModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup EnumToString
@@ -59,4 +56,3 @@ public:
 std::string GetSeedTypeName(SeedType type);
 
 ///@}
-

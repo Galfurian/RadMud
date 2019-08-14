@@ -25,44 +25,43 @@
 #include "materialType.hpp"
 
 /// @brief Holds details about a material.
-class Material
-{
+class Material {
 public:
-    /// Virtual number.
-    unsigned int vnum;
-    /// Type of material.
-    MaterialType type;
-    /// Material's name.
-    std::string name;
-    /// Material's article.
-    std::string article;
-    /// Material's value on market.
-    double worth;
-    /// Material's hardness.
-    double hardness;
-    /// Material's lightness.
-    double lightness;
+	/// Virtual number.
+	unsigned int vnum;
+	/// Type of material.
+	MaterialType type;
+	/// Material's name.
+	std::string name;
+	/// Material's article.
+	std::string article;
+	/// Material's value on market.
+	double worth;
+	/// Material's hardness.
+	double hardness;
+	/// Material's lightness.
+	double lightness;
 
-    /// @brief Constructor.
-    Material();
+	/// @brief Constructor.
+	Material();
 
-    /// @brief Disable Copy Construct.
-    Material(Material const &) = delete;
+	/// @brief Disable Copy Construct.
+	Material(Material const &) = delete;
 
-    /// @brief Disable Move construct.
-    Material(Material &&) = delete;
+	/// @brief Disable Move construct.
+	Material(Material &&) = delete;
 
-    /// @brief Disable Copy assign.
-    Material & operator=(Material const &) = delete;
+	/// @brief Disable Copy assign.
+	Material &operator=(Material const &) = delete;
 
-    /// @brief Disable Move assign.
-    Material & operator=(Material &&) = delete;
+	/// @brief Disable Move assign.
+	Material &operator=(Material &&) = delete;
 
-    /// @brief Destructor.
-    ~Material();
+	/// @brief Destructor.
+	~Material();
 
-    /// @brief Check the correctness of the material.
-    /// @return <b>True</b> if the material has correct values,<br>
-    ///         <b>False</b> otherwise.
-    bool check();
+	/// @brief Check the correctness of the material.
+	/// @return <b>True</b> if the material has correct values,<br>
+	///         <b>False</b> otherwise.
+	bool check();
 };

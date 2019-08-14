@@ -25,34 +25,31 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the container of liquid.
-enum class LiqContainerFlag
-{
-    None = 0,       ///< No flag.
-    Endless = 1,    ///< Content never ends.
-    Destroy = 2,    ///< Container is destroyed once emptied.
+enum class LiqContainerFlag {
+	None = 0, ///< No flag.
+	Endless = 1, ///< Content never ends.
+	Destroy = 2, ///< Container is destroyed once emptied.
 };
 
 /// @brief Model of a container of liquids.
-class LiquidContainerModel :
-    public ItemModel
-{
+class LiquidContainerModel : public ItemModel {
 public:
-    /// The maximum weight which this container can carry.
-    unsigned int maxWeight;
-    /// The flags of the container.
-    unsigned int liquidFlags;
+	/// The maximum weight which this container can carry.
+	unsigned int maxWeight;
+	/// The flags of the container.
+	unsigned int liquidFlags;
 
-    LiquidContainerModel();
+	LiquidContainerModel();
 
-    virtual ~LiquidContainerModel();
+	virtual ~LiquidContainerModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup FlagsToList
@@ -63,4 +60,3 @@ public:
 std::string GetLiqContainerFlagString(unsigned int flags);
 
 /// @}
-

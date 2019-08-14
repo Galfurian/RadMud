@@ -23,13 +23,14 @@
 
 std::string StatusModifier::toString() const
 {
-    if (value == StatusModifier::Health)
-        return "Health";
-    if (value == StatusModifier::HealthRegeneration)
-        return "HealthRegeneration";
-    if (value == StatusModifier::Stamina)
-        return "Stamina";
-    if (value == StatusModifier::StaminaRegeneration)
-        return "StaminaRegeneration";
-    else return "None";
+	if (value == StatusModifier::Health)
+		return "Health";
+	if (value == StatusModifier::HealthRegeneration)
+		return "HealthRegeneration";
+	if (value == StatusModifier::Stamina)
+		return "Stamina";
+	if (value == StatusModifier::StaminaRegeneration)
+		return "StaminaRegeneration";
+	else
+		return "None";
 }

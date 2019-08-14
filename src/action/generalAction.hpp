@@ -36,102 +36,97 @@ class MoveAction;
 class CombatAction;
 
 /// The list of possible actions.
-enum class ActionType
-{
-    Wait,       ///< The character is doing common action.
-    Move,       ///< The character is moving to another location.
-    Crafting,   ///< The character is crafting something.
-    Building,   ///< The character is crafting something.
-    Combat,     ///< The character is fighting.
-    Scout,      ///< The character is scouting the area.
-    Reload,     ///< The character is reloading a firearm.
-    Load,       ///< The character is loading something.
-    Unload,     ///< The character is unloading something.
-    Aim,        ///< The character is aiming a target.
-    Dismember   ///< The character is dismembering a corpse.
+enum class ActionType {
+	Wait, ///< The character is doing common action.
+	Move, ///< The character is moving to another location.
+	Crafting, ///< The character is crafting something.
+	Building, ///< The character is crafting something.
+	Combat, ///< The character is fighting.
+	Scout, ///< The character is scouting the area.
+	Reload, ///< The character is reloading a firearm.
+	Load, ///< The character is loading something.
+	Unload, ///< The character is unloading something.
+	Aim, ///< The character is aiming a target.
+	Dismember ///< The character is dismembering a corpse.
 };
 
 /// The list of possible actions.
-enum class ActionStatus
-{
-    Finished,   ///< The action is finished.
-    Running,    ///< The action is still running.
-    Error       ///< The action has encountered an error.
+enum class ActionStatus {
+	Finished, ///< The action is finished.
+	Running, ///< The action is still running.
+	Error ///< The action has encountered an error.
 };
 
 /// @brief A general action. Performing this action will result in doing nothing.
-class GeneralAction :
-    public std::enable_shared_from_this<GeneralAction>
-{
+class GeneralAction : public std::enable_shared_from_this<GeneralAction> {
 protected:
-    /// Actor of the action.
-    Character * actor;
-    /// Determines if this is the last action of the action queue.
-    bool lastAction;
-    /// The time point in the future needed by the action to complete.
-    std::chrono::time_point<std::chrono::system_clock> actionCooldown;
+	/// Actor of the action.
+	Character *actor;
+	/// Determines if this is the last action of the action queue.
+	bool lastAction;
+	/// The time point in the future needed by the action to complete.
+	std::chrono::time_point<std::chrono::system_clock> actionCooldown;
 
 public:
-    /// @brief Constructor.
-    explicit GeneralAction(Character * _actor,
-                           const bool & _lastAction = false);
+	/// @brief Constructor.
+	explicit GeneralAction(Character *_actor, const bool &_lastAction = false);
 
-    /// @brief Destructor.
-    virtual ~GeneralAction();
+	/// @brief Destructor.
+	virtual ~GeneralAction();
 
-    /// @brief Determines if this is the last action of the action queue.
-    /// @return
-    inline bool isLastAction() const
-    {
-        return lastAction;
-    }
+	/// @brief Determines if this is the last action of the action queue.
+	/// @return
+	inline bool isLastAction() const
+	{
+		return lastAction;
+	}
 
-    /// @brief Check if the cooldown of the action is elapsed.
-    /// @return <b>True</b> if the time has passed,<br>
-    ///         <b>False</b> otherwise.
-    bool checkElapsed() const;
+	/// @brief Check if the cooldown of the action is elapsed.
+	/// @return <b>True</b> if the time has passed,<br>
+	///         <b>False</b> otherwise.
+	bool checkElapsed() const;
 
-    /// @brief Get the elapsed time.
-    long int getElapsed() const;
+	/// @brief Get the elapsed time.
+	long int getElapsed() const;
 
-    /// @brief Checks the correctness of the action's values.
-    /// @param error A string which contains the error in case of a failed check.
-    /// @return <b>True</b> if it has correct values,<br>
-    ///         <b>False</b> otherwise.
-    virtual bool check(std::string & error) const;
+	/// @brief Checks the correctness of the action's values.
+	/// @param error A string which contains the error in case of a failed check.
+	/// @return <b>True</b> if it has correct values,<br>
+	///         <b>False</b> otherwise.
+	virtual bool check(std::string &error) const;
 
-    /// @brief Provides the type of the action.
-    /// @return The type of action.
-    virtual ActionType getType() const;
+	/// @brief Provides the type of the action.
+	/// @return The type of action.
+	virtual ActionType getType() const;
 
-    /// @brief Provides the description of the action.
-    /// @return The string which describe the current action.
-    virtual std::string getDescription() const;
+	/// @brief Provides the description of the action.
+	/// @return The string which describe the current action.
+	virtual std::string getDescription() const;
 
-    /// @brief Stops the current action and returns a string which describe the intterruption.
-    /// @return The stopping description.
-    virtual std::string stop();
+	/// @brief Stops the current action and returns a string which describe the intterruption.
+	/// @return The stopping description.
+	virtual std::string stop();
 
 	/// @brief Starts the action, and performs all the checks.
 	virtual bool start();
 
-    /// @brief Performs the current action.
-    /// @return the status after performing the action.
-    virtual ActionStatus perform();
+	/// @brief Performs the current action.
+	/// @return the status after performing the action.
+	virtual ActionStatus perform();
 
-    /// @brief Provides the remaining time before the action can be triggered.
-    virtual unsigned int getCooldown();
+	/// @brief Provides the remaining time before the action can be triggered.
+	virtual unsigned int getCooldown();
 
-    /// @brief Allows to set the remaining time before the action can be triggered.
-    /// @param _actionCooldown The cooldown that has to be set.
-    void resetCooldown(const unsigned int & _actionCooldown = 0);
+	/// @brief Allows to set the remaining time before the action can be triggered.
+	/// @param _actionCooldown The cooldown that has to be set.
+	void resetCooldown(const unsigned int &_actionCooldown = 0);
 
-    /// @brief Returns the action <b>statically</b> casted to CombatAction.
-    std::shared_ptr<CombatAction> toCombatAction();
+	/// @brief Returns the action <b>statically</b> casted to CombatAction.
+	std::shared_ptr<CombatAction> toCombatAction();
 };
 
-bool operator==(const std::shared_ptr<GeneralAction> & _generalAction,
-                const ActionType & _actionType);
+bool operator==(const std::shared_ptr<GeneralAction> &_generalAction,
+				const ActionType &_actionType);
 
-bool operator!=(const std::shared_ptr<GeneralAction> & _generalAction,
-                const ActionType & _actionType);
+bool operator!=(const std::shared_ptr<GeneralAction> &_generalAction,
+				const ActionType &_actionType);

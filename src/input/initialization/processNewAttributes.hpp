@@ -22,14 +22,12 @@
 #include "processInitialization.hpp"
 
 /// @brief Allows to choose the player attributes.
-class ProcessNewAttributes :
-    public ProcessInitialization
-{
+class ProcessNewAttributes : public ProcessInitialization {
 public:
-    bool process(Character * character, ArgumentHandler & args);
+	bool process(Character *character, ArgumentHandler &args);
 
-    void advance(Character * character,
-                 const std::string & error = std::string());
+	void advance(Character *character,
+				 const std::string &error = std::string());
 
-    void rollBack(Character * character);
+	void rollBack(Character *character);
 };

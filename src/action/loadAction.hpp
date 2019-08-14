@@ -28,36 +28,32 @@ class MagazineItem;
 class Item;
 
 /// @brief Allows to load something.
-class LoadAction :
-    public GeneralAction
-{
+class LoadAction : public GeneralAction {
 private:
-    /// The magazine which has to be loaded.
-    MagazineItem * magazine;
-    /// The projectile used to load the item.
-    Item * projectile;
-    /// The amount that has to be loaded.
-    unsigned int amount;
+	/// The magazine which has to be loaded.
+	MagazineItem *magazine;
+	/// The projectile used to load the item.
+	Item *projectile;
+	/// The amount that has to be loaded.
+	unsigned int amount;
 
 public:
-    /// @brief Constructor.
-    LoadAction(Character * _actor,
-               MagazineItem * _magazine,
-               Item * _projectile,
-               const unsigned int & _amount);
+	/// @brief Constructor.
+	LoadAction(Character *_actor, MagazineItem *_magazine, Item *_projectile,
+			   const unsigned int &_amount);
 
-    /// @brief Destructor.
-    virtual ~LoadAction();
+	/// @brief Destructor.
+	virtual ~LoadAction();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 };

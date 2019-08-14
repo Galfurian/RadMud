@@ -25,35 +25,32 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the node.
-enum class NodeType
-{
-    NoType, ///< [0] No type.
-    Metal,  ///< [1] Metal vein.
-    Wood,   ///< [2] A tree.
-    Stone   ///< [3] A monolith of stone.
+enum class NodeType {
+	NoType, ///< [0] No type.
+	Metal, ///< [1] Metal vein.
+	Wood, ///< [2] A tree.
+	Stone ///< [3] A monolith of stone.
 };
 
 /// @brief Model of a node of resources.
-class NodeModel :
-    public ItemModel
-{
+class NodeModel : public ItemModel {
 public:
-    /// Type of node.
-    NodeType nodeType;
-    /// The vnum of the item provided during the extraction.
-    //unsigned int provides;
+	/// Type of node.
+	NodeType nodeType;
+	/// The vnum of the item provided during the extraction.
+	//unsigned int provides;
 
-    NodeModel();
+	NodeModel();
 
-    virtual ~NodeModel();
+	virtual ~NodeModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup EnumToString
@@ -63,4 +60,3 @@ public:
 std::string GetNodeTypeName(NodeType type);
 
 ///@}
-

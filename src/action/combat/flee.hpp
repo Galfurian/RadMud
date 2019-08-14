@@ -26,33 +26,31 @@
 #include "combatAction.hpp"
 
 /// @brief An action executed by characters when fleeing from combat.
-class Flee :
-    public CombatAction
-{
+class Flee : public CombatAction {
 public:
-    /// @brief Constructor.
-    /// @param _actor The actor who is doing the action.
-    Flee(Character * _actor);
+	/// @brief Constructor.
+	/// @param _actor The actor who is doing the action.
+	Flee(Character *_actor);
 
-    /// @brief Destructor.
-    virtual ~Flee();
+	/// @brief Destructor.
+	virtual ~Flee();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 
-    CombatActionType getCombatActionType() const override;
+	CombatActionType getCombatActionType() const override;
 
-    /// @brief Returns the stamina required to execute the action.
-    /// @param character The actor.
-    /// @return The required stamina.
-    static unsigned int getConsumedStamina(Character * character);
+	/// @brief Returns the stamina required to execute the action.
+	/// @param character The actor.
+	/// @return The required stamina.
+	static unsigned int getConsumedStamina(Character *character);
 };

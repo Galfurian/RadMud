@@ -25,80 +25,84 @@
 #include "logger.hpp"
 
 RangedWeaponModel::RangedWeaponModel() :
-    rangedWeaponType(),
-    minDamage(),
-    maxDamage(),
-    range()
+	rangedWeaponType(),
+	minDamage(),
+	maxDamage(),
+	range()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 RangedWeaponModel::~RangedWeaponModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType RangedWeaponModel::getType() const
 {
-    return ModelType::RangedWeapon;
+	return ModelType::RangedWeapon;
 }
 
 std::string RangedWeaponModel::getTypeName() const
 {
-    return "Ranged Weapon";
+	return "Ranged Weapon";
 }
 
-bool RangedWeaponModel::setModel(const std::string & source)
+bool RangedWeaponModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 4)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Ranged Weapon Model (%s).",
-            this->name);
-        return false;
-    }
-    this->rangedWeaponType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(
-        functionList[0]));
-    this->minDamage = ToNumber<unsigned int>(functionList[1]);
-    this->maxDamage = ToNumber<unsigned int>(functionList[2]);
-    this->range = ToNumber<int>(functionList[3]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 4) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Ranged Weapon Model (%s).",
+					this->name);
+		return false;
+	}
+	this->rangedWeaponType =
+		static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
+	this->minDamage = ToNumber<unsigned int>(functionList[1]);
+	this->maxDamage = ToNumber<unsigned int>(functionList[2]);
+	this->range = ToNumber<int>(functionList[3]);
+	return true;
 }
 
-void RangedWeaponModel::getSheet(Table & sheet) const
+void RangedWeaponModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Ranged Weapon Type",
-                  GetRangedWeaponTypeName(this->rangedWeaponType)});
-    sheet.addRow({"Minimum Damage", ToString(this->minDamage)});
-    sheet.addRow({"Maximum Damage", ToString(this->maxDamage)});
-    sheet.addRow({"Range", ToString(this->range)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Ranged Weapon Type",
+				   GetRangedWeaponTypeName(this->rangedWeaponType) });
+	sheet.addRow({ "Minimum Damage", ToString(this->minDamage) });
+	sheet.addRow({ "Maximum Damage", ToString(this->maxDamage) });
+	sheet.addRow({ "Range", ToString(this->range) });
 }
 
 std::string GetRangedWeaponTypeName(RangedWeaponType type)
 {
-    if (type == RangedWeaponType::Pistol) return "Pistol";
-    if (type == RangedWeaponType::Rifle) return "Rifle";
-    if (type == RangedWeaponType::Shotgun) return "Shotgun";
-    if (type == RangedWeaponType::HeavyWeapon) return "Heavy Weapon";
-    if (type == RangedWeaponType::EnergyPistol) return "Energy Pistol";
-    if (type == RangedWeaponType::EnergyRifle) return "Energy Rifle";
-    if (type == RangedWeaponType::EnergyHeavyWeapon)
-        return "Energy Heavy Weapon";
-    if (type == RangedWeaponType::Granade) return "Granade";
-    if (type == RangedWeaponType::Thrown) return "Thrown";
-    return "No Weapon Type";
+	if (type == RangedWeaponType::Pistol)
+		return "Pistol";
+	if (type == RangedWeaponType::Rifle)
+		return "Rifle";
+	if (type == RangedWeaponType::Shotgun)
+		return "Shotgun";
+	if (type == RangedWeaponType::HeavyWeapon)
+		return "Heavy Weapon";
+	if (type == RangedWeaponType::EnergyPistol)
+		return "Energy Pistol";
+	if (type == RangedWeaponType::EnergyRifle)
+		return "Energy Rifle";
+	if (type == RangedWeaponType::EnergyHeavyWeapon)
+		return "Energy Heavy Weapon";
+	if (type == RangedWeaponType::Granade)
+		return "Granade";
+	if (type == RangedWeaponType::Thrown)
+		return "Thrown";
+	return "No Weapon Type";
 }

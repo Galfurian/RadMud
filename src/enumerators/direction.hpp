@@ -28,57 +28,51 @@
 class Coordinates;
 
 /// Provides a complete control on directions.
-class Direction :
-    public BaseEnumerator
-{
+class Direction : public BaseEnumerator {
 public:
-    /// The possible directions.
-    enum Enum
-    {
-        None,   ///< No direction.
-        North,  ///< North.
-        South,  ///< South.
-        West,   ///< West.
-        East,   ///< East.
-        Up,     ///< Up.
-        Down    ///< Down.
-    };
+	/// The possible directions.
+	enum Enum {
+		None, ///< No direction.
+		North, ///< North.
+		South, ///< South.
+		West, ///< West.
+		East, ///< East.
+		Up, ///< Up.
+		Down ///< Down.
+	};
 
-    /// @brief Constructor.
-    Direction() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	Direction() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit Direction(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit Direction(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    Direction(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	Direction(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from string.
-    /// @param _direction The string representing the direction.
-    /// @param exact      If the string must be the exact name of the direction.
-    Direction(const std::string & _direction, const bool & exact = true);
+	/// @brief Constructor from string.
+	/// @param _direction The string representing the direction.
+	/// @param exact      If the string must be the exact name of the direction.
+	Direction(const std::string &_direction, const bool &exact = true);
 
-    /// @brief Returns the direction as string.
-    std::string toString() const override;
+	/// @brief Returns the direction as string.
+	std::string toString() const override;
 
-    /// @brief Returns the opposite direction.
-    Direction getOpposite() const;
+	/// @brief Returns the opposite direction.
+	Direction getOpposite() const;
 
-    /// @brief Returns the direction in terms of coordinates.
-    Coordinates getCoordinates() const;
+	/// @brief Returns the direction in terms of coordinates.
+	Coordinates getCoordinates() const;
 
-    /// Vector with all the possible directions.
-    static std::vector<Direction> getAllDirections();
+	/// Vector with all the possible directions.
+	static std::vector<Direction> getAllDirections();
 };

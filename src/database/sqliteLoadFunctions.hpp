@@ -29,158 +29,158 @@
 
 /// @{
 /// @brief Function used to retrieve information about bad names.
-bool LoadBadName(ResultSet * result);
+bool LoadBadName(ResultSet *result);
 
 /// @brief Function used to retrieve information about blocked ips.
-bool LoadBlockedIp(ResultSet * result);
+bool LoadBlockedIp(ResultSet *result);
 
 /// @brief Function used to retrieve information about the news from
 ///         the developers.
-bool LoadNews(ResultSet * result);
+bool LoadNews(ResultSet *result);
 
 /// @brief Function used to retrieve information about items inside containers.
-bool LoadItemContent(ResultSet * result);
+bool LoadItemContent(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the items.
-bool LoadItem(ResultSet * result);
+bool LoadItem(ResultSet *result);
 
 /// @brief Function used to retrieve information about skills.
-bool LoadSkill(ResultSet * result);
+bool LoadSkill(ResultSet *result);
 
 /// @brief Function used to retrieve information about skills prerequisites.
-bool LoadSkillPrerequisite(ResultSet * result);
+bool LoadSkillPrerequisite(ResultSet *result);
 
 /// @brief Loads the ability modifier associated with a skill.
-bool LoadSkillAbilityModifier(ResultSet * result);
+bool LoadSkillAbilityModifier(ResultSet *result);
 
 /// @brief Loads the status modifier associated with a skill.
-bool LoadSkillStatusModifier(ResultSet * result);
+bool LoadSkillStatusModifier(ResultSet *result);
 
 /// @brief Loads the combat modifier associated with a skill.
-bool LoadSkillCombatModifier(ResultSet * result);
+bool LoadSkillCombatModifier(ResultSet *result);
 
 /// @brief Loads the knowledge associated with a skill.
-bool LoadSkillKnowledge(ResultSet * result);
+bool LoadSkillKnowledge(ResultSet *result);
 
 /// @brief Function used to retrieve information about factions.
-bool LoadFaction(ResultSet * result);
+bool LoadFaction(ResultSet *result);
 
 /// @brief Function used to retrieve information about models of items.
-bool LoadModel(ResultSet * result);
+bool LoadModel(ResultSet *result);
 
 /// @brief Function used to retrieve information about races.
-bool LoadRace(ResultSet * result);
+bool LoadRace(ResultSet *result);
 
 /// @brief Function used to load body parts associated to races.
-bool LoadRaceBodyPart(ResultSet * result);
+bool LoadRaceBodyPart(ResultSet *result);
 
 /// @brief Function used to load the base skills of a race.
-bool LoadRaceBaseSkill(ResultSet * result);
+bool LoadRaceBaseSkill(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the mobiles.
-bool LoadMobileModel(ResultSet * result);
+bool LoadMobileModel(ResultSet *result);
 
 /// @brief Load default mobiles.
-bool LoadMobileSpawn(ResultSet * result);
+bool LoadMobileSpawn(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the rooms.
-bool LoadRoom(ResultSet * result);
+bool LoadRoom(ResultSet *result);
 
 /// @brief Retrieves the liquids inside rooms.
-bool LoadRoomLiquid(ResultSet * result);
+bool LoadRoomLiquid(ResultSet *result);
 
 /// @brief Function used to retrieve information about exits of rooms.
-bool LoadExit(ResultSet * result);
+bool LoadExit(ResultSet *result);
 
 /// @brief Function used to retrieve information about the item
 ///         placed inside the rooms.
-bool LoadItemRoom(ResultSet * result);
+bool LoadItemRoom(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the areas of the mud.
-bool LoadArea(ResultSet * result);
+bool LoadArea(ResultSet *result);
 
 /// @brief Function used to retrieve information about the rooms
 ///         associated with every area.
-bool LoadAreaList(ResultSet * result);
+bool LoadAreaList(ResultSet *result);
 
 /// @brief Function used to retrieve the writings
-bool LoadWriting(ResultSet * result);
+bool LoadWriting(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the materials.
-bool LoadMaterial(ResultSet * result);
+bool LoadMaterial(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the professions.
-bool LoadProfession(ResultSet * result);
+bool LoadProfession(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the productions.
-bool LoadProduction(ResultSet * result);
+bool LoadProduction(ResultSet *result);
 
 /// @brief Function used to retrieve information about the tools
 /// required by productions.
-bool LoadProductionTool(ResultSet * result);
+bool LoadProductionTool(ResultSet *result);
 
 /// @brief Function used to retrieve information about the outcomes
 /// of productions.
-bool LoadProductionOutcome(ResultSet * result);
+bool LoadProductionOutcome(ResultSet *result);
 
 /// @brief Function used to retrieve information about the ingredients
 /// required by productions.
-bool LoadProductionIngredient(ResultSet * result);
+bool LoadProductionIngredient(ResultSet *result);
 
 /// @brief Function used to retrieve information about the knowledge
 /// required by productions.
-bool LoadProductionKnowledge(ResultSet * result);
+bool LoadProductionKnowledge(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the liquids.
-bool LoadLiquid(ResultSet * result);
+bool LoadLiquid(ResultSet *result);
 
 /// @brief Function used to retrieve information about liquids
 ///         inside containers.
-bool LoadItemLiquidContent(ResultSet * result);
+bool LoadItemLiquidContent(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the travelling point.
-bool LoadTravelPoint(ResultSet * result);
+bool LoadTravelPoint(ResultSet *result);
 
 /// @brief Function used to retrieve information about all the buildings.
-bool LoadBuilding(ResultSet * result);
+bool LoadBuilding(ResultSet *result);
 
 /// @brief Function used to retrieve information about the tools
 /// required by productions.
-bool LoadBuildingTool(ResultSet * result);
+bool LoadBuildingTool(ResultSet *result);
 
 /// @brief Function used to retrieve information about the ingredients
 /// required by productions.
-bool LoadBuildingIngredient(ResultSet * result);
+bool LoadBuildingIngredient(ResultSet *result);
 
 /// @brief Function used to retrieve information about the knowledge
 /// required by productions.
-bool LoadBuildingKnowledge(ResultSet * result);
+bool LoadBuildingKnowledge(ResultSet *result);
 
 /// @brief Function used to load shops.
-bool LoadShop(ResultSet * result);
+bool LoadShop(ResultSet *result);
 
 /// @brief Function used to load shops default items.
-bool LoadShopDefaultStock(ResultSet * result);
+bool LoadShopDefaultStock(ResultSet *result);
 
 /// @brief Function used to load currencies.
-bool LoadCurrency(ResultSet * result);
+bool LoadCurrency(ResultSet *result);
 
 /// @brief Function used to load terrains.
-bool LoadTerrain(ResultSet * result);
+bool LoadTerrain(ResultSet *result);
 
 /// @brief Loads the liquids which fill the terrains.
-bool LoadTerrainLiquid(ResultSet * result);
+bool LoadTerrainLiquid(ResultSet *result);
 
 /// @brief Function used to load terrains liquid sources.
-bool LoadTerrainLiquidSources(ResultSet * result);
+bool LoadTerrainLiquidSources(ResultSet *result);
 
 /// @brief Function used to load body parts.
-bool LoadBodyPart(ResultSet * result);
+bool LoadBodyPart(ResultSet *result);
 
 /// @brief Function used to load the resources produced from a body part.
-bool LoadBodyPartResources(ResultSet * result);
+bool LoadBodyPartResources(ResultSet *result);
 
 /// @brief Function used to load the attack properties of body parts.
-bool LoadBodyPartWeapon(ResultSet * result);
+bool LoadBodyPartWeapon(ResultSet *result);
 
 ///@}

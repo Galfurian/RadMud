@@ -27,27 +27,27 @@
 /// @{
 
 /// Generate a new item from the vnum of a model.
-bool DoItemCreate(Character * character, ArgumentHandler & args);
+bool DoItemCreate(Character *character, ArgumentHandler &args);
 
 /// Destroy an item.
-bool DoItemDestroy(Character * character, ArgumentHandler & args);
+bool DoItemDestroy(Character *character, ArgumentHandler &args);
 
 /// Materialize an item from everywhere.
-bool DoItemGet(Character * character, ArgumentHandler & args);
+bool DoItemGet(Character *character, ArgumentHandler &args);
 
 /// Get information about an item.
-bool DoItemInfo(Character * character, ArgumentHandler & args);
+bool DoItemInfo(Character *character, ArgumentHandler &args);
 
 /// List all the items in the Mud.
-bool DoItemList(Character * character, ArgumentHandler & args);
+bool DoItemList(Character *character, ArgumentHandler &args);
 
 /// Show all the information fo the desired model.
-bool DoModelInfo(Character * character, ArgumentHandler & args);
+bool DoModelInfo(Character *character, ArgumentHandler &args);
 
 /// List all the model used to define items.
-bool DoModelList(Character * character, ArgumentHandler & args);
+bool DoModelList(Character *character, ArgumentHandler &args);
 
 /// List all the writings.
-bool DoWritingList(Character * character, ArgumentHandler & args);
+bool DoWritingList(Character *character, ArgumentHandler &args);
 
 /// @}

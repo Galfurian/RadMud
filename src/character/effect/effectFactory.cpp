@@ -25,86 +25,58 @@
 
 namespace EffectFactory
 {
-
-Effect clearTargets(Character * actor,
-                    const unsigned int & duration)
+Effect clearTargets(Character *actor, const unsigned int &duration)
 {
-    Effect::Functionality functionality;
-    functionality.expire = [](Character * character)
-    {
-        if (character != nullptr)
-        {
-            character->combatHandler.charactersInSight.clear();
-        }
-    };
-    auto effect = Effect(actor,
-                         "ClearTargets",
-                         0,
-                         duration,
-                         functionality);
-    return effect;
+	Effect::Functionality functionality;
+	functionality.expire = [](Character *character) {
+		if (character != nullptr) {
+			character->combatHandler.charactersInSight.clear();
+		}
+	};
+	auto effect = Effect(actor, "ClearTargets", 0, duration, functionality);
+	return effect;
 }
 
-Effect disturbedAim(Character * actor,
-                    const unsigned int & duration,
-                    const int & negativeMagnitude)
+Effect disturbedAim(Character *actor, const unsigned int &duration,
+					const int &negativeMagnitude)
 {
-    auto effect = Effect(actor,
-                         "DisturbedAim",
-                         0,
-                         duration,
-                         Effect::Functionality());
-    effect.setCombatMod(CombatModifier::RangedWeaponHitRoll, negativeMagnitude);
-    return effect;
+	auto effect =
+		Effect(actor, "DisturbedAim", 0, duration, Effect::Functionality());
+	effect.setCombatMod(CombatModifier::RangedWeaponHitRoll, negativeMagnitude);
+	return effect;
 }
 
-Effect poisonDamage(Character * actor,
-                    std::string const & name,
-                    const unsigned int & delay,
-                    const unsigned int & duration,
-                    std::string const & messageActivate,
-                    std::string const & messagePeriodic,
-                    std::string const & messageExpire,
-                    std::string const & messageDeath,
-                    const unsigned int & damage)
+Effect poisonDamage(Character *actor, std::string const &name,
+					const unsigned int &delay, const unsigned int &duration,
+					std::string const &messageActivate,
+					std::string const &messagePeriodic,
+					std::string const &messageExpire,
+					std::string const &messageDeath, const unsigned int &damage)
 {
-    Effect::Functionality functionality;
-    functionality.activate = [messageActivate](Character * character)
-    {
-        if (character != nullptr)
-        {
-            character->sendMsg(messageActivate + "\n\n");
-        }
-    };
-    functionality.periodic =
-        [damage, messageDeath, messagePeriodic](Character * character)
-        {
-            if (character != nullptr)
-            {
-                if (!character->remHealth(damage))
-                {
-                    character->sendMsg(messageDeath + "\n\n");
-                    character->kill();
-                }
-                else
-                {
-                    character->sendMsg(messagePeriodic + "\n\n");
-                }
-            }
-        };
-    functionality.expire = [messageExpire](Character * character)
-    {
-        if (character != nullptr)
-        {
-            character->sendMsg(messageExpire + "\n\n");
-        }
-    };
-    auto effect = Effect(actor,
-                         name,
-                         delay,
-                         duration,
-                         functionality);
-    return effect;
+	Effect::Functionality functionality;
+	functionality.activate = [messageActivate](Character *character) {
+		if (character != nullptr) {
+			character->sendMsg(messageActivate + "\n\n");
+		}
+	};
+	functionality.periodic = [damage, messageDeath,
+							  messagePeriodic](Character *character) {
+		if (character != nullptr) {
+			if (!character->remHealth(damage)) {
+				character->sendMsg(messageDeath + "\n\n");
+				character->kill();
+			} else {
+				character->sendMsg(messagePeriodic + "\n\n");
+			}
+		}
+	};
+	functionality.expire = [messageExpire](Character *character) {
+		if (character != nullptr) {
+			character->sendMsg(messageExpire + "\n\n");
+		}
+	};
+	auto effect = Effect(actor, name, delay, duration, functionality);
+	return effect;
 }
 
 }

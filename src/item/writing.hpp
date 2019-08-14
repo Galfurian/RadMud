@@ -25,21 +25,20 @@
 #include <string>
 
 /// @brief Holds details about a writing.
-class Writing
-{
+class Writing {
 public:
-    /// The virtual number of the writing.
-    unsigned int vnum;
-    /// The title of the writing.
-    std::string title;
-    /// The author of the writing.
-    std::string author;
-    /// The content of the writing.
-    std::string content;
+	/// The virtual number of the writing.
+	unsigned int vnum;
+	/// The title of the writing.
+	std::string title;
+	/// The author of the writing.
+	std::string author;
+	/// The content of the writing.
+	std::string content;
 
-    /// @brief Constructor
-    Writing();
+	/// @brief Constructor
+	Writing();
 
-    /// @brief Destructor.
-    ~Writing();
+	/// @brief Destructor.
+	~Writing();
 };

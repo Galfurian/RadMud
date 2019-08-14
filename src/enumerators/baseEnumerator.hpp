@@ -24,78 +24,75 @@
 #include <string>
 
 /// @brief A base class used to implement complex enumerators.
-class BaseEnumerator
-{
+class BaseEnumerator {
 protected:
-    /// Internal value.
-    unsigned int value;
+	/// Internal value.
+	unsigned int value;
 
 public:
+	/// @brief Constructor.
+	BaseEnumerator();
 
-    /// @brief Constructor.
-    BaseEnumerator();
+	/// @brief Constructor from unsigned int.
+	BaseEnumerator(const unsigned int &_value);
 
-    /// @brief Constructor from unsigned int.
-    BaseEnumerator(const unsigned int & _value);
+	/// @brief Copy Constructor.
+	BaseEnumerator(const BaseEnumerator &other);
 
-    /// @brief Copy Constructor.
-    BaseEnumerator(const BaseEnumerator & other);
+	/// @brief Constructor from uint.
+	virtual ~BaseEnumerator();
 
-    /// @brief Constructor from uint.
-    virtual ~BaseEnumerator();
+	/// @brief Returns the value as string.
+	virtual std::string toString() const;
 
-    /// @brief Returns the value as string.
-    virtual std::string toString() const;
+	/// @brief Returns the value as number.
+	unsigned int toUInt() const
+	{
+		return value;
+	}
 
-    /// @brief Returns the value as number.
-    unsigned int toUInt() const
-    {
-        return value;
-    }
+	/// @brief Returns the value as number.
+	template <typename T> T to() const
+	{
+		return static_cast<T>(value);
+	}
 
-    /// @brief Returns the value as number.
-    template<typename T>
-    T to() const
-    {
-        return static_cast<T>(value);
-    }
+	/// @brief Equality operator.
+	bool operator==(const BaseEnumerator &rhs) const
+	{
+		return value == rhs.value;
+	}
 
-    /// @brief Equality operator.
-    bool operator==(const BaseEnumerator & rhs) const
-    {
-        return value == rhs.value;
-    }
+	/// @brief Inequality operator.
+	bool operator!=(const BaseEnumerator &rhs) const
+	{
+		return value != rhs.value;
+	}
 
-    /// @brief Inequality operator.
-    bool operator!=(const BaseEnumerator & rhs) const
-    {
-        return value != rhs.value;
-    }
+	/// @brief Lesser operator.
+	bool operator<(const BaseEnumerator &rhs) const
+	{
+		return value < rhs.value;
+	}
 
-    /// @brief Lesser operator.
-    bool operator<(const BaseEnumerator & rhs) const
-    {
-        return value < rhs.value;
-    }
+	/// @brief Greater operator.
+	bool operator>(const BaseEnumerator &rhs) const
+	{
+		return value > rhs.value;
+	}
 
-    /// @brief Greater operator.
-    bool operator>(const BaseEnumerator & rhs) const
-    {
-        return value > rhs.value;
-    }
+	/// @brief Lesser-Equal operator.
+	bool operator<=(const BaseEnumerator &rhs) const
+	{
+		return value <= rhs.value;
+	}
 
-    /// @brief Lesser-Equal operator.
-    bool operator<=(const BaseEnumerator & rhs) const
-    {
-        return value <= rhs.value;
-    }
-
-    /// @brief Greater-Equal operator.
-    bool operator>=(const BaseEnumerator & rhs) const
-    {
-        return value >= rhs.value;
-    }
+	/// @brief Greater-Equal operator.
+	bool operator>=(const BaseEnumerator &rhs) const
+	{
+		return value >= rhs.value;
+	}
 };
 
 /// @brief Operator which allows to print the base enumerator in a stream.
-std::ostream & operator<<(std::ostream & os, const BaseEnumerator & enumerator);
+std::ostream &operator<<(std::ostream &os, const BaseEnumerator &enumerator);

@@ -21,54 +21,45 @@
 #include <stdexcept>
 
 /// @brief Class used to check whether a given enum is valid or not.
-template<typename EnumType, EnumType ... Values>
-class EnumCheck;
+template <typename EnumType, EnumType... Values> class EnumCheck;
 
 /// @brief Class used to check whether a given enum is valid or not.
-template<typename EnumType>
-class EnumCheck<EnumType>
-{
+template <typename EnumType> class EnumCheck<EnumType> {
 public:
-    /// @brief Checks whether the integral value is one of the valid enums.
-    /// @return <b>True</b> if the value is a valid enum,<br>
-    ///         <b>False</b> otherwise.
-    template<typename IntType>
-    static bool constexpr is_value(IntType)
-    {
-        return false;
-    }
+	/// @brief Checks whether the integral value is one of the valid enums.
+	/// @return <b>True</b> if the value is a valid enum,<br>
+	///         <b>False</b> otherwise.
+	template <typename IntType> static bool constexpr is_value(IntType)
+	{
+		return false;
+	}
 };
 
 /// @brief Class used to check whether a given enum is valid or not.
-template<typename EnumType, EnumType V, EnumType ... Next>
-class EnumCheck<EnumType, V, Next...> :
-    private EnumCheck<EnumType, Next...>
-{
+template <typename EnumType, EnumType V, EnumType... Next>
+class EnumCheck<EnumType, V, Next...> : private EnumCheck<EnumType, Next...> {
 private:
-    /// The previous EnumCheck occurence.
-    using super = EnumCheck<EnumType, Next...>;
+	/// The previous EnumCheck occurence.
+	using super = EnumCheck<EnumType, Next...>;
 
 public:
-    /// @brief Checks whether the integral value is one of the valid enums.
-    /// @param value The value to check.
-    /// @return <b>True</b> if the value is a valid enum,<br>
-    ///         <b>False</b> otherwise.
-    template<typename IntType>
-    static bool constexpr is_value(IntType value)
-    {
-        return value == static_cast<IntType>(V) || super::is_value(value);
-    }
+	/// @brief Checks whether the integral value is one of the valid enums.
+	/// @param value The value to check.
+	/// @return <b>True</b> if the value is a valid enum,<br>
+	///         <b>False</b> otherwise.
+	template <typename IntType> static bool constexpr is_value(IntType value)
+	{
+		return value == static_cast<IntType>(V) || super::is_value(value);
+	}
 
-    /// @brief Allows to convert the given value to one of the valid enums.
-    /// @param value The value to convert.
-    /// @return The enum version of the integral value.
-    template<typename IntType>
-    static EnumType convert(IntType value)
-    {
-        if (!is_value(value))
-        {
-            throw std::runtime_error("Enum value out of range");
-        }
-        return static_cast<EnumType>(value);
-    }
+	/// @brief Allows to convert the given value to one of the valid enums.
+	/// @param value The value to convert.
+	/// @return The enum version of the integral value.
+	template <typename IntType> static EnumType convert(IntType value)
+	{
+		if (!is_value(value)) {
+			throw std::runtime_error("Enum value out of range");
+		}
+		return static_cast<EnumType>(value);
+	}
 };

@@ -23,33 +23,40 @@
 #include "material.hpp"
 
 Material::Material() :
-    vnum(),
-    type(MaterialType::None),
-    name(),
-    article(),
-    worth(),
-    hardness(),
-    lightness()
+	vnum(),
+	type(MaterialType::None),
+	name(),
+	article(),
+	worth(),
+	hardness(),
+	lightness()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Material::~Material()
 {
-//    Logger::log(LogLevel::Debug,
-//                "Deleted material\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+	//    Logger::log(LogLevel::Debug,
+	//                "Deleted material\t[%s]\t\t(%s)",
+	//                ToString(this->vnum),
+	//                this->name);
 }
 
 bool Material::check()
 {
-    if (vnum <= 0) return false;
-    if (name.empty()) return false;
-    if (article.empty()) return false;
-    if (type == MaterialType::None) return false;
-    if (worth <= 0) return false;
-    if (hardness <= 0) return false;
-    if (lightness <= 0) return false;
-    return true;
+	if (vnum <= 0)
+		return false;
+	if (name.empty())
+		return false;
+	if (article.empty())
+		return false;
+	if (type == MaterialType::None)
+		return false;
+	if (worth <= 0)
+		return false;
+	if (hardness <= 0)
+		return false;
+	if (lightness <= 0)
+		return false;
+	return true;
 }

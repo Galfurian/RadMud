@@ -30,7 +30,6 @@
 
 namespace luabridge
 {
-
 //------------------------------------------------------------------------------
 /**
  Container traits.
@@ -55,12 +54,9 @@ namespace luabridge
  }
  };
  */
-template<class T>
-struct ContainerTraits
-{
-    using isNotContainer = bool;
+template <class T> struct ContainerTraits {
+	using isNotContainer = bool;
 };
-
 
 //------------------------------------------------------------------------------
 /**
@@ -68,71 +64,56 @@ struct ContainerTraits
 
  Specializations return information about a type.
  */
-struct TypeTraits
-{
-    /** Determine if type T is a container.
+struct TypeTraits {
+	/** Determine if type T is a container.
 
      To be considered a container, there must be a specialization of
      ContainerTraits with the required fields.
      */
-    template<typename T>
-    class isContainer
-    {
-    private:
-        typedef char yes[1]; // sizeof (yes) == 1
-        typedef char no[2]; // sizeof (no)  == 2
+	template <typename T> class isContainer {
+	private:
+		typedef char yes[1]; // sizeof (yes) == 1
+		typedef char no[2]; // sizeof (no)  == 2
 
-        template<typename C>
-        static no & test(typename C::isNotContainer *);
+		template <typename C> static no &test(typename C::isNotContainer *);
 
-        template<typename>
-        static yes & test(...);
+		template <typename> static yes &test(...);
 
-    public:
-        static const bool value =
-            sizeof(test<ContainerTraits<T> >(0)) == sizeof(yes);
-    };
+	public:
+		static const bool value =
+			sizeof(test<ContainerTraits<T> >(0)) == sizeof(yes);
+	};
 
-    /** Determine if T is an enum */
-    template<typename T>
-    class isEnum
-    {
-    public:
-        //static const bool value = std::is_enum<T>::value; // C++11
-        static const bool value = std::is_enum<T>::value;
-    };
+	/** Determine if T is an enum */
+	template <typename T> class isEnum {
+	public:
+		//static const bool value = std::is_enum<T>::value; // C++11
+		static const bool value = std::is_enum<T>::value;
+	};
 
-    /** Determine if T is const qualified.
+	/** Determine if T is const qualified.
      */
-    /** @{ */
-    template<class T>
-    struct isConst
-    {
-        static bool const value = false;
-    };
+	/** @{ */
+	template <class T> struct isConst {
+		static bool const value = false;
+	};
 
-    template<class T>
-    struct isConst<T const>
-    {
-        static bool const value = true;
-    };
-    /** @} */
+	template <class T> struct isConst<T const> {
+		static bool const value = true;
+	};
+	/** @} */
 
-    /** Remove the const qualifier from T.
+	/** Remove the const qualifier from T.
      */
-    /** @{ */
-    template<class T>
-    struct removeConst
-    {
-        using Type = T;
-    };
+	/** @{ */
+	template <class T> struct removeConst {
+		using Type = T;
+	};
 
-    template<class T>
-    struct removeConst<T const>
-    {
-        using Type = T;
-    };
-    /**@}*/
+	template <class T> struct removeConst<T const> {
+		using Type = T;
+	};
+	/**@}*/
 };
 
-}
+} // namespace luabridge

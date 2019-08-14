@@ -25,19 +25,17 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a vehicle.
-class VehicleModel :
-    public ItemModel
-{
+class VehicleModel : public ItemModel {
 public:
-    VehicleModel();
+	VehicleModel();
 
-    virtual ~VehicleModel();
+	virtual ~VehicleModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

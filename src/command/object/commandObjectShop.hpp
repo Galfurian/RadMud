@@ -27,15 +27,15 @@
 /// @{
 
 /// Deposit a currency inside a shop.
-bool DoDeposit(Character * character, ArgumentHandler & args);
+bool DoDeposit(Character *character, ArgumentHandler &args);
 
 /// Buy an item.
-bool DoBuy(Character * character, ArgumentHandler & args);
+bool DoBuy(Character *character, ArgumentHandler &args);
 
 /// Sell an item.
-bool DoSell(Character * character, ArgumentHandler & args);
+bool DoSell(Character *character, ArgumentHandler &args);
 
 /// Shows the total amount of money.
-bool DoBalance(Character * character, ArgumentHandler & args);
+bool DoBalance(Character *character, ArgumentHandler &args);
 
 ///@}

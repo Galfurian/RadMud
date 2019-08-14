@@ -26,11 +26,10 @@
 #include <memory>
 
 /// @brief Factory for items models.
-class ModelFactory
-{
+class ModelFactory {
 public:
-    /// @brief Generates a new model based on the provided type.
-    /// @param type The type of the new model.
-    /// @return Return an istantiation of a model of the given type.
-    static std::shared_ptr<ItemModel> newModel(const ModelType & type);
+	/// @brief Generates a new model based on the provided type.
+	/// @param type The type of the new model.
+	/// @return Return an istantiation of a model of the given type.
+	static std::shared_ptr<ItemModel> newModel(const ModelType &type);
 };

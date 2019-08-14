@@ -28,139 +28,119 @@
 
 #include <cassert>
 
-LoadAction::LoadAction(Character * _actor,
-                       MagazineItem * _magazine,
-                       Item * _projectile,
-                       const unsigned int & _amount) :
-    GeneralAction(_actor),
-    magazine(_magazine),
-    projectile(_projectile),
-    amount(_amount)
+LoadAction::LoadAction(Character *_actor, MagazineItem *_magazine,
+					   Item *_projectile, const unsigned int &_amount) :
+	GeneralAction(_actor),
+	magazine(_magazine),
+	projectile(_projectile),
+	amount(_amount)
 {
-    // Debugging message.
-    Logger::log(LogLevel::Debug, "Created LoadAction.");
-    // Reset the cooldown of the action.
-    this->resetCooldown(this->getCooldown());
+	// Debugging message.
+	Logger::log(LogLevel::Debug, "Created LoadAction.");
+	// Reset the cooldown of the action.
+	this->resetCooldown(this->getCooldown());
 }
 
 LoadAction::~LoadAction()
 {
-    Logger::log(LogLevel::Debug, "Deleted load action.");
+	Logger::log(LogLevel::Debug, "Deleted load action.");
 }
 
-bool LoadAction::check(std::string & error) const
+bool LoadAction::check(std::string &error) const
 {
-    if (!GeneralAction::check(error))
-    {
-        return false;
-    }
-    if (magazine == nullptr)
-    {
-        Logger::log(LogLevel::Error, "The magazine is a null pointer.");
-        error = "You don't have a valid magazine to load.";
-        return false;
-    }
-    if (projectile == nullptr)
-    {
-        Logger::log(LogLevel::Error, "The projectile is a null pointer.");
-        error = "You don't have valid projectiles to load.";
-        return false;
-    }
-    auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
-    if (loadedProjectile != nullptr)
-    {
-        // If there are projectiles inside, check if the two types of
-        //  projectiles are compatible.
-        if (!projectile->canStackWith(loadedProjectile))
-        {
-            error = "You cannot stack the item with the one inside.";
-            return false;
-        }
-        if (magazine->model->to<MagazineModel>()->maxAmount <=
-            loadedProjectile->quantity)
-        {
-            error = "The item is already at full capacity.";
-            return false;
-        }
-    }
-    return true;
+	if (!GeneralAction::check(error)) {
+		return false;
+	}
+	if (magazine == nullptr) {
+		Logger::log(LogLevel::Error, "The magazine is a null pointer.");
+		error = "You don't have a valid magazine to load.";
+		return false;
+	}
+	if (projectile == nullptr) {
+		Logger::log(LogLevel::Error, "The projectile is a null pointer.");
+		error = "You don't have valid projectiles to load.";
+		return false;
+	}
+	auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
+	if (loadedProjectile != nullptr) {
+		// If there are projectiles inside, check if the two types of
+		//  projectiles are compatible.
+		if (!projectile->canStackWith(loadedProjectile)) {
+			error = "You cannot stack the item with the one inside.";
+			return false;
+		}
+		if (magazine->model->to<MagazineModel>()->maxAmount <=
+			loadedProjectile->quantity) {
+			error = "The item is already at full capacity.";
+			return false;
+		}
+	}
+	return true;
 }
 
 ActionType LoadAction::getType() const
 {
-    return ActionType::Load;
+	return ActionType::Load;
 }
 
 std::string LoadAction::getDescription() const
 {
-    return "loading";
+	return "loading";
 }
 
 std::string LoadAction::stop()
 {
-    return "You stop loading " + magazine->getName(true) + ".";
+	return "You stop loading " + magazine->getName(true) + ".";
 }
 
 ActionStatus LoadAction::perform()
 {
-    std::string error;
-    if (!this->check(error))
-    {
-        actor->sendMsg(error + "\n\n");
-        return ActionStatus::Error;
-    }
-    // First check if there are already some projectiles inside the magazine.
-    auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
-    if (loadedProjectile != nullptr)
-    {
-        SQLiteDbms::instance().beginTransaction();
-        if (projectile->quantity < amount)
-        {
-            magazine->putInside(projectile);
-        }
-        else
-        {
-            loadedProjectile->quantity += amount;
-            projectile->quantity -= amount;
-            loadedProjectile->updateOnDB();
-            projectile->updateOnDB();
-        }
-        SQLiteDbms::instance().endTransaction();
-    }
-    else
-    {
-        SQLiteDbms::instance().beginTransaction();
-        if (projectile->quantity <= amount)
-        {
-            actor->remInventoryItem(projectile);
-            magazine->putInside(projectile);
-        }
-        else
-        {
-            auto newProjectileStack = projectile->removeFromStack(actor,
-                                                                  amount);
-            if (newProjectileStack == nullptr)
-            {
-                // Rollback the transaction.
-                SQLiteDbms::instance().rollbackTransection();
-                actor->sendMsg(
-                    "Something is gone wrong while you were loading %s.\n\n",
-                    magazine->getName(true));
-                return ActionStatus::Error;
-            }
-            magazine->putInside(newProjectileStack);
-        }
-        SQLiteDbms::instance().endTransaction();
-    }
-    actor->sendMsg("You have finished loading %s with %s...\n\n",
-                   magazine->getName(true),
-                   projectile->getName(true));
-    return ActionStatus::Finished;
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return ActionStatus::Error;
+	}
+	// First check if there are already some projectiles inside the magazine.
+	auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
+	if (loadedProjectile != nullptr) {
+		SQLiteDbms::instance().beginTransaction();
+		if (projectile->quantity < amount) {
+			magazine->putInside(projectile);
+		} else {
+			loadedProjectile->quantity += amount;
+			projectile->quantity -= amount;
+			loadedProjectile->updateOnDB();
+			projectile->updateOnDB();
+		}
+		SQLiteDbms::instance().endTransaction();
+	} else {
+		SQLiteDbms::instance().beginTransaction();
+		if (projectile->quantity <= amount) {
+			actor->remInventoryItem(projectile);
+			magazine->putInside(projectile);
+		} else {
+			auto newProjectileStack =
+				projectile->removeFromStack(actor, amount);
+			if (newProjectileStack == nullptr) {
+				// Rollback the transaction.
+				SQLiteDbms::instance().rollbackTransection();
+				actor->sendMsg(
+					"Something is gone wrong while you were loading %s.\n\n",
+					magazine->getName(true));
+				return ActionStatus::Error;
+			}
+			magazine->putInside(newProjectileStack);
+		}
+		SQLiteDbms::instance().endTransaction();
+	}
+	actor->sendMsg("You have finished loading %s with %s...\n\n",
+				   magazine->getName(true), projectile->getName(true));
+	return ActionStatus::Finished;
 }
 
 unsigned int LoadAction::getCooldown()
 {
-    assert(actor && "Actor is nullptr");
-    assert(projectile && "Projectile is nullptr");
-    return static_cast<unsigned int>(projectile->getWeight(false) * amount);
+	assert(actor && "Actor is nullptr");
+	assert(projectile && "Projectile is nullptr");
+	return static_cast<unsigned int>(projectile->getWeight(false) * amount);
 }

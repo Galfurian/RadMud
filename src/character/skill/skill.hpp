@@ -36,46 +36,45 @@
 class Character;
 
 /// @brief Holds details about a skill.
-class Skill
-{
+class Skill {
 public:
-    /// The skill virtual number.
-    unsigned int vnum;
-    /// The name of the skill.
-    std::string name;
-    /// The description of the skill.
-    std::string description;
-    /// The main ability of the skill.
-    Ability ability;
-    /// The overall stage of the skill.
-    int stage;
-    /// The list of required skills.
-    std::vector<unsigned int> requiredSkill;
-    /// The list of required skills.
-    std::vector<unsigned int> usedForSkill;
-    /// The internal modifier manager.
-    std::shared_ptr<ModifierManager> modifierManager;
+	/// The skill virtual number.
+	unsigned int vnum;
+	/// The name of the skill.
+	std::string name;
+	/// The description of the skill.
+	std::string description;
+	/// The main ability of the skill.
+	Ability ability;
+	/// The overall stage of the skill.
+	int stage;
+	/// The list of required skills.
+	std::vector<unsigned int> requiredSkill;
+	/// The list of required skills.
+	std::vector<unsigned int> usedForSkill;
+	/// The internal modifier manager.
+	std::shared_ptr<ModifierManager> modifierManager;
 
-    /// @brief Constructor.
-    Skill();
+	/// @brief Constructor.
+	Skill();
 
-    /// @brief Disable Copy Construct.
-    Skill(Skill const &) = delete;
+	/// @brief Disable Copy Construct.
+	Skill(Skill const &) = delete;
 
-    /// @brief Disable Move construct.
-    Skill(Skill &&) = delete;
+	/// @brief Disable Move construct.
+	Skill(Skill &&) = delete;
 
-    /// @brief Disable Copy assign.
-    Skill & operator=(Skill const &) = delete;
+	/// @brief Disable Copy assign.
+	Skill &operator=(Skill const &) = delete;
 
-    /// @brief Disable Move assign.
-    Skill & operator=(Skill &&) = delete;
+	/// @brief Disable Move assign.
+	Skill &operator=(Skill &&) = delete;
 
-    /// @brief Destructor.
-    ~Skill();
+	/// @brief Destructor.
+	~Skill();
 
-    /// @brief Check the correctness of the skill.
-    /// @return <b>True</b> if it has correct values,<br>
-    ///         <b>False</b> otherwise.
-    bool check();
+	/// @brief Check the correctness of the skill.
+	/// @return <b>True</b> if it has correct values,<br>
+	///         <b>False</b> otherwise.
+	bool check();
 };

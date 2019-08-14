@@ -27,74 +27,66 @@
 #include "formatter.hpp"
 #include "race.hpp"
 
-BodyPart::BodyPart() :
-    vnum(),
-    name(),
-    description(),
-    flags(),
-    resources()
+BodyPart::BodyPart() : vnum(), name(), description(), flags(), resources()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 BodyPart::~BodyPart()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 bool BodyPart::check()
 {
-    assert(vnum > 0);
-    assert(!name.empty());
-    assert(!description.empty());
-    return true;
+	assert(vnum > 0);
+	assert(!name.empty());
+	assert(!description.empty());
+	return true;
 }
 
 std::string BodyPart::getName(bool capital) const
 {
-    return (capital) ? ToCapitals(name) : name;
+	return (capital) ? ToCapitals(name) : name;
 }
 
-std::string BodyPart::getDescription(Race * race, bool capital) const
+std::string BodyPart::getDescription(Race *race, bool capital) const
 {
-    std::string result = description;
-    FindAndReplace(&result, "&m", (race) ? ToLower(race->name) : "");
-    FindAndReplace(&result, "&M", (race) ? ToLower(race->article +
-                                                   ' ' + race->name) : "");
-    return (capital) ? ToCapitals(result) : result;
+	std::string result = description;
+	FindAndReplace(&result, "&m", (race) ? ToLower(race->name) : "");
+	FindAndReplace(&result, "&M",
+				   (race) ? ToLower(race->article + ' ' + race->name) : "");
+	return (capital) ? ToCapitals(result) : result;
 }
 
-void BodyPart::getSheet(Table & sheet) const
+void BodyPart::getSheet(Table &sheet) const
 {
-    // Add the columns.
-    sheet.addColumn("Attribute", align::left);
-    sheet.addColumn("Value", align::left);
-    // Set the values.
-    sheet.addRow({"Vnum", ToString(vnum)});
-    sheet.addRow({"Name", name});
-    sheet.addRow({"Description", description});
-    sheet.addRow({"Flags", ToString(flags)});
-    if (!resources.empty())
-    {
-        sheet.addDivider();
-        sheet.addRow({"Resource", "Base Quantity"});
-        for (auto it : resources)
-        {
-            sheet.addRow({it.resource->name, ToString(it.quantity)});
-        }
-    }
+	// Add the columns.
+	sheet.addColumn("Attribute", align::left);
+	sheet.addColumn("Value", align::left);
+	// Set the values.
+	sheet.addRow({ "Vnum", ToString(vnum) });
+	sheet.addRow({ "Name", name });
+	sheet.addRow({ "Description", description });
+	sheet.addRow({ "Flags", ToString(flags) });
+	if (!resources.empty()) {
+		sheet.addDivider();
+		sheet.addRow({ "Resource", "Base Quantity" });
+		for (auto it : resources) {
+			sheet.addRow({ it.resource->name, ToString(it.quantity) });
+		}
+	}
 }
 
 std::string BodyPart::BodyWeapon::getName(bool colored) const
 {
-    if (colored)
-    {
-        return Formatter::cyan() + name + Formatter::reset();
-    }
-    return name;
+	if (colored) {
+		return Formatter::cyan() + name + Formatter::reset();
+	}
+	return name;
 }
 
 unsigned int BodyPart::BodyWeapon::rollDamage() const
 {
-    return TRand<unsigned int>(minDamage, maxDamage);
+	return TRand<unsigned int>(minDamage, maxDamage);
 }

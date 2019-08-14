@@ -23,21 +23,22 @@
 
 std::string CombatModifier::toString() const
 {
-    if (value == CombatModifier::UnarmedHitRoll)
-        return "UnarmedHitRoll";
-    if (value == CombatModifier::UnarmedDamage)
-        return "UnarmedDamage";
-    if (value == CombatModifier::MeleeWeaponHitRoll)
-        return "MeleeWeaponHitRoll";
-    if (value == CombatModifier::MeleeWeaponDamage)
-        return "MeleeWeaponDamage";
-    if (value == CombatModifier::RangedWeaponHitRoll)
-        return "RangedWeaponHitRoll";
-    if (value == CombatModifier::RangedWeaponDamage)
-        return "RangedWeaponDamage";
-    if (value == CombatModifier::RangedAimSpeed)
-        return "RangedAimSpeed";
-    if (value == CombatModifier::ArmorClass)
-        return "ArmorClass";
-    else return "None";
+	if (value == CombatModifier::UnarmedHitRoll)
+		return "UnarmedHitRoll";
+	if (value == CombatModifier::UnarmedDamage)
+		return "UnarmedDamage";
+	if (value == CombatModifier::MeleeWeaponHitRoll)
+		return "MeleeWeaponHitRoll";
+	if (value == CombatModifier::MeleeWeaponDamage)
+		return "MeleeWeaponDamage";
+	if (value == CombatModifier::RangedWeaponHitRoll)
+		return "RangedWeaponHitRoll";
+	if (value == CombatModifier::RangedWeaponDamage)
+		return "RangedWeaponDamage";
+	if (value == CombatModifier::RangedAimSpeed)
+		return "RangedAimSpeed";
+	if (value == CombatModifier::ArmorClass)
+		return "ArmorClass";
+	else
+		return "None";
 }

@@ -1,5 +1,5 @@
 /// @file   materialType.cpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   05/12/2016
 /// @copyright
@@ -24,17 +24,29 @@
 
 std::string MaterialType::toString() const
 {
-    if (value == MaterialType::Metal) return "Metal";
-    if (value == MaterialType::Stone) return "Stone";
-    if (value == MaterialType::Wood) return "Wood";
-    if (value == MaterialType::Skin) return "Skin";
-    if (value == MaterialType::Cloth) return "Cloth";
-    if (value == MaterialType::Vegetable) return "Vegetable";
-    if (value == MaterialType::Meat) return "Meat";
-    if (value == MaterialType::Glass) return "Glass";
-    if (value == MaterialType::Paper) return "Paper";
-    if (value == MaterialType::Coal) return "Coal";
-    if (value == MaterialType::Bone) return "Bone";
-    if (value == MaterialType::Cereal) return "Cereal";
-    return "None";
+	if (value == MaterialType::Metal)
+		return "Metal";
+	if (value == MaterialType::Stone)
+		return "Stone";
+	if (value == MaterialType::Wood)
+		return "Wood";
+	if (value == MaterialType::Skin)
+		return "Skin";
+	if (value == MaterialType::Cloth)
+		return "Cloth";
+	if (value == MaterialType::Vegetable)
+		return "Vegetable";
+	if (value == MaterialType::Meat)
+		return "Meat";
+	if (value == MaterialType::Glass)
+		return "Glass";
+	if (value == MaterialType::Paper)
+		return "Paper";
+	if (value == MaterialType::Coal)
+		return "Coal";
+	if (value == MaterialType::Bone)
+		return "Bone";
+	if (value == MaterialType::Cereal)
+		return "Cereal";
+	return "None";
 }

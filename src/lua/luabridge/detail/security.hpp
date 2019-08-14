@@ -21,43 +21,39 @@
 
 namespace luabridge
 {
-
 /// @brief Class needed for secuirity options.
-class Security
-{
+class Security {
 public:
-    static bool hideMetatables()
-    {
-        return getSettings().hideMetatables;
-    }
+	static bool hideMetatables()
+	{
+		return getSettings().hideMetatables;
+	}
 
-    static void setHideMetatables(bool shouldHide)
-    {
-        getSettings().hideMetatables = shouldHide;
-    }
+	static void setHideMetatables(bool shouldHide)
+	{
+		getSettings().hideMetatables = shouldHide;
+	}
 
 private:
-    struct Settings
-    {
-        Settings() :
-            hideMetatables(true)
-        {
-        }
+	struct Settings {
+		Settings() : hideMetatables(true)
+		{
+		}
 
-        bool hideMetatables;
-    };
+		bool hideMetatables;
+	};
 
-    static Settings & getSettings()
-    {
-        static Settings settings;
-        return settings;
-    }
+	static Settings &getSettings()
+	{
+		static Settings settings;
+		return settings;
+	}
 };
 
 /// @brief Change whether or not metatables are hidden (on by default).
 inline void setHideMetatables(bool shouldHide)
 {
-    Security::setHideMetatables(shouldHide);
+	Security::setHideMetatables(shouldHide);
 }
 
-}
+} // namespace luabridge

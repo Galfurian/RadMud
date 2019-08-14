@@ -33,46 +33,46 @@ void LoadGeneralCommands();
 /// @{
 
 /// Disconnect the player from the Mud.
-bool DoQuit(Character * character, ArgumentHandler & args);
+bool DoQuit(Character *character, ArgumentHandler &args);
 
 /// Shows a list of all the online players.
-bool DoWho(Character * character, ArgumentHandler & args);
+bool DoWho(Character *character, ArgumentHandler &args);
 
 /// Allow to modify the character informations.
-bool DoSet(Character * character, ArgumentHandler & args);
+bool DoSet(Character *character, ArgumentHandler &args);
 
 /// @brief The character look at: the current room, the near rooms, an
 /// object, a player, a character, and so on.
-bool DoLook(Character * character, ArgumentHandler & args);
+bool DoLook(Character *character, ArgumentHandler &args);
 
 /// Provide a complete help on the mud.
-bool DoHelp(Character * character, ArgumentHandler & args);
+bool DoHelp(Character *character, ArgumentHandler &args);
 
 /// Allow character to modify his prompt.
-bool DoPrompt(Character * character, ArgumentHandler & args);
+bool DoPrompt(Character *character, ArgumentHandler &args);
 
 /// Report the current day phase.
-bool DoTime(Character * character, ArgumentHandler & args);
+bool DoTime(Character *character, ArgumentHandler &args);
 
 /// Show player statistics.
-bool DoStatistics(Character * character, ArgumentHandler & args);
+bool DoStatistics(Character *character, ArgumentHandler &args);
 
 /// Show player effects.
-bool DoEffects(Character * character, ArgumentHandler & args);
+bool DoEffects(Character *character, ArgumentHandler &args);
 
 /// Allow player to rent and disconnect.
-bool DoRent(Character * character, ArgumentHandler & args);
+bool DoRent(Character *character, ArgumentHandler &args);
 
 /// Show player skills.
-bool DoSkills(Character * character, ArgumentHandler & args);
+bool DoSkills(Character *character, ArgumentHandler &args);
 
 /// Show player list of actions.
-bool DoActions(Character * character, ArgumentHandler & args);
+bool DoActions(Character *character, ArgumentHandler &args);
 
 /// Show server informations and statistics.
-bool DoServer(Character * character, ArgumentHandler & args);
+bool DoServer(Character *character, ArgumentHandler &args);
 
 /// Generates a random name.
-bool DoGenerateName(Character * character, ArgumentHandler & args);
+bool DoGenerateName(Character *character, ArgumentHandler &args);
 
 ///@}

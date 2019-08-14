@@ -70,11 +70,6 @@ std::string DismemberAction::getDescription() const
 	return "dismembering";
 }
 
-std::string DismemberAction::stop()
-{
-	return "You stop dismembering.";
-}
-
 bool DismemberAction::start()
 {
 	std::string error;
@@ -86,6 +81,11 @@ bool DismemberAction::start()
 	actor->room->sendToAll("%s starts dismembering %s...\n", { actor },
 						   actor->getNameCapital(), corpse->getName(true));
 	return true;
+}
+
+std::string DismemberAction::stop()
+{
+	return "You stop dismembering.";
 }
 
 ActionStatus DismemberAction::perform()

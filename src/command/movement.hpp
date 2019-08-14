@@ -32,33 +32,33 @@ void LoadMovementCommands();
 /// @{
 
 /// Execute character movement.
-bool DoDirection(Character * character, Direction direction);
+bool DoDirection(Character *character, Direction direction);
 
 /// Allow the character to move between areas.
-bool DoTravel(Character * character, ArgumentHandler & args);
+bool DoTravel(Character *character, ArgumentHandler &args);
 
 /// Stop the current action of the character.
-bool DoStop(Character * character, ArgumentHandler & args);
+bool DoStop(Character *character, ArgumentHandler &args);
 
 /// Make the player stand up.
-bool DoStand(Character * character, ArgumentHandler & args);
+bool DoStand(Character *character, ArgumentHandler &args);
 
 /// Make the player crouch.
-bool DoCrouch(Character * character, ArgumentHandler & args);
+bool DoCrouch(Character *character, ArgumentHandler &args);
 
 /// Make the player sit.
-bool DoSit(Character * character, ArgumentHandler & args);
+bool DoSit(Character *character, ArgumentHandler &args);
 
 /// Make the player prone.
-bool DoProne(Character * character, ArgumentHandler & args);
+bool DoProne(Character *character, ArgumentHandler &args);
 
 /// Make the player lie down and rest.
-bool DoRest(Character * character, ArgumentHandler & args);
+bool DoRest(Character *character, ArgumentHandler &args);
 
 /// Make the player lie down and sleep.
-bool DoSleep(Character * character, ArgumentHandler & args);
+bool DoSleep(Character *character, ArgumentHandler &args);
 
 /// Make the player wake up.
-bool DoWake(Character * character, ArgumentHandler & args);
+bool DoWake(Character *character, ArgumentHandler &args);
 
 ///@}

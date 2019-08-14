@@ -25,28 +25,26 @@
 #include "generalAction.hpp"
 
 /// @brief Allows to aim a target.
-class AimAction :
-    public GeneralAction
-{
+class AimAction : public GeneralAction {
 public:
-    /// The target aimed by the character.
-    Character * target;
+	/// The target aimed by the character.
+	Character *target;
 
-    /// @brief Constructor.
-    AimAction(Character * _actor, Character * _target);
+	/// @brief Constructor.
+	AimAction(Character *_actor, Character *_target);
 
-    /// @brief Destructor.
-    virtual ~AimAction();
+	/// @brief Destructor.
+	virtual ~AimAction();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 };

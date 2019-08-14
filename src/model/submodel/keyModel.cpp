@@ -26,48 +26,45 @@
 
 KeyModel::KeyModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 KeyModel::~KeyModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType KeyModel::getType() const
 {
-    return ModelType::Key;
+	return ModelType::Key;
 }
 
 std::string KeyModel::getTypeName() const
 {
-    return "Key";
+	return "Key";
 }
 
-bool KeyModel::setModel(const std::string & source)
+bool KeyModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 0)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Key Model (%s).",
-                    this->name);
-        return false;
-    }
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 0) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Key Model (%s).",
+					this->name);
+		return false;
+	}
+	return true;
 }
 
-void KeyModel::getSheet(Table & sheet) const
+void KeyModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    //sheet.addDivider();
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	//sheet.addDivider();
 }

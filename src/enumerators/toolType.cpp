@@ -24,18 +24,31 @@
 
 std::string ToolType::toString() const
 {
-    if (value == Pickaxe) return "Pickaxe";
-    if (value == WoodcutterAxe) return "WoodcutterAxe";
-    if (value == Saw) return "Saw";
-    if (value == PrecisionChisel) return "PrecisionChisel";
-    if (value == Hammer) return "Hammer";
-    if (value == PlaneChisel) return "PlaneChisel";
-    if (value == Forge) return "Forge";
-    if (value == Anvil) return "Anvil";
-    if (value == BlacksmithHammer) return "BlacksmithHammer";
-    if (value == Bellows) return "Bellows";
-    if (value == Crucible) return "Crucible";
-    if (value == Firelighter) return "Firelighter";
-    if (value == CookingFire) return "CookingFire";
-    return "None";
+	if (value == Pickaxe)
+		return "Pickaxe";
+	if (value == WoodcutterAxe)
+		return "WoodcutterAxe";
+	if (value == Saw)
+		return "Saw";
+	if (value == PrecisionChisel)
+		return "PrecisionChisel";
+	if (value == Hammer)
+		return "Hammer";
+	if (value == PlaneChisel)
+		return "PlaneChisel";
+	if (value == Forge)
+		return "Forge";
+	if (value == Anvil)
+		return "Anvil";
+	if (value == BlacksmithHammer)
+		return "BlacksmithHammer";
+	if (value == Bellows)
+		return "Bellows";
+	if (value == Crucible)
+		return "Crucible";
+	if (value == Firelighter)
+		return "Firelighter";
+	if (value == CookingFire)
+		return "CookingFire";
+	return "None";
 }

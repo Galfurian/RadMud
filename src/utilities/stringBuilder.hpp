@@ -25,61 +25,53 @@
 #include <sstream>
 
 /// @brief Allows to build a string from a series of arguments.
-class StringBuilder
-{
+class StringBuilder {
 private:
-    /// @brief Constructor.
-    StringBuilder()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	StringBuilder()
+	{
+		// Nothing to do.
+	}
 
 public:
-    /// @brief Replaces all the occurrences of the pattern '%s' with
-    ///         the arguments.
-    /// @param str The string that has to be built.
-    /// @return The customized string.
-    static std::string build(const std::string & str)
-    {
-        return str;
-    }
+	/// @brief Replaces all the occurrences of the pattern '%s' with
+	///         the arguments.
+	/// @param str The string that has to be built.
+	/// @return The customized string.
+	static std::string build(const std::string &str)
+	{
+		return str;
+	}
 
-    /// @brief Replaces all the occurrences of the pattern '%s' with
-    ///         the arguments.
-    /// @param str   The string that has to be built.
-    /// @param first The first unpacked argument.
-    /// @param args  Packed arguments.
-    /// @return The customized string.
-    template<typename ... Args>
-    static std::string build(const std::string & str,
-                             const std::string & first,
-                             const Args & ... args)
-    {
-        std::string::size_type pos = str.find("%s");
-        if (pos == std::string::npos)
-        {
-            return str;
-        }
-        else
-        {
-            std::string working = str;
-            working.replace(pos, 2, first);
-            return build(working, args ...);
-        }
-    }
+	/// @brief Replaces all the occurrences of the pattern '%s' with
+	///         the arguments.
+	/// @param str   The string that has to be built.
+	/// @param first The first unpacked argument.
+	/// @param args  Packed arguments.
+	/// @return The customized string.
+	template <typename... Args>
+	static std::string build(const std::string &str, const std::string &first,
+							 const Args &... args)
+	{
+		std::string::size_type pos = str.find("%s");
+		if (pos == std::string::npos) {
+			return str;
+		} else {
+			std::string working = str;
+			working.replace(pos, 2, first);
+			return build(working, args...);
+		}
+	}
 
-    /// @brief Cover the case in which the first argument is a signed value.
-    template<
-        typename T,
-        typename ... Args,
-        typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-    static std::string build(const std::string & str,
-                             const T & first,
-                             const Args & ... args)
-    {
-        std::stringstream ss;
-        ss << first;
-        return build(str, ss.str(), args ...);
-    }
-
+	/// @brief Cover the case in which the first argument is a signed value.
+	template <
+		typename T, typename... Args,
+		typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+	static std::string build(const std::string &str, const T &first,
+							 const Args &... args)
+	{
+		std::stringstream ss;
+		ss << first;
+		return build(str, ss.str(), args...);
+	}
 };

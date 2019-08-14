@@ -26,47 +26,46 @@
 
 CurrencyItem::CurrencyItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 CurrencyItem::~CurrencyItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-void CurrencyItem::getSheet(Table & sheet) const
+void CurrencyItem::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    Item::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
+	// Call the function of the father class.
+	Item::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
 }
 
 unsigned int CurrencyItem::getPrice(bool entireStack) const
 {
-    auto customPrice = Item::getPrice(entireStack);
-    if (composition != nullptr)
-    {
-        if (model->to<CurrencyModel>()->findPrice(composition->vnum, customPrice))
-        {
-            return customPrice * quantity;
-        }
-        Logger::log(LogLevel::Error,
-                    "The item (%s) has a wrong composition w.r.t its currency.",
-                    this->getName());
-    }
-    Logger::log(LogLevel::Error, "The item %s has no composition.",
-                this->getName());
-    return customPrice;
+	auto customPrice = Item::getPrice(entireStack);
+	if (composition != nullptr) {
+		if (model->to<CurrencyModel>()->findPrice(composition->vnum,
+												  customPrice)) {
+			return customPrice * quantity;
+		}
+		Logger::log(LogLevel::Error,
+					"The item (%s) has a wrong composition w.r.t its currency.",
+					this->getName());
+	}
+	Logger::log(LogLevel::Error, "The item %s has no composition.",
+				this->getName());
+	return customPrice;
 }
 
 double CurrencyItem::getWeight(bool) const
 {
-    return 0.0;
+	return 0.0;
 }
 
 void CurrencyItem::triggerDecay()
 {
-    // Nothing to do.
+	// Nothing to do.
 }

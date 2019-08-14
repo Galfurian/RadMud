@@ -25,37 +25,33 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a corpse.
-class CorpseModel :
-    public ItemModel
-{
+class CorpseModel : public ItemModel {
 public:
-    /// The race associated with the corpse model.
-    Race * corpseRace;
-    /// The basic composition of the corpse.
-    Material * corpseComposition;
+	/// The race associated with the corpse model.
+	Race *corpseRace;
+	/// The basic composition of the corpse.
+	Material *corpseComposition;
 
-    CorpseModel();
+	CorpseModel();
 
-    virtual ~CorpseModel();
+	virtual ~CorpseModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    Item * createItem(
-        std::string maker,
-        Material * composition,
-        bool isForMobile = false,
-        const ItemQuality & itemQuality = ItemQuality::Normal,
-        const unsigned int & quantity = 1) override;
+	Item *createItem(std::string maker, Material *composition,
+					 bool isForMobile = false,
+					 const ItemQuality &itemQuality = ItemQuality::Normal,
+					 const unsigned int &quantity = 1) override;
 
-    /// Creates a new corpse.
-    /// @param maker       The player that create the corpse.
-    /// @param weight      The custom weight of the corpse.
-    /// @return The created corpse.
-    Item * createCorpse(std::string maker, const double & weight);
+	/// Creates a new corpse.
+	/// @param maker       The player that create the corpse.
+	/// @param weight      The custom weight of the corpse.
+	/// @return The created corpse.
+	Item *createCorpse(std::string maker, const double &weight);
 };

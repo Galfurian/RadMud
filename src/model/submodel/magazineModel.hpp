@@ -25,25 +25,22 @@
 #include "rangedWeaponModel.hpp"
 
 /// @brief Model of a container of projectiles.
-class MagazineModel :
-    public ItemModel
-{
+class MagazineModel : public ItemModel {
 public:
-    /// The type of projectiles which can be contained.
-    RangedWeaponType projectileType;
-    /// The maximum amount.
-    unsigned int maxAmount;
+	/// The type of projectiles which can be contained.
+	RangedWeaponType projectileType;
+	/// The maximum amount.
+	unsigned int maxAmount;
 
-    MagazineModel();
+	MagazineModel();
 
-    virtual ~MagazineModel();
+	virtual ~MagazineModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
-

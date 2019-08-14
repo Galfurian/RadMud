@@ -27,73 +27,57 @@
 
 void LoadManagerCommands()
 {
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoAssign, "assign", "(mobile) (building)",
-        "Allows to assign a mobile to a task/building.",
-        false, false, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoAssign, "assign", "(mobile) (building)",
+		"Allows to assign a mobile to a task/building.", false, false, false));
 }
 
-bool DoAssign(Character * character, ArgumentHandler & args)
+bool DoAssign(Character *character, ArgumentHandler &args)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (args.size() != 2)
-    {
-        character->sendMsg(
-            "You need to specify who you want assign to which building.\n");
-        return false;
-    }
-    auto mobile = character->room->findMobile(args[0].getContent(),
-                                              args[0].getIndex(), {});
-    if (mobile == nullptr)
-    {
-        character->sendMsg("You don't see that person.\n");
-        return false;
-    }
-    auto building = character->room->findBuilding(args[1].getContent(),
-                                                  args[1].getIndex());
-    if (building == nullptr)
-    {
-        character->sendMsg("You don't see the desired building here.\n");
-        return false;
-    }
-    if (building->getType() == ModelType::Shop)
-    {
-        auto shop = static_cast<ShopItem *>(building);
-        if (mobile->managedItem != nullptr)
-        {
-            if (mobile->managedItem == shop)
-            {
-                character->sendMsg("%s is already assigned to %s.\n",
-                                   mobile->getNameCapital(),
-                                   building->getName(true));
-            }
-            else
-            {
-                character->sendMsg("%s is already assigned to another shop.\n",
-                                   mobile->getNameCapital());
-            }
-        }
-        else
-        {
-            shop->setNewShopKeeper(mobile);
-            character->sendMsg("You assign %s to %s.\n",
-                               mobile->getName(),
-                               building->getName(true));
-            return true;
-        }
-    }
-    else
-    {
-        character->sendMsg("You cannot assign %s to %s.\n",
-                           mobile->getName(),
-                           building->getName(true));
-    }
-    return false;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (args.size() != 2) {
+		character->sendMsg(
+			"You need to specify who you want assign to which building.\n");
+		return false;
+	}
+	auto mobile = character->room->findMobile(args[0].getContent(),
+											  args[0].getIndex(), {});
+	if (mobile == nullptr) {
+		character->sendMsg("You don't see that person.\n");
+		return false;
+	}
+	auto building =
+		character->room->findBuilding(args[1].getContent(), args[1].getIndex());
+	if (building == nullptr) {
+		character->sendMsg("You don't see the desired building here.\n");
+		return false;
+	}
+	if (building->getType() == ModelType::Shop) {
+		auto shop = static_cast<ShopItem *>(building);
+		if (mobile->managedItem != nullptr) {
+			if (mobile->managedItem == shop) {
+				character->sendMsg("%s is already assigned to %s.\n",
+								   mobile->getNameCapital(),
+								   building->getName(true));
+			} else {
+				character->sendMsg("%s is already assigned to another shop.\n",
+								   mobile->getNameCapital());
+			}
+		} else {
+			shop->setNewShopKeeper(mobile);
+			character->sendMsg("You assign %s to %s.\n", mobile->getName(),
+							   building->getName(true));
+			return true;
+		}
+	} else {
+		character->sendMsg("You cannot assign %s to %s.\n", mobile->getName(),
+						   building->getName(true));
+	}
+	return false;
 }

@@ -24,19 +24,17 @@
 #include "item.hpp"
 
 /// @brief Holds details about currency.
-class CurrencyItem :
-    public Item
-{
+class CurrencyItem : public Item {
 public:
-    CurrencyItem();
+	CurrencyItem();
 
-    virtual ~CurrencyItem();
+	virtual ~CurrencyItem();
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    unsigned int getPrice(bool entireStack) const override;
+	unsigned int getPrice(bool entireStack) const override;
 
-    double getWeight(bool entireStack) const override;
+	double getWeight(bool entireStack) const override;
 
-    void triggerDecay() override;
+	void triggerDecay() override;
 };

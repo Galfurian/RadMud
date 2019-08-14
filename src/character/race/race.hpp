@@ -36,73 +36,72 @@
 class Material;
 
 /// @brief Holds details about a race.
-class Race
-{
+class Race {
 public:
-    /// The race virtual number.
-    unsigned int vnum;
-    /// The article for the race.
-    std::string article;
-    /// The name of the race.
-    std::string name;
-    /// The description of the race.
-    std::string description;
-    /// The base height of the race.
-    double height;
-    /// Base race abilities.
-    std::map<Ability, unsigned int> abilities;
-    /// The flag that indicates if the race is selectable by the player during
-    ///  character creation.
-    bool player_allow;
-    /// TileSet of the icon.
-    int tileSet;
-    /// TileId of the icon.
-    int tileId;
-    /// Corpse model.
-    std::shared_ptr<CorpseModel> corpse;
-    /// The list of body parts.
-    std::vector<std::shared_ptr<BodyPart>> bodyParts;
-    /// Base skills.
-    std::vector<std::shared_ptr<SkillData>> skills;
+	/// The race virtual number.
+	unsigned int vnum;
+	/// The article for the race.
+	std::string article;
+	/// The name of the race.
+	std::string name;
+	/// The description of the race.
+	std::string description;
+	/// The base height of the race.
+	double height;
+	/// Base race abilities.
+	std::map<Ability, unsigned int> abilities;
+	/// The flag that indicates if the race is selectable by the player during
+	///  character creation.
+	bool player_allow;
+	/// TileSet of the icon.
+	int tileSet;
+	/// TileId of the icon.
+	int tileId;
+	/// Corpse model.
+	std::shared_ptr<CorpseModel> corpse;
+	/// The list of body parts.
+	std::vector<std::shared_ptr<BodyPart> > bodyParts;
+	/// Base skills.
+	std::vector<std::shared_ptr<SkillData> > skills;
 
-    /// @brief Constructor.
-    Race();
+	/// @brief Constructor.
+	Race();
 
-    /// @brief Disable Copy Construct.
-    Race(Race const &) = delete;
+	/// @brief Disable Copy Construct.
+	Race(Race const &) = delete;
 
-    /// @brief Disable Move construct.
-    Race(Race &&) = delete;
+	/// @brief Disable Move construct.
+	Race(Race &&) = delete;
 
-    /// @brief Disable Copy assign.
-    Race & operator=(Race const &) = delete;
+	/// @brief Disable Copy assign.
+	Race &operator=(Race const &) = delete;
 
-    /// @brief Disable Move assign.
-    Race & operator=(Race &&) = delete;
+	/// @brief Disable Move assign.
+	Race &operator=(Race &&) = delete;
 
-    /// @brief Destructor.
-    ~Race();
+	/// @brief Destructor.
+	~Race();
 
-    /// @brief Check the correctness of the race.
-    /// @return <b>True</b> if the race has correct values,<br>
-    ///         <b>False</b> otherwise.
-    bool check();
+	/// @brief Check the correctness of the race.
+	/// @return <b>True</b> if the race has correct values,<br>
+	///         <b>False</b> otherwise.
+	bool check();
 
-    /// @brief Return the short description of this race.
-    /// @param capital If true the return description starts with a capital.
-    /// @return The short description.
-    std::string getShortDescription(bool capital = false);
+	/// @brief Return the short description of this race.
+	/// @param capital If true the return description starts with a capital.
+	/// @return The short description.
+	std::string getShortDescription(bool capital = false);
 
-    /// @brief Provides the value of the given ability.
-    /// @param ability The ability to retrieve.
-    /// @return The overall ability value.
-    unsigned int getAbility(const Ability & ability) const;
+	/// @brief Provides the value of the given ability.
+	/// @param ability The ability to retrieve.
+	/// @return The overall ability value.
+	unsigned int getAbility(const Ability &ability) const;
 
-    /// @brief Returns the tile of the race.
-    /// @return The string which contains the code of the race's tile.
-    std::string getTile();
+	/// @brief Returns the tile of the race.
+	/// @return The string which contains the code of the race's tile.
+	std::string getTile();
 
-    /// @brief Fills the provided table with the faction informations.
-    /// @param sheet The table that has to be filled.
-    void getSheet(Table & sheet) const;
+	/// @brief Fills the provided table with the faction informations.
+	/// @param sheet The table that has to be filled.
+	void getSheet(Table &sheet) const;
 };

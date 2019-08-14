@@ -24,165 +24,142 @@
 
 Logger::Logger()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Logger::~Logger()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-Logger & Logger::instance()
+Logger &Logger::instance()
 {
-    // Since it's a static variable, if the class has already been created,
-    // It won't be created again. And it **is** thread-safe in C++11.
-    static Logger instance;
-    // Return a reference to our instance.
-    return instance;
+	// Since it's a static variable, if the class has already been created,
+	// It won't be created again. And it **is** thread-safe in C++11.
+	static Logger instance;
+	// Return a reference to our instance.
+	return instance;
 }
 
-bool Logger::openLog(const std::string & filename)
+bool Logger::openLog(const std::string &filename)
 {
-    if (!Logger::getStream().is_open())
-    {
-        Logger::getStream().open(filename.c_str(), std::ios::in |
-                                                   std::ios::out |
-                                                   std::ios::app);
-    }
-    return Logger::getStream().is_open();
+	if (!Logger::getStream().is_open()) {
+		Logger::getStream().open(filename.c_str(),
+								 std::ios::in | std::ios::out | std::ios::app);
+	}
+	return Logger::getStream().is_open();
 }
 
-bool Logger::getLog(const LogLevel & level, std::string * result)
+bool Logger::getLog(const LogLevel &level, std::string *result)
 {
-    if (Logger::getStream().is_open())
-    {
-        // Clear the output string.
-        result->clear();
-        std::streamoff totalSize = Logger::getStream().tellg();
-        if (totalSize > 0)
-        {
-            // Resize the log string.
-            result->resize(static_cast<std::size_t>(totalSize));
-            // Move the input position to the beginning of the string.
-            Logger::getStream().seekg(0, std::ios::beg);
-            // Create a string which contains the given level.
-            std::string logLevel = "[" + Logger::levelToString(level) + "]";
-            for (std::string line; std::getline(Logger::getStream(), line);)
-            {
-                if (BeginWith(line, logLevel))
-                {
-                    result->append(line + "\n");
-                }
-            }
-            return true;
-        }
-    }
-    return false;
+	if (Logger::getStream().is_open()) {
+		// Clear the output string.
+		result->clear();
+		std::streamoff totalSize = Logger::getStream().tellg();
+		if (totalSize > 0) {
+			// Resize the log string.
+			result->resize(static_cast<std::size_t>(totalSize));
+			// Move the input position to the beginning of the string.
+			Logger::getStream().seekg(0, std::ios::beg);
+			// Create a string which contains the given level.
+			std::string logLevel = "[" + Logger::levelToString(level) + "]";
+			for (std::string line; std::getline(Logger::getStream(), line);) {
+				if (BeginWith(line, logLevel)) {
+					result->append(line + "\n");
+				}
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
-LogLevel Logger::castFromInt(const unsigned int & level)
+LogLevel Logger::castFromInt(const unsigned int &level)
 {
-    return static_cast<LogLevel>(level);
+	return static_cast<LogLevel>(level);
 }
 
-void Logger::log(const LogLevel & level, const std::string & msg)
+void Logger::log(const LogLevel &level, const std::string &msg)
 {
-    // Define a mutex for the log function.
-    static std::mutex logMutex;
-    std::lock_guard<std::mutex> lock(logMutex);
-    if (Logger::getStream().is_open())
-    {
-        // Write the log message inside the file.
-        Logger::getStream()
-            << "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
-            << "[" << Logger::levelToString(level) << "]"
-            << "[" << Logger::getDateTime() << "] "
-            << msg << "\n";
-    }
-    Logger::getOutputStream(level)
-        << "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
-        << "[" << Logger::levelToString(level) << "]"
-        << "[" << Logger::getDateTime() << "] "
-        << msg << "\n";
+	// Define a mutex for the log function.
+	static std::mutex logMutex;
+	std::lock_guard<std::mutex> lock(logMutex);
+	if (Logger::getStream().is_open()) {
+		// Write the log message inside the file.
+		Logger::getStream()
+			<< "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
+			<< "[" << Logger::levelToString(level) << "]"
+			<< "[" << Logger::getDateTime() << "] " << msg << "\n";
+	}
+	Logger::getOutputStream(level)
+		<< "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
+		<< "[" << Logger::levelToString(level) << "]"
+		<< "[" << Logger::getDateTime() << "] " << msg << "\n";
 }
 
-std::fstream & Logger::getStream()
+std::fstream &Logger::getStream()
 {
-    static std::fstream out_stream;
-    return out_stream;
+	static std::fstream out_stream;
+	return out_stream;
 }
 
 std::string Logger::getDateTime()
 {
-    time_t now = time(nullptr);
-    char buffer[32];
-    // Format: H:M
-    strftime(buffer, 32, "%H:%M:%S", localtime(&now));
-    return std::string(buffer);
+	time_t now = time(nullptr);
+	char buffer[32];
+	// Format: H:M
+	strftime(buffer, 32, "%H:%M:%S", localtime(&now));
+	return std::string(buffer);
 }
 
-std::ostream & Logger::getOutputStream(const LogLevel & level)
+std::ostream &Logger::getOutputStream(const LogLevel &level)
 {
-    if (level == LogLevel::Global)
-    {
-        return std::cout;
-    }
-    if (level == LogLevel::Debug)
-    {
-        return std::cout;
-    }
-    if (level == LogLevel::Info)
-    {
-        return std::cout;
-    }
-    if (level == LogLevel::Warning)
-    {
-        return std::cerr;
-    }
-    if (level == LogLevel::Error)
-    {
-        return std::cerr;
-    }
-    if (level == LogLevel::Fatal)
-    {
-        return std::cout;
-    }
-    if (level == LogLevel::Trace)
-    {
-        return std::cout;
-    }
-    return std::cout;
+	if (level == LogLevel::Global) {
+		return std::cout;
+	}
+	if (level == LogLevel::Debug) {
+		return std::cout;
+	}
+	if (level == LogLevel::Info) {
+		return std::cout;
+	}
+	if (level == LogLevel::Warning) {
+		return std::cerr;
+	}
+	if (level == LogLevel::Error) {
+		return std::cerr;
+	}
+	if (level == LogLevel::Fatal) {
+		return std::cout;
+	}
+	if (level == LogLevel::Trace) {
+		return std::cout;
+	}
+	return std::cout;
 }
 
-std::string Logger::levelToString(const LogLevel & level)
+std::string Logger::levelToString(const LogLevel &level)
 {
-    if (level == LogLevel::Global)
-    {
-        return " GLOBAL";
-    }
-    if (level == LogLevel::Debug)
-    {
-        return "  DEBUG";
-    }
-    if (level == LogLevel::Info)
-    {
-        return "   INFO";
-    }
-    if (level == LogLevel::Warning)
-    {
-        return "WARNING";
-    }
-    if (level == LogLevel::Error)
-    {
-        return "  ERROR";
-    }
-    if (level == LogLevel::Fatal)
-    {
-        return "  FATAL";
-    }
-    if (level == LogLevel::Trace)
-    {
-        return "  TRACE";
-    }
-    return "UNKNOWN";
+	if (level == LogLevel::Global) {
+		return " GLOBAL";
+	}
+	if (level == LogLevel::Debug) {
+		return "  DEBUG";
+	}
+	if (level == LogLevel::Info) {
+		return "   INFO";
+	}
+	if (level == LogLevel::Warning) {
+		return "WARNING";
+	}
+	if (level == LogLevel::Error) {
+		return "  ERROR";
+	}
+	if (level == LogLevel::Fatal) {
+		return "  FATAL";
+	}
+	if (level == LogLevel::Trace) {
+		return "  TRACE";
+	}
+	return "UNKNOWN";
 }

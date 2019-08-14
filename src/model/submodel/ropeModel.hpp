@@ -25,24 +25,22 @@
 #include "itemModel.hpp"
 
 /// @brief Model of a rope.
-class RopeModel :
-    public ItemModel
-{
+class RopeModel : public ItemModel {
 public:
-    /// The difficulty to untie.
-    unsigned int difficulty;
-    /// Type of rope
-    unsigned int ropeType;
+	/// The difficulty to untie.
+	unsigned int difficulty;
+	/// Type of rope
+	unsigned int ropeType;
 
-    RopeModel();
+	RopeModel();
 
-    virtual ~RopeModel();
+	virtual ~RopeModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

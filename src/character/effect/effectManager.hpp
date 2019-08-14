@@ -28,50 +28,47 @@
 #include <memory>
 
 /// @brief A class which allows to manage effects.
-class EffectManager :
-    public ModifierManager
-{
+class EffectManager : public ModifierManager {
 private:
-    /// The list of active effects.
-    std::vector<Effect> activeEffects;
-    /// The list of pending effects.
-    std::vector<Effect> pendingEffects;
+	/// The list of active effects.
+	std::vector<Effect> activeEffects;
+	/// The list of pending effects.
+	std::vector<Effect> pendingEffects;
 
 public:
-    /// @brief Constructor.
-    EffectManager();
+	/// @brief Constructor.
+	EffectManager();
 
-    /// @brief Destructor.
-    ~EffectManager();
+	/// @brief Destructor.
+	~EffectManager();
 
-    /// @brief Allows to add an effect to the buffer of pending effects.
-    /// @param effect    The one which has to be added to the buffer.
-    /// @param immediate If specified the effect is immediately activated.
-    void addEffect(Effect const & effect, bool immediate = false);
+	/// @brief Allows to add an effect to the buffer of pending effects.
+	/// @param effect    The one which has to be added to the buffer.
+	/// @param immediate If specified the effect is immediately activated.
+	void addEffect(Effect const &effect, bool immediate = false);
 
-    /// @brief Activate pending effects.
-    void effectActivate();
+	/// @brief Activate pending effects.
+	void effectActivate();
 
-    /// @brief Updates the active effects.
-    void effectUpdate();
+	/// @brief Updates the active effects.
+	void effectUpdate();
 
-    /// @brief Provides the list of active effects.
-    inline std::vector<Effect> const & getActiveEffects() const
-    {
-        return activeEffects;
-    }
+	/// @brief Provides the list of active effects.
+	inline std::vector<Effect> const &getActiveEffects() const
+	{
+		return activeEffects;
+	}
 
-    /// @brief Provides the list of pending effects.
-    inline std::vector<Effect> const & getPendingEffects() const
-    {
-        return pendingEffects;
-    }
+	/// @brief Provides the list of pending effects.
+	inline std::vector<Effect> const &getPendingEffects() const
+	{
+		return pendingEffects;
+	}
 
 private:
-
-    /// @brief Sort the list of active effects.
-    inline void sortEffects(std::vector<Effect> & effects)
-    {
-        std::sort(effects.begin(), effects.end(), std::less<Effect>());
-    }
+	/// @brief Sort the list of active effects.
+	inline void sortEffects(std::vector<Effect> &effects)
+	{
+		std::sort(effects.begin(), effects.end(), std::less<Effect>());
+	}
 };

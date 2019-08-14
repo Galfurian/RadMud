@@ -16,7 +16,6 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-
 #pragma once
 
 #include <cmath>
@@ -24,15 +23,15 @@
 
 inline bool IsEqual(double a, double b)
 {
-    return std::fabs(a - b) < std::numeric_limits<double>::epsilon();
+	return std::fabs(a - b) < std::numeric_limits<double>::epsilon();
 }
 
 inline bool IsLEqual(double a, double b)
 {
-    return IsEqual(a, b) || (a < b);
+	return IsEqual(a, b) || (a < b);
 }
 
 inline bool IsGEqual(double a, double b)
 {
-    return IsEqual(a, b) || (a > b);
+	return IsEqual(a, b) || (a > b);
 }

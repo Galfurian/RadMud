@@ -25,72 +25,72 @@
 #include "logger.hpp"
 
 ContainerModel::ContainerModel() :
-    maxWeight(),
-    containerFlags(),
-    keyVnum(),
-    difficulty()
+	maxWeight(),
+	containerFlags(),
+	keyVnum(),
+	difficulty()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ContainerModel::~ContainerModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType ContainerModel::getType() const
 {
-    return ModelType::Container;
+	return ModelType::Container;
 }
 
 std::string ContainerModel::getTypeName() const
 {
-    return "Container";
+	return "Container";
 }
 
-bool ContainerModel::setModel(const std::string & source)
+bool ContainerModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 4)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Container Model (%s).",
-                    this->name);
-        return false;
-    }
-    this->maxWeight = ToNumber<unsigned int>(functionList[0]);
-    this->containerFlags = ToNumber<unsigned int>(functionList[1]);
-    this->keyVnum = ToNumber<unsigned int>(functionList[2]);
-    this->difficulty = ToNumber<unsigned int>(functionList[3]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 4) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Container Model (%s).",
+					this->name);
+		return false;
+	}
+	this->maxWeight = ToNumber<unsigned int>(functionList[0]);
+	this->containerFlags = ToNumber<unsigned int>(functionList[1]);
+	this->keyVnum = ToNumber<unsigned int>(functionList[2]);
+	this->difficulty = ToNumber<unsigned int>(functionList[3]);
+	return true;
 }
 
-void ContainerModel::getSheet(Table & sheet) const
+void ContainerModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Max Weight", ToString(this->maxWeight)});
-    sheet.addRow({"Flags", GetContainerFlagString(this->containerFlags)});
-    sheet.addRow({"Key Vnum", ToString(this->keyVnum)});
-    sheet.addRow({"Picklock Difficulty", ToString(this->difficulty)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Max Weight", ToString(this->maxWeight) });
+	sheet.addRow({ "Flags", GetContainerFlagString(this->containerFlags) });
+	sheet.addRow({ "Key Vnum", ToString(this->keyVnum) });
+	sheet.addRow({ "Picklock Difficulty", ToString(this->difficulty) });
 }
 
 std::string GetContainerFlagString(unsigned int flags)
 {
-    std::string flagList;
-    if (HasFlag(flags, ContainerFlag::CanClose)) flagList += "|CanClose";
-    if (HasFlag(flags, ContainerFlag::CanBurgle)) flagList += "|CanBurgle";
-    if (HasFlag(flags, ContainerFlag::CanSee)) flagList += "|CanSee";
-    flagList += "|";
-    return flagList;
+	std::string flagList;
+	if (HasFlag(flags, ContainerFlag::CanClose))
+		flagList += "|CanClose";
+	if (HasFlag(flags, ContainerFlag::CanBurgle))
+		flagList += "|CanBurgle";
+	if (HasFlag(flags, ContainerFlag::CanSee))
+		flagList += "|CanSee";
+	flagList += "|";
+	return flagList;
 }

@@ -25,11 +25,9 @@
 #include <memory>
 
 /// @brief Factory which allows to create predefined rooms.
-class RoomFactory
-{
+class RoomFactory {
 public:
-    /// @brief Creates a room representing an empty area.
-    /// @return
-    static Room * createRoomAir();
-
+	/// @brief Creates a room representing an empty area.
+	/// @return
+	static Room *createRoomAir();
 };

@@ -25,44 +25,35 @@
 #include "itemModel.hpp"
 
 /// Used to determine the type of the resource.
-enum class MechanismType
-{
-    None,
-    Door,
-    Lock,
-    Picklock,
-    Lever
-};
+enum class MechanismType { None, Door, Lock, Picklock, Lever };
 
 /// @brief Model of a general mechanism.
-class MechanismModel :
-    public ItemModel
-{
+class MechanismModel : public ItemModel {
 public:
-    /// Type of mechanism.
-    MechanismType mechanismType;
-    /// The vnum of the key which opens the door/lock.
-    unsigned int key;
-    /// Lockpicking difficulty.
-    unsigned int difficulty;
-    /// Lockpick efficency.
-    unsigned int efficency;
-    /// Lever command.
-    unsigned int command;
-    /// Vnum of the target of the lever.
-    unsigned int target;
+	/// Type of mechanism.
+	MechanismType mechanismType;
+	/// The vnum of the key which opens the door/lock.
+	unsigned int key;
+	/// Lockpicking difficulty.
+	unsigned int difficulty;
+	/// Lockpick efficency.
+	unsigned int efficency;
+	/// Lever command.
+	unsigned int command;
+	/// Vnum of the target of the lever.
+	unsigned int target;
 
-    MechanismModel();
+	MechanismModel();
 
-    virtual ~MechanismModel();
+	virtual ~MechanismModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup EnumToString
@@ -72,4 +63,3 @@ public:
 std::string GetMechanismTypeName(MechanismType type);
 
 ///@}
-

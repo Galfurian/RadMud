@@ -23,41 +23,40 @@
 #include "liquid.hpp"
 #include "utils.hpp"
 
-Liquid::Liquid() :
-    vnum(),
-    type(),
-    name(),
-    description(),
-    worth(),
-    quench()
+Liquid::Liquid() : vnum(), type(), name(), description(), worth(), quench()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Liquid::~Liquid()
 {
-//    Logger::log(LogLevel::Debug,
-//                "Deleted liquid\t\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+	//    Logger::log(LogLevel::Debug,
+	//                "Deleted liquid\t\t[%s]\t\t(%s)",
+	//                ToString(this->vnum),
+	//                this->name);
 }
 
 bool Liquid::check()
 {
-    if (vnum <= 0) return false;
-    if (type == LiquidType::None) return false;
-    if (name.empty()) return false;
-    if (description.empty()) return false;
-    if (worth <= 0) return false;
-    return true;
+	if (vnum <= 0)
+		return false;
+	if (type == LiquidType::None)
+		return false;
+	if (name.empty())
+		return false;
+	if (description.empty())
+		return false;
+	if (worth <= 0)
+		return false;
+	return true;
 }
 
 std::string Liquid::getName()
 {
-    return ToLower(name);
+	return ToLower(name);
 }
 
 std::string Liquid::getNameCapital()
 {
-    return ToCapitals(name);
+	return ToCapitals(name);
 }

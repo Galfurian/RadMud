@@ -25,35 +25,32 @@
 #include "itemModel.hpp"
 
 /// Shield sizes.
-enum class ShieldSize
-{
-    All,    ///< [0] All kind of size.
-    Light,  ///< [1] Light Shield
-    Medium, ///< [2] Medium Shield
-    Heavy   ///< [3] Heavy Shield
+enum class ShieldSize {
+	All, ///< [0] All kind of size.
+	Light, ///< [1] Light Shield
+	Medium, ///< [2] Medium Shield
+	Heavy ///< [3] Heavy Shield
 };
 
 /// @brief Model of a shield.
-class ShieldModel :
-    public ItemModel
-{
+class ShieldModel : public ItemModel {
 public:
-    /// The size of the shield.
-    ShieldSize size;
-    /// The chace to parry with this weapon.
-    unsigned int parryChance;
+	/// The size of the shield.
+	ShieldSize size;
+	/// The chace to parry with this weapon.
+	unsigned int parryChance;
 
-    ShieldModel();
+	ShieldModel();
 
-    virtual ~ShieldModel();
+	virtual ~ShieldModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup EnumToString

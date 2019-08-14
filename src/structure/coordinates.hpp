@@ -30,54 +30,53 @@
 class Direction;
 
 /// Used to create and manage a tridimensional coordinates.
-class Coordinates
-{
+class Coordinates {
 public:
-    /// Coordinate on the x axis.
-    int x;
-    /// Coordinate on the y axis.
-    int y;
-    /// Coordinate on the z axis.
-    int z;
+	/// Coordinate on the x axis.
+	int x;
+	/// Coordinate on the y axis.
+	int y;
+	/// Coordinate on the z axis.
+	int z;
 
-    Coordinates();
+	Coordinates();
 
-    /// @brief It the constructor, needed to create a set of Coordinates.
-    /// @param _x Coordinate on width axis.
-    /// @param _y Coordinate on heigth axis.
-    /// @param _z Coordinate on altitude axis.
-    Coordinates(const int & _x, const int & _y, const int & _z);
+	/// @brief It the constructor, needed to create a set of Coordinates.
+	/// @param _x Coordinate on width axis.
+	/// @param _y Coordinate on heigth axis.
+	/// @param _z Coordinate on altitude axis.
+	Coordinates(const int &_x, const int &_y, const int &_z);
 
-    /// @brief Constructor.
-    Coordinates(const double & _x, const double & _y, const double & _z);
+	/// @brief Constructor.
+	Coordinates(const double &_x, const double &_y, const double &_z);
 
-    /// @brief Define operator ==, equal.
-    /// @param right The right parameter.
-    /// @return True if left Coordinates are equal to the right Coordinates.
-    bool operator==(const Coordinates & right) const;
+	/// @brief Define operator ==, equal.
+	/// @param right The right parameter.
+	/// @return True if left Coordinates are equal to the right Coordinates.
+	bool operator==(const Coordinates &right) const;
 
-    /// @brief Define operator !=, equal.
-    /// @param right The right parameter.
-    /// @return True if left Coordinates are different to the right Coordinates.
-    bool operator!=(const Coordinates & right) const;
+	/// @brief Define operator !=, equal.
+	/// @param right The right parameter.
+	/// @return True if left Coordinates are different to the right Coordinates.
+	bool operator!=(const Coordinates &right) const;
 
-    /// @brief Define operator <, less than.
-    /// @param right The right parameter.
-    /// @return True if left Coordinates are less than right Coordinates.
-    bool operator<(const Coordinates & right) const;
+	/// @brief Define operator <, less than.
+	/// @param right The right parameter.
+	/// @return True if left Coordinates are less than right Coordinates.
+	bool operator<(const Coordinates &right) const;
 
-    /// @brief Add to the current Coordinates the right operand.
-    /// @param right The right parameter.
-    /// @return The new Coordinates.
-    Coordinates operator+(const Coordinates & right) const;
+	/// @brief Add to the current Coordinates the right operand.
+	/// @param right The right parameter.
+	/// @return The new Coordinates.
+	Coordinates operator+(const Coordinates &right) const;
 
-    Coordinates operator+(const Direction & right) const;
+	Coordinates operator+(const Direction &right) const;
 
-    /// @brief Evaluates the square.
-    /// @return The square.
-    int square() const;
+	/// @brief Evaluates the square.
+	/// @return The square.
+	int square() const;
 
-    /// @brief Provides the string version of the coordinates.
-    /// @return A string representing the coordinates.
-    std::string toString() const;
+	/// @brief Provides the string version of the coordinates.
+	/// @return A string representing the coordinates.
+	std::string toString() const;
 };

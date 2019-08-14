@@ -25,70 +25,68 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-ArmorModel::ArmorModel() :
-    size(),
-    armorClass(),
-    allowedAnatomy()
+ArmorModel::ArmorModel() : size(), armorClass(), allowedAnatomy()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ArmorModel::~ArmorModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType ArmorModel::getType() const
 {
-    return ModelType::Armor;
+	return ModelType::Armor;
 }
 
 std::string ArmorModel::getTypeName() const
 {
-    return "Armor";
+	return "Armor";
 }
 
-bool ArmorModel::setModel(const std::string & source)
+bool ArmorModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 3)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Armor Model (%s).",
-            this->name);
-        return false;
-    }
-    this->size = static_cast<ArmorSize>(ToNumber<unsigned int>(
-        functionList[0]));
-    this->armorClass = ToNumber<unsigned int>(functionList[1]);
-    this->allowedAnatomy = ToNumber<unsigned int>(functionList[2]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 3) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Armor Model (%s).",
+					this->name);
+		return false;
+	}
+	this->size =
+		static_cast<ArmorSize>(ToNumber<unsigned int>(functionList[0]));
+	this->armorClass = ToNumber<unsigned int>(functionList[1]);
+	this->allowedAnatomy = ToNumber<unsigned int>(functionList[2]);
+	return true;
 }
 
-void ArmorModel::getSheet(Table & sheet) const
+void ArmorModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Size", GetArmorSizeName(this->size)});
-    sheet.addRow({"Armor Class", ToString(this->armorClass)});
-    sheet.addRow({"Allowed Anatomies", ToString(this->allowedAnatomy)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Size", GetArmorSizeName(this->size) });
+	sheet.addRow({ "Armor Class", ToString(this->armorClass) });
+	sheet.addRow({ "Allowed Anatomies", ToString(this->allowedAnatomy) });
 }
 
 std::string GetArmorSizeName(ArmorSize armorSize)
 {
-    if (armorSize == ArmorSize::All) return "Universal Armor";
-    if (armorSize == ArmorSize::Light) return "Light Armor";
-    if (armorSize == ArmorSize::Medium) return "Medium Armor";
-    if (armorSize == ArmorSize::Heavy) return "Heavy Armor";
-    return "No Armor Size";
+	if (armorSize == ArmorSize::All)
+		return "Universal Armor";
+	if (armorSize == ArmorSize::Light)
+		return "Light Armor";
+	if (armorSize == ArmorSize::Medium)
+		return "Medium Armor";
+	if (armorSize == ArmorSize::Heavy)
+		return "Heavy Armor";
+	return "No Armor Size";
 }

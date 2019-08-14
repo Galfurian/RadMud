@@ -25,38 +25,35 @@
 #include "itemModel.hpp"
 
 /// Types of weapons.
-enum class MeleeWeaponType
-{
-    None,
-    Unarmed, ///< [1] Weapon to enhance unarmed fight
-    Bladed,  ///< [2] All sort of blades
-    Blunt,   ///< [3] All sort of blunt weapons
-    Placed,  ///< [4] Placed explosives
+enum class MeleeWeaponType {
+	None,
+	Unarmed, ///< [1] Weapon to enhance unarmed fight
+	Bladed, ///< [2] All sort of blades
+	Blunt, ///< [3] All sort of blunt weapons
+	Placed, ///< [4] Placed explosives
 };
 
 /// @brief Model of a weapon.
-class MeleeWeaponModel :
-    public ItemModel
-{
+class MeleeWeaponModel : public ItemModel {
 public:
-    /// The type of the melee weapon.
-    MeleeWeaponType meleeWeaponType;
-    /// The minimum damage of the weapon.
-    unsigned int minDamage;
-    /// The maximum damage of the weapon.
-    unsigned int maxDamage;
+	/// The type of the melee weapon.
+	MeleeWeaponType meleeWeaponType;
+	/// The minimum damage of the weapon.
+	unsigned int minDamage;
+	/// The maximum damage of the weapon.
+	unsigned int maxDamage;
 
-    MeleeWeaponModel();
+	MeleeWeaponModel();
 
-    virtual ~MeleeWeaponModel();
+	virtual ~MeleeWeaponModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup EnumToString

@@ -28,55 +28,50 @@
 
 /// @brief Contains all the informations concerning a command,
 ///         including its handler.
-class Command
-{
+class Command {
 public:
-    /// The handler of the command.
-    std::function<bool(Character * character, ArgumentHandler & args)> handler;
-    /// The name of the command.
-    std::string name;
-    /// The arguemtns of the command.
-    std::string arguments;
-    /// The help message of the command.
-    std::string help;
-    /// Flag which identifies if the command is for gods.
-    bool gods;
-    /// Flag which determines if the command can be used in combat.
-    bool canUseInCombat;
-    /// Flag which determines if the command must be typed completely.
-    bool typedCompletely;
+	/// The handler of the command.
+	std::function<bool(Character *character, ArgumentHandler &args)> handler;
+	/// The name of the command.
+	std::string name;
+	/// The arguemtns of the command.
+	std::string arguments;
+	/// The help message of the command.
+	std::string help;
+	/// Flag which identifies if the command is for gods.
+	bool gods;
+	/// Flag which determines if the command can be used in combat.
+	bool canUseInCombat;
+	/// Flag which determines if the command must be typed completely.
+	bool typedCompletely;
 
-    /// @brief Constructor.
-    Command();
+	/// @brief Constructor.
+	Command();
 
-    /// @brief Create a complete structure for a command.
-    /// @param _handler         The handler of the command.
-    /// @param _name            The name of the command.
-    /// @param _arguments       The arguments of the command.
-    /// @param _help            The help message of the command.
-    /// @param _gods            The level necessary to execute the command.
-    /// @param _canUseInCombat  The can_use_in_combat flag.
-    /// @param _typedCompletely If the command must be typed completely.
-    Command(const std::function<bool(Character * character,
-                                     ArgumentHandler & args)> & _handler,
-            const std::string & _name,
-            const std::string & _arguments,
-            const std::string & _help,
-            const bool & _gods,
-            const bool & _canUseInCombat,
-            const bool & _typedCompletely);
+	/// @brief Create a complete structure for a command.
+	/// @param _handler         The handler of the command.
+	/// @param _name            The name of the command.
+	/// @param _arguments       The arguments of the command.
+	/// @param _help            The help message of the command.
+	/// @param _gods            The level necessary to execute the command.
+	/// @param _canUseInCombat  The can_use_in_combat flag.
+	/// @param _typedCompletely If the command must be typed completely.
+	Command(const std::function<bool(Character *character,
+									 ArgumentHandler &args)> &_handler,
+			const std::string &_name, const std::string &_arguments,
+			const std::string &_help, const bool &_gods,
+			const bool &_canUseInCombat, const bool &_typedCompletely);
 
-    /// @brief Checks if the provided character can use the command.
-    /// @param character The character to check.
-    /// @return <b>True</b> if the character can use the command,<br>
-    ///         <b>False</b> otherwise.
-    bool canUse(Character * character) const;
+	/// @brief Checks if the provided character can use the command.
+	/// @param character The character to check.
+	/// @return <b>True</b> if the character can use the command,<br>
+	///         <b>False</b> otherwise.
+	bool canUse(Character *character) const;
 };
 
 /// @brief Stop any action the character is executing.
-void StopAction(Character * character);
+void StopAction(Character *character);
 
 /// @brief Map all the command to the respective std::string that the
 ///         character can type.
 void LoadCommands();
-

@@ -24,28 +24,51 @@
 
 std::string ModelType::toString() const
 {
-    if (value == Corpse) return "Corpse";
-    if (value == MeleeWeapon) return "MeleeWeapon";
-    if (value == RangedWeapon) return "RangedWeapon";
-    if (value == Armor) return "Armor";
-    if (value == Shield) return "Shield";
-    if (value == Projectile) return "Projectile";
-    if (value == Container) return "Container";
-    if (value == LiquidContainer) return "LiquidContainer";
-    if (value == Tool) return "Tool";
-    if (value == Node) return "Node";
-    if (value == Resource) return "Resource";
-    if (value == Seed) return "Seed";
-    if (value == Key) return "Key";
-    if (value == Furniture) return "Furniture";
-    if (value == Food) return "Food";
-    if (value == Light) return "Light";
-    if (value == Vehicle) return "Vehicle";
-    if (value == Book) return "Book";
-    if (value == Rope) return "Rope";
-    if (value == Mechanism) return "Mechanism";
-    if (value == Currency) return "Currency";
-    if (value == Shop) return "Shop";
-    if (value == Magazine) return "Magazine";
-    return "None";
+	if (value == Corpse)
+		return "Corpse";
+	if (value == MeleeWeapon)
+		return "MeleeWeapon";
+	if (value == RangedWeapon)
+		return "RangedWeapon";
+	if (value == Armor)
+		return "Armor";
+	if (value == Shield)
+		return "Shield";
+	if (value == Projectile)
+		return "Projectile";
+	if (value == Container)
+		return "Container";
+	if (value == LiquidContainer)
+		return "LiquidContainer";
+	if (value == Tool)
+		return "Tool";
+	if (value == Node)
+		return "Node";
+	if (value == Resource)
+		return "Resource";
+	if (value == Seed)
+		return "Seed";
+	if (value == Key)
+		return "Key";
+	if (value == Furniture)
+		return "Furniture";
+	if (value == Food)
+		return "Food";
+	if (value == Light)
+		return "Light";
+	if (value == Vehicle)
+		return "Vehicle";
+	if (value == Book)
+		return "Book";
+	if (value == Rope)
+		return "Rope";
+	if (value == Mechanism)
+		return "Mechanism";
+	if (value == Currency)
+		return "Currency";
+	if (value == Shop)
+		return "Shop";
+	if (value == Magazine)
+		return "Magazine";
+	return "None";
 }

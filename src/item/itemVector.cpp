@@ -25,120 +25,105 @@
 
 ItemVector::ItemVector()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-void ItemVector::emplace_back_item(Item *& item)
+void ItemVector::emplace_back_item(Item *&item)
 {
-    for (auto it = this->begin(); it != this->end(); ++it)
-    {
-        auto content = (*it);
-        if (item->canStackWith(content))
-        {
-            content->quantity += item->quantity;
-            MudUpdater::instance().addItemToDestroy(item);
-            item = content;
-            content->updateOnDB();
-            return;
-        }
-    }
-    this->emplace_back(item);
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		auto content = (*it);
+		if (item->canStackWith(content)) {
+			content->quantity += item->quantity;
+			MudUpdater::instance().addItemToDestroy(item);
+			item = content;
+			content->updateOnDB();
+			return;
+		}
+	}
+	this->emplace_back(item);
 }
 
-bool ItemVector::removeItem(Item * item)
+bool ItemVector::removeItem(Item *item)
 {
-    for (auto it = this->begin(); it != this->end(); ++it)
-    {
-        auto contained = (*it);
-        if (contained->vnum == item->vnum)
-        {
-            this->erase(it);
-            return true;
-        }
-    }
-    return false;
+	for (auto it = this->begin(); it != this->end(); ++it) {
+		auto contained = (*it);
+		if (contained->vnum == item->vnum) {
+			this->erase(it);
+			return true;
+		}
+	}
+	return false;
 }
 
-Item * ItemVector::findItem(const unsigned int & vnum) const
+Item *ItemVector::findItem(const unsigned int &vnum) const
 {
-    for (const_iterator it = this->begin(); it != this->end(); ++it)
-    {
-        if ((*it)->vnum == vnum)
-        {
-            return (*it);
-        }
-    }
-    return nullptr;
+	for (const_iterator it = this->begin(); it != this->end(); ++it) {
+		if ((*it)->vnum == vnum) {
+			return (*it);
+		}
+	}
+	return nullptr;
 }
 
-std::vector<std::pair<Item *, int>> ItemVector::toStack() const
+std::vector<std::pair<Item *, int> > ItemVector::toStack() const
 {
-    std::vector<std::pair<Item *, int>> numberedItems;
-    for (auto item : (*this))
-    {
-        bool missing = true;
-        for (auto & it2 : numberedItems)
-        {
-            if (it2.first->getName() == item->getName())
-            {
-                if (HasFlag(it2.first->flags, ItemFlag::Built))
-                {
-                    if (HasFlag(item->flags, ItemFlag::Built))
-                    {
-                        missing = false;
-                        it2.second++;
-                        break;
-                    }
-                }
-                else
-                {
-                    missing = false;
-                    it2.second++;
-                    break;
-                }
-            }
-        }
-        if (missing)
-        {
-            numberedItems.emplace_back(std::make_pair(item, 1));
-        }
-    }
-    return numberedItems;
+	std::vector<std::pair<Item *, int> > numberedItems;
+	for (auto item : (*this)) {
+		bool missing = true;
+		for (auto &it2 : numberedItems) {
+			if (it2.first->getName() == item->getName()) {
+				if (HasFlag(it2.first->flags, ItemFlag::Built)) {
+					if (HasFlag(item->flags, ItemFlag::Built)) {
+						missing = false;
+						it2.second++;
+						break;
+					}
+				} else {
+					missing = false;
+					it2.second++;
+					break;
+				}
+			}
+		}
+		if (missing) {
+			numberedItems.emplace_back(std::make_pair(item, 1));
+		}
+	}
+	return numberedItems;
 }
 
-void ItemVector::orderBy(const ItemVector::Order & order)
+void ItemVector::orderBy(const ItemVector::Order &order)
 {
-    auto orderingFunction = ItemVector::orderItemByName;
-    if (order == Order::ByWeight)
-    {
-        orderingFunction = ItemVector::orderItemByWeight;
-    }
-    else if (order == Order::ByPrice)
-    {
-        orderingFunction = ItemVector::orderItemByPrice;
-    }
-    std::sort(this->begin(), this->end(), orderingFunction);
+	auto orderingFunction = ItemVector::orderItemByName;
+	if (order == Order::ByWeight) {
+		orderingFunction = ItemVector::orderItemByWeight;
+	} else if (order == Order::ByPrice) {
+		orderingFunction = ItemVector::orderItemByPrice;
+	}
+	std::sort(this->begin(), this->end(), orderingFunction);
 }
 
-std::string ItemVector::orderToString(const Order & order)
+std::string ItemVector::orderToString(const Order &order)
 {
-    if (order == Order::ByName) return "name";
-    else if (order == Order::ByWeight) return "weight";
-    else return "price";
+	if (order == Order::ByName)
+		return "name";
+	else if (order == Order::ByWeight)
+		return "weight";
+	else
+		return "price";
 }
 
-bool ItemVector::orderItemByName(Item * first, Item * second)
+bool ItemVector::orderItemByName(Item *first, Item *second)
 {
-    return first->getName() < second->getName();
+	return first->getName() < second->getName();
 }
 
-bool ItemVector::orderItemByWeight(Item * first, Item * second)
+bool ItemVector::orderItemByWeight(Item *first, Item *second)
 {
-    return first->getWeight(true) < second->getWeight(true);
+	return first->getWeight(true) < second->getWeight(true);
 }
 
-bool ItemVector::orderItemByPrice(Item * first, Item * second)
+bool ItemVector::orderItemByPrice(Item *first, Item *second)
 {
-    return first->getPrice(true) < second->getPrice(true);
+	return first->getPrice(true) < second->getPrice(true);
 }
-

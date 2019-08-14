@@ -24,20 +24,31 @@
 
 std::string ItemQuality::toString() const
 {
-    if (value == ItemQuality::Disastrous) return "Disastrous";
-    if (value == ItemQuality::Poor) return "Poor";
-    if (value == ItemQuality::Normal) return "Normal";
-    if (value == ItemQuality::Fine) return "Fine";
-    if (value == ItemQuality::Masterful) return "Masterful";
-    else return "None";
+	if (value == ItemQuality::Disastrous)
+		return "Disastrous";
+	if (value == ItemQuality::Poor)
+		return "Poor";
+	if (value == ItemQuality::Normal)
+		return "Normal";
+	if (value == ItemQuality::Fine)
+		return "Fine";
+	if (value == ItemQuality::Masterful)
+		return "Masterful";
+	else
+		return "None";
 }
 
 double ItemQuality::getModifier() const
 {
-    if (value == ItemQuality::Disastrous) return 0.5;
-    if (value == ItemQuality::Poor) return 0.75;
-    if (value == ItemQuality::Normal) return 1.0;
-    if (value == ItemQuality::Fine) return 1.50;
-    if (value == ItemQuality::Masterful) return 2.00;
-    return 0.25;
+	if (value == ItemQuality::Disastrous)
+		return 0.5;
+	if (value == ItemQuality::Poor)
+		return 0.75;
+	if (value == ItemQuality::Normal)
+		return 1.0;
+	if (value == ItemQuality::Fine)
+		return 1.50;
+	if (value == ItemQuality::Masterful)
+		return 2.00;
+	return 0.25;
 }

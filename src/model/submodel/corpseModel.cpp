@@ -25,94 +25,81 @@
 #include "logger.hpp"
 #include "mud.hpp"
 
-CorpseModel::CorpseModel() :
-    corpseRace(),
-    corpseComposition()
+CorpseModel::CorpseModel() : corpseRace(), corpseComposition()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 CorpseModel::~CorpseModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType CorpseModel::getType() const
 {
-    return ModelType::Corpse;
+	return ModelType::Corpse;
 }
 
 std::string CorpseModel::getTypeName() const
 {
-    return "Corpse";
+	return "Corpse";
 }
 
-bool CorpseModel::setModel(const std::string & source)
+bool CorpseModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 0)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Corpse Model (%s).",
-            this->name);
-        return false;
-    }
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 0) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Corpse Model (%s).",
+					this->name);
+		return false;
+	}
+	return true;
 }
 
-void CorpseModel::getSheet(Table & sheet) const
+void CorpseModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    if (corpseRace != nullptr)
-    {
-        sheet.addRow({"Corpse", corpseRace->name});
-    }
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	if (corpseRace != nullptr) {
+		sheet.addRow({ "Corpse", corpseRace->name });
+	}
 }
 
-Item * CorpseModel::createItem(std::string,
-                               Material *,
-                               bool,
-                               const ItemQuality &,
-                               const unsigned int &)
+Item *CorpseModel::createItem(std::string, Material *, bool,
+							  const ItemQuality &, const unsigned int &)
 {
-    Logger::log(LogLevel::Error, "Use the proper createCorpse function.");
-    return nullptr;
+	Logger::log(LogLevel::Error, "Use the proper createCorpse function.");
+	return nullptr;
 }
 
-Item * CorpseModel::createCorpse(
-    std::string maker,
-    const double & weight)
+Item *CorpseModel::createCorpse(std::string maker, const double &weight)
 {
-    // Instantiate the new item.
-    auto newCorpse = new CorpseItem();
-    if (newCorpse == nullptr)
-    {
-        Logger::log(LogLevel::Error, "Cannot create the new item.");
-        // Return pointer to nothing.
-        return nullptr;
-    }
+	// Instantiate the new item.
+	auto newCorpse = new CorpseItem();
+	if (newCorpse == nullptr) {
+		Logger::log(LogLevel::Error, "Cannot create the new item.");
+		// Return pointer to nothing.
+		return nullptr;
+	}
 
-    // First set: Vnum, Model, Maker, Composition, Quality.
-    newCorpse->vnum = 0;
-    newCorpse->model = this->shared_from_this();
-    newCorpse->maker = maker;
-    newCorpse->quality = ItemQuality::Normal;
-    // Then set the rest.
-    newCorpse->condition = static_cast<unsigned int>(weight);
-    newCorpse->composition = corpseComposition;
-    newCorpse->remainingBodyParts = corpseRace->bodyParts;
+	// First set: Vnum, Model, Maker, Composition, Quality.
+	newCorpse->vnum = 0;
+	newCorpse->model = this->shared_from_this();
+	newCorpse->maker = maker;
+	newCorpse->quality = ItemQuality::Normal;
+	// Then set the rest.
+	newCorpse->condition = static_cast<unsigned int>(weight);
+	newCorpse->composition = corpseComposition;
+	newCorpse->remainingBodyParts = corpseRace->bodyParts;
 
-    Mud::instance().addCorpse(newCorpse);
-    return newCorpse;
+	Mud::instance().addCorpse(newCorpse);
+	return newCorpse;
 }

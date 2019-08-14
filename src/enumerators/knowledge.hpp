@@ -24,58 +24,52 @@
 #include "baseEnumerator.hpp"
 
 /// @brief The list of notions a character can learn.
-class Knowledge :
-    public BaseEnumerator
-{
+class Knowledge : public BaseEnumerator {
 public:
-    /// The possible notions a character can learn.
-    enum Enum
-    {
-        None,
-        GatherHerbs = 3,                ///< Gather Herbs
-        GatherPlant = 4,                ///< Gather Plant
-        Butchery = 5,                   ///< Butcher Animal
-        SkinAnimal = 6,                 ///< Skin Animal
-        TanHide = 7,                    ///< Tan Hide
-        ReadBook = 8,                   ///< Read Book
-        Climb = 10,                     ///< Climb
-        Run = 11,                       ///< Run
-        Dash = 12,                      ///< Dash
-        Woodcutting = 15,               ///< Woodcutting
-        Carpentry = 16,                 ///< Carpentry
-        Woodcarving = 17,               ///< Woodcarving
-        Mining = 20,                    ///< Mining
-        Smelting = 21,                  ///< Smelting
-        Blacksmithing = 22,             ///< Blacksmithing
-        MetalWeaponCrafting = 23,       ///< Metal Weapon Crafting
-        MetalArmorCrafting = 24,        ///< Metal Armor Crafting
-        CraftSurvivalTool = 30,         ///< Craft Survival Tool
-        Cooking = 31,                   ///< Cooking skills.
-        Scavenge = 35,                  ///< Scavenging skils.
-        BasicArmorProficiency = 40      ///< Basic Armor Proficiency
-    };
+	/// The possible notions a character can learn.
+	enum Enum {
+		None,
+		GatherHerbs = 3, ///< Gather Herbs
+		GatherPlant = 4, ///< Gather Plant
+		Butchery = 5, ///< Butcher Animal
+		SkinAnimal = 6, ///< Skin Animal
+		TanHide = 7, ///< Tan Hide
+		ReadBook = 8, ///< Read Book
+		Climb = 10, ///< Climb
+		Run = 11, ///< Run
+		Dash = 12, ///< Dash
+		Woodcutting = 15, ///< Woodcutting
+		Carpentry = 16, ///< Carpentry
+		Woodcarving = 17, ///< Woodcarving
+		Mining = 20, ///< Mining
+		Smelting = 21, ///< Smelting
+		Blacksmithing = 22, ///< Blacksmithing
+		MetalWeaponCrafting = 23, ///< Metal Weapon Crafting
+		MetalArmorCrafting = 24, ///< Metal Armor Crafting
+		CraftSurvivalTool = 30, ///< Craft Survival Tool
+		Cooking = 31, ///< Cooking skills.
+		Scavenge = 35, ///< Scavenging skils.
+		BasicArmorProficiency = 40 ///< Basic Armor Proficiency
+	};
 
-    /// @brief Constructor.
-    Knowledge() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	Knowledge() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit Knowledge(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit Knowledge(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    Knowledge(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	Knowledge(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the enumerator as string.
-    std::string toString() const override;
+	/// @brief Returns the enumerator as string.
+	std::string toString() const override;
 };

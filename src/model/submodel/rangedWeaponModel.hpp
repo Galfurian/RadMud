@@ -25,45 +25,42 @@
 #include "itemModel.hpp"
 
 /// Types of ranged weapons.
-enum class RangedWeaponType
-{
-    None,
-    Pistol,             ///< [1] Normal Pistols
-    Rifle,              ///< [2] Normal Rifles
-    Shotgun,            ///< [3] Normal Shotguns
-    HeavyWeapon,        ///< [4] Normal Heavy Weapons
-    EnergyPistol,       ///< [5] Pistols that uses energy
-    EnergyRifle,        ///< [6] Rifles that uses energy
-    EnergyHeavyWeapon,  ///< [7] Heavy Weapons that uses energy
-    Granade,            ///< [8] Normal Granades
-    Thrown,             ///< [9] Throwable weapons
+enum class RangedWeaponType {
+	None,
+	Pistol, ///< [1] Normal Pistols
+	Rifle, ///< [2] Normal Rifles
+	Shotgun, ///< [3] Normal Shotguns
+	HeavyWeapon, ///< [4] Normal Heavy Weapons
+	EnergyPistol, ///< [5] Pistols that uses energy
+	EnergyRifle, ///< [6] Rifles that uses energy
+	EnergyHeavyWeapon, ///< [7] Heavy Weapons that uses energy
+	Granade, ///< [8] Normal Granades
+	Thrown, ///< [9] Throwable weapons
 };
 
 /// @brief Model of a weapon.
-class RangedWeaponModel :
-    public ItemModel
-{
+class RangedWeaponModel : public ItemModel {
 public:
-    /// The type of the ranged weapon.
-    RangedWeaponType rangedWeaponType;
-    /// The minimum damage of the weapon.
-    unsigned int minDamage;
-    /// The maximum damage of the weapon.
-    unsigned int maxDamage;
-    /// The range of the weapon.
-    int range;
+	/// The type of the ranged weapon.
+	RangedWeaponType rangedWeaponType;
+	/// The minimum damage of the weapon.
+	unsigned int minDamage;
+	/// The maximum damage of the weapon.
+	unsigned int maxDamage;
+	/// The range of the weapon.
+	int range;
 
-    RangedWeaponModel();
+	RangedWeaponModel();
 
-    virtual ~RangedWeaponModel();
+	virtual ~RangedWeaponModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup EnumToString

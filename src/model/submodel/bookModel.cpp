@@ -24,55 +24,50 @@
 
 #include "logger.hpp"
 
-BookModel::BookModel() :
-    maxParchments()
+BookModel::BookModel() : maxParchments()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 BookModel::~BookModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType BookModel::getType() const
 {
-    return ModelType::Book;
+	return ModelType::Book;
 }
 
 std::string BookModel::getTypeName() const
 {
-    return "Book";
+	return "Book";
 }
 
-bool BookModel::setModel(const std::string & source)
+bool BookModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 1)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Book Model (%s).",
-                    this->name);
-        return false;
-    }
-    this->maxParchments = ToNumber<unsigned int>(functionList[0]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 1) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Book Model (%s).",
+					this->name);
+		return false;
+	}
+	this->maxParchments = ToNumber<unsigned int>(functionList[0]);
+	return true;
 }
 
-void BookModel::getSheet(Table & sheet) const
+void BookModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Max Parchments", ToString(this->maxParchments)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Max Parchments", ToString(this->maxParchments) });
 }
-

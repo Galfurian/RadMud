@@ -29,64 +29,60 @@
 class Liquid;
 
 /// Used to determine the flag of the terrain.
-enum class TerrainFlag
-{
-    None = 0,           ///< No flag.
-    Indoor = 1,         ///< The terrain is indoor.
-    NaturalLight = 2    ///< There is natural light on this terrain.
+enum class TerrainFlag {
+	None = 0, ///< No flag.
+	Indoor = 1, ///< The terrain is indoor.
+	NaturalLight = 2 ///< There is natural light on this terrain.
 };
 
 /// Used to determine the generation flag of the terrain.
-enum class TerrainGenerationFlag
-{
-    None = 0,                   ///< No flag.
-    CanHostLiquidSource = 2,    ///< The terrain can host a liquid source.
-    CanHostForest = 4,          ///< The terrain can host a forest.
-    //8
+enum class TerrainGenerationFlag {
+	None = 0, ///< No flag.
+	CanHostLiquidSource = 2, ///< The terrain can host a liquid source.
+	CanHostForest = 4, ///< The terrain can host a forest.
+	//8
 };
 
 /// @brief Holds information about a type of terrain.
-class Terrain
-{
+class Terrain {
 protected:
-    /// The list of liquids which can generate from this terrain.
-    struct LiquidSource
-    {
-        /// The liquid.
-        Liquid * liquid;
-        /// The nominal probability.
-        unsigned int assignedProbability;
-        /// The complexive probability.
-        unsigned int cumulativeProbability;
-    };
+	/// The list of liquids which can generate from this terrain.
+	struct LiquidSource {
+		/// The liquid.
+		Liquid *liquid;
+		/// The nominal probability.
+		unsigned int assignedProbability;
+		/// The complexive probability.
+		unsigned int cumulativeProbability;
+	};
 
 public:
-    /// The vnum.
-    unsigned int vnum;
-    /// The unique name.
-    std::string name;
-    /// The flags of the terrain.
-    unsigned int flags;
-    /// The flags used during map generation.
-    unsigned int generationFlags;
-    /// The available space inside the terrain.
-    unsigned int space;
-    /// The symbol describing the terrain.
-    std::string symbol;
-    /// The lua_State associated with this terrain.
-    lua_State * L;
-    /// The liquid which fills the terrain by default.
-    std::pair<Liquid *, unsigned int> liquidContent;
-    /// A list of liquid sources.
-    std::vector<LiquidSource> liquidSources;
+	/// The vnum.
+	unsigned int vnum;
+	/// The unique name.
+	std::string name;
+	/// The flags of the terrain.
+	unsigned int flags;
+	/// The flags used during map generation.
+	unsigned int generationFlags;
+	/// The available space inside the terrain.
+	unsigned int space;
+	/// The symbol describing the terrain.
+	std::string symbol;
+	/// The lua_State associated with this terrain.
+	lua_State *L;
+	/// The liquid which fills the terrain by default.
+	std::pair<Liquid *, unsigned int> liquidContent;
+	/// A list of liquid sources.
+	std::vector<LiquidSource> liquidSources;
 
-    /// @brief Constructor.
-    Terrain();
+	/// @brief Constructor.
+	Terrain();
 
-    /// @brief Adds a liquid source to the terrain.
-    void addLiquidSource(Liquid * _liquid,
-                         const unsigned int & _assignedProbability);
+	/// @brief Adds a liquid source to the terrain.
+	void addLiquidSource(Liquid *_liquid,
+						 const unsigned int &_assignedProbability);
 
-    /// @brief Provides a random liquid source based on their probabilities.
-    Liquid * getRandomLiquidSource() const;
+	/// @brief Provides a random liquid source based on their probabilities.
+	Liquid *getRandomLiquidSource() const;
 };

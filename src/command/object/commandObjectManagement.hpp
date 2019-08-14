@@ -28,15 +28,15 @@
 
 /// @brief Allow the character to pick up an object, or take an object from
 ///         another one.
-bool DoTake(Character * character, ArgumentHandler & args);
+bool DoTake(Character *character, ArgumentHandler &args);
 
 /// Allow the character to drop an object.
-bool DoDrop(Character * character, ArgumentHandler & args);
+bool DoDrop(Character *character, ArgumentHandler &args);
 
 /// Put an object inside a container.
-bool DoPut(Character * character, ArgumentHandler & args);
+bool DoPut(Character *character, ArgumentHandler &args);
 
 /// Allow the character to give an object to another character.
-bool DoGive(Character * character, ArgumentHandler & args);
+bool DoGive(Character *character, ArgumentHandler &args);
 
 ///@}

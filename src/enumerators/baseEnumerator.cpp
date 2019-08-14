@@ -23,38 +23,35 @@
 #include <sstream>
 
 /// @brief Constructor from uint.
-BaseEnumerator::BaseEnumerator() :
-    value()
+BaseEnumerator::BaseEnumerator() : value()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-BaseEnumerator::BaseEnumerator(const unsigned int & _value) :
-    value(_value)
+BaseEnumerator::BaseEnumerator(const unsigned int &_value) : value(_value)
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-BaseEnumerator::BaseEnumerator(const BaseEnumerator & other) :
-    value(other.value)
+BaseEnumerator::BaseEnumerator(const BaseEnumerator &other) : value(other.value)
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 BaseEnumerator::~BaseEnumerator()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 std::string BaseEnumerator::toString() const
 {
-    std::stringstream ss;
-    ss << value;
-    return ss.str();
+	std::stringstream ss;
+	ss << value;
+	return ss.str();
 }
 
-std::ostream & operator<<(std::ostream & os, const BaseEnumerator & enumerator)
+std::ostream &operator<<(std::ostream &os, const BaseEnumerator &enumerator)
 {
-    os << enumerator.toString();
-    return os;
+	os << enumerator.toString();
+	return os;
 }

@@ -26,22 +26,20 @@
 #include "itemModel.hpp"
 
 /// @brief Model of resources.
-class ResourceModel :
-    public ItemModel
-{
+class ResourceModel : public ItemModel {
 public:
-    /// Type of resource.
-    ResourceType resourceType;
+	/// Type of resource.
+	ResourceType resourceType;
 
-    ResourceModel();
+	ResourceModel();
 
-    virtual ~ResourceModel();
+	virtual ~ResourceModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

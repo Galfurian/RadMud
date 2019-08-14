@@ -26,107 +26,98 @@
 #include "itemVector.hpp"
 
 /// @brief Model of a currency.
-class CurrencyModel :
-    public ItemModel
-{
+class CurrencyModel : public ItemModel {
 private:
-    /// @brief Give a currency, this class is used to determine the value
-    ///         of the currency based on material and a pre-defined price.
-    class Price
-    {
-    public:
-        /// Material vnum.
-        unsigned int material;
-        /// The associated price.
-        unsigned int price;
+	/// @brief Give a currency, this class is used to determine the value
+	///         of the currency based on material and a pre-defined price.
+	class Price {
+	public:
+		/// Material vnum.
+		unsigned int material;
+		/// The associated price.
+		unsigned int price;
 
-        /// @brief Constructor.
-        Price() :
-            material(),
-            price()
-        {
-            // Nothing to do.
-        }
+		/// @brief Constructor.
+		Price() : material(), price()
+		{
+			// Nothing to do.
+		}
 
-        /// @brief Constructor.
-        /// @param _material The material.
-        /// @param _price    The price associated to the material.
-        Price(const unsigned int & _material, const unsigned int & _price) :
-            material(_material),
-            price(_price)
-        {
-            // Nothing to do.
-        }
+		/// @brief Constructor.
+		/// @param _material The material.
+		/// @param _price    The price associated to the material.
+		Price(const unsigned int &_material, const unsigned int &_price) :
+			material(_material),
+			price(_price)
+		{
+			// Nothing to do.
+		}
 
-        /// @brief Operator used to order the prices.
-        inline bool operator>(const Price & rhs) const
-        {
-            return price > rhs.price;
-        }
+		/// @brief Operator used to order the prices.
+		inline bool operator>(const Price &rhs) const
+		{
+			return price > rhs.price;
+		}
 
-        /// @brief Operator used to order the prices.
-        inline bool operator==(const Price & rhs) const
-        {
-            return price == rhs.price;
-        }
+		/// @brief Operator used to order the prices.
+		inline bool operator==(const Price &rhs) const
+		{
+			return price == rhs.price;
+		}
 
-        /// @brief Operator used to order the prices.
-        inline bool operator==(const unsigned int & _rhs) const
-        {
-            return material == _rhs;
-        }
-    };
+		/// @brief Operator used to order the prices.
+		inline bool operator==(const unsigned int &_rhs) const
+		{
+			return material == _rhs;
+		}
+	};
 
 public:
-    /// All the prices defined for this currency.
-    std::vector<Price> prices;
+	/// All the prices defined for this currency.
+	std::vector<Price> prices;
 
-    CurrencyModel();
+	CurrencyModel();
 
-    virtual ~CurrencyModel();
+	virtual ~CurrencyModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    Item * createItem(
-        std::string maker,
-        Material * composition,
-        bool isForMobile = false,
-        const ItemQuality & itemQuality = ItemQuality::Normal,
-        const unsigned int & quantity = 1) override;
+	Item *createItem(std::string maker, Material *composition,
+					 bool isForMobile = false,
+					 const ItemQuality &itemQuality = ItemQuality::Normal,
+					 const unsigned int &quantity = 1) override;
 
-    /// @brief Add an entry to the prices.
-    /// @param materialVnum The vnum of the material.
-    /// @param price        The price associated to the material.
-    /// @return <b>True</b> if the price has been added,<br>
-    ///         <b>False</b> otherwise.
-    bool addPrice(const unsigned int & materialVnum,
-                  const unsigned int & price);
+	/// @brief Add an entry to the prices.
+	/// @param materialVnum The vnum of the material.
+	/// @param price        The price associated to the material.
+	/// @return <b>True</b> if the price has been added,<br>
+	///         <b>False</b> otherwise.
+	bool addPrice(const unsigned int &materialVnum, const unsigned int &price);
 
-    /// @brief Given a specific material, this function returns the
-    ///         associated price.
-    /// @param materialVnum The vnum of the material.
-    /// @param price        Variable where the found price is saved.
-    /// @return <b>True</b> if the price has been found,<br>
-    ///         <b>False</b> otherwise.
-    bool findPrice(const unsigned int & materialVnum,
-                   unsigned int & price) const;
+	/// @brief Given a specific material, this function returns the
+	///         associated price.
+	/// @param materialVnum The vnum of the material.
+	/// @param price        Variable where the found price is saved.
+	/// @return <b>True</b> if the price has been found,<br>
+	///         <b>False</b> otherwise.
+	bool findPrice(const unsigned int &materialVnum, unsigned int &price) const;
 
-    /// @brief Generates an amount of currency with a worth equal to
-    ///         the variable value.
-    /// @details <b>This function starts and ends a SQLITE3 Transaction.</b>
-    /// @param maker Who has generated the currency.
-    /// @param value The total worth that has to be generate.
-    /// @return The list of generated currencies.
-    ItemVector generateCurrency(const std::string & maker,
-                                const unsigned int & value);
+	/// @brief Generates an amount of currency with a worth equal to
+	///         the variable value.
+	/// @details <b>This function starts and ends a SQLITE3 Transaction.</b>
+	/// @param maker Who has generated the currency.
+	/// @param value The total worth that has to be generate.
+	/// @return The list of generated currencies.
+	ItemVector generateCurrency(const std::string &maker,
+								const unsigned int &value);
 
 private:
-    /// @brief Sort the list of prices.
-    void sortList();
+	/// @brief Sort the list of prices.
+	void sortList();
 };

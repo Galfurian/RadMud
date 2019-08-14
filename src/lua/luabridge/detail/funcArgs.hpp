@@ -30,28 +30,22 @@
 
 namespace luabridge
 {
-
-template<typename List, int Start = 1>
-struct FuncArgs
-{
+template <typename List, int Start = 1> struct FuncArgs {
 };
 
-template<int Start>
-struct FuncArgs<None, Start>
-{
-    static void refs(LuaRef, TypeListValues<None>)
-    {
-    }
+template <int Start> struct FuncArgs<None, Start> {
+	static void refs(LuaRef, TypeListValues<None>)
+	{
+	}
 };
 
-template<typename Head, typename Tail, int Start>
-struct FuncArgs<TypeList<Head, Tail>, Start>
-{
-    static void refs(LuaRef l, TypeListValues<TypeList<Head, Tail> > tvl)
-    {
-        l[Start + 1] = tvl.hd;
-        FuncArgs<Tail, Start + 1>::refs(l, tvl.tl);
-    }
+template <typename Head, typename Tail, int Start>
+struct FuncArgs<TypeList<Head, Tail>, Start> {
+	static void refs(LuaRef l, TypeListValues<TypeList<Head, Tail> > tvl)
+	{
+		l[Start + 1] = tvl.hd;
+		FuncArgs<Tail, Start + 1>::refs(l, tvl.tl);
+	}
 };
 
-}
+} // namespace luabridge

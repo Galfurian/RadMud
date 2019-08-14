@@ -23,47 +23,48 @@
 
 std::string Knowledge::toString() const
 {
-    if (value == Knowledge::GatherHerbs)
-        return "GatherHerbs";
-    if (value == Knowledge::GatherPlant)
-        return "GatherPlant";
-    if (value == Knowledge::Butchery)
-        return "Butchery";
-    if (value == Knowledge::SkinAnimal)
-        return "SkinAnimal";
-    if (value == Knowledge::TanHide)
-        return "TanHide";
-    if (value == Knowledge::ReadBook)
-        return "ReadBook";
-    if (value == Knowledge::Climb)
-        return "Climb";
-    if (value == Knowledge::Run)
-        return "Run";
-    if (value == Knowledge::Dash)
-        return "Dash";
-    if (value == Knowledge::Woodcutting)
-        return "Woodcutting";
-    if (value == Knowledge::Carpentry)
-        return "Carpentry";
-    if (value == Knowledge::Woodcarving)
-        return "Woodcarving";
-    if (value == Knowledge::Mining)
-        return "Mining";
-    if (value == Knowledge::Smelting)
-        return "Smelting";
-    if (value == Knowledge::Blacksmithing)
-        return "Blacksmithing";
-    if (value == Knowledge::MetalWeaponCrafting)
-        return "MetalWeaponCrafting";
-    if (value == Knowledge::MetalArmorCrafting)
-        return "MetalArmorCrafting";
-    if (value == Knowledge::CraftSurvivalTool)
-        return "CraftSurvivalTool";
-    if (value == Knowledge::Cooking)
-        return "Cooking";
-    if (value == Knowledge::Scavenge)
-        return "Scavenge";
-    if (value == Knowledge::BasicArmorProficiency)
-        return "BasicArmorProficiency";
-    else return "None";
+	if (value == Knowledge::GatherHerbs)
+		return "GatherHerbs";
+	if (value == Knowledge::GatherPlant)
+		return "GatherPlant";
+	if (value == Knowledge::Butchery)
+		return "Butchery";
+	if (value == Knowledge::SkinAnimal)
+		return "SkinAnimal";
+	if (value == Knowledge::TanHide)
+		return "TanHide";
+	if (value == Knowledge::ReadBook)
+		return "ReadBook";
+	if (value == Knowledge::Climb)
+		return "Climb";
+	if (value == Knowledge::Run)
+		return "Run";
+	if (value == Knowledge::Dash)
+		return "Dash";
+	if (value == Knowledge::Woodcutting)
+		return "Woodcutting";
+	if (value == Knowledge::Carpentry)
+		return "Carpentry";
+	if (value == Knowledge::Woodcarving)
+		return "Woodcarving";
+	if (value == Knowledge::Mining)
+		return "Mining";
+	if (value == Knowledge::Smelting)
+		return "Smelting";
+	if (value == Knowledge::Blacksmithing)
+		return "Blacksmithing";
+	if (value == Knowledge::MetalWeaponCrafting)
+		return "MetalWeaponCrafting";
+	if (value == Knowledge::MetalArmorCrafting)
+		return "MetalArmorCrafting";
+	if (value == Knowledge::CraftSurvivalTool)
+		return "CraftSurvivalTool";
+	if (value == Knowledge::Cooking)
+		return "Cooking";
+	if (value == Knowledge::Scavenge)
+		return "Scavenge";
+	if (value == Knowledge::BasicArmorProficiency)
+		return "BasicArmorProficiency";
+	else
+		return "None";
 }

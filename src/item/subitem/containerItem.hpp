@@ -24,21 +24,19 @@
 #include "item.hpp"
 
 /// @brief Holds details about armors.
-class ContainerItem :
-    public Item
-{
+class ContainerItem : public Item {
 public:
-    ContainerItem();
+	ContainerItem();
 
-    virtual ~ContainerItem();
+	virtual ~ContainerItem();
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    bool isAContainer() const override;
+	bool isAContainer() const override;
 
-    bool isEmpty() const override;
+	bool isEmpty() const override;
 
-    double getTotalSpace() const override;
+	double getTotalSpace() const override;
 
-    std::string lookContent() override;
+	std::string lookContent() override;
 };

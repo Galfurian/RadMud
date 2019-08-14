@@ -49,100 +49,95 @@ class Production;
 
 class ItemModel;
 
-template<typename WeaponItemType>
-std::vector<WeaponItemType *> GetActiveWeapons(Character * character)
+template <typename WeaponItemType>
+std::vector<WeaponItemType *> GetActiveWeapons(Character *character)
 {
-    std::vector<WeaponItemType *> weapons;
-    for (auto item : character->equipment)
-    {
-        // Cast the item to the desired type of weapon.
-        auto wpn(dynamic_cast<WeaponItemType *>(item));
-        if (wpn == nullptr) continue;
-        // If at least one of the occupied body parts can be used to wield
-        // a weapon, consider it an active weapon.
-        for (auto const & bodyPart : item->occupiedBodyParts)
-        {
-            // Skip bodyparts which cannot wield.
-            if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) continue;
-            // Store the item and break the loop otherwise the weapon would be
-            // added for each occupied body part.
-            weapons.emplace_back(wpn);
-            break;
-        }
-    }
-    return weapons;
+	std::vector<WeaponItemType *> weapons;
+	for (auto item : character->equipment) {
+		// Cast the item to the desired type of weapon.
+		auto wpn(dynamic_cast<WeaponItemType *>(item));
+		if (wpn == nullptr)
+			continue;
+		// If at least one of the occupied body parts can be used to wield
+		// a weapon, consider it an active weapon.
+		for (auto const &bodyPart : item->occupiedBodyParts) {
+			// Skip bodyparts which cannot wield.
+			if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
+				continue;
+			// Store the item and break the loop otherwise the weapon would be
+			// added for each occupied body part.
+			weapons.emplace_back(wpn);
+			break;
+		}
+	}
+	return weapons;
 }
 
 /// @brief Provides the list of active natural weapons.
 /// @param character The target character.
 /// @return Vector of natural weapons.
-std::vector<std::shared_ptr<BodyPart::BodyWeapon>> GetActiveNaturalWeapons(
-    Character * character);
+std::vector<std::shared_ptr<BodyPart::BodyWeapon> >
+GetActiveNaturalWeapons(Character *character);
 
 /// @brief Search the coins inside the given container.
 /// @param character The target character.
 /// @return List of found coins.
-void FindCoinsInContainer(ItemVector const & container,
-                          ItemVector & foundCoins,
-                          bool iterative = false);
+void FindCoinsInContainer(ItemVector const &container, ItemVector &foundCoins,
+						  bool iterative = false);
 
 /// @brief Search the coins on the character.
 /// @param character The target character.
 /// @return List of found coins.
-ItemVector FindPosessedCoins(Character * character);
+ItemVector FindPosessedCoins(Character *character);
 
 /// @brief Structure used to determine the options of the search.
-struct SearchOptionsCharacter
-{
+struct SearchOptionsCharacter {
 public:
-    /// Allows the function to search inside the room.
-    bool searchInRoom;
-    /// Allows the function to search inside the character's inventory.
-    bool searchInInventory;
-    /// Allows the function to search inside the character's equipment.
-    bool searchInEquipment;
-    /// Checks if the lights is present.
-    bool checkLightLevels;
-    /// If there is no light it will pick a random item from inventory
-    /// and equipment.
-    bool randomIfNoLight;
+	/// Allows the function to search inside the room.
+	bool searchInRoom;
+	/// Allows the function to search inside the character's inventory.
+	bool searchInInventory;
+	/// Allows the function to search inside the character's equipment.
+	bool searchInEquipment;
+	/// Checks if the lights is present.
+	bool checkLightLevels;
+	/// If there is no light it will pick a random item from inventory
+	/// and equipment.
+	bool randomIfNoLight;
 
-    /// @brief Constructor.
-    explicit SearchOptionsCharacter(
-        bool _searchInRoom = false,
-        bool _searchInInventory = false,
-        bool _searchInEquipment = false,
-        bool _checkLightLevels = false,
-        bool _randomIfNoLight = false) :
-        searchInRoom(_searchInRoom),
-        searchInInventory(_searchInInventory),
-        searchInEquipment(_searchInEquipment),
-        checkLightLevels(_checkLightLevels),
-        randomIfNoLight(_randomIfNoLight)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	explicit SearchOptionsCharacter(bool _searchInRoom = false,
+									bool _searchInInventory = false,
+									bool _searchInEquipment = false,
+									bool _checkLightLevels = false,
+									bool _randomIfNoLight = false) :
+		searchInRoom(_searchInRoom),
+		searchInInventory(_searchInInventory),
+		searchInEquipment(_searchInEquipment),
+		checkLightLevels(_checkLightLevels),
+		randomIfNoLight(_randomIfNoLight)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Destructor.
-    ~SearchOptionsCharacter() = default;
+	/// @brief Destructor.
+	~SearchOptionsCharacter() = default;
 
-    static SearchOptionsCharacter allOptions()
-    {
-        SearchOptionsCharacter searchOptions;
-        searchOptions.searchInRoom = true;
-        searchOptions.searchInInventory = true;
-        searchOptions.searchInEquipment = true;
-        searchOptions.checkLightLevels = true;
-        searchOptions.randomIfNoLight = true;
-        return searchOptions;
-    }
+	static SearchOptionsCharacter allOptions()
+	{
+		SearchOptionsCharacter searchOptions;
+		searchOptions.searchInRoom = true;
+		searchOptions.searchInInventory = true;
+		searchOptions.searchInEquipment = true;
+		searchOptions.checkLightLevels = true;
+		searchOptions.randomIfNoLight = true;
+		return searchOptions;
+	}
 };
 
 /// @brief Search the given item name nearby the character.
-Item * FindNearbyItem(
-    Character * character,
-    std::string const & key, int & number,
-    const SearchOptionsCharacter & searchOptions);
+Item *FindNearbyItem(Character *character, std::string const &key, int &number,
+					 const SearchOptionsCharacter &searchOptions);
 
 /// @brief Search the list of ingredients nearby the character.
 /// @param character            The target character.
@@ -152,11 +147,10 @@ Item * FindNearbyItem(
 /// @return <b>True</b> if the operation goes well,<br>
 ///         <b>False</b> otherwise.
 bool FindNearbyResouces(
-    Character * character,
-    std::map<ResourceType, unsigned int> requiredResources,
-    std::vector<std::pair<Item *, unsigned int>> & foundResources,
-    const SearchOptionsCharacter & searchOptions,
-    ResourceType & missing);
+	Character *character,
+	std::map<ResourceType, unsigned int> requiredResources,
+	std::vector<std::pair<Item *, unsigned int> > &foundResources,
+	const SearchOptionsCharacter &searchOptions, ResourceType &missing);
 
 /// @brief Search the given type of tool in the proximity of the character.
 /// @param character        The target character.
@@ -164,11 +158,9 @@ bool FindNearbyResouces(
 /// @param exceptions       Items which cannot be selected.
 /// @param searchOptions    The search options.
 /// @return The searched tool.
-Item * FindNearbyTool(
-    Character * character,
-    const ToolType & toolType,
-    const ItemVector & exceptions,
-    const SearchOptionsCharacter & searchOptions);
+Item *FindNearbyTool(Character *character, const ToolType &toolType,
+					 const ItemVector &exceptions,
+					 const SearchOptionsCharacter &searchOptions);
 
 /// @brief Search the list of tools nearby the character.
 /// @param character        The target character.
@@ -177,11 +169,9 @@ Item * FindNearbyTool(
 /// @param searchOptions    The search options.
 /// @return <b>True</b> if the operation goes well,<br>
 ///         <b>False</b> otherwise.
-bool FindNearbyTools(
-    Character * character,
-    std::vector<ToolType> requiredTools,
-    ItemVector & foundTools,
-    const SearchOptionsCharacter & searchOptions);
+bool FindNearbyTools(Character *character, std::vector<ToolType> requiredTools,
+					 ItemVector &foundTools,
+					 const SearchOptionsCharacter &searchOptions);
 
 /// @brief Search the required building.
 /// @param character        The target character.
@@ -189,10 +179,9 @@ bool FindNearbyTools(
 /// @param searchOptions    The search options.
 /// @return <b>True</b> if the operation goes well,<br>
 ///         <b>False</b> otherwise.
-Item * FindNearbyBuilding(
-    Character * character,
-    std::shared_ptr<ItemModel> buildingModel,
-    const SearchOptionsCharacter & searchOptions);
+Item *FindNearbyBuilding(Character *character,
+						 std::shared_ptr<ItemModel> buildingModel,
+						 const SearchOptionsCharacter &searchOptions);
 
 /// @brief Move the character to another room.
 /// @param character   The target character.
@@ -202,12 +191,9 @@ Item * FindNearbyBuilding(
 /// @param msgChar     What to tell the character.
 /// @return <b>True</b> if the operation goes well,<br>
 ///         <b>False</b> otherwise.
-bool MoveCharacterTo(
-    Character * character,
-    Room * destination,
-    const std::string & msgDepart,
-    const std::string & msgArrive,
-    const std::string & msgChar = "");
+bool MoveCharacterTo(Character *character, Room *destination,
+					 const std::string &msgDepart, const std::string &msgArrive,
+					 const std::string &msgChar = "");
 
 /// @brief Checks if the character has the required knowledge for the
 ///         given production.
@@ -215,13 +201,13 @@ bool MoveCharacterTo(
 /// @param production   The production to check.
 /// @return <b>True</b> has the required knowledge,<br>
 ///         <b>False</b> otherwise.
-bool HasRequiredKnowledge(Character * character,
-                          std::vector<Knowledge> const & required);
+bool HasRequiredKnowledge(Character *character,
+						  std::vector<Knowledge> const &required);
 
 /// @brief Parse the abilities from the given string.
 /// @param abilities The map where the abilities should be stored.
 /// @param source    The string which containts the values
 /// @return <b>True</b> if the string is correct,<br>
 ///         <b>False</b> otherwise.
-bool ParseAbilities(std::map<Ability, unsigned int> & abilities,
-                    std::string const & source);
+bool ParseAbilities(std::map<Ability, unsigned int> &abilities,
+					std::string const &source);

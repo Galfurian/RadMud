@@ -28,33 +28,29 @@ class Item;
 class RangedWeaponItem;
 
 /// @brief Allows to scout the surrounding area.
-class ReloadAction :
-    public GeneralAction
-{
+class ReloadAction : public GeneralAction {
 private:
-    /// The weapon which has to be reloaded.
-    RangedWeaponItem * weapon;
-    /// The magazine used to load the weapon.
-    Item * magazine;
+	/// The weapon which has to be reloaded.
+	RangedWeaponItem *weapon;
+	/// The magazine used to load the weapon.
+	Item *magazine;
 
 public:
-    /// @brief Constructor.
-    ReloadAction(Character * _actor,
-                 RangedWeaponItem * _weapon,
-                 Item * _magazine);
+	/// @brief Constructor.
+	ReloadAction(Character *_actor, RangedWeaponItem *_weapon, Item *_magazine);
 
-    /// @brief Destructor.
-    virtual ~ReloadAction();
+	/// @brief Destructor.
+	virtual ~ReloadAction();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 };

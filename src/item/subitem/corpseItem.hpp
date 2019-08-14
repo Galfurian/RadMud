@@ -24,33 +24,31 @@
 #include "item.hpp"
 
 /// @brief Holds details about a corpse.
-class CorpseItem :
-    public Item
-{
+class CorpseItem : public Item {
 public:
-    /// Store the remaining body parts not yet processed.
-    std::vector<std::shared_ptr<BodyPart>> remainingBodyParts;
+	/// Store the remaining body parts not yet processed.
+	std::vector<std::shared_ptr<BodyPart> > remainingBodyParts;
 
-    /// @brief Constructor.
-    CorpseItem();
+	/// @brief Constructor.
+	CorpseItem();
 
-    virtual ~CorpseItem();
+	virtual ~CorpseItem();
 
-    void removeFromMud() override;
+	void removeFromMud() override;
 
-    bool updateOnDB() override;
+	bool updateOnDB() override;
 
-    bool removeOnDB() override;
+	bool removeOnDB() override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    std::string lookContent() override;
+	std::string lookContent() override;
 
-    bool isAContainer() const override;
+	bool isAContainer() const override;
 
-    /// @brief Provides the remaining body parts.
-    std::shared_ptr<BodyPart> getAvailableBodyPart();
+	/// @brief Provides the remaining body parts.
+	std::shared_ptr<BodyPart> getAvailableBodyPart();
 
-    /// @brief Removes the given body part from the pool.
-    bool removeBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
+	/// @brief Removes the given body part from the pool.
+	bool removeBodyPart(const std::shared_ptr<BodyPart> &bodyPart);
 };

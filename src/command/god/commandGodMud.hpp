@@ -29,27 +29,27 @@
 /// @{
 
 /// Shutdown the Mud.
-bool DoShutdown(Character * character, ArgumentHandler & args);
+bool DoShutdown(Character *character, ArgumentHandler &args);
 
 /// Save the Mud.
-bool DoMudSave(Character * character, ArgumentHandler & args);
+bool DoMudSave(Character *character, ArgumentHandler &args);
 
 /// Go to the desired room.
-bool DoGoTo(Character * character, ArgumentHandler & args);
+bool DoGoTo(Character *character, ArgumentHandler &args);
 
 /// Shows the information about a faction.
-bool DoFactionInfo(Character * character, ArgumentHandler & args);
+bool DoFactionInfo(Character *character, ArgumentHandler &args);
 
 /// List all the factions.
-bool DoFactionList(Character * character, ArgumentHandler & args);
+bool DoFactionList(Character *character, ArgumentHandler &args);
 
 /// Shows the information about a race.
-bool DoRaceInfo(Character * character, ArgumentHandler & args);
+bool DoRaceInfo(Character *character, ArgumentHandler &args);
 
 /// List all the races.
-bool DoRaceList(Character * character, ArgumentHandler & args);
+bool DoRaceList(Character *character, ArgumentHandler &args);
 
 /// List all the skills.
-bool DoSkillList(Character * character, ArgumentHandler & args);
+bool DoSkillList(Character *character, ArgumentHandler &args);
 
 ///@}

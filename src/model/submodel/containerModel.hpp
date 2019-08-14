@@ -25,39 +25,36 @@
 #include "itemModel.hpp"
 
 /// Used to determine the flag of the container.
-enum class ContainerFlag
-{
-    None = 0,       ///< No flag.
-    CanClose = 1,   ///< Can be closed.
-    CanBurgle = 2,  ///< Can be burgled.
-    CanSee = 4,     ///< Can see inside even if closed.
+enum class ContainerFlag {
+	None = 0, ///< No flag.
+	CanClose = 1, ///< Can be closed.
+	CanBurgle = 2, ///< Can be burgled.
+	CanSee = 4, ///< Can see inside even if closed.
 };
 
 /// @brief Model of a container of objects.
-class ContainerModel :
-    public ItemModel
-{
+class ContainerModel : public ItemModel {
 public:
-    /// The maximum weight which this container can carry.
-    double maxWeight;
-    /// The flags of the container.
-    unsigned int containerFlags;
-    /// The vnum of the key which opens this container.
-    unsigned int keyVnum;
-    /// The lockpicking difficulty.
-    unsigned int difficulty;
+	/// The maximum weight which this container can carry.
+	double maxWeight;
+	/// The flags of the container.
+	unsigned int containerFlags;
+	/// The vnum of the key which opens this container.
+	unsigned int keyVnum;
+	/// The lockpicking difficulty.
+	unsigned int difficulty;
 
-    ContainerModel();
+	ContainerModel();
 
-    virtual ~ContainerModel();
+	virtual ~ContainerModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };
 
 /// @addtogroup FlagsToList

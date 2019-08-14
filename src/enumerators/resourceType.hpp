@@ -1,5 +1,5 @@
 /// @file   resourceType.hpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   05/12/2016
 /// @copyright
@@ -25,55 +25,49 @@
 #include "baseEnumerator.hpp"
 
 /// Represents a type of resource.
-class ResourceType :
-    public BaseEnumerator
-{
+class ResourceType : public BaseEnumerator {
 public:
-    /// The possible type of resources.
-    enum Enum
-    {
-        None,
-        Coal,           ///< [1] COAL
-        Ore,            ///< [2] ORE
-        Bar,            ///< [3] BAR
-        Log,            ///< [4] LOG
-        Plank,          ///< [5] PLANK
-        Tree,           ///< [6] TREE
-        Fastener,       ///< [7] FASTENER
-        Leather,        ///< [8] LEATHER
-        Cloth,          ///< [9] CLOTH
-        StoneBlock,     ///< [10] STONE_BLOCK
-        MetalVein,      ///< [11] METAL_VEIN
-        StoneMonolith,  ///< [12] STONE_MONOLITH
-        Pen,            ///< [13] Pen
-        Trash,          ///< [14] Trash (Anything which has no specific use)
-        Meat,           ///< [15] MEAT
-        Bone,           ///< [16] BONE
-        Skull,          ///< [17] SKULL
-        Nail            ///< [18] NAIL
-    };
+	/// The possible type of resources.
+	enum Enum {
+		None,
+		Coal, ///< [1] COAL
+		Ore, ///< [2] ORE
+		Bar, ///< [3] BAR
+		Log, ///< [4] LOG
+		Plank, ///< [5] PLANK
+		Tree, ///< [6] TREE
+		Fastener, ///< [7] FASTENER
+		Leather, ///< [8] LEATHER
+		Cloth, ///< [9] CLOTH
+		StoneBlock, ///< [10] STONE_BLOCK
+		MetalVein, ///< [11] METAL_VEIN
+		StoneMonolith, ///< [12] STONE_MONOLITH
+		Pen, ///< [13] Pen
+		Trash, ///< [14] Trash (Anything which has no specific use)
+		Meat, ///< [15] MEAT
+		Bone, ///< [16] BONE
+		Skull, ///< [17] SKULL
+		Nail ///< [18] NAIL
+	};
 
-    /// @brief Constructor.
-    ResourceType() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	ResourceType() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit ResourceType(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit ResourceType(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    ResourceType(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	ResourceType(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the resource as string.
-    std::string toString() const override;
+	/// @brief Returns the resource as string.
+	std::string toString() const override;
 };

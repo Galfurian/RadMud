@@ -25,66 +25,64 @@
 #include "liquidType.hpp"
 
 /// Flags of a liquid.
-enum class LiquidFlags
-{
-    None,               ///< [0]   No flag.
-    Inflammable = 1,    ///< [1]   The liquid is inflammable.
-    AlcoholicBase = 2,  ///< [2]   The liquid can be used as base for mixtures.
-    DealDamage = 4      ///< [4]   The liquid deals damage over time.
-    ///< [8]
-    ///< [16]
-    ///< [32]
-    ///< [64]
-    ///< [128]
+enum class LiquidFlags {
+	None, ///< [0]   No flag.
+	Inflammable = 1, ///< [1]   The liquid is inflammable.
+	AlcoholicBase = 2, ///< [2]   The liquid can be used as base for mixtures.
+	DealDamage = 4 ///< [4]   The liquid deals damage over time.
+	///< [8]
+	///< [16]
+	///< [32]
+	///< [64]
+	///< [128]
 };
 
 /// @brief Holds details about a liquid.
-class Liquid
-{
+class Liquid {
 public:
-    /// Virtual number.
-    unsigned int vnum;
-    /// The type of liquid.
-    LiquidType type;
-    /// Liquid's name.
-    std::string name;
-    /// Short description of the liquid.
-    std::string description;
-    /// The liquid's flags.
-    unsigned int flags;
-    /// Liquid's value on market.
-    int worth;
-    /// How much the liquid is able to quench the thirst.
-    double quench;
+	/// Virtual number.
+	unsigned int vnum;
+	/// The type of liquid.
+	LiquidType type;
+	/// Liquid's name.
+	std::string name;
+	/// Short description of the liquid.
+	std::string description;
+	/// The liquid's flags.
+	unsigned int flags;
+	/// Liquid's value on market.
+	int worth;
+	/// How much the liquid is able to quench the thirst.
+	double quench;
 
-    /// @brief Constructor.
-    Liquid();
+	/// @brief Constructor.
+	Liquid();
 
-    /// @brief Disable Copy Construct.
-    Liquid(Liquid const &) = delete;
+	/// @brief Disable Copy Construct.
+	Liquid(Liquid const &) = delete;
 
-    /// @brief Disable Move construct.
-    Liquid(Liquid &&) = delete;
+	/// @brief Disable Move construct.
+	Liquid(Liquid &&) = delete;
 
-    /// @brief Disable Copy assign.
-    Liquid & operator=(Liquid const &) = delete;
+	/// @brief Disable Copy assign.
+	Liquid &operator=(Liquid const &) = delete;
 
-    /// @brief Disable Move assign.
-    Liquid & operator=(Liquid &&) = delete;
+	/// @brief Disable Move assign.
+	Liquid &operator=(Liquid &&) = delete;
 
-    /// @brief Destructor.
-    ~Liquid();
+	/// @brief Destructor.
+	~Liquid();
 
-    /// @brief Check the correctness of the liquid.
-    /// @return <b>True</b> if the liquid has correct values,<br>
-    ///         <b>False</b> otherwise.
-    bool check();
+	/// @brief Check the correctness of the liquid.
+	/// @return <b>True</b> if the liquid has correct values,<br>
+	///         <b>False</b> otherwise.
+	bool check();
 
-    /// @brief Return the name of the liquid.
-    /// @return The name of the liquid.
-    std::string getName();
+	/// @brief Return the name of the liquid.
+	/// @return The name of the liquid.
+	std::string getName();
 
-    /// @brief Return the name of the liquid with the first letter capitalized.
-    /// @return The name of the liquid.
-    std::string getNameCapital();
+	/// @brief Return the name of the liquid with the first letter capitalized.
+	/// @return The name of the liquid.
+	std::string getNameCapital();
 };

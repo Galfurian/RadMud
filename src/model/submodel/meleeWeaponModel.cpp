@@ -25,71 +25,71 @@
 #include "logger.hpp"
 
 MeleeWeaponModel::MeleeWeaponModel() :
-    meleeWeaponType(),
-    minDamage(),
-    maxDamage()
+	meleeWeaponType(),
+	minDamage(),
+	maxDamage()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 MeleeWeaponModel::~MeleeWeaponModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType MeleeWeaponModel::getType() const
 {
-    return ModelType::MeleeWeapon;
+	return ModelType::MeleeWeapon;
 }
 
 std::string MeleeWeaponModel::getTypeName() const
 {
-    return "Melee Weapon";
+	return "Melee Weapon";
 }
 
-bool MeleeWeaponModel::setModel(const std::string & source)
+bool MeleeWeaponModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 3)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Weapon Model (%s).",
-            this->name);
-        return false;
-    }
-    this->meleeWeaponType = static_cast<MeleeWeaponType>(ToNumber<unsigned int>(
-        functionList[0]));
-    this->minDamage = ToNumber<unsigned int>(functionList[1]);
-    this->maxDamage = ToNumber<unsigned int>(functionList[2]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 3) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Weapon Model (%s).",
+					this->name);
+		return false;
+	}
+	this->meleeWeaponType =
+		static_cast<MeleeWeaponType>(ToNumber<unsigned int>(functionList[0]));
+	this->minDamage = ToNumber<unsigned int>(functionList[1]);
+	this->maxDamage = ToNumber<unsigned int>(functionList[2]);
+	return true;
 }
 
-void MeleeWeaponModel::getSheet(Table & sheet) const
+void MeleeWeaponModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow(
-        {"Melee Weapon Type", GetMeleeWeaponTypeName(this->meleeWeaponType)});
-    sheet.addRow({"Minimum Damage", ToString(this->minDamage)});
-    sheet.addRow({"Maximum Damage", ToString(this->maxDamage)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow(
+		{ "Melee Weapon Type", GetMeleeWeaponTypeName(this->meleeWeaponType) });
+	sheet.addRow({ "Minimum Damage", ToString(this->minDamage) });
+	sheet.addRow({ "Maximum Damage", ToString(this->maxDamage) });
 }
 
 std::string GetMeleeWeaponTypeName(MeleeWeaponType type)
 {
-    if (type == MeleeWeaponType::Unarmed) return "Unarmed";
-    if (type == MeleeWeaponType::Bladed) return "Bladed";
-    if (type == MeleeWeaponType::Blunt) return "Blunt";
-    if (type == MeleeWeaponType::Placed) return "Placed";
-    return "No Weapon Type";
+	if (type == MeleeWeaponType::Unarmed)
+		return "Unarmed";
+	if (type == MeleeWeaponType::Bladed)
+		return "Bladed";
+	if (type == MeleeWeaponType::Blunt)
+		return "Blunt";
+	if (type == MeleeWeaponType::Placed)
+		return "Placed";
+	return "No Weapon Type";
 }

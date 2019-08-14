@@ -27,138 +27,117 @@
 
 CurrencyModel::CurrencyModel()
 {
-// Nothing to do.
+	// Nothing to do.
 }
 
 CurrencyModel::~CurrencyModel()
 {
-// Nothing to do.
+	// Nothing to do.
 }
 
 ModelType CurrencyModel::getType() const
 {
-    return ModelType::Currency;
+	return ModelType::Currency;
 }
 
 std::string CurrencyModel::getTypeName() const
 {
-    return "Currency";
+	return "Currency";
 }
 
-bool CurrencyModel::setModel(const std::string & source)
+bool CurrencyModel::setModel(const std::string &source)
 {
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 0)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Currency Model (%s).",
-            this->name);
-        return false;
-    }
-    return true;
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 0) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Currency Model (%s).",
+					this->name);
+		return false;
+	}
+	return true;
 }
 
-void CurrencyModel::getSheet(Table & sheet) const
+void CurrencyModel::getSheet(Table &sheet) const
 {
-// Call the function of the father class.
-    ItemModel::getSheet(sheet);
-// Add a divider.
-//sheet.addDivider();
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	//sheet.addDivider();
 }
 
-Item * CurrencyModel::createItem(
-    std::string maker,
-    Material * composition,
-    bool isForMobile,
-    const ItemQuality & itemQuality,
-    const unsigned int & quantity)
+Item *CurrencyModel::createItem(std::string maker, Material *composition,
+								bool isForMobile,
+								const ItemQuality &itemQuality,
+								const unsigned int &quantity)
 {
-    auto it = std::find(prices.begin(), prices.end(), composition->vnum);
-    if (it != prices.end())
-    {
-        return ItemModel::createItem(maker,
-                                     composition,
-                                     isForMobile,
-                                     itemQuality,
-                                     quantity);
-    }
-    else
-    {
-        Logger::log(LogLevel::Error, "Material is not allowed.");
-        return nullptr;
-    }
+	auto it = std::find(prices.begin(), prices.end(), composition->vnum);
+	if (it != prices.end()) {
+		return ItemModel::createItem(maker, composition, isForMobile,
+									 itemQuality, quantity);
+	} else {
+		Logger::log(LogLevel::Error, "Material is not allowed.");
+		return nullptr;
+	}
 }
 
-bool
-CurrencyModel::addPrice(const unsigned int & materialVnum,
-                        const unsigned int & price)
+bool CurrencyModel::addPrice(const unsigned int &materialVnum,
+							 const unsigned int &price)
 {
-    auto it = std::find(prices.begin(), prices.end(), materialVnum);
-    if (it == prices.end())
-    {
-        prices.emplace_back(Price(materialVnum, price));
-        this->sortList();
-        return true;
-    }
-    return false;
+	auto it = std::find(prices.begin(), prices.end(), materialVnum);
+	if (it == prices.end()) {
+		prices.emplace_back(Price(materialVnum, price));
+		this->sortList();
+		return true;
+	}
+	return false;
 }
 
-bool CurrencyModel::findPrice(const unsigned int & materialVnum,
-                              unsigned int & price) const
+bool CurrencyModel::findPrice(const unsigned int &materialVnum,
+							  unsigned int &price) const
 {
-    auto it = std::find(prices.begin(), prices.end(), materialVnum);
-    if (it != prices.end())
-    {
-        price = it->price;
-        return true;
-    }
-    return false;
+	auto it = std::find(prices.begin(), prices.end(), materialVnum);
+	if (it != prices.end()) {
+		price = it->price;
+		return true;
+	}
+	return false;
 }
 
-ItemVector CurrencyModel::generateCurrency(
-    const std::string & maker,
-    const unsigned int & value)
+ItemVector CurrencyModel::generateCurrency(const std::string &maker,
+										   const unsigned int &value)
 {
-    auto status = true;
-    auto currentValue = value;
-    ItemVector coins;
-    SQLiteDbms::instance().beginTransaction();
-    for (auto it : prices)
-    {
-        auto coinMaterial = Mud::instance().findMaterial(it.material);
-        auto coinQuantity = (currentValue / it.price);
-        if (coinQuantity == 0)
-        {
-            continue;
-        }
-        auto coin = this->createItem(maker, coinMaterial, false,
-                                     ItemQuality::Normal, coinQuantity);
-        if (coin != nullptr)
-        {
-            coins.emplace_back(coin);
-        }
-        else
-        {
-            status = false;
-            break;
-        }
-        currentValue -= it.price * coinQuantity;
-    }
-    if (!status)
-    {
-        for (auto generated : coins)
-        {
-            MudUpdater::instance().addItemToDestroy(generated);
-        }
-        coins.clear();
-        SQLiteDbms::instance().rollbackTransection();
-    }
-    SQLiteDbms::instance().endTransaction();
-    return coins;
+	auto status = true;
+	auto currentValue = value;
+	ItemVector coins;
+	SQLiteDbms::instance().beginTransaction();
+	for (auto it : prices) {
+		auto coinMaterial = Mud::instance().findMaterial(it.material);
+		auto coinQuantity = (currentValue / it.price);
+		if (coinQuantity == 0) {
+			continue;
+		}
+		auto coin = this->createItem(maker, coinMaterial, false,
+									 ItemQuality::Normal, coinQuantity);
+		if (coin != nullptr) {
+			coins.emplace_back(coin);
+		} else {
+			status = false;
+			break;
+		}
+		currentValue -= it.price * coinQuantity;
+	}
+	if (!status) {
+		for (auto generated : coins) {
+			MudUpdater::instance().addItemToDestroy(generated);
+		}
+		coins.clear();
+		SQLiteDbms::instance().rollbackTransection();
+	}
+	SQLiteDbms::instance().endTransaction();
+	return coins;
 }
 
 void CurrencyModel::sortList()
 {
-    std::sort(prices.begin(), prices.end(), std::greater<Price>());
+	std::sort(prices.begin(), prices.end(), std::greater<Price>());
 }

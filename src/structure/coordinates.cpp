@@ -24,75 +24,79 @@
 #include "direction.hpp"
 #include "utils.hpp"
 
-Coordinates::Coordinates() :
-    x(),
-    y(),
-    z()
+Coordinates::Coordinates() : x(), y(), z()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-Coordinates::Coordinates(const int & _x, const int & _y, const int & _z) :
-    x(_x),
-    y(_y),
-    z(_z)
+Coordinates::Coordinates(const int &_x, const int &_y, const int &_z) :
+	x(_x),
+	y(_y),
+	z(_z)
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-Coordinates::Coordinates(const double & _x,
-                         const double & _y,
-                         const double & _z) :
-    x(static_cast<int>(_x)),
-    y(static_cast<int>(_y)),
-    z(static_cast<int>(_z))
+Coordinates::Coordinates(const double &_x, const double &_y, const double &_z) :
+	x(static_cast<int>(_x)),
+	y(static_cast<int>(_y)),
+	z(static_cast<int>(_z))
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-bool Coordinates::operator==(const Coordinates & right) const
+bool Coordinates::operator==(const Coordinates &right) const
 {
-    if (x != right.x) return false;
-    if (y != right.y) return false;
-    return (z == right.z);
+	if (x != right.x)
+		return false;
+	if (y != right.y)
+		return false;
+	return (z == right.z);
 }
 
-bool Coordinates::operator!=(const Coordinates & right) const
+bool Coordinates::operator!=(const Coordinates &right) const
 {
-    if (x != right.x) return true;
-    if (y != right.y) return true;
-    return (z != right.z);
+	if (x != right.x)
+		return true;
+	if (y != right.y)
+		return true;
+	return (z != right.z);
 }
 
-bool Coordinates::operator<(const Coordinates & right) const
+bool Coordinates::operator<(const Coordinates &right) const
 {
-    if (x < right.x) return true;
-    if (x > right.x) return false;
-    if (y < right.y) return true;
-    if (y > right.y) return false;
-    if (z < right.z) return true;
-    if (z > right.z) return false;
-    return false;
+	if (x < right.x)
+		return true;
+	if (x > right.x)
+		return false;
+	if (y < right.y)
+		return true;
+	if (y > right.y)
+		return false;
+	if (z < right.z)
+		return true;
+	if (z > right.z)
+		return false;
+	return false;
 }
 
-Coordinates Coordinates::operator+(const Coordinates & right) const
+Coordinates Coordinates::operator+(const Coordinates &right) const
 {
-    return Coordinates(x + right.x, y + right.y, z + right.z);
+	return Coordinates(x + right.x, y + right.y, z + right.z);
 }
 
-Coordinates Coordinates::operator+(const Direction & right) const
+Coordinates Coordinates::operator+(const Direction &right) const
 {
-    return Coordinates(x, y, z) + right.getCoordinates();
+	return Coordinates(x, y, z) + right.getCoordinates();
 }
 
 int Coordinates::square() const
 {
-    return (x * x) + (y * y);
+	return (x * x) + (y * y);
 }
 
 std::string Coordinates::toString() const
 {
-    return "[X:" + ToString(x) + ";" +
-           " Y:" + ToString(y) + ";" +
-           " Z:" + ToString(z) + "]";
+	return "[X:" + ToString(x) + ";" + " Y:" + ToString(y) + ";" +
+		   " Z:" + ToString(z) + "]";
 }

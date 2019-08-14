@@ -30,54 +30,51 @@
 class Room;
 
 /// @brief An action executed by characters when fighting at close range.
-class Chase :
-    public CombatAction
-{
+class Chase : public CombatAction {
 private:
-    /// The chased target.
-    Character * target;
-    /// The room to which the path leads.
-    Room * lastRoom;
-    /// The path which leads to the target.
-    std::vector<Room *> path;
-    /// Checking function.
-    std::function<bool(Room *, Room *)> RoomCheckFunction;
+	/// The chased target.
+	Character *target;
+	/// The room to which the path leads.
+	Room *lastRoom;
+	/// The path which leads to the target.
+	std::vector<Room *> path;
+	/// Checking function.
+	std::function<bool(Room *, Room *)> RoomCheckFunction;
 
 public:
-    /// @brief Constructor.
-    /// @param _actor  The actor who is doing the action.
-    /// @param _target The target of the action.
-    Chase(Character * _actor, Character * _target);
+	/// @brief Constructor.
+	/// @param _actor  The actor who is doing the action.
+	/// @param _target The target of the action.
+	Chase(Character *_actor, Character *_target);
 
-    /// @brief Destructor.
-    virtual ~Chase();
+	/// @brief Destructor.
+	virtual ~Chase();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 
-    CombatActionType getCombatActionType() const override;
+	CombatActionType getCombatActionType() const override;
 
-    /// @brief Returns the stamina required to execute the action.
-    /// @param character The character.
-    /// @return The required stamina.
-    static unsigned int getConsumedStamina(Character * character);
+	/// @brief Returns the stamina required to execute the action.
+	/// @param character The character.
+	/// @return The required stamina.
+	static unsigned int getConsumedStamina(Character *character);
 
 private:
+	/// @brief Updates the path between the actor and the target.
+	/// @return If there is a valid path.
+	bool updatePath();
 
-    /// @brief Updates the path between the actor and the target.
-    /// @return If there is a valid path.
-    bool updatePath();
-
-    /// @brief Advance on the next tile towards the target.
-    /// @return If the move has been performed.
-    bool moveTowardsTarget();
+	/// @brief Advance on the next tile towards the target.
+	/// @return If the move has been performed.
+	bool moveTowardsTarget();
 };

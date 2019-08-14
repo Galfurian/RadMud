@@ -26,65 +26,61 @@
 
 ContainerItem::ContainerItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ContainerItem::~ContainerItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-void ContainerItem::getSheet(Table & sheet) const
+void ContainerItem::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    Item::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
+	// Call the function of the father class.
+	Item::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
 }
 
 bool ContainerItem::isAContainer() const
 {
-    return true;
+	return true;
 }
 
 bool ContainerItem::isEmpty() const
 {
-    return content.empty();
+	return content.empty();
 }
 
 double ContainerItem::getTotalSpace() const
 {
-    // The base space.
-    double spaceBase = model->to<ContainerModel>()->maxWeight;
-    // Evaluate the result.
-    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
+	// The base space.
+	double spaceBase = model->to<ContainerModel>()->maxWeight;
+	// Evaluate the result.
+	return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
 }
 
 std::string ContainerItem::lookContent()
 {
-    std::stringstream ss;
-    if (HasFlag(this->flags, ItemFlag::Closed))
-    {
-        ss << Formatter::italic("It is closed.\n\n");
-        if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough))
-        {
-            return ss.str();
-        }
-    }
-    if (content.empty())
-    {
-        ss << Formatter::italic("It's empty.\n\n");
-        return ss.str();
-    }
-    ss << "Looking inside you see:\n";
-    for (auto it : content)
-    {
-        ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
-        ss << it->getNameCapital() << "\n";
-    }
-    ss << "Has been used " << Formatter::yellow(ToString(getUsedSpace()));
-    ss << " out of " << Formatter::yellow(ToString(getTotalSpace())) << ' ';
-    ss << Mud::instance().getWeightMeasure() << ".\n";
-    return ss.str();
+	std::stringstream ss;
+	if (HasFlag(this->flags, ItemFlag::Closed)) {
+		ss << Formatter::italic("It is closed.\n\n");
+		if (!HasFlag(this->model->modelFlags, ModelFlag::CanSeeThrough)) {
+			return ss.str();
+		}
+	}
+	if (content.empty()) {
+		ss << Formatter::italic("It's empty.\n\n");
+		return ss.str();
+	}
+	ss << "Looking inside you see:\n";
+	for (auto it : content) {
+		ss << " [" << std::right << std::setw(3) << it->quantity << "] ";
+		ss << it->getNameCapital() << "\n";
+	}
+	ss << "Has been used " << Formatter::yellow(ToString(getUsedSpace()));
+	ss << " out of " << Formatter::yellow(ToString(getTotalSpace())) << ' ';
+	ss << Mud::instance().getWeightMeasure() << ".\n";
+	return ss.str();
 }

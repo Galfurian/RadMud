@@ -24,65 +24,61 @@
 
 #include "logger.hpp"
 
-FoodModel::FoodModel() :
-    nurishment(),
-    foodFlags()
+FoodModel::FoodModel() : nurishment(), foodFlags()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 FoodModel::~FoodModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType FoodModel::getType() const
 {
-    return ModelType::Food;
+	return ModelType::Food;
 }
 
 std::string FoodModel::getTypeName() const
 {
-    return "Food";
+	return "Food";
 }
 
-bool FoodModel::setModel(const std::string & source)
+bool FoodModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).",
-                    name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 2)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Food Model (%s).",
-                    name);
-        return false;
-    }
-    nurishment = ToNumber<unsigned int>(functionList[0]);
-    foodFlags = ToNumber<unsigned int>(functionList[1]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).", name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 2) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Food Model (%s).", name);
+		return false;
+	}
+	nurishment = ToNumber<unsigned int>(functionList[0]);
+	foodFlags = ToNumber<unsigned int>(functionList[1]);
+	return true;
 }
 
-void FoodModel::getSheet(Table & sheet) const
+void FoodModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Nurishment", ToString(nurishment)});
-    sheet.addRow({"Flags", GetFoodFlagString(foodFlags)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Nurishment", ToString(nurishment) });
+	sheet.addRow({ "Flags", GetFoodFlagString(foodFlags) });
 }
 
 std::string GetFoodFlagString(unsigned int flags)
 {
-    std::string flagList;
-    if (HasFlag(flags, FoodFlag::Poisoned)) flagList += "|Poisoned";
-    if (HasFlag(flags, FoodFlag::Raw)) flagList += "|Raw";
-    flagList += "|";
-    return flagList;
+	std::string flagList;
+	if (HasFlag(flags, FoodFlag::Poisoned))
+		flagList += "|Poisoned";
+	if (HasFlag(flags, FoodFlag::Raw))
+		flagList += "|Raw";
+	flagList += "|";
+	return flagList;
 }

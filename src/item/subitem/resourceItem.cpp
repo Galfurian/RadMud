@@ -1,5 +1,5 @@
 /// @file   resourceItem.cpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   12/12/2016
 /// @copyright
@@ -24,10 +24,10 @@
 
 ResourceItem::ResourceItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ResourceItem::~ResourceItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }

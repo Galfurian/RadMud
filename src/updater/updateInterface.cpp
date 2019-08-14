@@ -24,16 +24,15 @@
 
 UpdateInterface::~UpdateInterface()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 void UpdateInterface::updateTic()
 {
-    this->updateTicImpl();
+	this->updateTicImpl();
 }
 
 void UpdateInterface::updateHour()
 {
-    this->updateHourImpl();
+	this->updateHourImpl();
 }
-

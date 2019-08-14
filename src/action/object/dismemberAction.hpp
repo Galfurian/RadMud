@@ -27,35 +27,32 @@
 class CorpseItem;
 
 /// @brief An action which allows to dismember corpses.
-class DismemberAction :
-    public GeneralAction
-{
+class DismemberAction : public GeneralAction {
 private:
-    /// The corpse.
-    CorpseItem * corpse;
-    /// The body part that the actor is dismembering.
-    std::shared_ptr<BodyPart> bodyPart;
+	/// The corpse.
+	CorpseItem *corpse;
+	/// The body part that the actor is dismembering.
+	std::shared_ptr<BodyPart> bodyPart;
 
 public:
-    /// @brief Constructor.
-    DismemberAction(Character * _actor,
-                    CorpseItem * _corpse,
-                    const std::shared_ptr<BodyPart> & _bodyPart);
+	/// @brief Constructor.
+	DismemberAction(Character *_actor, CorpseItem *_corpse,
+					const std::shared_ptr<BodyPart> &_bodyPart);
 
-    /// @brief Destructor.
-    virtual ~DismemberAction();
+	/// @brief Destructor.
+	virtual ~DismemberAction();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
-
-    std::string stop() override;
+	std::string getDescription() const override;
 
 	bool start() override;
 
-    ActionStatus perform() override;
+	std::string stop() override;
 
-    unsigned int getCooldown() override;
+	ActionStatus perform() override;
+
+	unsigned int getCooldown() override;
 };

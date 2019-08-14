@@ -1,5 +1,5 @@
 /// @file   resourceItem.hpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   12/12/2016
 /// @copyright
@@ -25,12 +25,9 @@
 #include "item.hpp"
 
 /// @brief Holds details about lights.
-class ResourceItem :
-    public Item
-{
+class ResourceItem : public Item {
 public:
+	ResourceItem();
 
-    ResourceItem();
-
-    virtual ~ResourceItem();
+	virtual ~ResourceItem();
 };

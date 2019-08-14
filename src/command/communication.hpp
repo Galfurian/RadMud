@@ -33,21 +33,21 @@ void LoadCommunicationCommands();
 /// @{
 
 /// The character say something.
-bool DoSay(Character * character, ArgumentHandler & args);
+bool DoSay(Character *character, ArgumentHandler &args);
 
 /// The character whisper something to someone, even in distance.
-bool DoWhisper(Character * character, ArgumentHandler & args);
+bool DoWhisper(Character *character, ArgumentHandler &args);
 
 /// The character emote something.
-bool DoEmote(Character * character, ArgumentHandler & args);
+bool DoEmote(Character *character, ArgumentHandler &args);
 
 /// The character report a bug.
-bool DoBug(Character * character, ArgumentHandler & args);
+bool DoBug(Character *character, ArgumentHandler &args);
 
 /// The character send an idea.
-bool DoIdea(Character * character, ArgumentHandler & args);
+bool DoIdea(Character *character, ArgumentHandler &args);
 
 /// The character report a typo.
-bool DoTypo(Character * character, ArgumentHandler & args);
+bool DoTypo(Character *character, ArgumentHandler &args);
 
 ///@}

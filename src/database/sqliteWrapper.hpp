@@ -26,131 +26,127 @@
 #include <sqlite3.h>
 
 /// @brief Class necessary to execute query on the Database.
-class SQLiteWrapper :
-    public ResultSet
-{
+class SQLiteWrapper : public ResultSet {
 private:
-    /// @brief SQLite Connection Object.
-    using DBDetails = struct
-    {
-        /// SQLite connection object.
-        sqlite3 * dbConnection;
-        /// Database name.
-        std::string dbName;
-        /// Database file directory.
-        std::string dbDirectory;
-        /// Connection status to the database.
-        bool connected;
-        /// Location of the database.
-        bool dbIsInMemory;
-        /// SQLite statement object.
-        sqlite3_stmt * dbStatement;
-    };
+	/// @brief SQLite Connection Object.
+	using DBDetails = struct {
+		/// SQLite connection object.
+		sqlite3 *dbConnection;
+		/// Database name.
+		std::string dbName;
+		/// Database file directory.
+		std::string dbDirectory;
+		/// Connection status to the database.
+		bool connected;
+		/// Location of the database.
+		bool dbIsInMemory;
+		/// SQLite statement object.
+		sqlite3_stmt *dbStatement;
+	};
 
-    /// SQLite Connection Details.
-    DBDetails dbDetails;
+	/// SQLite Connection Details.
+	DBDetails dbDetails;
 
-    /// Last error message.
-    std::string errorMessage;
+	/// Last error message.
+	std::string errorMessage;
 
-    /// Last error code.
-    int errorCode;
+	/// Last error code.
+	int errorCode;
 
-    /// Number of column in the result set.
-    int num_col;
+	/// Number of column in the result set.
+	int num_col;
 
-    /// Current column.
-    int currentColumn;
+	/// Current column.
+	int currentColumn;
 
 public:
-    /// @brief Constructor.
-    SQLiteWrapper();
+	/// @brief Constructor.
+	SQLiteWrapper();
 
-    /// Deconstructor for the class SQLiteWrapper.
-    virtual ~SQLiteWrapper();
+	/// Deconstructor for the class SQLiteWrapper.
+	virtual ~SQLiteWrapper();
 
-    /// @brief Open database connection.
-    /// @param dbName       The name of the database.
-    /// @param dbDirectory  The directory where the database resides.
-    /// @param openInMemory The db is loaded from the file to the memory.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool openConnection(const std::string & dbName,
-                        const std::string & dbDirectory,
-                        const bool & openInMemory);
+	/// @brief Open database connection.
+	/// @param dbName       The name of the database.
+	/// @param dbDirectory  The directory where the database resides.
+	/// @param openInMemory The db is loaded from the file to the memory.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool openConnection(const std::string &dbName,
+						const std::string &dbDirectory,
+						const bool &openInMemory);
 
-    bool updateInMemoryDatabase();
+	bool updateInMemoryDatabase();
 
-    /// @brief Close database connection.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    bool closeConnection();
+	/// @brief Close database connection.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	bool closeConnection();
 
-    /// @brief Get the last error message.
-    /// @return The string of the last error message.
-    std::string getLastErrorMsg() const;
+	/// @brief Get the last error message.
+	/// @return The string of the last error message.
+	std::string getLastErrorMsg() const;
 
-    /// @brief Get the last error code.
-    /// @return The last error code.
-    int getLastErrorCode() const;
+	/// @brief Get the last error code.
+	/// @return The last error code.
+	int getLastErrorCode() const;
 
-    /// @brief This method is used to execute a SELECT Query.
-    /// @param query The query that has to be executed.
-    /// @return <b>True</b> if the operations succeeded,<br>
-    ///         <b>False</b> Otherwise.
-    ResultSet * executeSelect(const char * query);
+	/// @brief This method is used to execute a SELECT Query.
+	/// @param query The query that has to be executed.
+	/// @return <b>True</b> if the operations succeeded,<br>
+	///         <b>False</b> Otherwise.
+	ResultSet *executeSelect(const char *query);
 
-    /// @brief This method is used to execute a INSERT/DELETE/UPDATE Query.
-    /// @param query The query that has to be executed.
-    /// @return The number of affected data by the query.
-    int executeQuery(const char * query);
+	/// @brief This method is used to execute a INSERT/DELETE/UPDATE Query.
+	/// @param query The query that has to be executed.
+	/// @return The number of affected data by the query.
+	int executeQuery(const char *query);
 
-    /// @brief Begin a transaction.
-    void beginTransaction();
+	/// @brief Begin a transaction.
+	void beginTransaction();
 
-    /// @brief End a transaction.
-    void endTransaction();
+	/// @brief End a transaction.
+	void endTransaction();
 
-    /// @brief Rollback a Transaction.
-    void rollbackTransection();
+	/// @brief Rollback a Transaction.
+	void rollbackTransection();
 
-    /// @brief Check if the databse is connected
-    /// @return <b>True</b> if databse is connected,<br>
-    ///         <b>False</b> Otherwise.
-    bool isConnected();
+	/// @brief Check if the databse is connected
+	/// @return <b>True</b> if databse is connected,<br>
+	///         <b>False</b> Otherwise.
+	bool isConnected();
 
 private:
-    bool next() override;
+	bool next() override;
 
-    bool release() override;
+	bool release() override;
 
-    int getColumnCount() override;
+	int getColumnCount() override;
 
-    bool getColumnName(const int & column, std::string & columnName) override;
+	bool getColumnName(const int &column, std::string &columnName) override;
 
-    bool getDataString(const int & column, std::string & data) override;
+	bool getDataString(const int &column, std::string &data) override;
 
-    bool getDataInteger(const int & column, int & data) override;
+	bool getDataInteger(const int &column, int &data) override;
 
-    bool getDataUnsignedInteger(const int & column,
-                                unsigned int & data) override;
+	bool getDataUnsignedInteger(const int &column, unsigned int &data) override;
 
-    bool getDataDouble(const int & column, double & data) override;
+	bool getDataDouble(const int &column, double &data) override;
 
-    std::string getNextString() override;
+	std::string getNextString() override;
 
-    int getNextInteger() override;
+	int getNextInteger() override;
 
-    unsigned int getNextUnsignedInteger() override;
+	unsigned int getNextUnsignedInteger() override;
 
-    double getNextDouble() override;
+	double getNextDouble() override;
 
-    /// @brief Manages the database contents from disk to memory and
-    /// vice-versa.
-    /// For more deailts, see:
-    /// @param save <b>True</b> save the in-memory database to file,<br>
-    ///             <b>False</b> vice-versa.
-    /// @return If the operation is successful, SQLITE_OK is returned.
-    /// Otherwise, if an error occurs, an SQLite error code is returned.
-    int loadOrSaveDb(bool save);
+	/// @brief Manages the database contents from disk to memory and
+	/// vice-versa.
+	/// For more deailts, see:
+	/// @param save <b>True</b> save the in-memory database to file,<br>
+	///             <b>False</b> vice-versa.
+	/// @return If the operation is successful, SQLITE_OK is returned.
+	/// Otherwise, if an error occurs, an SQLite error code is returned.
+	int loadOrSaveDb(bool save);
 };

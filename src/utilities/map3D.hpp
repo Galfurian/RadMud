@@ -22,186 +22,172 @@
 #include <map>
 
 /// Used to create and manage a tridimensional map.
-template<typename T>
-class Map3D
-{
+template <typename T> class Map3D {
 private:
-    /// Define the type of internal 2D data structure.
-    using two_dim_map_t = typename
-    std::map<const int, std::map<const int, T> >;
+	/// Define the type of internal 2D data structure.
+	using two_dim_map_t = typename std::map<const int, std::map<const int, T> >;
 
-    /// Define the type of internal 3D data structure.
-    using three_dim_map_t = typename
-    std::map<const int, std::map<const int, std::map<const int, T> > >;
+	/// Define the type of internal 3D data structure.
+	using three_dim_map_t =
+		typename std::map<const int,
+						  std::map<const int, std::map<const int, T> > >;
 
-    /// Width of th map.
-    int width;
-    /// Height of th map.
-    int height;
-    /// Elevation of th map.
-    int elevation;
-    /// Data contained inside the map.
-    three_dim_map_t data;
+	/// Width of th map.
+	int width;
+	/// Height of th map.
+	int height;
+	/// Elevation of th map.
+	int elevation;
+	/// Data contained inside the map.
+	three_dim_map_t data;
 
 public:
-    /// @brief Constructor.
-    Map3D() :
-        width(),
-        height(),
-        elevation(),
-        data()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	Map3D() : width(), height(), elevation(), data()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor.
-    /// @param _width     The width of the 3D map.
-    /// @param _height    The height of the 3D map.
-    /// @param _elevation The elevation of the 3D map.
-    Map3D(int _width, int _height, int _elevation) :
-        width(_width),
-        height(_height),
-        elevation(_elevation),
-        data()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	/// @param _width     The width of the 3D map.
+	/// @param _height    The height of the 3D map.
+	/// @param _elevation The elevation of the 3D map.
+	Map3D(int _width, int _height, int _elevation) :
+		width(_width),
+		height(_height),
+		elevation(_elevation),
+		data()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor.
-    /// @param _width     The width of the 3D map.
-    /// @param _height    The height of the 3D map.
-    /// @param _elevation The elevation of the 3D map.
-    /// @param value     The initial value of the cells.
-    Map3D(int _width, int _height, int _elevation, T value) :
-        width(_width),
-        height(_height),
-        elevation(_elevation),
-        data()
-    {
-        for (int z = 0; z < width; ++z)
-        {
-            for (int y = 0; y < height; ++y)
-            {
-                for (int x = 0; x < height; ++x)
-                {
-                    data[x][y][z] = value;
-                }
-            }
-        }
-    }
+	/// @brief Constructor.
+	/// @param _width     The width of the 3D map.
+	/// @param _height    The height of the 3D map.
+	/// @param _elevation The elevation of the 3D map.
+	/// @param value     The initial value of the cells.
+	Map3D(int _width, int _height, int _elevation, T value) :
+		width(_width),
+		height(_height),
+		elevation(_elevation),
+		data()
+	{
+		for (int z = 0; z < width; ++z) {
+			for (int y = 0; y < height; ++y) {
+				for (int x = 0; x < height; ++x) {
+					data[x][y][z] = value;
+				}
+			}
+		}
+	}
 
-    /// Disable copy constructor.
-    Map3D(const Map3D<T> &) = delete;
+	/// Disable copy constructor.
+	Map3D(const Map3D<T> &) = delete;
 
-    /// Disable assignment.
-    Map3D & operator=(const Map3D<T> &) = delete;
+	/// Disable assignment.
+	Map3D &operator=(const Map3D<T> &) = delete;
 
-    /// @brief Destructor.
-    ~Map3D()
-    {
-        // Nothing to do.
-    }
+	/// @brief Destructor.
+	~Map3D()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Provides the width.
-    int getWidth() const
-    {
-        return width;
-    }
+	/// @brief Provides the width.
+	int getWidth() const
+	{
+		return width;
+	}
 
-    /// @brief Provides the height.
-    int getHeight() const
-    {
-        return height;
-    }
+	/// @brief Provides the height.
+	int getHeight() const
+	{
+		return height;
+	}
 
-    /// @brief Provides the elevation.
-    int getElevation() const
-    {
-        return elevation;
-    }
+	/// @brief Provides the elevation.
+	int getElevation() const
+	{
+		return elevation;
+	}
 
-    /// @brief Set the object at the given Coordinates3D.
-    /// @param x     Coordinate on width.
-    /// @param y     Coordinate on heigth.
-    /// @param z     Coordinate on altitude.
-    /// @param value The value that has to be set.
-    /// @return <b>True</b> if the value has been set,<br>
-    ///         <b>False</b> otherwise.
-    bool set(int x, int y, int z, T value)
-    {
-        if (this->has(x, y, z))
-        {
-            return false;
-        }
-        data[x][y][z] = value;
-        return true;
-    }
+	/// @brief Set the object at the given Coordinates3D.
+	/// @param x     Coordinate on width.
+	/// @param y     Coordinate on heigth.
+	/// @param z     Coordinate on altitude.
+	/// @param value The value that has to be set.
+	/// @return <b>True</b> if the value has been set,<br>
+	///         <b>False</b> otherwise.
+	bool set(int x, int y, int z, T value)
+	{
+		if (this->has(x, y, z)) {
+			return false;
+		}
+		data[x][y][z] = value;
+		return true;
+	}
 
-    /// @brief Retrieve the object at the given Coordinates3D.
-    /// @param x Coordinate on width.
-    /// @param y Coordinate on heigth.
-    /// @param z Coordinate on altitude.
-    /// @return The object at the given Coordinates3D.
-    T & get(int x, int y, int z)
-    {
-        return data[x][y][z];
-    }
+	/// @brief Retrieve the object at the given Coordinates3D.
+	/// @param x Coordinate on width.
+	/// @param y Coordinate on heigth.
+	/// @param z Coordinate on altitude.
+	/// @return The object at the given Coordinates3D.
+	T &get(int x, int y, int z)
+	{
+		return data[x][y][z];
+	}
 
-    /// @brief Checks if there is an object at the given Coordinates3D.
-    /// @param x Coordinate on width.
-    /// @param y Coordinate on heigth.
-    /// @param z Coordinate on altitude.
-    /// @return <b>True</b> if if there is an object at the given coordinates,<br>
-    ///         <b>False</b> otherwise.
-    bool has(int x, int y, int z) const
-    {
+	/// @brief Checks if there is an object at the given Coordinates3D.
+	/// @param x Coordinate on width.
+	/// @param y Coordinate on heigth.
+	/// @param z Coordinate on altitude.
+	/// @return <b>True</b> if if there is an object at the given coordinates,<br>
+	///         <b>False</b> otherwise.
+	bool has(int x, int y, int z) const
+	{
+		typename three_dim_map_t::const_iterator it = data.find(x);
+		if (it != data.end()) {
+			typename two_dim_map_t::const_iterator it2 = it->second.find(y);
+			if (it2 != it->second.end()) {
+				return (it2->second.find(z) != it2->second.end());
+			}
+		}
+		return false;
+	}
 
-        typename three_dim_map_t::const_iterator it = data.find(x);
-        if (it != data.end())
-        {
-            typename two_dim_map_t::const_iterator it2 = it->second.find(y);
-            if (it2 != it->second.end())
-            {
-                return (it2->second.find(z) != it2->second.end());
-            }
-        }
-        return false;
-    }
+	/// @brief Erase the object at the given Coordinates3D and returns an iterator to the.
+	/// @param x Coordinate on width axis.
+	/// @param y Coordinate on heigth axis.
+	/// @param z Coordinate on altitude axis.
+	/// @return <b>True</b> if if the object where removed,<br>
+	///         <b>False</b> otherwise.
+	bool erase(int x, int y, int z)
+	{
+		if (this->has(x, y, z)) {
+			data[x][y].erase(data[x][y].find(z));
+			return true;
+		}
+		return false;
+	}
 
-    /// @brief Erase the object at the given Coordinates3D and returns an iterator to the.
-    /// @param x Coordinate on width axis.
-    /// @param y Coordinate on heigth axis.
-    /// @param z Coordinate on altitude axis.
-    /// @return <b>True</b> if if the object where removed,<br>
-    ///         <b>False</b> otherwise.
-    bool erase(int x, int y, int z)
-    {
-        if (this->has(x, y, z))
-        {
-            data[x][y].erase(data[x][y].find(z));
-            return true;
-        }
-        return false;
-    }
+	/// @brief Provides an iterator to the begin of the list of data.
+	/// @return An iterator to the begin of the 3D map.
+	typename three_dim_map_t::iterator begin()
+	{
+		return data.begin();
+	}
 
-    /// @brief Provides an iterator to the begin of the list of data.
-    /// @return An iterator to the begin of the 3D map.
-    typename three_dim_map_t::iterator begin()
-    {
-        return data.begin();
-    }
+	/// @brief Provides an iterator to the end of the list of data.
+	/// @return An iterator to the end of the 3D map.
+	typename three_dim_map_t::iterator end()
+	{
+		return data.end();
+	}
 
-    /// @brief Provides an iterator to the end of the list of data.
-    /// @return An iterator to the end of the 3D map.
-    typename three_dim_map_t::iterator end()
-    {
-        return data.end();
-    }
-
-    /// @brief Provides the size of the data.
-    /// @return The size of the 3D map.
-    size_t size() const
-    {
-        return data.size();
-    }
+	/// @brief Provides the size of the data.
+	/// @return The size of the 3D map.
+	size_t size() const
+	{
+		return data.size();
+	}
 };

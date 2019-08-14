@@ -22,31 +22,28 @@
 #pragma once
 
 /// @brief A supporting node for all the pathfinding algorithms.
-template<typename T>
-class PathFinderNode
-{
+template <typename T> class PathFinderNode {
 private:
-    /// Wrapped element.
-    T element;
+	/// Wrapped element.
+	T element;
 
 public:
-    /// @brief Constructor.
-    PathFinderNode(T _element) :
-        element(_element)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	PathFinderNode(T _element) : element(_element)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Allows to set the wrapped element.
-    /// @param _element The element to set.
-    void setElement(T _element)
-    {
-        element = _element;
-    }
+	/// @brief Allows to set the wrapped element.
+	/// @param _element The element to set.
+	void setElement(T _element)
+	{
+		element = _element;
+	}
 
-    /// @brief Provides the wrapped element.
-    T getElement()
-    {
-        return element;
-    }
+	/// @brief Provides the wrapped element.
+	T getElement()
+	{
+		return element;
+	}
 };

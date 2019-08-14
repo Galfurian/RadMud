@@ -24,50 +24,48 @@
 #include "mobile.hpp"
 #include "mud.hpp"
 
-Mobile * MobileModel::spawn(Room * spawnRoom, unsigned int mobileVnum)
+Mobile *MobileModel::spawn(Room *spawnRoom, unsigned int mobileVnum)
 {
-    (void) spawnRoom;
-    (void) mobileVnum;
-    if (spawnRoom == nullptr) return nullptr;
-    if (mobileVnum == 0)
-    {
-        mobileVnum = Mud::instance().getMaxVnumMobile() + 1;
-    }
-    // Initialize the mobile.
-    auto mob = new Mobile(shared_from_this());
-    mob->vnum = mobileVnum;
-    mob->respawnRoom = spawnRoom;
-    mob->room = mob->respawnRoom;
-    mob->name = propnoun;
-    mob->keys = keys;
-    mob->shortdesc = shortdesc;
-    mob->staticdesc = staticdesc;
-    mob->description = description;
-    mob->race = race;
-    mob->faction = faction;
-    mob->gender = gender;
-    mob->weight = weight;
-    mob->actions = actions;
-    mob->flags = flags;
-    mob->level = level;
-    mob->abilities = abilities;
-    mob->lua_script = lua_script;
-    mob->setHealth(mob->getMaxHealth(), true);
-    mob->setStamina(mob->getMaxStamina(), true);
-    // Check the correctness.
-    if (!mob->check())
-    {
-        delete (mob);
-        Logger::log(LogLevel::Error, "Error during error checking on mob.");
-        return nullptr;
-    }
-    if (!Mud::instance().addMobile(mob))
-    {
-        delete (mob);
-        Logger::log(LogLevel::Error, "Error during mob insertion.");
-        return nullptr;
-    }
-    // Respawn the mob.
-    mob->respawn();
-    return mob;
+	(void)spawnRoom;
+	(void)mobileVnum;
+	if (spawnRoom == nullptr)
+		return nullptr;
+	if (mobileVnum == 0) {
+		mobileVnum = Mud::instance().getMaxVnumMobile() + 1;
+	}
+	// Initialize the mobile.
+	auto mob = new Mobile(shared_from_this());
+	mob->vnum = mobileVnum;
+	mob->respawnRoom = spawnRoom;
+	mob->room = mob->respawnRoom;
+	mob->name = propnoun;
+	mob->keys = keys;
+	mob->shortdesc = shortdesc;
+	mob->staticdesc = staticdesc;
+	mob->description = description;
+	mob->race = race;
+	mob->faction = faction;
+	mob->gender = gender;
+	mob->weight = weight;
+	mob->actions = actions;
+	mob->flags = flags;
+	mob->level = level;
+	mob->abilities = abilities;
+	mob->lua_script = lua_script;
+	mob->setHealth(mob->getMaxHealth(), true);
+	mob->setStamina(mob->getMaxStamina(), true);
+	// Check the correctness.
+	if (!mob->check()) {
+		delete (mob);
+		Logger::log(LogLevel::Error, "Error during error checking on mob.");
+		return nullptr;
+	}
+	if (!Mud::instance().addMobile(mob)) {
+		delete (mob);
+		Logger::log(LogLevel::Error, "Error during mob insertion.");
+		return nullptr;
+	}
+	// Respawn the mob.
+	mob->respawn();
+	return mob;
 }

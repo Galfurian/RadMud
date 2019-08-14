@@ -26,9 +26,8 @@
 /// @return Error code.
 int main()
 {
-    if (Mud::instance().runMud())
-    {
-        return 0;
-    }
-    return 1;
+	if (Mud::instance().runMud()) {
+		return 0;
+	}
+	return 1;
 }

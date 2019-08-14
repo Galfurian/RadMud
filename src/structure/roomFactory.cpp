@@ -23,14 +23,14 @@
 #include "terrainFactory.hpp"
 #include "mud.hpp"
 
-Room * RoomFactory::createRoomAir()
+Room *RoomFactory::createRoomAir()
 {
-    // Create an empty Room.
-    auto airRoom = new Room();
-    // Initialize the Room.
-    airRoom->terrain = TerrainFactory::getAir();
-    airRoom->name = "Air";
-    airRoom->description = "You are floating in the air";
-    SetFlag(airRoom->flags, RoomFlag::Air);
-    return airRoom;
+	// Create an empty Room.
+	auto airRoom = new Room();
+	// Initialize the Room.
+	airRoom->terrain = TerrainFactory::getAir();
+	airRoom->name = "Air";
+	airRoom->description = "You are floating in the air";
+	SetFlag(airRoom->flags, RoomFlag::Air);
+	return airRoom;
 }

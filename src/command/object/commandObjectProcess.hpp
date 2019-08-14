@@ -24,4 +24,4 @@
 #include "commandObject.hpp"
 
 /// Allows to dismember a corpse.
-bool DoDismember(Character * character, ArgumentHandler & args);
+bool DoDismember(Character *character, ArgumentHandler &args);

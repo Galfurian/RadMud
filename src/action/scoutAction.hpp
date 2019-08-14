@@ -25,31 +25,28 @@
 #include "generalAction.hpp"
 
 /// @brief Allows to scout the surrounding area.
-class ScoutAction :
-    public GeneralAction
-{
-
+class ScoutAction : public GeneralAction {
 public:
-    /// @brief Constructor.
-    ScoutAction(Character * _actor);
+	/// @brief Constructor.
+	ScoutAction(Character *_actor);
 
-    /// @brief Destructor.
-    virtual ~ScoutAction();
+	/// @brief Destructor.
+	virtual ~ScoutAction();
 
-    bool check(std::string & error) const override;
+	bool check(std::string &error) const override;
 
-    ActionType getType() const override;
+	ActionType getType() const override;
 
-    std::string getDescription() const override;
+	std::string getDescription() const override;
 
-    std::string stop() override;
+	std::string stop() override;
 
-    ActionStatus perform() override;
+	ActionStatus perform() override;
 
-    unsigned int getCooldown() override;
+	unsigned int getCooldown() override;
 
-    /// @brief Returns the stamina required to execute the action.
-    /// @param character The actor.
-    /// @return The required stamina.
-    static unsigned int getConsumedStamina(Character * character);
+	/// @brief Returns the stamina required to execute the action.
+	/// @param character The actor.
+	/// @return The required stamina.
+	static unsigned int getConsumedStamina(Character *character);
 };

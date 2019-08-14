@@ -25,90 +25,86 @@
 #include "mobile.hpp"
 
 /// @brief Holds details about shops.
-class ShopItem :
-    public Item
-{
+class ShopItem : public Item {
 private:
-    struct default_stock_t
-    {
-        std::shared_ptr<ItemModel> model;
-        Material * material;
-        ItemQuality quality;
-        unsigned int quantity;
-    };
+	struct default_stock_t {
+		std::shared_ptr<ItemModel> model;
+		Material *material;
+		ItemQuality quality;
+		unsigned int quantity;
+	};
 
 public:
-    /// The name of the shop.
-    std::string shopName;
-    /// The tax applied to each good which is bought.
-    unsigned int shopBuyTax;
-    /// The tax applied to each good which is sold.
-    unsigned int shopSellTax;
-    /// The shop balance.
-    unsigned int balance;
-    /// The mobile which is managing the shop.
-    Mobile * shopKeeper;
-    /// The opening hour.
-    unsigned int openingHour;
-    /// The closing hour.
-    unsigned int closingHour;
-    /// The list of default stocks.
-    std::vector<default_stock_t> defaultStock;
+	/// The name of the shop.
+	std::string shopName;
+	/// The tax applied to each good which is bought.
+	unsigned int shopBuyTax;
+	/// The tax applied to each good which is sold.
+	unsigned int shopSellTax;
+	/// The shop balance.
+	unsigned int balance;
+	/// The mobile which is managing the shop.
+	Mobile *shopKeeper;
+	/// The opening hour.
+	unsigned int openingHour;
+	/// The closing hour.
+	unsigned int closingHour;
+	/// The list of default stocks.
+	std::vector<default_stock_t> defaultStock;
 
-    /// @brief Constructor.
-    ShopItem();
+	/// @brief Constructor.
+	ShopItem();
 
-    virtual ~ShopItem();
+	virtual ~ShopItem();
 
-    bool updateOnDB() override;
+	bool updateOnDB() override;
 
-    bool removeOnDB() override;
+	bool removeOnDB() override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    bool canDeconstruct(std::string & error) const override;
+	bool canDeconstruct(std::string &error) const override;
 
-    std::string lookContent() override;
+	std::string lookContent() override;
 
-    bool isAContainer() const override;
+	bool isAContainer() const override;
 
-    double getTotalSpace() const override;
+	double getTotalSpace() const override;
 
-    inline void addDefaultStock(
-        std::shared_ptr<ItemModel> const & _model,
-        Material * _material,
-        ItemQuality const & _quality,
-        unsigned int const & _quantity)
-    {
-        default_stock_t new_default_stock;
-        new_default_stock.model = _model;
-        new_default_stock.material = _material;
-        new_default_stock.quality = _quality;
-        new_default_stock.quantity = _quantity;
-        defaultStock.emplace_back(new_default_stock);
-    }
+	inline void addDefaultStock(std::shared_ptr<ItemModel> const &_model,
+								Material *_material,
+								ItemQuality const &_quality,
+								unsigned int const &_quantity)
+	{
+		default_stock_t new_default_stock;
+		new_default_stock.model = _model;
+		new_default_stock.material = _material;
+		new_default_stock.quality = _quality;
+		new_default_stock.quantity = _quantity;
+		defaultStock.emplace_back(new_default_stock);
+	}
 
-    /// @brief Allows to set the new shop keeper.
-    /// @param _shopKeeper The new shop keeper.
-    void setNewShopKeeper(Mobile * _shopKeeper);
+	/// @brief Allows to set the new shop keeper.
+	/// @param _shopKeeper The new shop keeper.
+	void setNewShopKeeper(Mobile *_shopKeeper);
 
-    /// @brief Provides the balance of the shop.
-    unsigned int getBalance() const;
+	/// @brief Provides the balance of the shop.
+	unsigned int getBalance() const;
 
-    /// Check if the shop can be used.
-    /// @param error In case it cannot be used, the reason is stored
-    ///               in this variable.
-    /// @return <b>True</b> if it can be used,<br>
-    ///         <b>False</b> otherwise.
-    bool canUse(std::string & error);
+	/// Check if the shop can be used.
+	/// @param error In case it cannot be used, the reason is stored
+	///               in this variable.
+	/// @return <b>True</b> if it can be used,<br>
+	///         <b>False</b> otherwise.
+	bool canUse(std::string &error);
 
-    /// @brief Applies the buy tax to the item's price.
-    /// @param item The item that has to be priced.
-    /// @return The buy price with applied the taxes.
-    unsigned int evaluateBuyPrice(Item * item);
+	/// @brief Applies the buy tax to the item's price.
+	/// @param item The item that has to be priced.
+	/// @return The buy price with applied the taxes.
+	unsigned int evaluateBuyPrice(Item *item);
 
-    /// @brief Applies the sell tax to the item's price.
-    /// @param item The item that has to be priced.
-    /// @return The sell price with applied the taxes.
-    unsigned int evaluateSellPrice(Item * item);
+	/// @brief Applies the sell tax to the item's price.
+	/// @param item The item that has to be priced.
+	/// @return The sell price with applied the taxes.
+	unsigned int evaluateSellPrice(Item *item);
 };

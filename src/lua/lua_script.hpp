@@ -60,28 +60,23 @@ void LuaStopScript();
 /// @param vnumMaterial The vnum of the material.
 /// @param qualityValue The initial quality of the item.
 /// @return The newly created item.
-Item * LuaLoadItem(Character * character,
-                   unsigned int vnumModel,
-                   unsigned int vnumMaterial,
-                   unsigned int qualityValue);
+Item *LuaLoadItem(Character *character, unsigned int vnumModel,
+				  unsigned int vnumMaterial, unsigned int qualityValue);
 
 /// @brief Provides the path from the character to the destination.
 /// @param character    The character which has to move.
 /// @param destination  The destination to reach.
 /// @return The path (as list of directions) to the destination.
-std::vector<Direction> LuaFindPath(
-    Character * character,
-    Room * destination);
+std::vector<Direction> LuaFindPath(Character *character, Room *destination);
 
 /// @brief Returns the list of rooms in sight.
-std::vector<Room *> LuaGetRoomsInSight(Character * character);
+std::vector<Room *> LuaGetRoomsInSight(Character *character);
 
 /// @brief Returns the list of characters in sight.
-std::vector<Character *> LuaGetCharactersInSight(Character * character);
+std::vector<Character *> LuaGetCharactersInSight(Character *character);
 
 /// @brief Returns the list of items in sight.
-std::vector<Item *> LuaGetItemsInSight(Character * character);
+std::vector<Item *> LuaGetItemsInSight(Character *character);
 
 /// @brief Register every mud element inside the Lua environment.
-void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile);
-
+void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile);

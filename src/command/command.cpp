@@ -33,65 +33,60 @@
 #include "movement.hpp"
 
 Command::Command() :
-    handler(),
-    name(),
-    arguments(),
-    help(),
-    gods(),
-    canUseInCombat(),
-    typedCompletely()
+	handler(),
+	name(),
+	arguments(),
+	help(),
+	gods(),
+	canUseInCombat(),
+	typedCompletely()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-Command::Command(const std::function<bool(Character * character,
-                                          ArgumentHandler & args)> & _handler,
-                 const std::string & _name,
-                 const std::string & _arguments,
-                 const std::string & _help,
-                 const bool & _gods,
-                 const bool & _canUseInCombat,
-                 const bool & _typedCompletely) :
-    handler(_handler),
-    name(_name),
-    arguments(_arguments),
-    help(_help),
-    gods(_gods),
-    canUseInCombat(_canUseInCombat),
-    typedCompletely(_typedCompletely)
+Command::Command(const std::function<bool(Character *character,
+										  ArgumentHandler &args)> &_handler,
+				 const std::string &_name, const std::string &_arguments,
+				 const std::string &_help, const bool &_gods,
+				 const bool &_canUseInCombat, const bool &_typedCompletely) :
+	handler(_handler),
+	name(_name),
+	arguments(_arguments),
+	help(_help),
+	gods(_gods),
+	canUseInCombat(_canUseInCombat),
+	typedCompletely(_typedCompletely)
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-bool Command::canUse(Character * character) const
+bool Command::canUse(Character *character) const
 {
-    return (gods && HasFlag(character->flags, CharacterFlag::IsGod)) || (!gods);
+	return (gods && HasFlag(character->flags, CharacterFlag::IsGod)) || (!gods);
 }
 
-void StopAction(Character * character)
+void StopAction(Character *character)
 {
-    if ((character->getAction() != ActionType::Wait))
-    {
-        if (character->getAction() != ActionType::Combat)
-        {
-            character->doCommand("stop");
-        }
-    }
+	if ((character->getAction() != ActionType::Wait)) {
+		if (character->getAction() != ActionType::Combat) {
+			character->doCommand("stop");
+		}
+	}
 }
 
 void LoadCommands()
 {
-    // Beware the order is important.
-    // Changing the order will not compromise the correct
-    //  execution of the Mud, but...
-    // If a player just types 'l' or 'lo' in order to 'look'
-    //  the first command which get hit is the 'load' command.
-    LoadMovementCommands();
-    LoadGeneralCommands();
-    LoadObjectCommands();
-    LoadCommunicationCommands();
-    LoadCraftingCommands();
-    LoadCombatCommands();
-    LoadManagerCommands();
-    LoadGodCommands();
+	// Beware the order is important.
+	// Changing the order will not compromise the correct
+	//  execution of the Mud, but...
+	// If a player just types 'l' or 'lo' in order to 'look'
+	//  the first command which get hit is the 'load' command.
+	LoadMovementCommands();
+	LoadGeneralCommands();
+	LoadObjectCommands();
+	LoadCommunicationCommands();
+	LoadCraftingCommands();
+	LoadCombatCommands();
+	LoadManagerCommands();
+	LoadGodCommands();
 }

@@ -25,45 +25,39 @@
 #include "baseEnumerator.hpp"
 
 /// The quality of an item.
-class ItemQuality :
-    public BaseEnumerator
-{
+class ItemQuality : public BaseEnumerator {
 public:
-    /// List of possible quality values.
-    enum Enum
-    {
-        None,       ///< No quality.
-        Disastrous, ///< Disastrous quality.
-        Poor,       ///< Poor quality.
-        Normal,     ///< Normal quality.
-        Fine,       ///< Fine quality.
-        Masterful   ///< Masterful quality.
-    };
+	/// List of possible quality values.
+	enum Enum {
+		None, ///< No quality.
+		Disastrous, ///< Disastrous quality.
+		Poor, ///< Poor quality.
+		Normal, ///< Normal quality.
+		Fine, ///< Fine quality.
+		Masterful ///< Masterful quality.
+	};
 
-    /// @brief Constructor.
-    ItemQuality() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	ItemQuality() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit ItemQuality(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit ItemQuality(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    ItemQuality(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	ItemQuality(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the quality as string.
-    std::string toString() const override;
+	/// @brief Returns the quality as string.
+	std::string toString() const override;
 
-    /// @brief Returns the quality modifier.
-    double getModifier() const;
+	/// @brief Returns the quality modifier.
+	double getModifier() const;
 };

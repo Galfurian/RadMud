@@ -25,65 +25,59 @@
 #include "baseEnumerator.hpp"
 
 /// @brief The list of character's abilities.
-class Ability :
-    public BaseEnumerator
-{
+class Ability : public BaseEnumerator {
 public:
-    /// The possible abilities.
-    enum Enum
-    {
-        None,
-        Strength,
-        Agility,
-        Perception,
-        Constitution,
-        Intelligence
-    };
+	/// The possible abilities.
+	enum Enum {
+		None,
+		Strength,
+		Agility,
+		Perception,
+		Constitution,
+		Intelligence
+	};
 
-    /// @brief Constructor.
-    Ability() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	Ability() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit Ability(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit Ability(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    Ability(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	Ability(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the ability as string.
-    std::string toString() const override;
+	/// @brief Returns the ability as string.
+	std::string toString() const override;
 
-    /// @brief Returns the abbreviation of the ability name.
-    std::string getAbbreviation() const;
+	/// @brief Returns the abbreviation of the ability name.
+	std::string getAbbreviation() const;
 
-    /// @brief Returns the description of the ability.
-    std::string getDescription() const;
+	/// @brief Returns the description of the ability.
+	std::string getDescription() const;
 
-    /// @brief Return the modifier of the given ability.
-    /// @param _value The total ability value.
-    /// @return The ability modifier.
-    static unsigned int getModifier(const unsigned int & _value);
+	/// @brief Return the modifier of the given ability.
+	/// @param _value The total ability value.
+	/// @return The ability modifier.
+	static unsigned int getModifier(const unsigned int &_value);
 
-    inline Ability &operator++()
-    {
-        ++value;
-        return (*this);
-    }
+	inline Ability &operator++()
+	{
+		++value;
+		return (*this);
+	}
 
-    inline Ability &operator--()
-    {
-        --value;
-        return (*this);
-    }
+	inline Ability &operator--()
+	{
+		--value;
+		return (*this);
+	}
 };

@@ -36,38 +36,35 @@ class Player;
 class Item;
 
 /// @brief Allows to save the given player inside the database.
-bool SavePlayer(Player * player);
+bool SavePlayer(Player *player);
 
 /// @brief Allows to save the skills of the given player inside the database.
-bool SavePlayerSkills(Player * player);
+bool SavePlayerSkills(Player *player);
 
 /// @brief Allows to save the lua variables of the given player inside the
 /// database.
-bool SavePlayerLuaVariables(Player * player);
+bool SavePlayerLuaVariables(Player *player);
 
 /// @brief Allows to save the items posessed by the given player inside the
 /// database.
-bool SaveItemPlayer(Player * player,
-                    Item * item,
-                    const unsigned int & bodyPartVnum);
+bool SaveItemPlayer(Player *player, Item *item,
+					const unsigned int &bodyPartVnum);
 
 /// @brief Allows to save the information concerning the given shop inside
 /// the database.
-bool SaveShopItem(ShopItem * item,
-                  const bool & transaction);
+bool SaveShopItem(ShopItem *item, const bool &transaction);
 
 /// @brief Allows to save the given item inside the database.
-bool SaveItem(Item * item,
-              const bool & transaction);
+bool SaveItem(Item *item, const bool &transaction);
 
 /// @brief Allows to save the given area inside the database.
-bool SaveArea(Area * area);
+bool SaveArea(Area *area);
 
 /// @brief Allows to save the given room inside the database.
-bool SaveRoom(Room * room);
+bool SaveRoom(Room *room);
 
 /// @brief Allows to save the given pair of room and area inside the database.
-bool SaveAreaList(Area * area, Room * room);
+bool SaveAreaList(Area *area, Room *room);
 
 /// @brief Allows to save the given exit inside the database.
-bool SaveRoomExit(const std::shared_ptr<Exit> & roomExit);
+bool SaveRoomExit(const std::shared_ptr<Exit> &roomExit);

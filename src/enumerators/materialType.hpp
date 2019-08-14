@@ -1,5 +1,5 @@
 /// @file   materialType.hpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   05/12/2016
 /// @copyright
@@ -25,49 +25,43 @@
 #include "baseEnumerator.hpp"
 
 /// Represents a type of material.
-class MaterialType :
-    public BaseEnumerator
-{
+class MaterialType : public BaseEnumerator {
 public:
-    /// The possible type of materials.
-    enum Enum
-    {
-        None,       ///< [0] No type.
-        Metal,      ///< [1] Metal
-        Stone,      ///< [2] Stone
-        Wood,       ///< [3] Wood
-        Skin,       ///< [4] Skin
-        Cloth,      ///< [5] Cloth
-        Vegetable,  ///< [6] Vegetable
-        Meat,       ///< [7] Meat
-        Glass,      ///< [8] Glass
-        Paper,      ///< [9] Paper
-        Coal,       ///< [10] Coal
-        Bone,       ///< [11] Bone
-        Cereal      ///< [12] Cereal
-    };
+	/// The possible type of materials.
+	enum Enum {
+		None, ///< [0] No type.
+		Metal, ///< [1] Metal
+		Stone, ///< [2] Stone
+		Wood, ///< [3] Wood
+		Skin, ///< [4] Skin
+		Cloth, ///< [5] Cloth
+		Vegetable, ///< [6] Vegetable
+		Meat, ///< [7] Meat
+		Glass, ///< [8] Glass
+		Paper, ///< [9] Paper
+		Coal, ///< [10] Coal
+		Bone, ///< [11] Bone
+		Cereal ///< [12] Cereal
+	};
 
-    /// @brief Constructor.
-    MaterialType() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	MaterialType() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit MaterialType(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit MaterialType(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    MaterialType(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	MaterialType(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the material as string.
-    std::string toString() const override;
+	/// @brief Returns the material as string.
+	std::string toString() const override;
 };

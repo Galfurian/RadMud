@@ -25,12 +25,10 @@
 #include "item.hpp"
 
 /// @brief Factory for items.
-class ItemFactory
-{
+class ItemFactory {
 public:
-    /// @brief Generates a new item based on the provided type.
-    /// @param type The type of the new item.
-    /// @return Return an istantiation of an item of the given type.
-    static Item * newItem(const ModelType & type);
-
+	/// @brief Generates a new item based on the provided type.
+	/// @param type The type of the new item.
+	/// @return Return an istantiation of an item of the given type.
+	static Item *newItem(const ModelType &type);
 };

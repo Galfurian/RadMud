@@ -25,62 +25,58 @@
 #include "logger.hpp"
 
 ProjectileModel::ProjectileModel() :
-    projectileType(),
-    damageBonus(),
-    rangeBonus()
+	projectileType(),
+	damageBonus(),
+	rangeBonus()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ProjectileModel::~ProjectileModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType ProjectileModel::getType() const
 {
-    return ModelType::Projectile;
+	return ModelType::Projectile;
 }
 
 std::string ProjectileModel::getTypeName() const
 {
-    return "Projectile";
+	return "Projectile";
 }
 
-bool ProjectileModel::setModel(const std::string & source)
+bool ProjectileModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 3)
-    {
-        Logger::log(
-            LogLevel::Error,
-            "Wrong number of parameters for Projectile Model (%s).",
-            this->name);
-        return false;
-    }
-    this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(
-        functionList[0]));
-    this->damageBonus = ToNumber<unsigned int>(functionList[1]);
-    this->rangeBonus = ToNumber<int>(functionList[2]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 3) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Projectile Model (%s).",
+					this->name);
+		return false;
+	}
+	this->projectileType =
+		static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
+	this->damageBonus = ToNumber<unsigned int>(functionList[1]);
+	this->rangeBonus = ToNumber<int>(functionList[2]);
+	return true;
 }
 
-void ProjectileModel::getSheet(Table & sheet) const
+void ProjectileModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow(
-        {"Projectile Type", GetRangedWeaponTypeName(this->projectileType)});
-    sheet.addRow({"Damage Bonus", ToString(this->damageBonus)});
-    sheet.addRow({"Range  Bonus", ToString(this->rangeBonus)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow(
+		{ "Projectile Type", GetRangedWeaponTypeName(this->projectileType) });
+	sheet.addRow({ "Damage Bonus", ToString(this->damageBonus) });
+	sheet.addRow({ "Range  Bonus", ToString(this->rangeBonus) });
 }

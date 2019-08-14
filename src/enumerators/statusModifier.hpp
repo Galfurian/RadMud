@@ -24,41 +24,35 @@
 #include "baseEnumerator.hpp"
 
 /// @brief The list of status modifiers.
-class StatusModifier :
-    public BaseEnumerator
-{
+class StatusModifier : public BaseEnumerator {
 public:
-    /// The possible status modifiers.
-    enum Enum
-    {
-        None,
-        Health,
-        HealthRegeneration,
-        Stamina,
-        StaminaRegeneration,
-    };
+	/// The possible status modifiers.
+	enum Enum {
+		None,
+		Health,
+		HealthRegeneration,
+		Stamina,
+		StaminaRegeneration,
+	};
 
-    /// @brief Constructor.
-    StatusModifier() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	StatusModifier() : BaseEnumerator()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from unsigned int.
-    explicit StatusModifier(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from unsigned int.
+	explicit StatusModifier(const unsigned int &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Constructor from enum.
-    StatusModifier(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor from enum.
+	StatusModifier(const Enum &_value) : BaseEnumerator(_value)
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Returns the enumerator as string.
-    std::string toString() const override;
+	/// @brief Returns the enumerator as string.
+	std::string toString() const override;
 };

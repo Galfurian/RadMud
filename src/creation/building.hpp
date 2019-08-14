@@ -37,42 +37,41 @@ class ResourceType;
 class Knowledge;
 
 /// @brief Holds details about a building.
-class Building
-{
+class Building {
 public:
-    /// The virtual number of the building.
-    unsigned int vnum;
-    /// The name of the building.
-    std::string name;
-    /// The difficulty of the building.
-    unsigned int difficulty;
-    /// The time required to perform the building.
-    unsigned int time;
-    /// A flag which indicates if the maker can be assisted by someone.
-    bool assisted;
-    /// The model that has to be built.
-    std::shared_ptr<ItemModel> buildingModel;
-    /// The list of needed type of tools.
-    std::vector<ToolType> tools;
-    /// The list of needed type of ingredients and their quantity.
-    std::map<ResourceType, unsigned int> ingredients;
-    /// The required knowledge levels for the given building.
-    std::vector<Knowledge> requiredKnowledge;
+	/// The virtual number of the building.
+	unsigned int vnum;
+	/// The name of the building.
+	std::string name;
+	/// The difficulty of the building.
+	unsigned int difficulty;
+	/// The time required to perform the building.
+	unsigned int time;
+	/// A flag which indicates if the maker can be assisted by someone.
+	bool assisted;
+	/// The model that has to be built.
+	std::shared_ptr<ItemModel> buildingModel;
+	/// The list of needed type of tools.
+	std::vector<ToolType> tools;
+	/// The list of needed type of ingredients and their quantity.
+	std::map<ResourceType, unsigned int> ingredients;
+	/// The required knowledge levels for the given building.
+	std::vector<Knowledge> requiredKnowledge;
 
-    /// @brief Constructor.
-    Building();
+	/// @brief Constructor.
+	Building();
 
-    /// @brief Copy Constructor.
-    Building(const Building & source);
+	/// @brief Copy Constructor.
+	Building(const Building &source);
 
-    /// @brief Destructor.
-    ~Building();
+	/// @brief Destructor.
+	~Building();
 
-    /// @brief Return the name of the building.
-    /// @return The name of the building.
-    std::string getName();
+	/// @brief Return the name of the building.
+	/// @return The name of the building.
+	std::string getName();
 
-    /// @brief Return the name with the first letter capitalized.
-    /// @return The name of the building capitalized.
-    std::string getNameCapital();
+	/// @brief Return the name with the first letter capitalized.
+	/// @return The name of the building capitalized.
+	std::string getNameCapital();
 };

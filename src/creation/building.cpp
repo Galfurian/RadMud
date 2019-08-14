@@ -28,30 +28,30 @@
 #include "logger.hpp"
 
 Building::Building() :
-    vnum(),
-    name(),
-    difficulty(),
-    time(),
-    assisted(),
-    buildingModel(),
-    tools(),
-    ingredients(),
-    requiredKnowledge()
+	vnum(),
+	name(),
+	difficulty(),
+	time(),
+	assisted(),
+	buildingModel(),
+	tools(),
+	ingredients(),
+	requiredKnowledge()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 Building::~Building()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 std::string Building::getName()
 {
-    return ToLower(name);
+	return ToLower(name);
 }
 
 std::string Building::getNameCapital()
 {
-    return name;
+	return name;
 }

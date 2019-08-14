@@ -24,54 +24,50 @@
 
 #include "mud.hpp"
 
-ShopModel::ShopModel() :
-    maxWeight()
+ShopModel::ShopModel() : maxWeight()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ShopModel::~ShopModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType ShopModel::getType() const
 {
-    return ModelType::Shop;
+	return ModelType::Shop;
 }
 
 std::string ShopModel::getTypeName() const
 {
-    return "Shop";
+	return "Shop";
 }
 
-bool ShopModel::setModel(const std::string & source)
+bool ShopModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error,
-                    "Function list is empty (%s).",
-                    this->name);
-        return false;
-    }
-    std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 1)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Shop Model (%s).",
-                    this->name);
-        return false;
-    }
-    this->maxWeight = ToNumber<unsigned int>(functionList[0]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+					this->name);
+		return false;
+	}
+	std::vector<std::string> functionList = SplitString(source, " ");
+	if (functionList.size() != 1) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Shop Model (%s).",
+					this->name);
+		return false;
+	}
+	this->maxWeight = ToNumber<unsigned int>(functionList[0]);
+	return true;
 }
 
-void ShopModel::getSheet(Table & sheet) const
+void ShopModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Max Weight", ToString(this->maxWeight)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Max Weight", ToString(this->maxWeight) });
 }

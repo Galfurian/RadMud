@@ -24,61 +24,55 @@
 
 #include "logger.hpp"
 
-LightModel::LightModel() :
-    fuelType(),
-    radius(),
-    maxWeight(),
-    lightSourceFlags()
+LightModel::LightModel() : fuelType(), radius(), maxWeight(), lightSourceFlags()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 LightModel::~LightModel()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ModelType LightModel::getType() const
 {
-    return ModelType::Light;
+	return ModelType::Light;
 }
 
 std::string LightModel::getTypeName() const
 {
-    return "Light";
+	return "Light";
 }
 
-bool LightModel::setModel(const std::string & source)
+bool LightModel::setModel(const std::string &source)
 {
-    if (source.empty())
-    {
-        Logger::log(LogLevel::Error, "Function list is empty (%s).", name);
-        return false;
-    }
-    auto functionList = SplitString(source, " ");
-    if (functionList.size() != 4)
-    {
-        Logger::log(LogLevel::Error,
-                    "Wrong number of parameters for Light Model (%s)[%s].",
-                    name, source);
-        return false;
-    }
-    fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));
-    radius = ToNumber<int>(functionList[1]);
-    maxWeight = ToNumber<double>(functionList[2]);
-    lightSourceFlags = ToNumber<unsigned int>(functionList[3]);
-    return true;
+	if (source.empty()) {
+		Logger::log(LogLevel::Error, "Function list is empty (%s).", name);
+		return false;
+	}
+	auto functionList = SplitString(source, " ");
+	if (functionList.size() != 4) {
+		Logger::log(LogLevel::Error,
+					"Wrong number of parameters for Light Model (%s)[%s].",
+					name, source);
+		return false;
+	}
+	fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));
+	radius = ToNumber<int>(functionList[1]);
+	maxWeight = ToNumber<double>(functionList[2]);
+	lightSourceFlags = ToNumber<unsigned int>(functionList[3]);
+	return true;
 }
 
-void LightModel::getSheet(Table & sheet) const
+void LightModel::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    ItemModel::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Fuel Type", fuelType.toString()});
-    sheet.addRow({"Radius", ToString(radius)});
-    sheet.addRow({"Max Weight", ToString(maxWeight)});
-    sheet.addRow({"Flags", ToString(lightSourceFlags)});
+	// Call the function of the father class.
+	ItemModel::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Fuel Type", fuelType.toString() });
+	sheet.addRow({ "Radius", ToString(radius) });
+	sheet.addRow({ "Max Weight", ToString(maxWeight) });
+	sheet.addRow({ "Flags", ToString(lightSourceFlags) });
 }

@@ -27,12 +27,12 @@
 /// @{
 
 /// Drink from a container of liquids.
-bool DoDrink(Character * character, ArgumentHandler & args);
+bool DoDrink(Character *character, ArgumentHandler &args);
 
 /// Fill a container of liquids from a source of liquid.
-bool DoFill(Character * character, ArgumentHandler & args);
+bool DoFill(Character *character, ArgumentHandler &args);
 
 /// Pour the container of liquids into another one or on the ground.
-bool DoPour(Character * character, ArgumentHandler & args);
+bool DoPour(Character *character, ArgumentHandler &args);
 
 ///@}

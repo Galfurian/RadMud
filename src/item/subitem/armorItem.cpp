@@ -24,40 +24,38 @@
 
 ArmorItem::ArmorItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 ArmorItem::~ArmorItem()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
-void ArmorItem::getSheet(Table & sheet) const
+void ArmorItem::getSheet(Table &sheet) const
 {
-    // Call the function of the father class.
-    Item::getSheet(sheet);
-    // Add a divider.
-    sheet.addDivider();
-    // Set the values.
-    sheet.addRow({"Armor Class", ToString(this->getArmorClass())});
+	// Call the function of the father class.
+	Item::getSheet(sheet);
+	// Add a divider.
+	sheet.addDivider();
+	// Set the values.
+	sheet.addRow({ "Armor Class", ToString(this->getArmorClass()) });
 }
 
 unsigned int ArmorItem::getArmorClass() const
 {
-    // Add the base armor class.
-    auto acBase = this->model->to<ArmorModel>()->armorClass;
-    // Evaluate the modifier due to item's quality.
-    auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
-    // Evaluate the modifier due to item's condition.
-    auto acCondition = static_cast<unsigned int>(acBase *
-                                                 this->getConditionModifier());
-    // Evaluate the modifier due to item's material.
-    unsigned int acMaterial = 0;
-    if (composition != nullptr)
-    {
-        acMaterial = static_cast<unsigned int>(
-            acBase * composition->hardness);
-    }
-    // The resulting armor class.
-    return ((acBase + acQuality + acCondition + acMaterial) / 4);
+	// Add the base armor class.
+	auto acBase = this->model->to<ArmorModel>()->armorClass;
+	// Evaluate the modifier due to item's quality.
+	auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
+	// Evaluate the modifier due to item's condition.
+	auto acCondition =
+		static_cast<unsigned int>(acBase * this->getConditionModifier());
+	// Evaluate the modifier due to item's material.
+	unsigned int acMaterial = 0;
+	if (composition != nullptr) {
+		acMaterial = static_cast<unsigned int>(acBase * composition->hardness);
+	}
+	// The resulting armor class.
+	return ((acBase + acQuality + acCondition + acMaterial) / 4);
 }

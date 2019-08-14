@@ -1,5 +1,5 @@
 /// @file   lightItem.hpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   05/12/2016
 /// @copyright
@@ -25,53 +25,50 @@
 #include "item.hpp"
 
 /// @brief Holds details about lights.
-class LightItem :
-    public Item
-{
+class LightItem : public Item {
 public:
-    /// Activity status.
-    bool active;
+	/// Activity status.
+	bool active;
 
-    LightItem();
+	LightItem();
 
-    virtual ~LightItem();
+	virtual ~LightItem();
 
-    std::string getName(bool colored = false) const override;
+	std::string getName(bool colored = false) const override;
 
-    std::string getNameCapital(bool colored = false) const override;
+	std::string getNameCapital(bool colored = false) const override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    std::string lookContent() override;
+	std::string lookContent() override;
 
-    double getTotalSpace() const override;
+	double getTotalSpace() const override;
 
-    /// @brief Checks if the light source is active.
-    bool isActive() const;
+	/// @brief Checks if the light source is active.
+	bool isActive() const;
 
-    /// @brief Determines if this can be refilled with the given item.
-    /// @param item  The item, probably the fuel.
-    /// @param error The error message in case it cannot be used as fuel.
-    /// @return If this can be refilled with item.
-    bool canRefillWith(Item * item, std::string & error) const;
+	/// @brief Determines if this can be refilled with the given item.
+	/// @param item  The item, probably the fuel.
+	/// @param error The error message in case it cannot be used as fuel.
+	/// @return If this can be refilled with item.
+	bool canRefillWith(Item *item, std::string &error) const;
 
-    /// @brief Provides the amount of the given item is required to fill this.
-    /// @param item   The item, probably the fuel.
-    /// @param amount The amount of required fuel.
-    /// @param error  The error message in case something goes wrong.
-    /// @return If the value amount has been set correctly.
-    bool getAmountToRefill(Item * item, unsigned int & amount,
-                           std::string & error) const;
+	/// @brief Provides the amount of the given item is required to fill this.
+	/// @param item   The item, probably the fuel.
+	/// @param amount The amount of required fuel.
+	/// @param error  The error message in case something goes wrong.
+	/// @return If the value amount has been set correctly.
+	bool getAmountToRefill(Item *item, unsigned int &amount,
+						   std::string &error) const;
 
-    /// @brief Provides the list already loaded fuel items.
-    ItemVector getAlreadyLoadedFuel() const;
+	/// @brief Provides the list already loaded fuel items.
+	ItemVector getAlreadyLoadedFuel() const;
 
-    /// @brief Provides the remaining TIC, IF the light is turned on.
-    double getAutonomy() const;
+	/// @brief Provides the remaining TIC, IF the light is turned on.
+	double getAutonomy() const;
 
 protected:
-    void updateTicImpl() override;
+	void updateTicImpl() override;
 
-    void updateHourImpl() override;
-
+	void updateHourImpl() override;
 };

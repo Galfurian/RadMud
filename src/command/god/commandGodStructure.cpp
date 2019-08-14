@@ -25,444 +25,378 @@
 #include "aStar.hpp"
 #include "mud.hpp"
 
-bool DoFindPath(Character * character, ArgumentHandler & args)
+bool DoFindPath(Character *character, ArgumentHandler &args)
 {
-    if (args.size() != 1)
-    {
-        character->sendMsg("You have to provide a room vnum.\n\n");
-        return false;
-    }
-    auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
-    auto room = character->room->area->getRoom(roomVnum);
-    if (room == nullptr)
-    {
-        character->sendMsg("The room %s doesn't exists.\n", roomVnum);
-        return false;
-    }
-    auto RoomCheckFunction = [&](Room * from, Room * to)
-    {
-        // Prepare the movement options.
-        MovementOptions options;
-        options.character = character;
-        // Prepare the error string.
-        std::string error;
-        return StructUtils::checkConnection(options, from, to, error);
-    };
-    AStar<Room *> aStar(RoomCheckFunction,
-                        StructUtils::getRoomDistance,
-                        StructUtils::roomsAreEqual,
-                        StructUtils::getNeighbours);
-    std::vector<Room *> path;
-    if (!aStar.findPath(character->room, room, path))
-    {
-        character->sendMsg("There is no path to that room.\n\n");
-        return false;
-    }
-    character->sendMsg("You have to go:\n");
-    Coordinates previous = character->room->coord;
-    for (auto node : path)
-    {
-        auto direction = StructUtils::getDirection(previous, node->coord);
-        previous = node->coord;
-        character->sendMsg("    %s\n", direction.toString());
-    }
-    character->sendMsg("\n");
-    return true;
+	if (args.size() != 1) {
+		character->sendMsg("You have to provide a room vnum.\n\n");
+		return false;
+	}
+	auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
+	auto room = character->room->area->getRoom(roomVnum);
+	if (room == nullptr) {
+		character->sendMsg("The room %s doesn't exists.\n", roomVnum);
+		return false;
+	}
+	auto RoomCheckFunction = [&](Room *from, Room *to) {
+		// Prepare the movement options.
+		MovementOptions options;
+		options.character = character;
+		// Prepare the error string.
+		std::string error;
+		return StructUtils::checkConnection(options, from, to, error);
+	};
+	AStar<Room *> aStar(RoomCheckFunction, StructUtils::getRoomDistance,
+						StructUtils::roomsAreEqual, StructUtils::getNeighbours);
+	std::vector<Room *> path;
+	if (!aStar.findPath(character->room, room, path)) {
+		character->sendMsg("There is no path to that room.\n\n");
+		return false;
+	}
+	character->sendMsg("You have to go:\n");
+	Coordinates previous = character->room->coord;
+	for (auto node : path) {
+		auto direction = StructUtils::getDirection(previous, node->coord);
+		previous = node->coord;
+		character->sendMsg("    %s\n", direction.toString());
+	}
+	character->sendMsg("\n");
+	return true;
 }
 
-bool DoRoomCreate(Character * character, ArgumentHandler & args)
+bool DoRoomCreate(Character *character, ArgumentHandler &args)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
+	// Stop any action the character is executing.
+	StopAction(character);
 
-    // Check the number of arguments.
-    if (args.size() != 1)
-    {
-        character->sendMsg("Usage: [direction]\n");
-        return false;
-    }
-    auto currentRoom = character->room;
-    auto currentArea = currentRoom->area;
-    if (currentArea == nullptr)
-    {
-        character->sendMsg("Your room's area has not been defined!\n");
-        return false;
-    }
-    // Check if it's a direction.
-    auto direction = Direction(args[0].getContent(), true);
-    if (direction == Direction::None)
-    {
-        character->sendMsg("You must insert a valid direction!\n");
-        return false;
-    }
-    // Get the coordinate modifier.
-    auto targetCoord = currentRoom->coord + direction.getCoordinates();
-    if (!currentArea->inBoundaries(targetCoord))
-    {
-        character->sendMsg("Its outside the boundaries.\n");
-        return false;
-    }
-    // Find the room.
-    auto targetRoom = currentArea->getRoom(targetCoord);
-    if (targetRoom)
-    {
-        character->sendMsg("There is already a room.\n");
-        return false;
-    }
-    if (!CreateRoom(targetCoord, currentRoom))
-    {
-        character->sendMsg("Sorry but you couldn't create the room.\n");
-        return false;
-    }
-    character->sendMsg("Room create (%s)\n", targetCoord.toString());
-    return true;
+	// Check the number of arguments.
+	if (args.size() != 1) {
+		character->sendMsg("Usage: [direction]\n");
+		return false;
+	}
+	auto currentRoom = character->room;
+	auto currentArea = currentRoom->area;
+	if (currentArea == nullptr) {
+		character->sendMsg("Your room's area has not been defined!\n");
+		return false;
+	}
+	// Check if it's a direction.
+	auto direction = Direction(args[0].getContent(), true);
+	if (direction == Direction::None) {
+		character->sendMsg("You must insert a valid direction!\n");
+		return false;
+	}
+	// Get the coordinate modifier.
+	auto targetCoord = currentRoom->coord + direction.getCoordinates();
+	if (!currentArea->inBoundaries(targetCoord)) {
+		character->sendMsg("Its outside the boundaries.\n");
+		return false;
+	}
+	// Find the room.
+	auto targetRoom = currentArea->getRoom(targetCoord);
+	if (targetRoom) {
+		character->sendMsg("There is already a room.\n");
+		return false;
+	}
+	if (!CreateRoom(targetCoord, currentRoom)) {
+		character->sendMsg("Sorry but you couldn't create the room.\n");
+		return false;
+	}
+	character->sendMsg("Room create (%s)\n", targetCoord.toString());
+	return true;
 }
 
-bool DoRoomDelete(Character * character, ArgumentHandler & args)
+bool DoRoomDelete(Character *character, ArgumentHandler &args)
 {
-    // Stop any action the character is executing.
-    StopAction(character);
-    // Check the number of arguments.
-    if (args.size() != 1)
-    {
-        character->sendMsg("Usage: [direction]\n");
-        return false;
-    }
-    auto currentArea = character->room->area;
-    if (currentArea == nullptr)
-    {
-        character->sendMsg("Your room's area has not been defined!\n");
-        return false;
-    }
-    // Check if it's a direction.
-    auto direction = Direction(args[0].getContent(), true);
-    if (direction == Direction::None)
-    {
-        character->sendMsg("You must insert a valid direction!\n");
-        return false;
-    }
-    // Get the coordinate modifier.
-    auto coord = character->room->coord + direction.getCoordinates();
-    if (!currentArea->inBoundaries(coord))
-    {
-        character->sendMsg("Outside the boundaries.\n");
-        return false;
-    }
-    // Find the room.
-    auto targetRoom = currentArea->getRoom(coord);
-    if (targetRoom == nullptr)
-    {
-        character->sendMsg("Sorry but in that direction there is no room.\n");
-        return false;
-    }
-    // Remove the room from the Database.
-    if (!targetRoom->removeOnDB())
-    {
-        character->sendMsg("You couldn't delete the selected room.\n");
-        character->sendMsg("There are items or characters in that room.\n");
-        return false;
-    }
-    // Remove the room from the list of rooms.
-    if (!Mud::instance().remRoom(targetRoom))
-    {
-        character->sendMsg("You cannot remove the room.\n");
-        return false;
-    }
-    // Delete completely the room.
-    delete (targetRoom);
-    character->sendMsg("You have destroyed the room at coordinates :\n");
-    character->sendMsg("%s\n", coord.toString());
-    return true;
+	// Stop any action the character is executing.
+	StopAction(character);
+	// Check the number of arguments.
+	if (args.size() != 1) {
+		character->sendMsg("Usage: [direction]\n");
+		return false;
+	}
+	auto currentArea = character->room->area;
+	if (currentArea == nullptr) {
+		character->sendMsg("Your room's area has not been defined!\n");
+		return false;
+	}
+	// Check if it's a direction.
+	auto direction = Direction(args[0].getContent(), true);
+	if (direction == Direction::None) {
+		character->sendMsg("You must insert a valid direction!\n");
+		return false;
+	}
+	// Get the coordinate modifier.
+	auto coord = character->room->coord + direction.getCoordinates();
+	if (!currentArea->inBoundaries(coord)) {
+		character->sendMsg("Outside the boundaries.\n");
+		return false;
+	}
+	// Find the room.
+	auto targetRoom = currentArea->getRoom(coord);
+	if (targetRoom == nullptr) {
+		character->sendMsg("Sorry but in that direction there is no room.\n");
+		return false;
+	}
+	// Remove the room from the Database.
+	if (!targetRoom->removeOnDB()) {
+		character->sendMsg("You couldn't delete the selected room.\n");
+		character->sendMsg("There are items or characters in that room.\n");
+		return false;
+	}
+	// Remove the room from the list of rooms.
+	if (!Mud::instance().remRoom(targetRoom)) {
+		character->sendMsg("You cannot remove the room.\n");
+		return false;
+	}
+	// Delete completely the room.
+	delete (targetRoom);
+	character->sendMsg("You have destroyed the room at coordinates :\n");
+	character->sendMsg("%s\n", coord.toString());
+	return true;
 }
 
-bool DoRoomEdit(Character * character, ArgumentHandler & args)
+bool DoRoomEdit(Character *character, ArgumentHandler &args)
 {
-    if (args.empty())
-    {
-        character->sendMsg("What do you want to edit?\n");
-        return false;
-    }
-    if (args[0].getContent() == "des")
-    {
-        auto input = args.substr(1);
-        if (input.empty())
-        {
-            character->sendMsg("You can't set an empty description.\n");
-            return false;
-        }
-        QueryList value = {std::make_pair("description", input)};
-        QueryList where = {
-            std::make_pair("vnum", ToString(character->room->vnum))};
-        if (!SQLiteDbms::instance().updateInto("Room", value, where))
-        {
-            character->sendMsg("Command gone wrong.\n");
-            return false;
-        }
-        character->room->description = input;
-        character->sendMsg("Room description modified.\n");
-        return true;
-    }
-    else if (args[0].getContent() == "nam")
-    {
-        auto input = args.substr(1);
-        if (input.empty())
-        {
-            character->sendMsg("You can't set an empty name.\n");
-            return false;
-        }
-        QueryList value = {std::make_pair("name", input)};
-        QueryList where = {
-            std::make_pair("vnum", ToString(character->room->vnum))};
-        if (!SQLiteDbms::instance().updateInto("Room", value, where))
-        {
-            character->sendMsg("Command gone wrong.\n");
-            return false;
-        }
-        character->room->name = input;
-        character->sendMsg("Room name modified.\n");
-        return true;
-    }
-    else if (args[0].getContent() == "sflag")
-    {
-        auto input = args.substr(1);
-        if (input.empty())
-        {
-            character->sendMsg("Wrong flag.\n");
-        }
-        else
-        {
-            if (input == "R")
-            {
-                SetFlag(character->room->flags, RoomFlag::Rent);
-                return true;
-            }
-            else if (input == "P")
-            {
-                SetFlag(character->room->flags, RoomFlag::Peaceful);
-                return true;
-            }
-            character->sendMsg("Not a valid flag.\n");
-        }
-    }
-    else if (args[0].getContent() == "cflag")
-    {
-        auto input = args.substr(1);
-        if (input.empty())
-        {
-            character->sendMsg("Wrong flag.\n");
-        }
-        else
-        {
-            if (input == "R")
-            {
-                ClearFlag(character->room->flags, RoomFlag::Rent);
-                return true;
-            }
-            else if (input == "P")
-            {
-                ClearFlag(character->room->flags, RoomFlag::Peaceful);
-                return true;
-            }
-            character->sendMsg("Not a valid flag.\n");
-        }
-    }
-    else
-    {
-        std::string msg;
-        msg += "Usage:                           \n";
-        msg += "|  Argument  |  Text            |\n";
-        msg += "| ---------- | ---------------- |\n";
-        msg += "|  nam       |  [name]          |\n";
-        msg += "|  ter       |  [terrain]       |\n";
-        msg += "|  des       |  [description]   |\n";
-        msg += "|  sflag     |  [Set Flag]      |\n";
-        msg += "|            |   R -> kRent     |\n";
-        msg += "|            |   P -> kPeaceful |\n";
-        msg += "|  cflag     |  [Clear Flag]    |\n";
-        msg += "|            |   R -> kRent     |\n";
-        msg += "|            |   P -> kPeaceful |\n";
-        msg += "| ---------- | ---------------- |\n";
-        character->sendMsg(msg);
-    }
-    return false;
+	if (args.empty()) {
+		character->sendMsg("What do you want to edit?\n");
+		return false;
+	}
+	if (args[0].getContent() == "des") {
+		auto input = args.substr(1);
+		if (input.empty()) {
+			character->sendMsg("You can't set an empty description.\n");
+			return false;
+		}
+		QueryList value = { std::make_pair("description", input) };
+		QueryList where = { std::make_pair("vnum",
+										   ToString(character->room->vnum)) };
+		if (!SQLiteDbms::instance().updateInto("Room", value, where)) {
+			character->sendMsg("Command gone wrong.\n");
+			return false;
+		}
+		character->room->description = input;
+		character->sendMsg("Room description modified.\n");
+		return true;
+	} else if (args[0].getContent() == "nam") {
+		auto input = args.substr(1);
+		if (input.empty()) {
+			character->sendMsg("You can't set an empty name.\n");
+			return false;
+		}
+		QueryList value = { std::make_pair("name", input) };
+		QueryList where = { std::make_pair("vnum",
+										   ToString(character->room->vnum)) };
+		if (!SQLiteDbms::instance().updateInto("Room", value, where)) {
+			character->sendMsg("Command gone wrong.\n");
+			return false;
+		}
+		character->room->name = input;
+		character->sendMsg("Room name modified.\n");
+		return true;
+	} else if (args[0].getContent() == "sflag") {
+		auto input = args.substr(1);
+		if (input.empty()) {
+			character->sendMsg("Wrong flag.\n");
+		} else {
+			if (input == "R") {
+				SetFlag(character->room->flags, RoomFlag::Rent);
+				return true;
+			} else if (input == "P") {
+				SetFlag(character->room->flags, RoomFlag::Peaceful);
+				return true;
+			}
+			character->sendMsg("Not a valid flag.\n");
+		}
+	} else if (args[0].getContent() == "cflag") {
+		auto input = args.substr(1);
+		if (input.empty()) {
+			character->sendMsg("Wrong flag.\n");
+		} else {
+			if (input == "R") {
+				ClearFlag(character->room->flags, RoomFlag::Rent);
+				return true;
+			} else if (input == "P") {
+				ClearFlag(character->room->flags, RoomFlag::Peaceful);
+				return true;
+			}
+			character->sendMsg("Not a valid flag.\n");
+		}
+	} else {
+		std::string msg;
+		msg += "Usage:                           \n";
+		msg += "|  Argument  |  Text            |\n";
+		msg += "| ---------- | ---------------- |\n";
+		msg += "|  nam       |  [name]          |\n";
+		msg += "|  ter       |  [terrain]       |\n";
+		msg += "|  des       |  [description]   |\n";
+		msg += "|  sflag     |  [Set Flag]      |\n";
+		msg += "|            |   R -> kRent     |\n";
+		msg += "|            |   P -> kPeaceful |\n";
+		msg += "|  cflag     |  [Clear Flag]    |\n";
+		msg += "|            |   R -> kRent     |\n";
+		msg += "|            |   P -> kPeaceful |\n";
+		msg += "| ---------- | ---------------- |\n";
+		character->sendMsg(msg);
+	}
+	return false;
 }
 
-bool DoRoomInfo(Character * character, ArgumentHandler & args)
+bool DoRoomInfo(Character *character, ArgumentHandler &args)
 {
-    Room * room;
-    if (args.empty())
-    {
-        room = character->room;
-    }
-    else if (args.size() == 1)
-    {
-        auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
-        room = Mud::instance().findRoom(roomVnum);
-        if (room == nullptr)
-        {
-            character->sendMsg("Can't find the desired room (%s).\n",
-                               roomVnum);
-            return false;
-        }
-    }
-    else
-    {
-        character->sendMsg("CanYu can only provide nothing or a room vnum.\n");
-        return false;
-    }
-    std::string msg;
-    msg += "Room Informations:\n";
-    msg += " Vnum        :" + ToString(room->vnum) + "\n";
-    msg += " Area        :";
-    msg += ((room->area) ? ToString(room->area->vnum) : "NULL") + "\n";
-    msg += " X           :" + ToString(room->coord.x) + "\n";
-    msg += " Y           :" + ToString(room->coord.y) + "\n";
-    msg += " Z           :" + ToString(room->coord.z) + "\n";
-    msg += " Name        :" + room->name + "\n";
-    msg += " Description :" + room->description + "\n";
-    msg += " Terrain     :" + room->terrain->name + "\n";
-    msg += " Flags       :" + GetRoomFlagString(room->flags) + "\n";
-    character->sendMsg(msg);
-    return true;
+	Room *room;
+	if (args.empty()) {
+		room = character->room;
+	} else if (args.size() == 1) {
+		auto roomVnum = ToNumber<unsigned int>(args[0].getContent());
+		room = Mud::instance().findRoom(roomVnum);
+		if (room == nullptr) {
+			character->sendMsg("Can't find the desired room (%s).\n", roomVnum);
+			return false;
+		}
+	} else {
+		character->sendMsg("CanYu can only provide nothing or a room vnum.\n");
+		return false;
+	}
+	std::string msg;
+	msg += "Room Informations:\n";
+	msg += " Vnum        :" + ToString(room->vnum) + "\n";
+	msg += " Area        :";
+	msg += ((room->area) ? ToString(room->area->vnum) : "NULL") + "\n";
+	msg += " X           :" + ToString(room->coord.x) + "\n";
+	msg += " Y           :" + ToString(room->coord.y) + "\n";
+	msg += " Z           :" + ToString(room->coord.z) + "\n";
+	msg += " Name        :" + room->name + "\n";
+	msg += " Description :" + room->description + "\n";
+	msg += " Terrain     :" + room->terrain->name + "\n";
+	msg += " Flags       :" + GetRoomFlagString(room->flags) + "\n";
+	character->sendMsg(msg);
+	return true;
 }
 
-bool DoRoomList(Character * character, ArgumentHandler & args)
+bool DoRoomList(Character *character, ArgumentHandler &args)
 {
-    Area * area = nullptr;
-    if (args.size() == 1)
-    {
-        auto areaVnum = ToNumber<unsigned int>(args[0].getOriginal());
-        area = Mud::instance().findArea(areaVnum);
-    }
-    if (area == nullptr)
-    {
-        character->sendMsg("You must provide the vnum of a valid area:\n");
-        for (auto it: Mud::instance().mudAreas)
-        {
-            character->sendMsg("[%s] %s.\n", it.first, it.second->name);
-        }
-        return false;
-    }
-    Table table;
-    table.addColumn("VNUM", align::center);
-    table.addColumn("AREA", align::left);
-    table.addColumn("COORD", align::center);
-    table.addColumn("TERRAIN", align::center);
-    table.addColumn("NAME", align::left);
-    for (auto iterator : Mud::instance().mudRooms)
-    {
-        Room * room = iterator.second;
-        if (room->area->vnum != area->vnum) continue;
-        if (HasFlag(room->flags, RoomFlag::Air)) continue;
-        // Prepare the row.
-        TableRow row;
-        row.emplace_back(ToString(room->vnum));
-        if (room->area != nullptr)
-        {
-            row.emplace_back(room->area->name);
-        }
-        else
-        {
-            row.emplace_back("None");
-        }
-        row.emplace_back(
-            ToString(room->coord.x) + ' ' + ToString(room->coord.y) + ' '
-            + ToString(room->coord.z));
-        row.emplace_back(room->terrain->name);
-        row.emplace_back(room->name);
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
+	Area *area = nullptr;
+	if (args.size() == 1) {
+		auto areaVnum = ToNumber<unsigned int>(args[0].getOriginal());
+		area = Mud::instance().findArea(areaVnum);
+	}
+	if (area == nullptr) {
+		character->sendMsg("You must provide the vnum of a valid area:\n");
+		for (auto it : Mud::instance().mudAreas) {
+			character->sendMsg("[%s] %s.\n", it.first, it.second->name);
+		}
+		return false;
+	}
+	Table table;
+	table.addColumn("VNUM", align::center);
+	table.addColumn("AREA", align::left);
+	table.addColumn("COORD", align::center);
+	table.addColumn("TERRAIN", align::center);
+	table.addColumn("NAME", align::left);
+	for (auto iterator : Mud::instance().mudRooms) {
+		Room *room = iterator.second;
+		if (room->area->vnum != area->vnum)
+			continue;
+		if (HasFlag(room->flags, RoomFlag::Air))
+			continue;
+		// Prepare the row.
+		TableRow row;
+		row.emplace_back(ToString(room->vnum));
+		if (room->area != nullptr) {
+			row.emplace_back(room->area->name);
+		} else {
+			row.emplace_back("None");
+		}
+		row.emplace_back(ToString(room->coord.x) + ' ' +
+						 ToString(room->coord.y) + ' ' +
+						 ToString(room->coord.z));
+		row.emplace_back(room->terrain->name);
+		row.emplace_back(room->name);
+		// Add the row to the table.
+		table.addRow(row);
+	}
+	character->sendMsg(table.getTable());
+	return true;
 }
 
-bool DoAreaInfo(Character * character, ArgumentHandler & args)
+bool DoAreaInfo(Character *character, ArgumentHandler &args)
 {
-    if (args.size() != 1)
-    {
-        character->sendMsg("You must instert an area vnum.\n");
-        return false;
-    }
-    auto areaVnum = ToNumber<unsigned int>(args[0].getContent());
-    auto area = Mud::instance().findArea(areaVnum);
-    if (area == nullptr)
-    {
-        character->sendMsg("The selected area does not exist.");
-        return false;
-    }
-    std::string msg;
-    msg += "Area Informations:\n";
-    msg += " Vnum      :" + ToString(area->vnum) + "\n";
-    msg += " Name      :" + area->name + "\n";
-    msg += " Builder   :" + area->builder + "\n";
-    msg += " Width     :" + ToString(area->width) + "\n";
-    msg += " Height    :" + ToString(area->height) + "\n";
-    msg += " Elevation :" + ToString(area->elevation) + "\n";
-    msg += " N. Rooms  :" + ToString(area->map.size()) + "\n";
-    character->sendMsg(msg);
-    return true;
+	if (args.size() != 1) {
+		character->sendMsg("You must instert an area vnum.\n");
+		return false;
+	}
+	auto areaVnum = ToNumber<unsigned int>(args[0].getContent());
+	auto area = Mud::instance().findArea(areaVnum);
+	if (area == nullptr) {
+		character->sendMsg("The selected area does not exist.");
+		return false;
+	}
+	std::string msg;
+	msg += "Area Informations:\n";
+	msg += " Vnum      :" + ToString(area->vnum) + "\n";
+	msg += " Name      :" + area->name + "\n";
+	msg += " Builder   :" + area->builder + "\n";
+	msg += " Width     :" + ToString(area->width) + "\n";
+	msg += " Height    :" + ToString(area->height) + "\n";
+	msg += " Elevation :" + ToString(area->elevation) + "\n";
+	msg += " N. Rooms  :" + ToString(area->map.size()) + "\n";
+	character->sendMsg(msg);
+	return true;
 }
 
-bool DoAreaList(Character * character, ArgumentHandler & /*args*/)
+bool DoAreaList(Character *character, ArgumentHandler & /*args*/)
 {
-    Table table;
-    table.addColumn("VNUM", align::center);
-    table.addColumn("NAME", align::left);
-    table.addColumn("BUILDER", align::left);
-    table.addColumn("ROOMS", align::center);
-    for (auto iterator : Mud::instance().mudAreas)
-    {
-        Area * area = iterator.second;
-        // Prepare the row.
-        TableRow row;
-        row.emplace_back(ToString(area->vnum));
-        row.emplace_back(area->name);
-        row.emplace_back(area->builder);
-        row.emplace_back(ToString(area->map.size()));
-        // Add the row to the table.
-        table.addRow(row);
-    }
-    character->sendMsg(table.getTable());
-    return true;
+	Table table;
+	table.addColumn("VNUM", align::center);
+	table.addColumn("NAME", align::left);
+	table.addColumn("BUILDER", align::left);
+	table.addColumn("ROOMS", align::center);
+	for (auto iterator : Mud::instance().mudAreas) {
+		Area *area = iterator.second;
+		// Prepare the row.
+		TableRow row;
+		row.emplace_back(ToString(area->vnum));
+		row.emplace_back(area->name);
+		row.emplace_back(area->builder);
+		row.emplace_back(ToString(area->map.size()));
+		// Add the row to the table.
+		table.addRow(row);
+	}
+	character->sendMsg(table.getTable());
+	return true;
 }
 
-bool DoAreaMap(Character * character, ArgumentHandler & args)
+bool DoAreaMap(Character *character, ArgumentHandler &args)
 {
-    if (character->room == nullptr) return false;
-    if (character->room->area == nullptr) return false;
-    auto area = character->room->area;
-    auto level = character->room->coord.z;
-    if (args.size() == 2)
-    {
-        auto areaVnum = ToNumber<unsigned int>(args[0].getContent());
-        area = Mud::instance().findArea(areaVnum);
-        if (area == nullptr)
-        {
-            character->sendMsg("The selected area does not exist.");
-            return false;
-        }
-        level = ToNumber<int>(args[1].getContent());
-    }
-    // Draw the fov.
-    Coordinates point = Coordinates(0, 0, level);
-    std::string result;
-    for (point.y = area->height - 1; point.y >= 0; --point.y)
-    {
-        for (point.x = 0; point.x < area->width; ++point.x)
-        {
-            auto room = area->getRoom(point);
-            if (room != nullptr)
-            {
-                result += area->getASCIICell(room);
-            }
-            else
-            {
-                result.push_back(' ');
-            }
-        }
-        result.push_back('\n');
-    }
-    character->sendMsg(result);
-    return true;
+	if (character->room == nullptr)
+		return false;
+	if (character->room->area == nullptr)
+		return false;
+	auto area = character->room->area;
+	auto level = character->room->coord.z;
+	if (args.size() == 2) {
+		auto areaVnum = ToNumber<unsigned int>(args[0].getContent());
+		area = Mud::instance().findArea(areaVnum);
+		if (area == nullptr) {
+			character->sendMsg("The selected area does not exist.");
+			return false;
+		}
+		level = ToNumber<int>(args[1].getContent());
+	}
+	// Draw the fov.
+	Coordinates point = Coordinates(0, 0, level);
+	std::string result;
+	for (point.y = area->height - 1; point.y >= 0; --point.y) {
+		for (point.x = 0; point.x < area->width; ++point.x) {
+			auto room = area->getRoom(point);
+			if (room != nullptr) {
+				result += area->getASCIICell(room);
+			} else {
+				result.push_back(' ');
+			}
+		}
+		result.push_back('\n');
+	}
+	character->sendMsg(result);
+	return true;
 }

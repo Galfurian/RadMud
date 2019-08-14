@@ -23,106 +23,94 @@
 #include "utils.hpp"
 #include "logger.hpp"
 
-ArgumentHandler::ArgumentHandler(const std::string & _original) :
-    original(_original),
-    arguments()
+ArgumentHandler::ArgumentHandler(const std::string &_original) :
+	original(_original),
+	arguments()
 {
-    // First, evaluate the arguments.
-    this->evaluateArguments();
+	// First, evaluate the arguments.
+	this->evaluateArguments();
 }
 
-ArgumentHandler::ArgumentHandler(std::istream & _original) :
-    original(),
-    arguments()
+ArgumentHandler::ArgumentHandler(std::istream &_original) :
+	original(),
+	arguments()
 {
-    // First, get the content.
-    std::getline(_original, original);
-    // First, evaluate the arguments.
-    this->evaluateArguments();
+	// First, get the content.
+	std::getline(_original, original);
+	// First, evaluate the arguments.
+	this->evaluateArguments();
 }
 
 ArgumentHandler::~ArgumentHandler()
 {
-    // Nothing to do.
+	// Nothing to do.
 }
 
 void ArgumentHandler::evaluateArguments()
 {
-    auto words = GetWords(original);
-    for (auto it : words)
-    {
-        arguments.emplace_back(Argument(it));
-    }
+	auto words = GetWords(original);
+	for (auto it : words) {
+		arguments.emplace_back(Argument(it));
+	}
 }
 
 std::string ArgumentHandler::getOriginal()
 {
-    return original;
+	return original;
 }
 
 size_t ArgumentHandler::size() const
 {
-    return arguments.size();
+	return arguments.size();
 }
 
 bool ArgumentHandler::empty() const
 {
-    return arguments.empty();
+	return arguments.empty();
 }
 
-Argument & ArgumentHandler::get(const size_t & position)
+Argument &ArgumentHandler::get(const size_t &position)
 {
-    return arguments.at(position);
+	return arguments.at(position);
 }
 
-Argument & ArgumentHandler::operator[](const size_t & position)
+Argument &ArgumentHandler::operator[](const size_t &position)
 {
-    return arguments[position];
+	return arguments[position];
 }
 
-std::string ArgumentHandler::substr(const size_t & startingArgument)
+std::string ArgumentHandler::substr(const size_t &startingArgument)
 {
-    if (startingArgument < this->size())
-    {
-        std::string result;
-        for (size_t it = startingArgument; it < arguments.size(); ++it)
-        {
-            result += arguments[it].getContent();
-            if (it != (arguments.size() - 1))
-            {
-                result += " ";
-            }
-        }
-        return result;
-    }
-    else
-    {
-        Logger::log(LogLevel::Error, "Starting argument out of bound!");
-        return original;
-    }
+	if (startingArgument < this->size()) {
+		std::string result;
+		for (size_t it = startingArgument; it < arguments.size(); ++it) {
+			result += arguments[it].getContent();
+			if (it != (arguments.size() - 1)) {
+				result += " ";
+			}
+		}
+		return result;
+	} else {
+		Logger::log(LogLevel::Error, "Starting argument out of bound!");
+		return original;
+	}
 }
 
-void ArgumentHandler::erase(const size_t & position)
+void ArgumentHandler::erase(const size_t &position)
 {
-    if (position < arguments.size())
-    {
-        auto it = arguments.begin();
-        std::advance(it, position);
-        arguments.erase(it);
-    }
-    else
-    {
-        Logger::log(LogLevel::Error, "Position out of bound!");
-    }
+	if (position < arguments.size()) {
+		auto it = arguments.begin();
+		std::advance(it, position);
+		arguments.erase(it);
+	} else {
+		Logger::log(LogLevel::Error, "Position out of bound!");
+	}
 }
 
 void ArgumentHandler::dump() const
 {
-    for (size_t it = 0; it < arguments.size(); ++it)
-    {
-        Logger::log(LogLevel::Debug,
-                    "[%s] %s",
-                    it,
-                    arguments.at(it).getOriginal());
-    }
+	for (size_t it = 0; it < arguments.size(); ++it) {
+		Logger::log(LogLevel::Debug, "[%s] %s", it,
+					arguments.at(it).getOriginal());
+	}
 }

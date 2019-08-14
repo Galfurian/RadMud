@@ -31,139 +31,135 @@
 #include "character.hpp"
 
 /// Handle all the player's phases during login.
-enum class ConnectionState
-{
-    LoggingIn, ///< The player is logging in.
-    Playing    ///< The player is playing.
+enum class ConnectionState {
+	LoggingIn, ///< The player is logging in.
+	Playing ///< The player is playing.
 };
 
 /// @brief Holds details about each connected player.
-class Player :
-    public Character
-{
+class Player : public Character {
 private:
-    /// Socket they connected on.
-    int psocket;
-    /// Port they connected on.
-    int port;
-    /// Address player is from.
-    std::string address;
-    /// Pending input.
-    std::string inbuf;
+	/// Socket they connected on.
+	int psocket;
+	/// Port they connected on.
+	int port;
+	/// Address player is from.
+	std::string address;
+	/// Pending input.
+	std::string inbuf;
 
 public:
-    /// Player password.
-    std::string password;
-    /// Player age.
-    int age;
-    /// Player experience points.
-    int experience;
-    /// The current prompt.
-    std::string prompt;
-    /// The place where the player has slept last time.
-    unsigned int rent_room;
-    /// Points that could be spent during character creation.
-    int remaining_points;
-    /// Connection state.
-    ConnectionState connectionState;
-    /// Password guessing attempts.
-    int password_attempts;
-    /// True if they are about to leave us.
-    bool closing;
-    /// Determine if the player has successfully logged in.
-    bool logged_in;
-    /// Connection flags.
-    unsigned int connectionFlags;
-    /// MSDP Variables.
-    std::map<std::string, std::string> msdpVariables;
-    /// Lua variables.
-    std::map<std::string, std::string> luaVariables;
+	/// Player password.
+	std::string password;
+	/// Player age.
+	int age;
+	/// Player experience points.
+	int experience;
+	/// The current prompt.
+	std::string prompt;
+	/// The place where the player has slept last time.
+	unsigned int rent_room;
+	/// Points that could be spent during character creation.
+	int remaining_points;
+	/// Connection state.
+	ConnectionState connectionState;
+	/// Password guessing attempts.
+	int password_attempts;
+	/// True if they are about to leave us.
+	bool closing;
+	/// Determine if the player has successfully logged in.
+	bool logged_in;
+	/// Connection flags.
+	unsigned int connectionFlags;
+	/// MSDP Variables.
+	std::map<std::string, std::string> msdpVariables;
+	/// Lua variables.
+	std::map<std::string, std::string> luaVariables;
 
-    /// @brief Constructor.
-    /// @param socket    Player socket.
-    /// @param port      Player port.
-    /// @param address   Player address.
-    Player(const int & socket, const int & port, const std::string & address);
+	/// @brief Constructor.
+	/// @param socket    Player socket.
+	/// @param port      Player port.
+	/// @param address   Player address.
+	Player(const int &socket, const int &port, const std::string &address);
 
-    /// @brief Destructor.
-    ~Player();
+	/// @brief Destructor.
+	~Player();
 
-    /// Disable copy constructor.
-    Player(const Player &) = delete;
+	/// Disable copy constructor.
+	Player(const Player &) = delete;
 
-    /// Disable assign operator.
-    Player & operator=(const Player &) = delete;
+	/// Disable assign operator.
+	Player &operator=(const Player &) = delete;
 
-    bool check() const override;
+	bool check() const override;
 
-    bool isPlayer() const override;
+	bool isPlayer() const override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 
-    std::string getName() const override;
+	std::string getName() const override;
 
-    void addInventoryItem(Item *& item) override;
+	void addInventoryItem(Item *&item) override;
 
-    void addEquipmentItem(Item *& item) override;
+	void addEquipmentItem(Item *&item) override;
 
-    bool remInventoryItem(Item * item) override;
+	bool remInventoryItem(Item *item) override;
 
-    bool remEquipmentItem(Item * item) override;
+	bool remEquipmentItem(Item *item) override;
 
-    void initialize() override;
+	void initialize() override;
 
-    /// @brief Return player socket.
-    /// @return Player sockec.
-    int getSocket() const;
+	/// @brief Return player socket.
+	/// @return Player sockec.
+	int getSocket() const;
 
-    /// @brief Return player IP address.
-    /// @return Player IP Address.
-    std::string getAddress() const;
+	/// @brief Return player IP address.
+	/// @return Player IP Address.
+	std::string getAddress() const;
 
-    /// @brief Check if player is connected.
-    /// @return <b>True</b> if player is connected,<br>
-    ///         <b>False</b> otherwise.
-    bool checkConnection() const;
+	/// @brief Check if player is connected.
+	/// @return <b>True</b> if player is connected,<br>
+	///         <b>False</b> otherwise.
+	bool checkConnection() const;
 
-    /// @brief Close this player's connection.
-    void closeConnection();
+	/// @brief Close this player's connection.
+	void closeConnection();
 
-    /// @brief Check if this player actively playing.
-    /// @return <b>True</b> if player is playing,<br>
-    ///         <b>False</b> otherwise.
-    bool isPlaying() const;
+	/// @brief Check if this player actively playing.
+	/// @return <b>True</b> if player is playing,<br>
+	///         <b>False</b> otherwise.
+	bool isPlaying() const;
 
-    /// @brief Check if player has pending output.
-    /// @return <b>True</b> if we have something to send them,<br>
-    ///         <b>False</b> otherwise.
-    bool hasPendingOutput() const;
+	/// @brief Check if player has pending output.
+	/// @return <b>True</b> if we have something to send them,<br>
+	///         <b>False</b> otherwise.
+	bool hasPendingOutput() const;
 
-    /// @brief Create an updated entry for the player inside the database.
-    /// @return <b>True</b> if the update goes well,<br>
-    ///         <b>False</b> otherwise.
-    bool updateOnDB();
+	/// @brief Create an updated entry for the player inside the database.
+	/// @return <b>True</b> if the update goes well,<br>
+	///         <b>False</b> otherwise.
+	bool updateOnDB();
 
-    /// @brief Send the prompt to player.
-    void sendPrompt();
+	/// @brief Send the prompt to player.
+	void sendPrompt();
 
-    /// @brief Handle what happend when this player die.
-    void kill() override;
+	/// @brief Handle what happend when this player die.
+	void kill() override;
 
-    /// @brief Handle player has entered the game.
-    void enterGame();
+	/// @brief Handle player has entered the game.
+	void enterGame();
 
-    /// @brief Get player input.
-    void processRead();
+	/// @brief Get player input.
+	void processRead();
 
-    /// @brief Output text to player.
-    void processWrite();
+	/// @brief Output text to player.
+	void processWrite();
 
-    /// @brief Handle player exception on socket.
-    void processException();
+	/// @brief Handle player exception on socket.
+	void processException();
 
 protected:
-    void updateTicImpl() override;
+	void updateTicImpl() override;
 
-    void updateHourImpl() override;
-
+	void updateHourImpl() override;
 };

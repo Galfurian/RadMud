@@ -24,83 +24,90 @@
 #include "coordinates.hpp"
 #include "utils.hpp"
 
-Direction::Direction(const std::string & _direction, const bool & exact) :
-    BaseEnumerator()
+Direction::Direction(const std::string &_direction, const bool &exact) :
+	BaseEnumerator()
 {
-    if ((exact && (_direction == "north")) ||
-        (!exact && BeginWith("north", _direction)))
-    {
-        value = North;
-    }
-    else if ((exact && (_direction == "south")) ||
-             (!exact && BeginWith("south", _direction)))
-    {
-        value = South;
-    }
-    else if ((exact && (_direction == "west")) ||
-             (!exact && BeginWith("west", _direction)))
-    {
-        value = West;
-    }
-    else if ((exact && (_direction == "east")) ||
-             (!exact && BeginWith("east", _direction)))
-    {
-        value = East;
-    }
-    else if ((exact && (_direction == "up")) ||
-             (!exact && BeginWith("up", _direction)))
-    {
-        value = Up;
-    }
-    else if ((exact && (_direction == "down")) ||
-             (!exact && BeginWith("down", _direction)))
-    {
-        value = Down;
-    }
-    else value = None;
+	if ((exact && (_direction == "north")) ||
+		(!exact && BeginWith("north", _direction))) {
+		value = North;
+	} else if ((exact && (_direction == "south")) ||
+			   (!exact && BeginWith("south", _direction))) {
+		value = South;
+	} else if ((exact && (_direction == "west")) ||
+			   (!exact && BeginWith("west", _direction))) {
+		value = West;
+	} else if ((exact && (_direction == "east")) ||
+			   (!exact && BeginWith("east", _direction))) {
+		value = East;
+	} else if ((exact && (_direction == "up")) ||
+			   (!exact && BeginWith("up", _direction))) {
+		value = Up;
+	} else if ((exact && (_direction == "down")) ||
+			   (!exact && BeginWith("down", _direction))) {
+		value = Down;
+	} else
+		value = None;
 }
 
 std::string Direction::toString() const
 {
-    if (value == Direction::North) return "north";
-    if (value == Direction::South) return "south";
-    if (value == Direction::West) return "west";
-    if (value == Direction::East) return "east";
-    if (value == Direction::Up) return "up";
-    if (value == Direction::Down) return "down";
-    return "none";
+	if (value == Direction::North)
+		return "north";
+	if (value == Direction::South)
+		return "south";
+	if (value == Direction::West)
+		return "west";
+	if (value == Direction::East)
+		return "east";
+	if (value == Direction::Up)
+		return "up";
+	if (value == Direction::Down)
+		return "down";
+	return "none";
 }
 
 Direction Direction::getOpposite() const
 {
-    if (value == Direction::North) return Direction::South;
-    if (value == Direction::South) return Direction::North;
-    if (value == Direction::West) return Direction::East;
-    if (value == Direction::East) return Direction::West;
-    if (value == Direction::Up) return Direction::Down;
-    if (value == Direction::Down) return Direction::Up;
-    return Direction::None;
+	if (value == Direction::North)
+		return Direction::South;
+	if (value == Direction::South)
+		return Direction::North;
+	if (value == Direction::West)
+		return Direction::East;
+	if (value == Direction::East)
+		return Direction::West;
+	if (value == Direction::Up)
+		return Direction::Down;
+	if (value == Direction::Down)
+		return Direction::Up;
+	return Direction::None;
 }
 
 Coordinates Direction::getCoordinates() const
 {
-    if (value == Direction::North) return Coordinates(0, +1, 0);
-    if (value == Direction::South) return Coordinates(0, -1, 0);
-    if (value == Direction::West) return Coordinates(-1, 0, 0);
-    if (value == Direction::East) return Coordinates(+1, 0, 0);
-    if (value == Direction::Up) return Coordinates(0, 0, +1);
-    if (value == Direction::Down) return Coordinates(0, 0, -1);
-    return Coordinates(0, 0, 0);
+	if (value == Direction::North)
+		return Coordinates(0, +1, 0);
+	if (value == Direction::South)
+		return Coordinates(0, -1, 0);
+	if (value == Direction::West)
+		return Coordinates(-1, 0, 0);
+	if (value == Direction::East)
+		return Coordinates(+1, 0, 0);
+	if (value == Direction::Up)
+		return Coordinates(0, 0, +1);
+	if (value == Direction::Down)
+		return Coordinates(0, 0, -1);
+	return Coordinates(0, 0, 0);
 }
 
 std::vector<Direction> Direction::getAllDirections()
 {
-    std::vector<Direction> directions;
-    directions.emplace_back(Direction::North);
-    directions.emplace_back(Direction::South);
-    directions.emplace_back(Direction::West);
-    directions.emplace_back(Direction::East);
-    directions.emplace_back(Direction::Up);
-    directions.emplace_back(Direction::Down);
-    return directions;
+	std::vector<Direction> directions;
+	directions.emplace_back(Direction::North);
+	directions.emplace_back(Direction::South);
+	directions.emplace_back(Direction::West);
+	directions.emplace_back(Direction::East);
+	directions.emplace_back(Direction::Up);
+	directions.emplace_back(Direction::Down);
+	return directions;
 }

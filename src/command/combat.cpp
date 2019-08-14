@@ -33,544 +33,475 @@
 
 void LoadCombatCommands()
 {
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoKill, "kill", "(target)",
-        "Engage in combat the desired target.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoFlee, "flee", "",
-        "Try to flee from combat.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoScout, "scout", "",
-        "Provides information about the surrounding area.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoLoad, "load", "(magazine) (projectiles)",
-        "Allows to load a magazine with projectiles.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoUnload, "unload", "(magazine)",
-        "Allows to unload an magazine.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoReload, "reload", "(firearm) (magazine)",
-        "Allows to reload a firearm with a magazine.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoAim, "aim", "(target)",
-        "Allows to aim a target in sight.\n"
-            "If the target is not inside the same room,"
-            "you have first to scout the area.\n"
-            "If no arguments is provided it lists the available targets.",
-        false, true, false));
-    Mud::instance().addCommand(std::make_shared<Command>(
-        DoFire, "fire", "(firearm) (magazine)",
-        "Allows to fire with an equipped ranged weapon to an aimed target.",
-        false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoKill, "kill", "(target)", "Engage in combat the desired target.",
+		false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoFlee, "flee", "", "Try to flee from combat.", false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoScout, "scout", "",
+		"Provides information about the surrounding area.", false, true,
+		false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoLoad, "load", "(magazine) (projectiles)",
+		"Allows to load a magazine with projectiles.", false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoUnload, "unload", "(magazine)", "Allows to unload an magazine.",
+		false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoReload, "reload", "(firearm) (magazine)",
+		"Allows to reload a firearm with a magazine.", false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoAim, "aim", "(target)",
+		"Allows to aim a target in sight.\n"
+		"If the target is not inside the same room,"
+		"you have first to scout the area.\n"
+		"If no arguments is provided it lists the available targets.",
+		false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoFire, "fire", "(firearm) (magazine)",
+		"Allows to fire with an equipped ranged weapon to an aimed target.",
+		false, true, false));
 }
 
-bool DoKill(Character * character, ArgumentHandler & args)
+bool DoKill(Character *character, ArgumentHandler &args)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    // If there are no arguments, show the room.
-    if (args.size() != 1)
-    {
-        character->sendMsg("You have to specify whom to kill.\n");
-        return false;
-    }
-    // Retrieve the target.
-    auto target = character->room->findCharacter(args[0].getContent(),
-                                                 args[0].getIndex(),
-                                                 {character});
-    if (!target)
-    {
-        character->sendMsg("You don't see '%s' anywhere.\n",
-                           args[0].getContent());
-        return false;
-    }
-    // Check if the attacker can see the target.
-    if (!character->canSee(target))
-    {
-        character->sendMsg("You don't see '%s' anywhere.\n",
-                           args[0].getContent());
-        return false;
-    }
-    // Check if the two characters are both already in combat.
-    if (character->getAction() == ActionType::Combat)
-    {
-        // Check if the character is trying to attack a target
-        //  with which is not in combat.
-        if (character->combatHandler.hasOpponent(target))
-        {
-            // Check if the current predefined target is the target.
-            auto predefinedTarget = character->combatHandler
-                                             .getPredefinedTarget();
-            if (predefinedTarget != nullptr)
-            {
-                if (predefinedTarget == target)
-                {
-                    character->sendMsg(
-                        "You are already doing your best to kill %s!\n",
-                        target->getName());
-                    return false;
-                }
-            }
-            // Set the target as predefined target.
-            character->combatHandler.setPredefinedTarget(target);
-            // Notify to the character.
-            character->sendMsg("You focus your attacks on %s!\n",
-                               target->getName());
-            return true;
-        }
-        character->sendMsg("You have already your share of troubles!\n");
-    }
-    else
-    {
-        // Check if the character is attacking a target
-        //  which is already in combat.
-        // Let the characters enter the combat.
-        auto basicAttack = std::make_shared<BasicAttack>(character);
-        std::string error;
-        if (basicAttack->check(error))
-        {
-            // Add the target to the list of opponents.
-            character->combatHandler.addOpponent(target);
-            // Add the action to the character's combat queue.
-            character->pushAction(basicAttack);
-            // Set the predefined target.
-            character->combatHandler.setPredefinedTarget(target);
-            // Notify the character.
-            character->sendMsg("You attack %s.\n", target->getName());
-            return true;
-        }
-        character->sendMsg("You were not able to attack %s.\n",
-                           target->getName());
-    }
-    return false;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	// If there are no arguments, show the room.
+	if (args.size() != 1) {
+		character->sendMsg("You have to specify whom to kill.\n");
+		return false;
+	}
+	// Retrieve the target.
+	auto target = character->room->findCharacter(
+		args[0].getContent(), args[0].getIndex(), { character });
+	if (!target) {
+		character->sendMsg("You don't see '%s' anywhere.\n",
+						   args[0].getContent());
+		return false;
+	}
+	// Check if the attacker can see the target.
+	if (!character->canSee(target)) {
+		character->sendMsg("You don't see '%s' anywhere.\n",
+						   args[0].getContent());
+		return false;
+	}
+	// Check if the two characters are both already in combat.
+	if (character->getAction() == ActionType::Combat) {
+		// Check if the character is trying to attack a target
+		//  with which is not in combat.
+		if (character->combatHandler.hasOpponent(target)) {
+			// Check if the current predefined target is the target.
+			auto predefinedTarget =
+				character->combatHandler.getPredefinedTarget();
+			if (predefinedTarget != nullptr) {
+				if (predefinedTarget == target) {
+					character->sendMsg(
+						"You are already doing your best to kill %s!\n",
+						target->getName());
+					return false;
+				}
+			}
+			// Set the target as predefined target.
+			character->combatHandler.setPredefinedTarget(target);
+			// Notify to the character.
+			character->sendMsg("You focus your attacks on %s!\n",
+							   target->getName());
+			return true;
+		}
+		character->sendMsg("You have already your share of troubles!\n");
+	} else {
+		// Check if the character is attacking a target
+		//  which is already in combat.
+		// Let the characters enter the combat.
+		auto basicAttack = std::make_shared<BasicAttack>(character);
+		std::string error;
+		if (basicAttack->check(error)) {
+			// Add the target to the list of opponents.
+			character->combatHandler.addOpponent(target);
+			// Add the action to the character's combat queue.
+			character->pushAction(basicAttack);
+			// Set the predefined target.
+			character->combatHandler.setPredefinedTarget(target);
+			// Notify the character.
+			character->sendMsg("You attack %s.\n", target->getName());
+			return true;
+		}
+		character->sendMsg("You were not able to attack %s.\n",
+						   target->getName());
+	}
+	return false;
 }
 
-bool DoFlee(Character * character, ArgumentHandler & /*args*/)
+bool DoFlee(Character *character, ArgumentHandler & /*args*/)
 {
-    // Check if the character is in combat.
-    if (character->getAction() != ActionType::Combat)
-    {
-        character->sendMsg("You are not fighting.\n");
-        return false;
-    }
-    // Check if the actor is already trying to flee.
-    if (character->getAction() == ActionType::Combat)
-    {
-        // Check if the character is already trying to flee.
-        if (character->getAction()->toCombatAction()->getCombatActionType() ==
-            CombatActionType::Flee)
-        {
-            character->sendMsg("You are already trying to flee.\n");
-            return false;
-        }
-    }
-    auto flee = std::make_shared<Flee>(character);
-    std::string error;
-    if (flee->check(error))
-    {
-        // Add the action to the character's combat queue.
-        character->pushAction(flee);
-        // Notify the character.
-        character->sendMsg("You prepare to flee...\n");
-        return true;
-    }
-    character->sendMsg(error + "\n");
-    return false;
+	// Check if the character is in combat.
+	if (character->getAction() != ActionType::Combat) {
+		character->sendMsg("You are not fighting.\n");
+		return false;
+	}
+	// Check if the actor is already trying to flee.
+	if (character->getAction() == ActionType::Combat) {
+		// Check if the character is already trying to flee.
+		if (character->getAction()->toCombatAction()->getCombatActionType() ==
+			CombatActionType::Flee) {
+			character->sendMsg("You are already trying to flee.\n");
+			return false;
+		}
+	}
+	auto flee = std::make_shared<Flee>(character);
+	std::string error;
+	if (flee->check(error)) {
+		// Add the action to the character's combat queue.
+		character->pushAction(flee);
+		// Notify the character.
+		character->sendMsg("You prepare to flee...\n");
+		return true;
+	}
+	character->sendMsg(error + "\n");
+	return false;
 }
 
-bool DoScout(Character * character, ArgumentHandler & /*args*/)
+bool DoScout(Character *character, ArgumentHandler & /*args*/)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    auto newAction = std::make_shared<ScoutAction>(character);
-    // Check the new action.
-    std::string error;
-    if (newAction->check(error))
-    {
-        // Send the starting message.
-        character->sendMsg("You start scouting the area...\n");
-        // Set the new action.
-        character->pushAction(newAction);
-        return true;
-    }
-    character->sendMsg("%s\n", error);
-    return false;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	auto newAction = std::make_shared<ScoutAction>(character);
+	// Check the new action.
+	std::string error;
+	if (newAction->check(error)) {
+		// Send the starting message.
+		character->sendMsg("You start scouting the area...\n");
+		// Set the new action.
+		character->pushAction(newAction);
+		return true;
+	}
+	character->sendMsg("%s\n", error);
+	return false;
 }
 
-bool DoLoad(Character * character, ArgumentHandler & args)
+bool DoLoad(Character *character, ArgumentHandler &args)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (args.size() != 2)
-    {
-        character->sendMsg("What do you want to load with what?\n");
-        return false;
-    }
-    // Search the magazine.
-    auto itemToLoad = character->findEquipmentItem(args[0].getContent(),
-                                                   args[0].getIndex());
-    if (itemToLoad == nullptr)
-    {
-        itemToLoad = character->findInventoryItem(args[0].getContent(),
-                                                  args[0].getIndex());
-        if (itemToLoad == nullptr)
-        {
-            character->sendMsg("You don't have %s.\n", args[0].getContent());
-            return false;
-        }
-    }
-    // Check if the item is a magazine.
-    if (itemToLoad->getType() != ModelType::Magazine)
-    {
-        character->sendMsg("You can't load %s.\n", itemToLoad->getName(true));
-        return false;
-    }
-    // Transform the item into a magazine.
-    auto magazine = static_cast<MagazineItem *>(itemToLoad);
-    // Search the projectiles.
-    auto projectile = character->findEquipmentItem(args[1].getContent(),
-                                                   args[1].getIndex());
-    if (projectile == nullptr)
-    {
-        projectile = character->findInventoryItem(args[1].getContent(),
-                                                  args[1].getIndex());
-        if (projectile == nullptr)
-        {
-            character->sendMsg("You don't have %s.\n", args[1].getContent());
-            return false;
-        }
-    }
-    // Check if the projectiles can be loaded inside the magazine.
-    std::string error;
-    unsigned int amountToLoad = 0;
-    if (!magazine->getAmountToLoad(projectile, amountToLoad, error))
-    {
-        character->sendMsg("%s\n", error);
-        return false;
-    }
-    // Create the load action.
-    auto newAction = std::make_shared<LoadAction>(character, magazine,
-                                                  projectile, amountToLoad);
-    // Check the new action.
-    error = std::string();
-    if (newAction->check(error))
-    {
-        // Send the starting message.
-        character->sendMsg("You start loading %s with %s.\n",
-                           magazine->getName(true),
-                           projectile->getName(true));
-        // Set the new action.
-        character->pushAction(newAction);
-        return true;
-    }
-    character->sendMsg("%s\n", error);
-    return false;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (args.size() != 2) {
+		character->sendMsg("What do you want to load with what?\n");
+		return false;
+	}
+	// Search the magazine.
+	auto itemToLoad =
+		character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+	if (itemToLoad == nullptr) {
+		itemToLoad = character->findInventoryItem(args[0].getContent(),
+												  args[0].getIndex());
+		if (itemToLoad == nullptr) {
+			character->sendMsg("You don't have %s.\n", args[0].getContent());
+			return false;
+		}
+	}
+	// Check if the item is a magazine.
+	if (itemToLoad->getType() != ModelType::Magazine) {
+		character->sendMsg("You can't load %s.\n", itemToLoad->getName(true));
+		return false;
+	}
+	// Transform the item into a magazine.
+	auto magazine = static_cast<MagazineItem *>(itemToLoad);
+	// Search the projectiles.
+	auto projectile =
+		character->findEquipmentItem(args[1].getContent(), args[1].getIndex());
+	if (projectile == nullptr) {
+		projectile = character->findInventoryItem(args[1].getContent(),
+												  args[1].getIndex());
+		if (projectile == nullptr) {
+			character->sendMsg("You don't have %s.\n", args[1].getContent());
+			return false;
+		}
+	}
+	// Check if the projectiles can be loaded inside the magazine.
+	std::string error;
+	unsigned int amountToLoad = 0;
+	if (!magazine->getAmountToLoad(projectile, amountToLoad, error)) {
+		character->sendMsg("%s\n", error);
+		return false;
+	}
+	// Create the load action.
+	auto newAction = std::make_shared<LoadAction>(character, magazine,
+												  projectile, amountToLoad);
+	// Check the new action.
+	error = std::string();
+	if (newAction->check(error)) {
+		// Send the starting message.
+		character->sendMsg("You start loading %s with %s.\n",
+						   magazine->getName(true), projectile->getName(true));
+		// Set the new action.
+		character->pushAction(newAction);
+		return true;
+	}
+	character->sendMsg("%s\n", error);
+	return false;
 }
 
-bool DoUnload(Character * character, ArgumentHandler & args)
+bool DoUnload(Character *character, ArgumentHandler &args)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (args.size() != 1)
-    {
-        character->sendMsg("What do you want to unload?\n");
-        return false;
-    }
-    // Search the magazine.
-    auto itemToUnload = character->findEquipmentItem(args[0].getContent(),
-                                                     args[0].getIndex());
-    if (itemToUnload == nullptr)
-    {
-        itemToUnload = character->findInventoryItem(args[0].getContent(),
-                                                    args[0].getIndex());
-        if (itemToUnload == nullptr)
-        {
-            character->sendMsg("You don't have %s.\n", args[0].getContent());
-            return false;
-        }
-    }
-    // Check if the item is a magazine or a ranged weapon.
-    if ((itemToUnload->getType() != ModelType::Magazine) &&
-        (itemToUnload->getType() != ModelType::RangedWeapon))
-    {
-        character->sendMsg("You can't unload %s.\n",
-                           itemToUnload->getName(true));
-        return false;
-    }
-    if (itemToUnload->isEmpty())
-    {
-        character->sendMsg("%s is already empty...\n",
-                           itemToUnload->getNameCapital(true));
-        return false;
-    }
-    // Create the unload action.
-    auto newAction = std::make_shared<UnloadAction>(character, itemToUnload);
-    std::string error;
-    // Check the new action.
-    if (newAction->check(error))
-    {
-        // Send the starting message.
-        character->sendMsg("You start unloading %s.\n",
-                           itemToUnload->getName(true));
-        // Set the new action.
-        character->pushAction(newAction);
-        return true;
-    }
-    character->sendMsg("%s\n", error);
-    return false;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (args.size() != 1) {
+		character->sendMsg("What do you want to unload?\n");
+		return false;
+	}
+	// Search the magazine.
+	auto itemToUnload =
+		character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+	if (itemToUnload == nullptr) {
+		itemToUnload = character->findInventoryItem(args[0].getContent(),
+													args[0].getIndex());
+		if (itemToUnload == nullptr) {
+			character->sendMsg("You don't have %s.\n", args[0].getContent());
+			return false;
+		}
+	}
+	// Check if the item is a magazine or a ranged weapon.
+	if ((itemToUnload->getType() != ModelType::Magazine) &&
+		(itemToUnload->getType() != ModelType::RangedWeapon)) {
+		character->sendMsg("You can't unload %s.\n",
+						   itemToUnload->getName(true));
+		return false;
+	}
+	if (itemToUnload->isEmpty()) {
+		character->sendMsg("%s is already empty...\n",
+						   itemToUnload->getNameCapital(true));
+		return false;
+	}
+	// Create the unload action.
+	auto newAction = std::make_shared<UnloadAction>(character, itemToUnload);
+	std::string error;
+	// Check the new action.
+	if (newAction->check(error)) {
+		// Send the starting message.
+		character->sendMsg("You start unloading %s.\n",
+						   itemToUnload->getName(true));
+		// Set the new action.
+		character->pushAction(newAction);
+		return true;
+	}
+	character->sendMsg("%s\n", error);
+	return false;
 }
 
-bool DoReload(Character * character, ArgumentHandler & args)
+bool DoReload(Character *character, ArgumentHandler &args)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (args.size() != 2)
-    {
-        character->sendMsg("What do you want to reload with what?\n");
-        return false;
-    }
-    auto itemToReload = character->findEquipmentItem(args[0].getContent(),
-                                                     args[0].getIndex());
-    if (itemToReload == nullptr)
-    {
-        itemToReload = character->findInventoryItem(args[0].getContent(),
-                                                    args[0].getIndex());
-        if (itemToReload == nullptr)
-        {
-            character->sendMsg("You don't have %s.\n", args[0].getContent());
-            return false;
-        }
-    }
-    if (itemToReload->getType() != ModelType::RangedWeapon)
-    {
-        character->sendMsg("You can't reload %s.\n",
-                           itemToReload->getName(true));
-        return false;
-    }
-    // Transform the item into a ranged weapons.
-    auto rangedWeapon = static_cast<RangedWeaponItem *>(itemToReload);
-    // Search the magazine.
-    auto magazine = character->findEquipmentItem(args[1].getContent(),
-                                                 args[1].getIndex());
-    if (magazine == nullptr)
-    {
-        magazine = character->findInventoryItem(args[1].getContent(),
-                                                args[1].getIndex());
-        if (magazine == nullptr)
-        {
-            character->sendMsg("You don't have %s.\n", args[1].getContent());
-            return false;
-        }
-    }
-    if (magazine->getType() != ModelType::Magazine)
-    {
-        character->sendMsg("You can't reload %s with %s.\n",
-                           rangedWeapon->getName(true),
-                           magazine->getName(true));
-        return false;
-    }
-    auto newAction = std::make_shared<ReloadAction>(character, rangedWeapon,
-                                                    magazine);
-    std::string error;
-    // Check the new action.
-    if (newAction->check(error))
-    {
-        // Send the starting message.
-        character->sendMsg("You start reloading %s with %s.\n",
-                           rangedWeapon->getName(true),
-                           magazine->getName(true));
-        // Set the new action.
-        character->pushAction(newAction);
-        return true;
-    }
-    character->sendMsg("%s\n", error);
-    return false;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (args.size() != 2) {
+		character->sendMsg("What do you want to reload with what?\n");
+		return false;
+	}
+	auto itemToReload =
+		character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+	if (itemToReload == nullptr) {
+		itemToReload = character->findInventoryItem(args[0].getContent(),
+													args[0].getIndex());
+		if (itemToReload == nullptr) {
+			character->sendMsg("You don't have %s.\n", args[0].getContent());
+			return false;
+		}
+	}
+	if (itemToReload->getType() != ModelType::RangedWeapon) {
+		character->sendMsg("You can't reload %s.\n",
+						   itemToReload->getName(true));
+		return false;
+	}
+	// Transform the item into a ranged weapons.
+	auto rangedWeapon = static_cast<RangedWeaponItem *>(itemToReload);
+	// Search the magazine.
+	auto magazine =
+		character->findEquipmentItem(args[1].getContent(), args[1].getIndex());
+	if (magazine == nullptr) {
+		magazine = character->findInventoryItem(args[1].getContent(),
+												args[1].getIndex());
+		if (magazine == nullptr) {
+			character->sendMsg("You don't have %s.\n", args[1].getContent());
+			return false;
+		}
+	}
+	if (magazine->getType() != ModelType::Magazine) {
+		character->sendMsg("You can't reload %s with %s.\n",
+						   rangedWeapon->getName(true),
+						   magazine->getName(true));
+		return false;
+	}
+	auto newAction =
+		std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
+	std::string error;
+	// Check the new action.
+	if (newAction->check(error)) {
+		// Send the starting message.
+		character->sendMsg("You start reloading %s with %s.\n",
+						   rangedWeapon->getName(true),
+						   magazine->getName(true));
+		// Set the new action.
+		character->pushAction(newAction);
+		return true;
+	}
+	character->sendMsg("%s\n", error);
+	return false;
 }
 
-bool DoAim(Character * character, ArgumentHandler & args)
+bool DoAim(Character *character, ArgumentHandler &args)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    if (args.empty())
-    {
-        if (character->combatHandler.charactersInSight.empty())
-        {
-            character->sendMsg("Who or what do you want to aim?\n");
-        }
-        else
-        {
-            character->sendMsg("You are able to aim at:\n");
-            for (auto it : character->combatHandler.charactersInSight)
-            {
-                if (!it) continue;
-                if (!it->room) continue;
-                character->sendMsg(
-                    "  [%s] %s\n",
-                    StructUtils::getRoomDistance(character->room, it->room),
-                    it->getName());
-            }
-        }
-        return true;
-    }
-    else if (args.size() > 1)
-    {
-        character->sendMsg("Too many arguments.\n");
-        return false;
-    }
-    if (GetActiveWeapons<RangedWeaponItem>(character).empty())
-    {
-        character->sendMsg("You don't have a ranged weapon equipped.\n");
-        return false;
-    }
-    // Prepare a pointer to the aimed character.
-    Character * aimedCharacter = nullptr;
-    // Create a single CharacterVector which contains
-    //  a unique list of all the targets.
-    CharacterVector targets = character->room->characters;
-    targets.addUnique(character->combatHandler.charactersInSight);
-    // First try to search the target inside the same room.
-    aimedCharacter = targets.findCharacter(args[0].getContent(),
-                                           args[0].getIndex());
-    // Otherwise try to find the target inside the list
-    //  of characters in sight.
-    if (aimedCharacter == nullptr)
-    {
-        character->sendMsg("You don't see '%s' anywhere...\n",
-                           args[0].getContent());
-        return false;
-    }
-    // Check the room of the target.
-    if (aimedCharacter->room == nullptr)
-    {
-        character->sendMsg("%s is out of your line of sight...\n",
-                           aimedCharacter->getNameCapital());
-        return false;
-    }
-    // Check if the target is still in sight.
-    if (!character->isAtRange(aimedCharacter, character->getViewDistance()))
-    {
-        character->sendMsg("%s is out of your line of sight...\n",
-                           aimedCharacter->getNameCapital());
-        return false;
-    }
-    auto newAction = std::make_shared<AimAction>(character, aimedCharacter);
-    // Check the new action.
-    std::string error;
-    if (!newAction->check(error))
-    {
-        character->sendMsg("%s\n", error);
-        return false;
-    }
-    // Send the starting message.
-    character->sendMsg("You start aiming at %s...\n",
-                       aimedCharacter->getName());
-    // Set the new action.
-    character->pushAction(newAction);
-    return true;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	if (args.empty()) {
+		if (character->combatHandler.charactersInSight.empty()) {
+			character->sendMsg("Who or what do you want to aim?\n");
+		} else {
+			character->sendMsg("You are able to aim at:\n");
+			for (auto it : character->combatHandler.charactersInSight) {
+				if (!it)
+					continue;
+				if (!it->room)
+					continue;
+				character->sendMsg("  [%s] %s\n",
+								   StructUtils::getRoomDistance(character->room,
+																it->room),
+								   it->getName());
+			}
+		}
+		return true;
+	} else if (args.size() > 1) {
+		character->sendMsg("Too many arguments.\n");
+		return false;
+	}
+	if (GetActiveWeapons<RangedWeaponItem>(character).empty()) {
+		character->sendMsg("You don't have a ranged weapon equipped.\n");
+		return false;
+	}
+	// Prepare a pointer to the aimed character.
+	Character *aimedCharacter = nullptr;
+	// Create a single CharacterVector which contains
+	//  a unique list of all the targets.
+	CharacterVector targets = character->room->characters;
+	targets.addUnique(character->combatHandler.charactersInSight);
+	// First try to search the target inside the same room.
+	aimedCharacter =
+		targets.findCharacter(args[0].getContent(), args[0].getIndex());
+	// Otherwise try to find the target inside the list
+	//  of characters in sight.
+	if (aimedCharacter == nullptr) {
+		character->sendMsg("You don't see '%s' anywhere...\n",
+						   args[0].getContent());
+		return false;
+	}
+	// Check the room of the target.
+	if (aimedCharacter->room == nullptr) {
+		character->sendMsg("%s is out of your line of sight...\n",
+						   aimedCharacter->getNameCapital());
+		return false;
+	}
+	// Check if the target is still in sight.
+	if (!character->isAtRange(aimedCharacter, character->getViewDistance())) {
+		character->sendMsg("%s is out of your line of sight...\n",
+						   aimedCharacter->getNameCapital());
+		return false;
+	}
+	auto newAction = std::make_shared<AimAction>(character, aimedCharacter);
+	// Check the new action.
+	std::string error;
+	if (!newAction->check(error)) {
+		character->sendMsg("%s\n", error);
+		return false;
+	}
+	// Send the starting message.
+	character->sendMsg("You start aiming at %s...\n",
+					   aimedCharacter->getName());
+	// Set the new action.
+	character->pushAction(newAction);
+	return true;
 }
 
-bool DoFire(Character * character, ArgumentHandler & /*args*/)
+bool DoFire(Character *character, ArgumentHandler & /*args*/)
 {
-    // Check if the character is sleeping.
-    if (character->posture == CharacterPosture::Sleep)
-    {
-        character->sendMsg("Not while you're sleeping.\n");
-        return false;
-    }
-    // Stop any action the character is executing.
-    StopAction(character);
-    // Check if the pointer to the aimed target is still valid.
-    if (character->combatHandler.getAimedTarget() == nullptr)
-    {
-        character->sendMsg("You first need to aim at someone or something.\n");
-        return false;
-    }
-    auto aimedTarget = character->combatHandler.getAimedTarget();
-    // Check if the target is still in sight.
-    if (!character->isAtRange(character->combatHandler.getAimedTarget(),
-                              character->getViewDistance()))
-    {
-        character->sendMsg("%s is out of your line of sight...\n",
-                           aimedTarget->getNameCapital());
-        return false;
-    }
-    // Retrieve the active ranged weapons.
-    auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(character);
-    // Check if the character has some ranged weapons equipped.
-    if (rangedWeapons.empty())
-    {
-        character->sendMsg("You don't have any ranged weapon equipped.\n");
-        return false;
-    }
-    // For each ranged weapon check if it is able to reach the target.
-    if (std::find_if(
-        rangedWeapons.begin(), rangedWeapons.end(),
-        [&](RangedWeaponItem * weapon)
-        {
-            return (character->isAtRange(aimedTarget, weapon->getRange()));
-        }) == rangedWeapons.end())
-    {
-        character->sendMsg("%s is out of your reach...\n",
-                           aimedTarget->getNameCapital());
-        return false;
-    }
-    auto basicAttack = std::make_shared<BasicAttack>(character);
-    std::string error;
-    if (!basicAttack->check(error))
-    {
-        character->sendMsg("You were not able to fire at %s.\n",
-                           aimedTarget->getName());
-        return false;
-    }
-    // Add the aimedTarget to the list of opponents.
-    character->combatHandler.addOpponent(aimedTarget);
-    // Add the action to the character's combat queue.
-    character->pushAction(basicAttack);
-    // Set the predefined target.
-    character->combatHandler.setPredefinedTarget(aimedTarget);
-    character->sendMsg("You start firing at %s...\n",
-                       aimedTarget->getName());
-    return true;
+	// Check if the character is sleeping.
+	if (character->posture == CharacterPosture::Sleep) {
+		character->sendMsg("Not while you're sleeping.\n");
+		return false;
+	}
+	// Stop any action the character is executing.
+	StopAction(character);
+	// Check if the pointer to the aimed target is still valid.
+	if (character->combatHandler.getAimedTarget() == nullptr) {
+		character->sendMsg("You first need to aim at someone or something.\n");
+		return false;
+	}
+	auto aimedTarget = character->combatHandler.getAimedTarget();
+	// Check if the target is still in sight.
+	if (!character->isAtRange(character->combatHandler.getAimedTarget(),
+							  character->getViewDistance())) {
+		character->sendMsg("%s is out of your line of sight...\n",
+						   aimedTarget->getNameCapital());
+		return false;
+	}
+	// Retrieve the active ranged weapons.
+	auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(character);
+	// Check if the character has some ranged weapons equipped.
+	if (rangedWeapons.empty()) {
+		character->sendMsg("You don't have any ranged weapon equipped.\n");
+		return false;
+	}
+	// For each ranged weapon check if it is able to reach the target.
+	if (std::find_if(rangedWeapons.begin(), rangedWeapons.end(),
+					 [&](RangedWeaponItem *weapon) {
+						 return (character->isAtRange(aimedTarget,
+													  weapon->getRange()));
+					 }) == rangedWeapons.end()) {
+		character->sendMsg("%s is out of your reach...\n",
+						   aimedTarget->getNameCapital());
+		return false;
+	}
+	auto basicAttack = std::make_shared<BasicAttack>(character);
+	std::string error;
+	if (!basicAttack->check(error)) {
+		character->sendMsg("You were not able to fire at %s.\n",
+						   aimedTarget->getName());
+		return false;
+	}
+	// Add the aimedTarget to the list of opponents.
+	character->combatHandler.addOpponent(aimedTarget);
+	// Add the action to the character's combat queue.
+	character->pushAction(basicAttack);
+	// Set the predefined target.
+	character->combatHandler.setPredefinedTarget(aimedTarget);
+	character->sendMsg("You start firing at %s...\n", aimedTarget->getName());
+	return true;
 }

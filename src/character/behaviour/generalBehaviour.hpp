@@ -28,142 +28,126 @@
 #include "luaBridge.hpp"
 
 /// The list of possible behaviours.
-enum class BehaviourStatus
-{
-    Finished,   ///< The behaviour is finished.
-    Running,    ///< The behaviour is still running.
-    Error       ///< The behaviour has encountered an error.
+enum class BehaviourStatus {
+	Finished, ///< The behaviour is finished.
+	Running, ///< The behaviour is still running.
+	Error ///< The behaviour has encountered an error.
 };
 
 /// @brief A general behaviour. Performing this behaviour will result in doing nothing.
-class GeneralBehaviour
-{
+class GeneralBehaviour {
 protected:
-    /// @brief The name of the funciton.
-    std::string functionName;
-    /// @brief A reference to the function inside Lua.
-    luabridge::LuaRef functionRef;
+	/// @brief The name of the funciton.
+	std::string functionName;
+	/// @brief A reference to the function inside Lua.
+	luabridge::LuaRef functionRef;
 
 public:
-    /// @brief Constructor.
-    explicit GeneralBehaviour(const std::string & _functionName,
-                              const luabridge::LuaRef & _functionRef) :
-        functionName(_functionName),
-        functionRef(_functionRef)
-    {
-        // Nothing to do.
-    }
+	/// @brief Constructor.
+	explicit GeneralBehaviour(const std::string &_functionName,
+							  const luabridge::LuaRef &_functionRef) :
+		functionName(_functionName),
+		functionRef(_functionRef)
+	{
+		// Nothing to do.
+	}
 
-    inline std::string getFunctionName() const
-    {
-        return functionName;
-    }
+	inline std::string getFunctionName() const
+	{
+		return functionName;
+	}
 
-    /// @brief Destructor.
-    virtual ~GeneralBehaviour() = default;
+	/// @brief Destructor.
+	virtual ~GeneralBehaviour() = default;
 
-    /// @brief Performs the behaviour.
-    /// @return
-    virtual BehaviourStatus perform() = 0;
+	/// @brief Performs the behaviour.
+	/// @return
+	virtual BehaviourStatus perform() = 0;
 
 protected:
-    inline BehaviourStatus handleReturn(const luabridge::LuaRef & result) const
-    {
-        if (result.isBool())
-        {
-            if (result.cast<bool>())
-            {
-                return BehaviourStatus::Finished;
-            }
-            else
-            {
-                return BehaviourStatus::Running;
-            }
-        }
-        return BehaviourStatus::Error;
-    }
+	inline BehaviourStatus handleReturn(const luabridge::LuaRef &result) const
+	{
+		if (result.isBool()) {
+			if (result.cast<bool>()) {
+				return BehaviourStatus::Finished;
+			} else {
+				return BehaviourStatus::Running;
+			}
+		}
+		return BehaviourStatus::Error;
+	}
 };
 
-template<class P1>
-class BehaviourP1 :
-    public GeneralBehaviour
-{
+template <class P1> class BehaviourP1 : public GeneralBehaviour {
 private:
-    P1 p1;
+	P1 p1;
 
 public:
-    BehaviourP1(const std::string & _functionName,
-                const luabridge::LuaRef & _func, P1 _p1) :
-        GeneralBehaviour(_functionName, _func),
-        p1(_p1)
-    {
-        // Nothing to do.
-    }
+	BehaviourP1(const std::string &_functionName,
+				const luabridge::LuaRef &_func, P1 _p1) :
+		GeneralBehaviour(_functionName, _func),
+		p1(_p1)
+	{
+		// Nothing to do.
+	}
 
-    inline BehaviourStatus perform() override
-    {
-        if (functionRef.isFunction())
-        {
-            return this->handleReturn(functionRef(p1));
-        }
-        return BehaviourStatus::Error;
-    }
+	inline BehaviourStatus perform() override
+	{
+		if (functionRef.isFunction()) {
+			return this->handleReturn(functionRef(p1));
+		}
+		return BehaviourStatus::Error;
+	}
 };
 
-template<typename P1, typename P2>
-class BehaviourP2 :
-    public GeneralBehaviour
-{
+template <typename P1, typename P2>
+class BehaviourP2 : public GeneralBehaviour {
 private:
-    P1 p1;
-    P2 p2;
+	P1 p1;
+	P2 p2;
 
 public:
-    BehaviourP2(const std::string & _functionName,
-                const luabridge::LuaRef & _func, P1 _p1, P2 _p2) :
-        GeneralBehaviour(_functionName, _func),
-        p1(_p1),
-        p2(_p2)
-    {
-        // Nothing to do.
-    }
+	BehaviourP2(const std::string &_functionName,
+				const luabridge::LuaRef &_func, P1 _p1, P2 _p2) :
+		GeneralBehaviour(_functionName, _func),
+		p1(_p1),
+		p2(_p2)
+	{
+		// Nothing to do.
+	}
 
-    inline BehaviourStatus perform() override
-    {
-        if (functionRef.isFunction())
-        {
-            return this->handleReturn(functionRef(p1, p2));
-        }
-        return BehaviourStatus::Error;
-    }
+	inline BehaviourStatus perform() override
+	{
+		if (functionRef.isFunction()) {
+			return this->handleReturn(functionRef(p1, p2));
+		}
+		return BehaviourStatus::Error;
+	}
 };
 
-template<typename P1, typename P2, typename P3>
-class BehaviourP3 :
-    public GeneralBehaviour
-{
+template <typename P1, typename P2, typename P3>
+class BehaviourP3 : public GeneralBehaviour {
 private:
-    P1 p1;
-    P2 p2;
-    P3 p3;
+	P1 p1;
+	P2 p2;
+	P3 p3;
 
 public:
-    BehaviourP3(const std::string & _functionName,
-                const luabridge::LuaRef & _func, P1 _p1, P2 _p2, P3 _p3) :
-        GeneralBehaviour(_functionName, _func),
-        p1(_p1),
-        p2(_p2),
-        p3(_p3)
-    {
-        // Nothing to do.
-    }
+	BehaviourP3(const std::string &_functionName,
+				const luabridge::LuaRef &_func, P1 _p1, P2 _p2, P3 _p3) :
+		GeneralBehaviour(_functionName, _func),
+		p1(_p1),
+		p2(_p2),
+		p3(_p3)
+	{
+		// Nothing to do.
+	}
 
-    inline BehaviourStatus perform() override
-    {
-        if (functionRef.isFunction())
-        {
-            return this->handleReturn(functionRef(p1, p2, p3));
-        }
-        return BehaviourStatus::Error;
-    }
+	inline BehaviourStatus perform() override
+	{
+		if (functionRef.isFunction()) {
+			return this->handleReturn(functionRef(p1, p2, p3));
+		}
+		return BehaviourStatus::Error;
+	}
 };

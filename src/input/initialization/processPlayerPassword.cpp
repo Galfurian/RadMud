@@ -23,49 +23,40 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessPlayerPassword::process(Character * character,
-                                    ArgumentHandler & args)
+bool ProcessPlayerPassword::process(Character *character, ArgumentHandler &args)
 {
-    auto player = character->toPlayer();
-    auto input = args.getOriginal();
-    // Check the correctness of the password.
-    if (input != player->password)
-    {
-        // Detect too many password attempts.
-        if (++player->password_attempts >= 3)
-        {
-            player->closeConnection();
-            player->sendMsg("Goodbye!\n");
-            player->sendMsg("Too many attempts to guess the password!\n");
-        }
-        else
-        {
-            this->advance(character, "Incorrect password.");
-        }
-    }
-    else
-    {
-        // Set the handler.
-        player->inputProcessor = std::make_shared<ProcessInput>();
-        // Entered the MUD.
-        player->enterGame();
-        // Set the connection state to playing.
-        player->connectionState = ConnectionState::Playing;
-        return true;
-    }
-    return false;
+	auto player = character->toPlayer();
+	auto input = args.getOriginal();
+	// Check the correctness of the password.
+	if (input != player->password) {
+		// Detect too many password attempts.
+		if (++player->password_attempts >= 3) {
+			player->closeConnection();
+			player->sendMsg("Goodbye!\n");
+			player->sendMsg("Too many attempts to guess the password!\n");
+		} else {
+			this->advance(character, "Incorrect password.");
+		}
+	} else {
+		// Set the handler.
+		player->inputProcessor = std::make_shared<ProcessInput>();
+		// Entered the MUD.
+		player->enterGame();
+		// Set the connection state to playing.
+		player->connectionState = ConnectionState::Playing;
+		return true;
+	}
+	return false;
 }
 
-void ProcessPlayerPassword::advance(Character * character,
-                                    const std::string & error)
+void ProcessPlayerPassword::advance(Character *character,
+									const std::string &error)
 {
-    if (!error.empty())
-    {
-        character->sendMsg("# " + error + "\n");
-    }
+	if (!error.empty()) {
+		character->sendMsg("# " + error + "\n");
+	}
 }
 
 void ProcessPlayerPassword::rollBack(Character *)
 {
-
 }

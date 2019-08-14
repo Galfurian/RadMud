@@ -23,19 +23,33 @@
 
 std::string SkillRank::toString() const
 {
-    if (value == Newbie) return "Newbie";
-    if (value == Novice) return "Novice";
-    if (value == Rookie) return "Rookie";
-    if (value == Beginner) return "Beginner";
-    if (value == Talented) return "Talented";
-    if (value == Skilled) return "Skilled";
-    if (value == Intermediate) return "Intermediate";
-    if (value == Seasoned) return "Seasoned";
-    if (value == Proficient) return "Proficient";
-    if (value == Experienced) return "Experienced";
-    if (value == Advanced) return "Advanced";
-    if (value == Expert) return "Expert";
-    if (value == Specialist) return "Specialist";
-    if (value == Master) return "Master";
-    return "None";
+	if (value == Newbie)
+		return "Newbie";
+	if (value == Novice)
+		return "Novice";
+	if (value == Rookie)
+		return "Rookie";
+	if (value == Beginner)
+		return "Beginner";
+	if (value == Talented)
+		return "Talented";
+	if (value == Skilled)
+		return "Skilled";
+	if (value == Intermediate)
+		return "Intermediate";
+	if (value == Seasoned)
+		return "Seasoned";
+	if (value == Proficient)
+		return "Proficient";
+	if (value == Experienced)
+		return "Experienced";
+	if (value == Advanced)
+		return "Advanced";
+	if (value == Expert)
+		return "Expert";
+	if (value == Specialist)
+		return "Specialist";
+	if (value == Master)
+		return "Master";
+	return "None";
 }

@@ -26,42 +26,39 @@
 #include "itemModel.hpp"
 
 /// Flags of a light source.
-enum class LightModelFlags
-{
-    None,             ///< [0]   No flag.
-    AlwaysActive = 1, ///< [1]   The light source is always active.
-    CanUseToCook = 2, ///< [2]   The light source can be used to cook.
-    NeedToKindle = 4  ///< [4]
-    ///< [8]
-    ///< [16]
-    ///< [32]
-    ///< [64]
-    ///< [128]
+enum class LightModelFlags {
+	None, ///< [0]   No flag.
+	AlwaysActive = 1, ///< [1]   The light source is always active.
+	CanUseToCook = 2, ///< [2]   The light source can be used to cook.
+	NeedToKindle = 4 ///< [4]
+	///< [8]
+	///< [16]
+	///< [32]
+	///< [64]
+	///< [128]
 };
 
 /// @brief Model of a light source.
-class LightModel :
-    public ItemModel
-{
+class LightModel : public ItemModel {
 public:
-    /// The type of fuel used to keep the light on.
-    ResourceType fuelType;
-    /// The maximum radius of the light.
-    int radius;
-    /// Maximum contained weight.
-    double maxWeight;
-    /// The flags of the light source.
-    unsigned int lightSourceFlags;
+	/// The type of fuel used to keep the light on.
+	ResourceType fuelType;
+	/// The maximum radius of the light.
+	int radius;
+	/// Maximum contained weight.
+	double maxWeight;
+	/// The flags of the light source.
+	unsigned int lightSourceFlags;
 
-    LightModel();
+	LightModel();
 
-    virtual ~LightModel();
+	virtual ~LightModel();
 
-    ModelType getType() const override;
+	ModelType getType() const override;
 
-    std::string getTypeName() const override;
+	std::string getTypeName() const override;
 
-    bool setModel(const std::string & source) override;
+	bool setModel(const std::string &source) override;
 
-    void getSheet(Table & sheet) const override;
+	void getSheet(Table &sheet) const override;
 };

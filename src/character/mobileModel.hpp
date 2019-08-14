@@ -25,61 +25,59 @@
 #include "character.hpp"
 
 /// @brief Holds details about a Mobile OBject.
-class MobileModel :
-    public std::enable_shared_from_this<MobileModel>
-{
+class MobileModel : public std::enable_shared_from_this<MobileModel> {
 public:
-    /// The virtual number of the mobile object.
-    unsigned int vnum;
-    /// The name of the mobile.
-    std::string propnoun;
-    /// List of keys associated with the mobile.
-    std::vector<std::string> keys;
-    /// Short description.
-    std::string shortdesc;
-    /// Static description.
-    std::string staticdesc;
-    /// The complete description.
-    std::string description;
-    /// The original race.
-    Race * race;
-    /// The original faction.
-    Faction * faction;
-    /// The original gender.
-    GenderType gender;
-    /// The original weight.
-    double weight;
-    /// The original behaviours of the mobile.
-    std::vector<std::string> actions;
-    /// The original flags.
-    unsigned int flags;
-    /// The original level.
-    unsigned int level;
-    /// The original abilities.
-    std::map<Ability, unsigned int> abilities;
-    /// The original file that contains the behaviour of this mobile.
-    std::string lua_script;
+	/// The virtual number of the mobile object.
+	unsigned int vnum;
+	/// The name of the mobile.
+	std::string propnoun;
+	/// List of keys associated with the mobile.
+	std::vector<std::string> keys;
+	/// Short description.
+	std::string shortdesc;
+	/// Static description.
+	std::string staticdesc;
+	/// The complete description.
+	std::string description;
+	/// The original race.
+	Race *race;
+	/// The original faction.
+	Faction *faction;
+	/// The original gender.
+	GenderType gender;
+	/// The original weight.
+	double weight;
+	/// The original behaviours of the mobile.
+	std::vector<std::string> actions;
+	/// The original flags.
+	unsigned int flags;
+	/// The original level.
+	unsigned int level;
+	/// The original abilities.
+	std::map<Ability, unsigned int> abilities;
+	/// The original file that contains the behaviour of this mobile.
+	std::string lua_script;
 
-    MobileModel() :
-        vnum(),
-        propnoun(),
-        keys(),
-        shortdesc(),
-        staticdesc(),
-        race(),
-        faction(),
-        gender(),
-        weight(),
-        actions(),
-        flags(),
-        level(),
-        abilities(),
-        lua_script()
-    {
-        // Nothing to do.
-    }
+	MobileModel() :
+		vnum(),
+		propnoun(),
+		keys(),
+		shortdesc(),
+		staticdesc(),
+		race(),
+		faction(),
+		gender(),
+		weight(),
+		actions(),
+		flags(),
+		level(),
+		abilities(),
+		lua_script()
+	{
+		// Nothing to do.
+	}
 
-    /// @brief Creates a mobile using this model.
-    /// @return A pointer to the newly create mobile.
-    Mobile * spawn(Room * spawnRoom, unsigned int mobileVnum);
+	/// @brief Creates a mobile using this model.
+	/// @return A pointer to the newly create mobile.
+	Mobile *spawn(Room *spawnRoom, unsigned int mobileVnum);
 };
