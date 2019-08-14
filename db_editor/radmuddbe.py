@@ -10,13 +10,54 @@
 from radmuddbe_gui import *
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSql
+from PyQt5.QtGui import QColor
 from qtmodern import styles
 import gc
 import sys
 import logging
-from logging import *
 from functools import partial
-from custom_logger import ColorHandler
+
+
+class ColorHandler(logging.StreamHandler):
+    def __init__(self, _text_edit):
+        super(ColorHandler, self).__init__()
+        self.text_edit = _text_edit
+        assert (isinstance(self.text_edit, QtWidgets.QTextEdit))
+        self.ansi_colors = dict(
+            black=30,
+            red=31,
+            green=32,
+            yellow=33,
+            blue=34,
+            magenta=35,
+            cyan=36,
+            white=37
+        )
+        self.rgb_colors = dict(
+            black=QColor(0, 0, 0),
+            red=QColor(255, 0, 0),
+            green=QColor(0, 255, 0),
+            yellow=QColor(255, 255, 0),
+            blue=QColor(0, 0, 128),
+            magenta=QColor(255, 0, 255),
+            cyan=QColor(0, 255, 255),
+            white=QColor(255, 255, 255)
+        )
+
+    def emit(self, record):
+        msg_colors = {
+            logging.DEBUG: "green",
+            logging.INFO: "cyan",
+            logging.WARNING: "yellow",
+            logging.ERROR: "red"
+        }
+        color_id = msg_colors.get(record.levelno, "blue")
+        self.stream.write('\x1b[%s;1m%s\x1b[0m\n' % (self.ansi_colors[color_id], record))
+        if self.text_edit:
+            self.text_edit.setTextColor(QColor(255, 255, 255))
+            self.text_edit.insertPlainText("%s:%d : " % (record.funcName, record.lineno))
+            self.text_edit.setTextColor(self.rgb_colors[color_id])
+            self.text_edit.insertPlainText("%s\n" % (record.getMessage()))
 
 
 class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -123,13 +164,13 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
     def table_menu(self, position):
         widget = self.sender()
         if not isinstance(widget, QtWidgets.QTableView):
-            error("Sender is not QtWidgets.QTableView.")
+            logging.error("Sender is not QtWidgets.QTableView.")
             return
         try:
             index = widget.indexAt(position)
         except Exception as err:
-            error("Cannot get item at the given position.")
-            error(str(err))
+            logging.error("Cannot get item at the given position.")
+            logging.error(str(err))
             return
         menu = QtWidgets.QMenu("Menu", self)
         menu.addAction("Insert", partial(self.table_action_insert, table=widget))
@@ -140,7 +181,7 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
     def log_menu(self, position):
         widget = self.sender()
         if not isinstance(widget, QtWidgets.QTextEdit):
-            error("Sender is not QtWidgets.QTextEdit.")
+            logging.error("Sender is not QtWidgets.QTextEdit.")
             return False
         menu = QtWidgets.QMenu("Menu", self)
         menu.addAction("Select All", lambda: self.log_window.selectAll())
@@ -158,15 +199,15 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def table_action_delete(self, table, index):
         if not isinstance(table, QtWidgets.QTableView):
-            error("Table is not a QtWidgets.QTableView.")
+            logging.error("Table is not a QtWidgets.QTableView.")
             return False
-        query = "DELETE FROM '{}' WHERE _rowid_ = {}".format(table.model().tableName(), index.row() + 1)
+        query = "DELETE FROM {} WHERE _rowid_ = {}".format(table.model().tableName(), index.row() + 1)
         if self.db.exec(query):
             if table.model().submitAll():
                 if table.model().select():
-                    info("Removed row index '{}'.".format(index.row()))
+                    logging.info("Removed row index '{}'.".format(index.row()))
                     return True
-        error(self.db.lastError())
+        logging.error(self.db.lastError())
         return False
 
     def close_application(self):
@@ -175,63 +216,63 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def open_database(self, filename):
         if not filename:
-            error("You need to provide a filename!")
+            logging.error("You need to provide a filename!")
             return False
-        info("Opening database '%s'..." % filename)
+        logging.info("Opening database '%s'..." % filename)
         if self.db.isOpen():
-            error("You are already connected to database '%s'" % filename)
+            logging.error("You are already connected to database '%s'" % filename)
             return False
         self.db.setDatabaseName(filename)
         if not self.db.open():
-            error("Cannot connect to database '%s'" % filename)
+            logging.error("Cannot connect to database '%s'" % filename)
             return False
         self.db_filename = filename
         self.setup_tables()
         # self.db.transaction()
-        info("Opening database '%s'... done." % filename)
+        logging.info("Opening database '%s'... done." % filename)
         return True
 
     def save_database(self):
-        info("Saving database '%s'..." % self.db_filename)
+        logging.info("Saving database '%s'..." % self.db_filename)
         if not self.db.isOpen():
-            error("You are not connected to any database!")
+            logging.error("You are not connected to any database!")
             return False
         for obj in gc.get_objects():
             if isinstance(obj, QtSql.QSqlRelationalTableModel):
                 if not obj.submitAll():
-                    error(self.db.lastError())
-        info("Saving database '%s'... done." % self.db_filename)
+                    logging.error(self.db.lastError())
+        logging.info("Saving database '%s'... done." % self.db_filename)
         return True
 
     def update_models(self):
-        info("Updating models...")
+        logging.info("Updating models...")
         for obj in gc.get_objects():
             if isinstance(obj, QtWidgets.QTableView):
                 obj.horizontalHeader().setMaximumSectionSize(500)
                 obj.model().select()
                 obj.resizeColumnsToContents()
-        info("Updating models... done.")
+        logging.info("Updating models... done.")
 
     def clear_filters(self):
-        info("Clearing filters...")
+        logging.info("Clearing filters...")
         for obj in gc.get_objects():
             if isinstance(obj, QtSql.QSqlRelationalTableModel):
                 obj.setFilter("")
             if isinstance(obj, QtWidgets.QTableView):
                 obj.clearSelection()
-        info("Clearing filters... done.")
+        logging.info("Clearing filters... done.")
 
     def close_database(self):
-        info("Closing database '%s'..." % self.db_filename)
+        logging.info("Closing database '%s'..." % self.db_filename)
         if not self.db.isOpen():
-            error("The database is already closed!")
+            logging.error("The database is already closed!")
             return False
         self.db.close()
         if self.db.isOpen():
-            error("You failed to close the database '%s'!" % self.db_filename)
+            logging.error("You failed to close the database '%s'!" % self.db_filename)
             return False
         self.update_models()
-        info("Closing database '%s'... done." % self.db_filename)
+        logging.info("Closing database '%s'... done." % self.db_filename)
         return True
 
     def on_click_open_database(self):
