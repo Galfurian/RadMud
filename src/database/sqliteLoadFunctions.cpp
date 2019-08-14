@@ -140,7 +140,6 @@ bool LoadSkill(ResultSet *result)
 
 bool LoadSkillPrerequisite(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -167,7 +166,6 @@ bool LoadSkillPrerequisite(ResultSet *result)
 
 bool LoadSkillAbilityModifier(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -194,7 +192,6 @@ bool LoadSkillAbilityModifier(ResultSet *result)
 
 bool LoadSkillStatusModifier(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -221,7 +218,6 @@ bool LoadSkillStatusModifier(ResultSet *result)
 
 bool LoadSkillCombatModifier(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -248,7 +244,6 @@ bool LoadSkillCombatModifier(ResultSet *result)
 
 bool LoadSkillKnowledge(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto skillVnum = result->getNextUnsignedInteger();
     auto skill = Mud::instance().findSkill(skillVnum);
     if (skill == nullptr)
@@ -1050,7 +1045,6 @@ bool LoadBuilding(ResultSet *result)
 
 bool LoadBuildingTool(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
@@ -1075,7 +1069,6 @@ bool LoadBuildingTool(ResultSet *result)
 
 bool LoadBuildingIngredient(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
@@ -1104,7 +1097,6 @@ bool LoadBuildingIngredient(ResultSet *result)
 
 bool LoadBuildingKnowledge(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto buildingVnum = result->getNextUnsignedInteger();
     auto building = Mud::instance().findBuilding(buildingVnum);
     if (building == nullptr)
@@ -1122,7 +1114,7 @@ bool LoadBuildingKnowledge(ResultSet *result)
     building->requiredKnowledge.emplace_back(knowledge);
     Logger::log(LogLevel::Debug,
                 "\t[%s] %s%s",
-                Align(knowledgeId, align::left, 4),
+                Align(building->vnum, align::left, 4),
                 Align(building->name, align::left, 25),
                 Align(knowledge.toString(), align::left, 35));
     return true;
@@ -1194,7 +1186,6 @@ bool LoadShopDefaultStock(ResultSet *result)
 bool LoadCurrency(ResultSet *result)
 {
     // Retrieve the item vnum.
-    result->getNextUnsignedInteger(); // Skip ID
     auto modelVnum = result->getNextUnsignedInteger();
     auto materialVnum = result->getNextUnsignedInteger();
     auto worth = result->getNextUnsignedInteger();
@@ -1312,7 +1303,6 @@ bool LoadBodyPart(ResultSet *result)
 
 bool LoadBodyPartResources(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto bodyPartVnum = result->getNextUnsignedInteger();
     auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
     if (bodyPart == nullptr)
@@ -1352,7 +1342,6 @@ bool LoadBodyPartResources(ResultSet *result)
 
 bool LoadBodyPartWeapon(ResultSet *result)
 {
-    result->getNextUnsignedInteger(); // Skip ID
     auto bodyPartVnum = result->getNextUnsignedInteger();
     auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
     if (bodyPart == nullptr)

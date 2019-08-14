@@ -14,7 +14,7 @@
    <string>RadMud Db Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_6">
+   <layout class="QVBoxLayout" name="verticalLayout_4" stretch="10,1">
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="tabShape">
@@ -1174,6 +1174,19 @@ p, li { white-space: pre-wrap; }
         </item>
        </layout>
       </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="log_window">
+      <property name="focusPolicy">
+       <enum>Qt::ClickFocus</enum>
+      </property>
+      <property name="documentTitle">
+       <string>Log</string>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
      </widget>
     </item>
    </layout>
