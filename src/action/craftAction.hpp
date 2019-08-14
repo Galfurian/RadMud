@@ -46,8 +46,9 @@ public:
 	/// @param _production  A pointer to the production to craft.
 	/// @param _tools       The list of used tools.
 	/// @param _ingredients The list of used ingredients.
-	CraftAction(Character *_actor, Production *_production, ItemVector &_tools,
-				std::vector<std::pair<Item *, unsigned int> > &_ingredients);
+	CraftAction(
+		Character *_actor, Production *_production, ItemVector const &_tools,
+		std::vector<std::pair<Item *, unsigned int> > const &_ingredients);
 
 	/// @brief Destructor.
 	virtual ~CraftAction();
@@ -57,6 +58,8 @@ public:
 	ActionType getType() const override;
 
 	std::string getDescription() const override;
+
+	bool start() override;
 
 	std::string stop() override;
 

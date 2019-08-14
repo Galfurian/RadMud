@@ -108,64 +108,64 @@ Item *FindNearbyItem(Character *character, std::string const &key, int &number,
 
 bool FindNearbyResouces(
 	Character *character,
-	std::map<ResourceType, unsigned int> requiredResources,
+	std::map<ResourceType, unsigned int> const &requiredResources,
 	std::vector<std::pair<Item *, unsigned int> > &foundResources,
 	const SearchOptionsCharacter &searchOptions, ResourceType &missing)
 {
 	// Create a function which reduces the required quantity and checks if
 	// the zero has been reached.
-	auto DecrementRequired = [&](Item *item, unsigned int &requiredQuantity) {
+	auto DecrementRequired = [&](Item *item, unsigned int &required) {
 		// Set the used quantity.
-		auto used = std::min(item->quantity, requiredQuantity);
+		auto used = std::min(item->quantity, required);
 		// Add the item to the list of used resources.
 		foundResources.emplace_back(std::make_pair(item, used));
-		// Reduce the quantity needed.
-		requiredQuantity -= used;
-		// Returns if we've reached the needed quantity.
-		return (requiredQuantity == 0);
+		// Reduce quantity and check if we've reached the needed quantity.
+		return ((required -= used) == 0);
 	};
 	for (auto const &resource : requiredResources) {
 		// Quantity of ingredients that has to be found.
-		auto quantityNeeded = resource.second;
+		auto required = resource.second;
 		// Check if we need to search inside the room.
 		// TODO: Probably I need to check if a given item is not selected twice.
-		if (searchOptions.searchInRoom && (quantityNeeded > 0)) {
-			for (auto item : character->room->items) {
+		if (searchOptions.searchInRoom && (required > 0)) {
+			for (auto const &item : character->room->items) {
 				// Check if the item is a valid resource.
 				if (!ItemUtils::IsValidResource(item, resource.first))
 					continue;
 				// Decrement the required quantity. If we've reached the
 				// needed quantity stop the loop.
-				if (DecrementRequired(item, quantityNeeded))
+				if (DecrementRequired(item, required))
 					break;
 			}
 		}
 		// Check if we need to search inside the character's equipment.
-		if (searchOptions.searchInEquipment && (quantityNeeded > 0)) {
-			for (auto item : character->equipment) {
+		if (searchOptions.searchInEquipment && (required > 0)) {
+			for (auto const &item : character->equipment) {
 				// Check if the item is a valid resource.
 				if (!ItemUtils::IsValidResource(item, resource.first))
 					continue;
 				// Decrement the required quantity. If we've reached the
 				// needed quantity stop the loop.
-				if (DecrementRequired(item, quantityNeeded))
+				if (DecrementRequired(item, required))
 					break;
 			}
 		}
 		// Check if we need to search inside the character's inventory.
-		if (searchOptions.searchInInventory && (quantityNeeded > 0)) {
-			for (auto item : character->inventory) {
+		if (searchOptions.searchInInventory && (required > 0)) {
+			for (auto const &item : character->inventory) {
 				// Check if the item is a valid resource.
 				if (!ItemUtils::IsValidResource(item, resource.first))
 					continue;
 				// Decrement the required quantity. If we've reached the
 				// needed quantity stop the loop.
-				if (DecrementRequired(item, quantityNeeded))
+				if (DecrementRequired(item, required))
 					break;
 			}
 		}
+		Logger::log(LogLevel::Debug, "[%s] %s/%s", resource.first.toString(),
+					required, resource.second);
 		// If the ingredients are still not enough, return false.
-		if (quantityNeeded > 0) {
+		if (required > 0) {
 			missing = resource.first;
 			return false;
 		}

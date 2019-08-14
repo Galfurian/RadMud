@@ -59,7 +59,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit ResourceType(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > Nail)
+			value = None;
 	}
 
 	/// @brief Constructor from enum.

@@ -25,6 +25,7 @@
 #include "magazineModel.hpp"
 #include "sqliteDbms.hpp"
 #include "character.hpp"
+#include "room.hpp"
 
 #include <cassert>
 
@@ -86,6 +87,22 @@ ActionType LoadAction::getType() const
 std::string LoadAction::getDescription() const
 {
 	return "loading";
+}
+
+bool LoadAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the starting message.
+	actor->sendMsg("You start loading %s with %s.\n", magazine->getName(true),
+				   projectile->getName(true));
+	actor->room->sendToAll("%s starts loading %s with %s...\n", { actor },
+						   magazine->getName(true),
+						   projectile->getName(true));
+	return true;
 }
 
 std::string LoadAction::stop()

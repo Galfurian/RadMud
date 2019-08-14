@@ -64,7 +64,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit ModelType(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > Magazine)
+			value = None;
 	}
 
 	/// @brief Constructor from enum.

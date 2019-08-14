@@ -53,7 +53,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit MaterialType(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > Cereal)
+			value = None;
 	}
 
 	/// @brief Constructor from enum.

@@ -32,8 +32,8 @@
 
 BuildAction::BuildAction(
 	Character *_actor, const std::shared_ptr<Building> &_schematics,
-	Item *_building, ItemVector &_tools,
-	std::vector<std::pair<Item *, unsigned int> > &_ingredients) :
+	Item *_building, ItemVector const &_tools,
+	std::vector<std::pair<Item *, unsigned int> > const &_ingredients) :
 	GeneralAction(_actor),
 	schematics(_schematics),
 	building(_building),
@@ -53,68 +53,43 @@ BuildAction::~BuildAction()
 
 bool BuildAction::check(std::string &error) const
 {
-	if (!GeneralAction::check(error)) {
+	if (!GeneralAction::check(error))
 		return false;
-	}
 	if (building == nullptr) {
-		Logger::log(LogLevel::Error, "The building is a null pointer.");
 		error = "You don't have a building set.";
 		return false;
 	}
 	if (schematics == nullptr) {
-		Logger::log(LogLevel::Error,
-					"The schematics for a building are a null pointer.");
 		error = "You don't have a valid schematics set.";
 		return false;
 	}
-	for (auto iterator : ingredients) {
+	for (auto const &it : ingredients) {
 		// Check if the ingredient has been deleted.
-		if (iterator.first == nullptr) {
-			Logger::log(LogLevel::Error,
-						"One of the ingredients is a null pointer.");
+		if (it.first == nullptr) {
 			error = "One of your ingredient is missing.";
 			return false;
 		}
 	}
-#if 0
-    if (tools.empty())
-    {
-        Logger::log(LogLevel::Error, "No used tools have been set.");
-        error = "One or more tools are missing.";
-        return false;
-    }
-#endif
-	for (auto iterator : tools) {
+	for (auto const &it : tools) {
 		// Check if the tool has been deleted.
-		if (iterator == nullptr) {
-			Logger::log(LogLevel::Error, "One of the tools is a null pointer.");
-			error = "One or more tools are missing.";
+		if (it == nullptr) {
+			error = "You are missing one of the tools.";
 			return false;
 		}
 	}
 	// Check if the actor has enough stamina to execute the action.
-	if (this->getConsumedStamina(actor) > actor->stamina) {
+	if (getConsumedStamina(actor) > actor->stamina) {
 		error = "You are too tired right now.";
 		return false;
 	}
-	// Check if the actor has enough ingredients.
-	for (auto const &it : schematics->ingredients) {
-		auto required = it.second;
-		for (auto it2 : ingredients) {
-			auto item = it2.first;
-			if (item->getType() == ModelType::Resource) {
-				auto resourceModel = item->model->to<ResourceModel>();
-				if (resourceModel->resourceType == it.first) {
-					required -= item->quantity;
-					if (required <= 0) {
-						break;
-					}
-				}
-			}
+	// Add the ingredients to the list of items to destroy.
+	for (auto const &it : ingredients) {
+		if (it.first == nullptr) {
+			error = "You don't have one of the ingredients anymore.";
+			return false;
 		}
-		if (required > 0) {
-			error = "You don't have enough materials (" + it.first.toString() +
-					").";
+		if (it.first->quantity < it.second) {
+			error = "You don't have enough " + it.first->getName() + ".";
 			return false;
 		}
 	}
@@ -129,6 +104,22 @@ ActionType BuildAction::getType() const
 std::string BuildAction::getDescription() const
 {
 	return "building";
+}
+
+bool BuildAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the messages.
+	actor->sendMsg("You start building %s.\n",
+				   Formatter::yellow(schematics->buildingModel->getName()));
+	// Send the message inside the room.
+	actor->room->sendToAll("%s has started building something...\n", { actor },
+						   actor->getNameCapital());
+	return true;
 }
 
 std::string BuildAction::stop()
@@ -159,11 +150,11 @@ ActionStatus BuildAction::perform()
 			ingredient->quantity -= it.second;
 		}
 	}
-	for (auto iterator : tools) {
+	for (auto it : tools) {
 		// Update the condition of the involved objects.
-		iterator->triggerDecay();
-		if (iterator->condition < 0) {
-			actor->sendMsg(iterator->getName(true) + " falls into pieces.");
+		it->triggerDecay();
+		if (it->condition < 0) {
+			actor->sendMsg(it->getName(true) + " falls into pieces.");
 		}
 	}
 	// Send conclusion message.

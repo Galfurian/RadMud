@@ -30,10 +30,11 @@
 #include "room.hpp"
 
 #include <cassert>
+#include "formatter.hpp"
 
 CraftAction::CraftAction(
-	Character *_actor, Production *_production, ItemVector &_tools,
-	std::vector<std::pair<Item *, unsigned int> > &_ingredients) :
+	Character *_actor, Production *_production, ItemVector const &_tools,
+	std::vector<std::pair<Item *, unsigned int> > const &_ingredients) :
 	GeneralAction(_actor),
 	production(_production),
 	tools(_tools),
@@ -56,71 +57,51 @@ CraftAction::~CraftAction()
 
 bool CraftAction::check(std::string &error) const
 {
-	if (!GeneralAction::check(error)) {
+	if (!GeneralAction::check(error))
 		return false;
-	}
 	if (production == nullptr) {
-		Logger::log(LogLevel::Error, "The production is a null pointer.");
 		error = "You don't have a production set.";
 		return false;
-	} else {
-		if (production->outcome == nullptr) {
-			Logger::log(LogLevel::Error, "The outcome is a null pointer.");
-			error = "You don't have a production set.";
-			return false;
-		}
-		if (production->profession == nullptr) {
-			Logger::log(LogLevel::Error, "The profession is a null pointer.");
-			error = "You don't have a production set.";
-			return false;
-		}
+	}
+	if (production->outcome == nullptr) {
+		error = "You don't have a production set.";
+		return false;
+	}
+	if (production->profession == nullptr) {
+		error = "You don't have a production set.";
+		return false;
 	}
 	if (material == nullptr) {
-		Logger::log(LogLevel::Error, "The material is a null pointer.");
 		error = "You don't know how to craft the item.";
 		return false;
 	}
-	for (auto iterator : ingredients) {
+	for (auto const &it : ingredients) {
 		// Check if the ingredient has been deleted.
-		if (iterator.first == nullptr) {
-			Logger::log(LogLevel::Error, "Null pointer ingredient.");
+		if (it.first == nullptr) {
 			error = "One of your ingredient is missing.";
 			return false;
 		}
 	}
-#if 0
-    if (tools.empty())
-    {
-        Logger::log(LogLevel::Error, "No used tools have been set.");
-        error = "One or more tools are missing.";
-        return false;
-    }
-#endif
-	for (auto iterator : tools) {
+	for (auto const &it : tools) {
 		// Check if the tool has been deleted.
-		if (iterator == nullptr) {
-			Logger::log(LogLevel::Error, "One of the tools is a null pointer.");
-			error = "One or more tools are missing.";
+		if (it == nullptr) {
+			error = "You are missing one of the tools.";
 			return false;
 		}
 	}
 	// Check if the actor has enough stamina to execute the action.
-	if (this->getConsumedStamina(actor) > actor->stamina) {
+	if (getConsumedStamina(actor) > actor->stamina) {
 		error = "You are too tired right now.";
 		return false;
 	}
 	// Add the ingredients to the list of items to destroy.
-	for (auto it : production->ingredients) {
-		auto required = it.second;
-		for (auto it2 : ingredients) {
-			// Check the type.
-			if (!ItemUtils::IsValidResource(it2.first, it.first))
-				continue;
-			// Reduce the quantity.
-			required -= it2.second;
+	for (auto const &it : ingredients) {
+		if (it.first == nullptr) {
+			error = "You don't have one of the ingredients anymore.";
+			return false;
 		}
-		if (required > 0) {
-			error = "You don't have enough materials.";
+		if (it.first->quantity < it.second) {
+			error = "You don't have enough " + it.first->getName() + ".";
 			return false;
 		}
 	}
@@ -135,6 +116,22 @@ ActionType CraftAction::getType() const
 std::string CraftAction::getDescription() const
 {
 	return this->production->profession->action;
+}
+
+bool CraftAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the messages.
+	actor->sendMsg("%s %s.\n", production->profession->startMessage,
+				   Formatter::yellow(production->outcome->getName()));
+	actor->room->sendToAll("%s has started %s something...\n", { actor },
+						   actor->getNameCapital(),
+						   production->profession->action);
+	return true;
 }
 
 std::string CraftAction::stop()
@@ -205,13 +202,11 @@ ActionStatus CraftAction::perform()
 			actor->addInventoryItem(createdItem);
 		}
 	}
-	for (auto iterator : tools) {
+	for (auto it : tools) {
 		// Update the condition of the involved objects.
-		iterator->triggerDecay();
-		if (iterator->condition < 0) {
-			actor->sendMsg("%s falls into pieces.",
-						   iterator->getNameCapital(true));
-		}
+		it->triggerDecay();
+		if (it->condition < 0)
+			actor->sendMsg("%s falls into pieces.", it->getNameCapital(true));
 	}
 	// Send conclusion message.
 	actor->sendMsg("%s %s.\n\n", production->profession->finishMessage,

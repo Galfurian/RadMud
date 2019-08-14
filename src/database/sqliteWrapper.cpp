@@ -245,7 +245,7 @@ bool SQLiteWrapper::getDataString(const int &column, std::string &data)
 	// Check if the retrieved data is a string.
 	if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_TEXT) {
 		errorMessage = "Column at index (" + ToString(column) +
-					   ") does not contain a Text.";
+					   ") is not of type SQLITE_TEXT.";
 		errorCode = SQLITE_MISMATCH;
 		return false;
 	}
@@ -272,7 +272,7 @@ bool SQLiteWrapper::getDataInteger(const int &column, int &data)
 	// Check if the retrieved data is an integer.
 	if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER) {
 		errorMessage = "Column at index (" + ToString(column) +
-					   ") does not contain an Integer.";
+					   ") is not of type SQLITE_INTEGER.";
 		errorCode = SQLITE_MISMATCH;
 		return false;
 	}
@@ -293,14 +293,14 @@ bool SQLiteWrapper::getDataUnsignedInteger(const int &column,
 	// Check if the retrieved data is an integer.
 	if (sqlite3_column_type(dbDetails.dbStatement, column) != SQLITE_INTEGER) {
 		errorMessage = "Column at index (" + ToString(column) +
-					   ") does not contain an Unsigned Integer.";
+					   ") is not of type SQLITE_INTEGER.";
 		errorCode = SQLITE_MISMATCH;
 		return false;
 	}
 	int retrievedData = sqlite3_column_int(dbDetails.dbStatement, column);
 	if (retrievedData < 0) {
 		errorMessage = "Column at index (" + ToString(column) +
-					   ") does not contain an Unsigned Integer.";
+					   ") does not contain an UNSIGNED.";
 		errorCode = SQLITE_MISMATCH;
 		return false;
 	}

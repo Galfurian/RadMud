@@ -54,7 +54,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit ToolType(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > CookingFire)
+			value = None;
 	}
 
 	/// @brief Returns the type of model as string.

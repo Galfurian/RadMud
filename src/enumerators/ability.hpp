@@ -46,7 +46,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit Ability(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > Intelligence)
+			value = None;
 	}
 
 	/// @brief Constructor from enum.

@@ -78,6 +78,31 @@ std::string MoveAction::getDescription() const
 	return "moving";
 }
 
+bool MoveAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	if (actor->posture == CharacterPosture::Stand) {
+		actor->sendMsg("You start going %s...\n", direction.toString());
+		actor->room->sendToAll("%s starts going %s...\n", { actor },
+							   actor->getNameCapital(), direction.toString());
+	} else if (actor->posture == CharacterPosture::Crouch) {
+		actor->sendMsg("You move crouching towards %s...\n",
+					   direction.toString());
+		actor->room->sendToAll("%s move crouching towards %s...\n", { actor },
+							   actor->getNameCapital(), direction.toString());
+	} else if (actor->posture == CharacterPosture::Prone) {
+		actor->sendMsg("You begin crawling towards %s...\n",
+					   direction.toString());
+		actor->room->sendToAll("%s begin crawling towards %s...\n", { actor },
+							   actor->getNameCapital(), direction.toString());
+	}
+	return true;
+}
+
 std::string MoveAction::stop()
 {
 	return "You stop moving.";

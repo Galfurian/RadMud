@@ -54,7 +54,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit SkillRank(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > Master)
+			value = None;
 	}
 
 	/// @brief Constructor from enum.

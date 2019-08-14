@@ -24,6 +24,7 @@
 
 #include "sqliteDbms.hpp"
 #include "character.hpp"
+#include "room.hpp"
 
 #include <cassert>
 
@@ -80,6 +81,20 @@ ActionType UnloadAction::getType() const
 std::string UnloadAction::getDescription() const
 {
 	return "unloading";
+}
+
+bool UnloadAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the starting message.
+	actor->sendMsg("You start unloading %s.\n", item->getName(true));
+	actor->room->sendToAll("%s starts unloading %s...\n", { actor },
+						   item->getName(true));
+	return true;
 }
 
 std::string UnloadAction::stop()

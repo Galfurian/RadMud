@@ -27,20 +27,18 @@
 /// @brief A custom exception handler for the loading function used by the mud.
 class SQLiteException : public std::runtime_error {
 private:
-	/// The error code associated with the exception.
-	int errorCode;
 	/// The error message associated with the exception.
 	std::string errorMessage;
 
 public:
 	/// @brief Constructor.
 	/// @param _errorMessage The error message.
-	SQLiteException(std::string _errorMessage);
+	explicit SQLiteException(std::string const &_message);
 
 	/// @brief Constructor.
 	/// @param _errorCode    The SQLITE error code.
 	/// @param _errorMessage The error message.
-	SQLiteException(int _errorCode, std::string _errorMessage);
+	SQLiteException(int _code, std::string const & _message);
 
 	/// @brief Return what is the subject of the exception.
 	char const *what() const noexcept override;

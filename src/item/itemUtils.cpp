@@ -74,21 +74,21 @@ bool IsValidTool(Item *item, ItemVector const &exceptions,
 	return false;
 }
 
-bool IsValidResource(Item *item, const ResourceType &resourceType)
+bool IsValidResource(Item *item, const ResourceType &type)
 {
-	// Check the pointer to the model.
-	if (item->model == nullptr) {
+	// Check the pointer to the item.
+	if (item == nullptr)
 		return false;
-	}
-	// Check if the item is a resource.
-	if (item->model->getType() == ModelType::Resource) {
-		// Check if the type of resource is the same.
-		return (item->model->to<ResourceModel>()->resourceType == resourceType);
-	} else if ((resourceType == ResourceType::Meat) &&
-			   (item->model->getType() == ModelType::Food)) {
-		// Check if the type of resource is the same.
+	// Check the pointer to the model.
+	if (item->model == nullptr)
+		return false;
+	auto modelType = item->model->getType();
+	// Check if the item has the correct type.
+	if (modelType == ModelType::Resource)
+		return (item->model->to<ResourceModel>()->resourceType == type);
+	// If the required type is meat, and the item is food, check if it is raw.
+	if ((type == ResourceType::Meat) && (modelType == ModelType::Food))
 		return HasFlag(item->model->to<FoodModel>()->foodFlags, FoodFlag::Raw);
-	}
 	return false;
 }
 

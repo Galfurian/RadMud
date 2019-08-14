@@ -44,7 +44,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit StatusModifier(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > StaminaRegeneration)
+			value = None;
 	}
 
 	/// @brief Constructor from enum.

@@ -23,25 +23,21 @@
 #include "sqliteException.hpp"
 #include "utils.hpp"
 
-SQLiteException::SQLiteException(std::string _errorMessage) :
+SQLiteException::SQLiteException(std::string const &_message) :
 	std::runtime_error("SQLiteException"),
-	errorCode(1),
-	errorMessage(_errorMessage)
+	errorMessage("[1] " + _message)
 {
 	// Nothing to do.
 }
 
-SQLiteException::SQLiteException(int _errorCode, std::string _errorMessage) :
+SQLiteException::SQLiteException(int _code, std::string const &_message) :
 	std::runtime_error("SQLiteException"),
-	errorCode(_errorCode),
-	errorMessage(_errorMessage)
+	errorMessage("[" + ToString(_code) + "] " + _message)
 {
 	// Nothing to do.
 }
 
 char const *SQLiteException::what() const noexcept
 {
-	return std::string("Code : " + ToString(errorCode) +
-					   " | Message : " + errorMessage)
-		.c_str();
+	return errorMessage.c_str();
 }

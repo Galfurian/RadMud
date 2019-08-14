@@ -47,9 +47,10 @@ public:
 	/// @param _building    A pointer to the item which has to be built.
 	/// @param _tools       The list of used tools.
 	/// @param _ingredients The list of used ingredients.
-	BuildAction(Character *_actor, const std::shared_ptr<Building> &_schematics,
-				Item *_building, ItemVector &_tools,
-				std::vector<std::pair<Item *, unsigned int> > &_ingredients);
+	BuildAction(
+		Character *_actor, const std::shared_ptr<Building> &_schematics,
+		Item *_building, ItemVector const &_tools,
+		std::vector<std::pair<Item *, unsigned int> > const &_ingredients);
 
 	/// @brief Destructor.
 	virtual ~BuildAction();
@@ -59,6 +60,8 @@ public:
 	ActionType getType() const override;
 
 	std::string getDescription() const override;
+
+	bool start() override;
 
 	std::string stop() override;
 

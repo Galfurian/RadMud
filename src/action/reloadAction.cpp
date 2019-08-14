@@ -24,6 +24,8 @@
 
 #include "sqliteDbms.hpp"
 #include "character.hpp"
+#include "room.hpp"
+
 #include <cassert>
 
 ReloadAction::ReloadAction(Character *_actor, RangedWeaponItem *_weapon,
@@ -74,6 +76,21 @@ ActionType ReloadAction::getType() const
 std::string ReloadAction::getDescription() const
 {
 	return "reloading";
+}
+
+bool ReloadAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the starting message.
+	actor->sendMsg("You start reloading %s with %s.\n", weapon->getName(true),
+				   magazine->getName(true));
+	actor->room->sendToAll("%s starts reloading %s with %s...\n", { actor },
+						   weapon->getName(true), magazine->getName(true));
+	return true;
 }
 
 std::string ReloadAction::stop()

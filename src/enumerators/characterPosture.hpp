@@ -48,7 +48,8 @@ public:
 	explicit CharacterPosture(const unsigned int &_value) :
 		BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > Sleep)
+			value = None;
 	}
 
 	CharacterPosture(const Enum &_value) : BaseEnumerator(_value)

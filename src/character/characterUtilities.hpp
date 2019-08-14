@@ -148,7 +148,7 @@ Item *FindNearbyItem(Character *character, std::string const &key, int &number,
 ///         <b>False</b> otherwise.
 bool FindNearbyResouces(
 	Character *character,
-	std::map<ResourceType, unsigned int> requiredResources,
+	std::map<ResourceType, unsigned int> const &requiredResources,
 	std::vector<std::pair<Item *, unsigned int> > &foundResources,
 	const SearchOptionsCharacter &searchOptions, ResourceType &missing);
 

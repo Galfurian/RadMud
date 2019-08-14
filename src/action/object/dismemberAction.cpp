@@ -74,7 +74,7 @@ bool DismemberAction::start()
 {
 	std::string error;
 	if (!this->check(error)) {
-		actor->sendMsg(error + "\n");
+		actor->sendMsg(error + "\n\n");
 		return false;
 	}
 	actor->sendMsg("You start dismembering %s...\n", corpse->getName(true));
@@ -92,7 +92,7 @@ ActionStatus DismemberAction::perform()
 {
 	std::string error;
 	if (!this->check(error)) {
-		actor->sendMsg(error + "\n");
+		actor->sendMsg(error + "\n\n");
 		return ActionStatus::Error;
 	}
 	// First try to remove the body part.

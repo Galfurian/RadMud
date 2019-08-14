@@ -61,7 +61,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit Knowledge(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > BasicArmorProficiency)
+			value = None;
 	}
 
 	/// @brief Constructor from enum.

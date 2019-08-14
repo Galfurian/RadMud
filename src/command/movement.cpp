@@ -77,25 +77,11 @@ bool DoDirection(Character *character, Direction direction)
 	// Get the destination.
 	auto destination = character->room->findExit(direction)->destination;
 	// Create the move action.
-	auto moveAction =
-		std::make_shared<MoveAction>(character, destination, direction);
-	// Check the new action.
-	if (moveAction->check(error)) {
-		// Set the new action.
-		character->pushAction(moveAction);
-		// Calculate the time needed to move.
-		if (character->posture == CharacterPosture::Stand) {
-			character->sendMsg("You start to go %s...\n", direction.toString());
-		} else if (character->posture == CharacterPosture::Crouch) {
-			character->sendMsg("You move crouching towards %s...\n",
-							   direction.toString());
-		} else if (character->posture == CharacterPosture::Prone) {
-			character->sendMsg("You begin to crawl to %s...\n",
-							   direction.toString());
-		}
+	auto act = std::make_shared<MoveAction>(character, destination, direction);
+	if (act->start()) {
+		character->pushAction(act);
 		return true;
 	}
-	character->sendMsg("%s\n", error);
 	return false;
 }
 

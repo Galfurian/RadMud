@@ -46,7 +46,8 @@ public:
 	/// @brief Constructor from unsigned int.
 	explicit ItemQuality(const unsigned int &_value) : BaseEnumerator(_value)
 	{
-		// Nothing to do.
+		if (_value > Masterful)
+			value = Normal;
 	}
 
 	/// @brief Constructor from enum.

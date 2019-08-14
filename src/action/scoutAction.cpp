@@ -70,6 +70,19 @@ std::string ScoutAction::getDescription() const
 	return "scouting";
 }
 
+bool ScoutAction::start()
+{
+	std::string error;
+	if (!this->check(error)) {
+		actor->sendMsg(error + "\n\n");
+		return false;
+	}
+	// Send the starting message.
+	actor->sendMsg("You start scouting the area...\n");
+	actor->room->sendToAll("%s starts scouting the area...\n", { actor });
+	return true;
+}
+
 std::string ScoutAction::stop()
 {
 	return "You stop scouting the area.";

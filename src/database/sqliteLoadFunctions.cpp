@@ -983,12 +983,10 @@ bool LoadShop(ResultSet *result)
 	// Retrieve the item vnum.
 	auto vnum = result->getNextUnsignedInteger();
 	auto item = Mud::instance().findItem(vnum);
-	if (item == nullptr) {
+	if (item == nullptr)
 		throw SQLiteException("Can't find the item " + ToString(vnum));
-	}
-	if (item->getType() != ModelType::Shop) {
+	if (item->getType() != ModelType::Shop)
 		throw SQLiteException("Wrong type of item " + ToString(vnum));
-	}
 	// Cast the item to shop.
 	auto shop = dynamic_cast<ShopItem *>(item);
 	shop->shopName = result->getNextString();
@@ -999,9 +997,8 @@ bool LoadShop(ResultSet *result)
 		Mud::instance().findMobile(result->getNextUnsignedInteger());
 	shop->openingHour = result->getNextUnsignedInteger();
 	shop->closingHour = result->getNextUnsignedInteger();
-	if (shop->shopKeeper != nullptr) {
+	if (shop->shopKeeper != nullptr)
 		shop->shopKeeper->managedItem = shop;
-	}
 	return true;
 }
 

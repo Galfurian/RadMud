@@ -177,17 +177,11 @@ bool DoScout(Character *character, ArgumentHandler & /*args*/)
 	}
 	// Stop any action the character is executing.
 	StopAction(character);
-	auto newAction = std::make_shared<ScoutAction>(character);
-	// Check the new action.
-	std::string error;
-	if (newAction->check(error)) {
-		// Send the starting message.
-		character->sendMsg("You start scouting the area...\n");
-		// Set the new action.
-		character->pushAction(newAction);
+	auto act = std::make_shared<ScoutAction>(character);
+	if (act->start()) {
+		character->pushAction(act);
 		return true;
 	}
-	character->sendMsg("%s\n", error);
 	return false;
 }
 
@@ -241,19 +235,12 @@ bool DoLoad(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Create the load action.
-	auto newAction = std::make_shared<LoadAction>(character, magazine,
+	auto act = std::make_shared<LoadAction>(character, magazine,
 												  projectile, amountToLoad);
-	// Check the new action.
-	error = std::string();
-	if (newAction->check(error)) {
-		// Send the starting message.
-		character->sendMsg("You start loading %s with %s.\n",
-						   magazine->getName(true), projectile->getName(true));
-		// Set the new action.
-		character->pushAction(newAction);
+	if (act->start()) {
+		character->pushAction(act);
 		return true;
 	}
-	character->sendMsg("%s\n", error);
 	return false;
 }
 
@@ -294,18 +281,11 @@ bool DoUnload(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Create the unload action.
-	auto newAction = std::make_shared<UnloadAction>(character, itemToUnload);
-	std::string error;
-	// Check the new action.
-	if (newAction->check(error)) {
-		// Send the starting message.
-		character->sendMsg("You start unloading %s.\n",
-						   itemToUnload->getName(true));
-		// Set the new action.
-		character->pushAction(newAction);
+	auto act = std::make_shared<UnloadAction>(character, itemToUnload);
+	if (act->start()) {
+		character->pushAction(act);
 		return true;
 	}
-	character->sendMsg("%s\n", error);
 	return false;
 }
 
@@ -356,20 +336,11 @@ bool DoReload(Character *character, ArgumentHandler &args)
 						   magazine->getName(true));
 		return false;
 	}
-	auto newAction =
-		std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
-	std::string error;
-	// Check the new action.
-	if (newAction->check(error)) {
-		// Send the starting message.
-		character->sendMsg("You start reloading %s with %s.\n",
-						   rangedWeapon->getName(true),
-						   magazine->getName(true));
-		// Set the new action.
-		character->pushAction(newAction);
+	auto act = std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
+	if (act->start()) {
+		character->pushAction(act);
 		return true;
 	}
-	character->sendMsg("%s\n", error);
 	return false;
 }
 

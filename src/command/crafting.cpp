@@ -97,63 +97,49 @@ bool DoProfession(Character *character, Profession *profession,
 		return false;
 	}
 	// Search the needed tools.
-	ItemVector usedTools;
+	ItemVector tools;
 	// Prepare a structure to set the options of the search.
-	SearchOptionsCharacter searchOptions;
-	searchOptions.searchInRoom = true;
-	searchOptions.searchInEquipment = true;
-	searchOptions.searchInInventory = true;
-	if (!FindNearbyTools(character, production->tools, usedTools,
-						 searchOptions)) {
+	SearchOptionsCharacter options;
+	options.searchInRoom = true;
+	options.searchInEquipment = true;
+	options.searchInInventory = true;
+	if (!FindNearbyTools(character, production->tools, tools, options)) {
 		character->sendMsg("You don't have the right tools.\n");
 		return false;
 	}
 	// Search the needed ingredients.
-	std::vector<std::pair<Item *, unsigned int> > usedIngredients;
+	std::vector<std::pair<Item *, unsigned int> > ingredients;
 	// Do not search the ingredients inside the equipment.
-	searchOptions.searchInRoom = true;
-	searchOptions.searchInEquipment = false;
-	searchOptions.searchInInventory = true;
+	options.searchInRoom = true;
+	options.searchInEquipment = false;
+	options.searchInInventory = true;
 	ResourceType missing(ResourceType::None);
 	// Search the resources nearby.
-	if (!FindNearbyResouces(character, production->ingredients, usedIngredients,
-							searchOptions, missing)) {
-		character->sendMsg("You don't have enough material (%s).\n",
-						   missing.toString());
+	if (!FindNearbyResouces(character, production->ingredients, ingredients,
+							options, missing)) {
+		character->sendMsg("You don't have enough %s.\n", missing.toString());
 		return false;
 	}
 	// Search the needed workbench.
 	if (production->workbench != ToolType::None) {
 		// Just check inside the room.
-		searchOptions.searchInRoom = true;
-		searchOptions.searchInEquipment = false;
-		searchOptions.searchInInventory = false;
+		options.searchInRoom = true;
+		options.searchInEquipment = false;
+		options.searchInInventory = false;
 		auto workbench = FindNearbyTool(character, production->workbench,
-										ItemVector(), searchOptions);
+										ItemVector(), options);
 		if (workbench == nullptr) {
 			character->sendMsg("The proper workbench is not present.\n");
 			return false;
 		}
 	}
 	// Prepare the action.
-	auto craftAction = std::make_shared<CraftAction>(
-		character, production, usedTools, usedIngredients);
-	// Check the new action.
-	std::string error;
-	if (craftAction->check(error)) {
-		// Set the new action.
-		character->pushAction(craftAction);
-		// Send the messages.
-		character->sendMsg("%s %s.\n", profession->startMessage,
-						   Formatter::yellow() +
-							   production->outcome->getName() +
-							   Formatter::reset());
-		character->room->sendToAll("%s has started %s something...\n",
-								   { character }, character->getNameCapital(),
-								   production->profession->action);
+	auto act = std::make_shared<CraftAction>(character, production, tools,
+											 ingredients);
+	if (act->start()) {
+		character->pushAction(act);
 		return true;
 	}
-	character->sendMsg("%s\n", error);
 	return false;
 }
 
@@ -209,14 +195,14 @@ bool DoBuild(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Search the needed tools.
-	ItemVector usedTools;
-	if (!FindNearbyTools(character, schematics->tools, usedTools,
+	ItemVector tools;
+	if (!FindNearbyTools(character, schematics->tools, tools,
 						 SearchOptionsCharacter::allOptions())) {
 		character->sendMsg("You don't have the right tools.\n");
 		return false;
 	}
 	// Search the needed ingredients.
-	std::vector<std::pair<Item *, unsigned int> > usedIngredients;
+	std::vector<std::pair<Item *, unsigned int> > ingredients;
 	// Do not search the ingredients inside the equipment.
 	// Keep the previous search options and search the building.
 	auto building = FindNearbyBuilding(character, schematics->buildingModel,
@@ -227,7 +213,7 @@ bool DoBuild(Character *character, ArgumentHandler &args)
 	}
 	ResourceType missing(ResourceType::None);
 	// Search the resources nearby.
-	if (!FindNearbyResouces(character, schematics->ingredients, usedIngredients,
+	if (!FindNearbyResouces(character, schematics->ingredients, ingredients,
 							SearchOptionsCharacter(true, true), missing)) {
 		character->sendMsg("You don't have enough material (%s).\n",
 						   missing.toString());
@@ -235,7 +221,7 @@ bool DoBuild(Character *character, ArgumentHandler &args)
 	}
 	// Prepare the action.
 	auto buildAction = std::make_shared<BuildAction>(
-		character, schematics, building, usedTools, usedIngredients);
+		character, schematics, building, tools, ingredients);
 	// Check the new action.
 	std::string error;
 	if (buildAction->check(error)) {

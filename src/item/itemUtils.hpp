@@ -45,6 +45,6 @@ bool IsValidTool(Item *item, ItemVector const &exceptions,
 				 ToolType const &toolType);
 
 // Create a function which checks if the given item is of the required type.
-bool IsValidResource(Item *item, const ResourceType &resourceType);
+bool IsValidResource(Item *item, const ResourceType &type);
 
 }

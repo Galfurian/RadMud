@@ -78,6 +78,7 @@ bool DoDismember(Character *character, ArgumentHandler &args)
 	auto act = std::make_shared<DismemberAction>(character, corpse, bodyPart);
 	if (act->start()) {
 		character->pushAction(act);
+		return true;
 	}
-	return true;
+	return false;
 }
