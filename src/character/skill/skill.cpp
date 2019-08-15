@@ -37,7 +37,7 @@ Skill::Skill() :
 
 Skill::~Skill()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted skill\t\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);

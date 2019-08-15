@@ -48,7 +48,7 @@ bool FurnitureModel::setModel(const std::string &source)
 {
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 0) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Wrong number of parameters for Furniture Model (%s).",
 					this->name);
 		return false;

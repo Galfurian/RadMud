@@ -91,7 +91,7 @@ bool DoQuit(Character *character, ArgumentHandler & /*args*/)
 			player->room->sendToAll("Player %s disappear in a puff of smoke.\n",
 									{ character }, player->getName());
 		}
-		Logger::log(LogLevel::Global, "Player %s has left the game.",
+		MudLog(LogLevel::Global, "Player %s has left the game.",
 					player->getName());
 		// End of properly connected.
 		player->closeConnection();

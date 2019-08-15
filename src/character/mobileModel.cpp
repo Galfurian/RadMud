@@ -57,12 +57,12 @@ Mobile *MobileModel::spawn(Room *spawnRoom, unsigned int mobileVnum)
 	// Check the correctness.
 	if (!mob->check()) {
 		delete (mob);
-		Logger::log(LogLevel::Error, "Error during error checking on mob.");
+		MudLog(LogLevel::Error, "Error during error checking on mob.");
 		return nullptr;
 	}
 	if (!Mud::instance().addMobile(mob)) {
 		delete (mob);
-		Logger::log(LogLevel::Error, "Error during mob insertion.");
+		MudLog(LogLevel::Error, "Error during mob insertion.");
 		return nullptr;
 	}
 	// Respawn the mob.

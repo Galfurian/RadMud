@@ -33,14 +33,14 @@ MoveAction::MoveAction(Character *_actor, Room *_destination,
 	direction(_direction)
 {
 	// Debugging message.
-	//Logger::log(LogLevel::Debug, "Created MoveAction.");
+	//MudLog(LogLevel::Debug, "Created MoveAction.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 MoveAction::~MoveAction()
 {
-	//Logger::log(LogLevel::Debug, "Deleted MoveAction.");
+	//MudLog(LogLevel::Debug, "Deleted MoveAction.");
 }
 
 bool MoveAction::check(std::string &error) const
@@ -49,12 +49,12 @@ bool MoveAction::check(std::string &error) const
 		return false;
 	}
 	if (this->destination == nullptr) {
-		Logger::log(LogLevel::Error, "No destination has been set.");
+		MudLog(LogLevel::Error, "No destination has been set.");
 		error = "You cannot reach the destination.";
 		return false;
 	}
 	if (this->direction == Direction::None) {
-		Logger::log(LogLevel::Error, "No direction has been set.");
+		MudLog(LogLevel::Error, "No direction has been set.");
 		error = "You have lost your direction.";
 		return false;
 	}

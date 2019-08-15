@@ -30,7 +30,7 @@ Liquid::Liquid() : vnum(), type(), name(), description(), worth(), quench()
 
 Liquid::~Liquid()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted liquid\t\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);

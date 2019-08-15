@@ -39,7 +39,7 @@ static fd_set exc_set;
 void Bailout(int signal)
 {
 	std::cout << "\n";
-	Logger::log(LogLevel::Global, "Received signal " + ToString(signal) + "!");
+	MudLog(LogLevel::Global, "Received signal " + ToString(signal) + "!");
 	Mud::instance().shutDownSignal();
 }
 
@@ -85,55 +85,55 @@ Mud::Mud() :
 
 Mud::~Mud()
 {
-	Logger::log(LogLevel::Global, "Freeing memory occupied by players...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by players...");
 	for (auto iterator : mudPlayers) {
 		delete (iterator);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by mobiles...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by mobiles...");
 	for (auto iterator : mudMobiles) {
 		delete (iterator);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by items...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by items...");
 	for (auto iterator : mudItems) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by rooms...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by rooms...");
 	for (auto iterator : mudRooms) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by areas...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by areas...");
 	for (auto iterator : mudAreas) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by writings...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by writings...");
 	for (auto iterator : mudWritings) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by corpses...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by corpses...");
 	for (auto iterator : mudCorpses) {
 		delete (iterator);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by races...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by races...");
 	for (auto iterator : mudRaces) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by factions...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by factions...");
 	for (auto iterator : mudFactions) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by liquids...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by liquids...");
 	for (auto iterator : mudLiquids) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by professions...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by professions...");
 	for (auto iterator : mudProfessions) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by productions...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by productions...");
 	for (auto iterator : mudProductions) {
 		delete (iterator.second);
 	}
-	Logger::log(LogLevel::Global, "Freeing memory occupied by materials...");
+	MudLog(LogLevel::Global, "Freeing memory occupied by materials...");
 	for (auto iterator : mudMaterials) {
 		delete (iterator.second);
 	}
@@ -166,14 +166,11 @@ bool Mud::saveRooms()
 bool Mud::saveMud()
 {
 	bool result = true;
-	Logger::log(LogLevel::Global,
-				"Saving information on Database for : Players...");
+	MudLog(LogLevel::Global, "Saving information on Database for : Players...");
 	result &= this->savePlayers();
-	Logger::log(LogLevel::Global,
-				"Saving information on Database for : Items...");
+	MudLog(LogLevel::Global, "Saving information on Database for : Items...");
 	result &= this->saveItems();
-	Logger::log(LogLevel::Global,
-				"Saving information on Database for : Rooms...");
+	MudLog(LogLevel::Global, "Saving information on Database for : Rooms...");
 	result &= this->saveRooms();
 	// Save, if necessary the database.
 	result &= SQLiteDbms::instance().updateInMemoryDatabase();
@@ -560,21 +557,20 @@ std::shared_ptr<HeightMap> Mud::findHeightMap(const unsigned int &vnum)
 bool Mud::runMud()
 {
 	// Open logging file.
-	if (!Logger::instance().openLog(this->getMudSystemDirectory() + GetDate() +
-									".log")) {
+	if (!OpenLog(this->getMudSystemDirectory() + GetDate() + ".log")) {
 		std::cerr << "Can't create the logging file." << std::endl;
 		return false;
 	}
 
 	if (!this->startMud()) {
-		Logger::log(LogLevel::Error, "Something gone wrong during the boot.");
+		MudLog(LogLevel::Error, "Something gone wrong during the boot.");
 		return false;
 	}
 	// Set up timeout interval.
 	struct timeval timeoutVal;
 	timeoutVal.tv_sec = 0; // seconds
 	timeoutVal.tv_usec = 500000; // microseconds
-	Logger::log(LogLevel::Global, "Waiting for Connections...");
+	MudLog(LogLevel::Global, "Waiting for Connections...");
 	// Loop processing input, output, events.
 	// We will go through this loop roughly every timeout seconds.
 	do {
@@ -603,8 +599,8 @@ bool Mud::runMud()
 		// Check if there are new connections on control port.
 		if (CMacroWrapper::FdIsSet(_servSocket, &in_set)) {
 			if (!this->processNewConnection()) {
-				Logger::log(LogLevel::Error,
-							"Error during processing a new connection.");
+				MudLog(LogLevel::Error,
+					   "Error during processing a new connection.");
 			}
 		}
 		// Handle all player input/output.
@@ -613,8 +609,7 @@ bool Mud::runMud()
 		}
 	} while (!_shutdownSignal);
 	if (!this->stopMud()) {
-		Logger::log(LogLevel::Error,
-					"Something gone wrong during the shutdown.");
+		MudLog(LogLevel::Error, "Something gone wrong during the shutdown.");
 		return false;
 	}
 	return true;
@@ -717,8 +712,8 @@ void Mud::removeInactivePlayers()
 		// Get the player at the given position.
 		auto player = *iterator;
 		// Log the action of removing.
-		Logger::log(LogLevel::Global,
-					"Removing inactive player : " + player->getName());
+		MudLog(LogLevel::Global,
+			   "Removing inactive player : " + player->getName());
 		// Only if the player has successfully logged in, save its state on DB.
 		if (player->logged_in) {
 			SQLiteDbms::instance().beginTransaction();
@@ -784,20 +779,20 @@ bool Mud::processNewConnection()
 		int port = ntohs(socketAddress.sin_port);
 		// Immediately close connections from blocked IP addresses.
 		if (blockedIPs.find(address) != blockedIPs.end()) {
-			Logger::log(LogLevel::Global,
-						"Rejected connection from " + address + "!");
+			MudLog(LogLevel::Global,
+				   "Rejected connection from " + address + "!");
 			closeSocket(socketFileDescriptor);
 			continue;
 		}
 		auto player = new Player(socketFileDescriptor, port, address);
 		// Insert the player in the list of players.
 		this->addPlayer(player);
-		Logger::log(LogLevel::Global, "#--------- New Connection ---------#");
-		Logger::log(LogLevel::Global,
-					" Socket  : " + ToString(socketFileDescriptor));
-		Logger::log(LogLevel::Global, " Address : " + address);
-		Logger::log(LogLevel::Global, " Port    : " + ToString(port));
-		Logger::log(LogLevel::Global, "#----------------------------------#");
+		MudLog(LogLevel::Global, "#--------- New Connection ---------#");
+		MudLog(LogLevel::Global,
+			   " Socket  : " + ToString(socketFileDescriptor));
+		MudLog(LogLevel::Global, " Address : " + address);
+		MudLog(LogLevel::Global, " Port    : " + ToString(port));
+		MudLog(LogLevel::Global, "#----------------------------------#");
 		// Create a shared pointer to the next step.
 		auto newStep = std::make_shared<ProcessPlayerName>();
 		// Set the handler.
@@ -856,11 +851,11 @@ void Mud::processDescriptor(Player *player)
 bool Mud::initDatabase()
 {
 	if (!SQLiteDbms::instance().openDatabase()) {
-		Logger::log(LogLevel::Error, "Error opening database!");
+		MudLog(LogLevel::Error, "Error opening database!");
 		return false;
 	}
 	if (!SQLiteDbms::instance().loadTables()) {
-		Logger::log(LogLevel::Error, "Error loading tables!");
+		MudLog(LogLevel::Error, "Error loading tables!");
 		return false;
 	}
 	return true;
@@ -971,57 +966,50 @@ bool Mud::startMud()
 {
 	// Create a stopwatch for general timing information.
 	Stopwatch<std::chrono::milliseconds> stopwatch("Boot");
-	Logger::log(LogLevel::Global,
-				"#--------------------------------------------#");
-	Logger::log(LogLevel::Global, "             XXXXXXXXXXXXX                ");
-	Logger::log(LogLevel::Global, "  /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    ");
-	Logger::log(LogLevel::Global, "  \\##/#/#XXXXXXXXXXXXXXXXXXXXX#\\#\\##/  ");
-	Logger::log(LogLevel::Global, "   \\/#/#XXXXXXXXXXXXXXXXXXXXXXX#\\#\\/   ");
-	Logger::log(LogLevel::Global, "    \\/##XXXXXXXXXXXXXXXXXXXXXXX##\\/     ");
-	Logger::log(LogLevel::Global, "     ###XXXX  ''-.XXX.-''  XXXX###        ");
-	Logger::log(LogLevel::Global, "       \\XXXX               XXXX/         ");
-	Logger::log(LogLevel::Global, "         XXXXXXXXXXXXXXXXXXXXX            ");
-	Logger::log(LogLevel::Global, "         XXXX XXXX X XXXX XXXX            ");
-	Logger::log(LogLevel::Global, "         XXX # XXX X XXX # XXX            ");
-	Logger::log(LogLevel::Global, "        /XXXX XXX XXX XXX XXXX\\          ");
-	Logger::log(LogLevel::Global, "       ##XXXXXXX X   X XXXXXXX##          ");
-	Logger::log(LogLevel::Global, "      ##   XOXXX X   X XXXOX   ##         ");
-	Logger::log(LogLevel::Global, "      ##    #XXXX XXX XXX #    ##         ");
-	Logger::log(LogLevel::Global, "       ##..##  XXXXXXXXX  ##..##          ");
-	Logger::log(LogLevel::Global, "        ###      XXXXX     ####           ");
-	Logger::log(LogLevel::Global,
-				"#--------------------------------------------#");
-	Logger::log(LogLevel::Global,
-				"|                   RadMud                   |");
-	Logger::log(LogLevel::Global,
-				"| Created by : Enrico Fraccaroli.            |");
-	Logger::log(LogLevel::Global,
-				"| Date       : 29 September 2014             |");
-	Logger::log(LogLevel::Global,
-				"#--------------------------------------------#");
-	Logger::log(LogLevel::Global, "Booting...");
+	MudLog(LogLevel::Global, "#--------------------------------------------#");
+	MudLog(LogLevel::Global, "             XXXXXXXXXXXXX                ");
+	MudLog(LogLevel::Global, "  /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    ");
+	MudLog(LogLevel::Global, "  \\##/#/#XXXXXXXXXXXXXXXXXXXXX#\\#\\##/  ");
+	MudLog(LogLevel::Global, "   \\/#/#XXXXXXXXXXXXXXXXXXXXXXX#\\#\\/   ");
+	MudLog(LogLevel::Global, "    \\/##XXXXXXXXXXXXXXXXXXXXXXX##\\/     ");
+	MudLog(LogLevel::Global, "     ###XXXX  ''-.XXX.-''  XXXX###        ");
+	MudLog(LogLevel::Global, "       \\XXXX               XXXX/         ");
+	MudLog(LogLevel::Global, "         XXXXXXXXXXXXXXXXXXXXX            ");
+	MudLog(LogLevel::Global, "         XXXX XXXX X XXXX XXXX            ");
+	MudLog(LogLevel::Global, "         XXX # XXX X XXX # XXX            ");
+	MudLog(LogLevel::Global, "        /XXXX XXX XXX XXX XXXX\\          ");
+	MudLog(LogLevel::Global, "       ##XXXXXXX X   X XXXXXXX##          ");
+	MudLog(LogLevel::Global, "      ##   XOXXX X   X XXXOX   ##         ");
+	MudLog(LogLevel::Global, "      ##    #XXXX XXX XXX #    ##         ");
+	MudLog(LogLevel::Global, "       ##..##  XXXXXXXXX  ##..##          ");
+	MudLog(LogLevel::Global, "        ###      XXXXX     ####           ");
+	MudLog(LogLevel::Global, "#--------------------------------------------#");
+	MudLog(LogLevel::Global, "|                   RadMud                   |");
+	MudLog(LogLevel::Global, "| Created by : Enrico Fraccaroli.            |");
+	MudLog(LogLevel::Global, "| Date       : 29 September 2014             |");
+	MudLog(LogLevel::Global, "#--------------------------------------------#");
+	MudLog(LogLevel::Global, "Booting...");
 	// Set the boot time.
 	time(&_bootTime);
-	Logger::log(LogLevel::Global, "Initializing Commands...");
+	MudLog(LogLevel::Global, "Initializing Commands...");
 	LoadCommands();
-	Logger::log(LogLevel::Global, "Initializing Database...");
+	MudLog(LogLevel::Global, "Initializing Database...");
 	if (!this->initDatabase()) {
-		Logger::log(LogLevel::Error,
-					"Something gone wrong during database initialization.");
+		MudLog(LogLevel::Error,
+			   "Something gone wrong during database initialization.");
 		return false;
 	}
 
-	Logger::log(LogLevel::Global, "Initializing Communications...");
+	MudLog(LogLevel::Global, "Initializing Communications...");
 	if (!this->initComunications()) {
-		Logger::log(
-			LogLevel::Error,
-			"Something gone wrong during initialization of comunication.");
+		MudLog(LogLevel::Error,
+			   "Something gone wrong during initialization of comunication.");
 		return false;
 	}
-	Logger::log(LogLevel::Global,
-				"Booting Done (" + ToString(stopwatch.elapsed()) + ").");
+	MudLog(LogLevel::Global,
+		   "Booting Done (" + ToString(stopwatch.elapsed()) + ").");
 	if (!this->afterBootActions()) {
-		Logger::log(LogLevel::Error, "Afterboot actions went wrong.");
+		MudLog(LogLevel::Error, "Afterboot actions went wrong.");
 		return false;
 	}
 	return true;
@@ -1031,41 +1019,36 @@ bool Mud::stopMud()
 {
 	Stopwatch<std::chrono::milliseconds> stopwatch("Shutdown");
 
-	Logger::log(LogLevel::Global, "Shutting down RadMud...");
-	Logger::log(LogLevel::Global, "Closing Communications...");
+	MudLog(LogLevel::Global, "Shutting down RadMud...");
+	MudLog(LogLevel::Global, "Closing Communications...");
 	if (!this->closeComunications()) {
-		Logger::log(LogLevel::Error,
-					"The communication has not been closed correctly.");
+		MudLog(LogLevel::Error,
+			   "The communication has not been closed correctly.");
 	}
 
-	Logger::log(LogLevel::Global, "Saving Mud Information...");
+	MudLog(LogLevel::Global, "Saving Mud Information...");
 	if (!this->saveMud()) {
-		Logger::log(LogLevel::Error,
-					"Somwthing has gone wrong during data saving.");
+		MudLog(LogLevel::Error, "Somwthing has gone wrong during data saving.");
 	}
 
-	Logger::log(LogLevel::Global, "Closing Database...");
+	MudLog(LogLevel::Global, "Closing Database...");
 	if (!SQLiteDbms::instance().closeDatabase()) {
-		Logger::log(LogLevel::Error,
-					"The database has not been closed correctly.");
+		MudLog(LogLevel::Error, "The database has not been closed correctly.");
 	}
-	Logger::log(LogLevel::Global,
-				"Shutdown Completed (" + ToString(stopwatch.elapsed()) + ").");
+	MudLog(LogLevel::Global,
+		   "Shutdown Completed (" + ToString(stopwatch.elapsed()) + ").");
 
 	///////////////////////////////////////////////////////////////////////////
 	size_t bIn = MudUpdater::instance().getBandIn();
 	size_t bOut = MudUpdater::instance().getBandOut();
 	size_t bUnc = MudUpdater::instance().getBandUncompressed();
 	// Print some statistics.
-	Logger::log(LogLevel::Info, "");
-	Logger::log(LogLevel::Info, "Statistics");
-	Logger::log(LogLevel::Info,
-				"    In            = " + ToString(bIn) + " Bytes.");
-	Logger::log(LogLevel::Info,
-				"    Output        = " + ToString(bOut) + " Bytes.");
-	Logger::log(LogLevel::Info,
-				"    Uncompressed  = " + ToString(bUnc) + " Bytes.");
-	Logger::log(LogLevel::Info, "");
+	MudLog(LogLevel::Info, "");
+	MudLog(LogLevel::Info, "Statistics");
+	MudLog(LogLevel::Info, "    In            = " + ToString(bIn) + " Bytes.");
+	MudLog(LogLevel::Info, "    Output        = " + ToString(bOut) + " Bytes.");
+	MudLog(LogLevel::Info, "    Uncompressed  = " + ToString(bUnc) + " Bytes.");
+	MudLog(LogLevel::Info, "");
 	return true;
 }
 

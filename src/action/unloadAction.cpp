@@ -33,14 +33,14 @@ UnloadAction::UnloadAction(Character *_actor, Item *_item) :
 	item(_item)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created UnloadAction.");
+	MudLog(LogLevel::Debug, "Created UnloadAction.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 UnloadAction::~UnloadAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted unload action.");
+	MudLog(LogLevel::Debug, "Deleted unload action.");
 }
 
 bool UnloadAction::check(std::string &error) const

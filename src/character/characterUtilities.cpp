@@ -162,7 +162,7 @@ bool FindNearbyResouces(
 					break;
 			}
 		}
-		Logger::log(LogLevel::Debug, "[%s] %s/%s", resource.first.toString(),
+		MudLog(LogLevel::Debug, "[%s] %s/%s", resource.first.toString(),
 					required, resource.second);
 		// If the ingredients are still not enough, return false.
 		if (required > 0) {
@@ -298,7 +298,7 @@ bool HasRequiredKnowledge(Character *character,
 			   [&character](Knowledge const &k) {
 				   if (!((character->skillManager.getKnowledge(k) > 0) ||
 						 (character->effectManager.getKnowledge(k) > 0))) {
-					   Logger::log(LogLevel::Debug, "Missing: %s",
+					   MudLog(LogLevel::Debug, "Missing: %s",
 								   k.toString());
 					   return false;
 				   }

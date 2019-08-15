@@ -42,7 +42,7 @@ Profession::Profession() :
 
 Profession::~Profession()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted profession\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);

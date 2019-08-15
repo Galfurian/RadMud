@@ -57,7 +57,7 @@ Room::~Room()
 	if (area != nullptr) {
 		area->remRoom(this);
 	}
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted room\t\t[%s]\t\t(%s)",
 	//                ToString(vnum),
 	//                name);
@@ -95,7 +95,7 @@ void Room::addItem(Item *&item, bool updateDB)
 		SQLiteDbms::instance().insertInto(
 			"ItemRoom", { ToString(vnum), ToString(item->vnum) }, false, true);
 	}
-	Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(),
+	MudLog(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(),
 				name);
 }
 
@@ -129,7 +129,7 @@ bool Room::removeItem(Item *item, bool updateDB)
 				"ItemRoom", { std::make_pair("item", ToString(item->vnum)) });
 		}
 		// Log it.
-		Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';",
+		MudLog(LogLevel::Debug, "Item '%s' removed from '%s';",
 					item->getName(), name);
 		return true;
 	}
@@ -155,7 +155,7 @@ void Room::removeCharacter(Character *character)
 			return;
 		}
 	}
-	Logger::log(LogLevel::Error, "Error during character removal from room.");
+	MudLog(LogLevel::Error, "Error during character removal from room.");
 }
 
 std::set<Player *> Room::getAllPlayer(Character *exception)
@@ -212,12 +212,12 @@ bool Room::updateOnDB()
 bool Room::removeOnDB()
 {
 	if (items.size() > 0) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"[Room::RemoveOnDB] There are still items in the room!");
 		return false;
 	}
 	if (characters.size() > 0) {
-		Logger::log(
+		MudLog(
 			LogLevel::Error,
 			"[Room::RemoveOnDB] There are still characters in the room!");
 		return false;
@@ -334,7 +334,7 @@ bool Room::isLit()
 	auto dayPhase = MudUpdater::instance().getDayPhase();
 	if (!HasFlag(terrain->flags, TerrainFlag::Indoor) &&
 		(dayPhase != DayPhase::Night)) {
-		//        Logger::log(LogLevel::Debug,
+		//        MudLog(LogLevel::Debug,
 		//                    "Room is lit (outside)(!night)(%s us)",
 		//                    stopwatch.stop());
 		return true;
@@ -345,14 +345,14 @@ bool Room::isLit()
 		auto room = area->getRoom(coordinates);
 		if (room != nullptr) {
 			if (CheckRoomForLights(room)) {
-				//                Logger::log(LogLevel::Debug,
+				//                MudLog(LogLevel::Debug,
 				//                            "Room is lit (LitByLight)     (%s us)",
 				//                            stopwatch.stop());
 				return true;
 			}
 		}
 	}
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Room is not lit              (%s us)",
 	//                stopwatch.stop());
 	return false;
@@ -506,7 +506,7 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 {
 	Room *new_room = new Room();
 	// Create a new room.
-	Logger::log(LogLevel::Info, "[CreateRoom] Setting up the room...");
+	MudLog(LogLevel::Info, "[CreateRoom] Setting up the room...");
 	new_room->vnum = Mud::instance().getMaxVnumRoom() + 1;
 	new_room->area = source_room->area;
 	new_room->coord = coord;
@@ -518,7 +518,7 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 	new_room->flags = 0;
 
 	// Insert into table Room the newly created room.
-	Logger::log(LogLevel::Info,
+	MudLog(LogLevel::Info,
 				"[CreateRoom] Saving room details on the database...");
 	std::vector<std::string> arguments;
 	arguments.push_back(ToString(new_room->vnum));
@@ -546,15 +546,15 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 		return false;
 	}
 	// Add the created room to the room_map.
-	Logger::log(LogLevel::Info,
+	MudLog(LogLevel::Info,
 				"[CreateRoom] Adding the room to the global list...");
 	if (!Mud::instance().addRoom(new_room)) {
-		Logger::log(LogLevel::Error, "Cannot add the room to the mud.\n");
+		MudLog(LogLevel::Error, "Cannot add the room to the mud.\n");
 		SQLiteDbms::instance().rollbackTransection();
 		return false;
 	}
 	if (!new_room->area->addRoom(new_room)) {
-		Logger::log(LogLevel::Error, "Cannot add the room to the area.\n");
+		MudLog(LogLevel::Error, "Cannot add the room to the area.\n");
 		SQLiteDbms::instance().rollbackTransection();
 		return false;
 	}
@@ -562,12 +562,12 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 	if (!ConnectRoom(new_room)) {
 		SQLiteDbms::instance().rollbackTransection();
 		if (!Mud::instance().remRoom(new_room)) {
-			Logger::log(
+			MudLog(
 				LogLevel::Error,
 				"During rollback I was not able to remove the room from the mud.\n");
 		}
 		if (!new_room->area->remRoom(new_room)) {
-			Logger::log(
+			MudLog(
 				LogLevel::Error,
 				"During rollback I was not able to remove the room from the area.\n");
 		}
@@ -582,7 +582,7 @@ bool ConnectRoom(Room *room)
 {
 	bool status = true;
 	std::vector<std::shared_ptr<Exit> > generatedExits;
-	Logger::log(LogLevel::Info,
+	MudLog(LogLevel::Info,
 				"[ConnectRoom] Connecting the room to near rooms...");
 	std::vector<Direction> directions = { Direction::North, Direction::South,
 										  Direction::West,	Direction::East,
@@ -614,7 +614,7 @@ bool ConnectRoom(Room *room)
 			arguments.push_back(ToString(forward->direction.toUInt()));
 			arguments.push_back(ToString(forward->flags));
 			if (!SQLiteDbms::instance().insertInto("Exit", arguments)) {
-				Logger::log(LogLevel::Error, "I was not able to save an exit.");
+				MudLog(LogLevel::Error, "I was not able to save an exit.");
 				status = false;
 				break;
 			}
@@ -624,17 +624,17 @@ bool ConnectRoom(Room *room)
 			arguments2.push_back(ToString(backward->direction.toUInt()));
 			arguments2.push_back(ToString(backward->flags));
 			if (!SQLiteDbms::instance().insertInto("Exit", arguments2)) {
-				Logger::log(LogLevel::Error, "I was not able to save an exit.");
+				MudLog(LogLevel::Error, "I was not able to save an exit.");
 				status = false;
 				break;
 			}
 		}
 	}
 	if (!status) {
-		Logger::log(LogLevel::Error, "Disconnecting all the rooms.");
+		MudLog(LogLevel::Error, "Disconnecting all the rooms.");
 		for (auto exitIterator : generatedExits) {
 			if (!exitIterator->unlink()) {
-				Logger::log(LogLevel::Fatal,
+				MudLog(LogLevel::Fatal,
 							"I was not able to remove an unwanted exit.");
 			}
 		}

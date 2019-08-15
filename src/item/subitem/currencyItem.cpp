@@ -51,11 +51,11 @@ unsigned int CurrencyItem::getPrice(bool entireStack) const
 												  customPrice)) {
 			return customPrice * quantity;
 		}
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"The item (%s) has a wrong composition w.r.t its currency.",
 					this->getName());
 	}
-	Logger::log(LogLevel::Error, "The item %s has no composition.",
+	MudLog(LogLevel::Error, "The item %s has no composition.",
 				this->getName());
 	return customPrice;
 }

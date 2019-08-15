@@ -42,7 +42,7 @@ CraftAction::CraftAction(
 	material()
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created CraftAction.");
+	MudLog(LogLevel::Debug, "Created CraftAction.");
 	// Determine the material of the creation based on the ammount of each
 	// single involved item.
 	this->determineMaterial();
@@ -52,7 +52,7 @@ CraftAction::CraftAction(
 
 CraftAction::~CraftAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted crafting action.");
+	MudLog(LogLevel::Debug, "Deleted crafting action.");
 }
 
 bool CraftAction::check(std::string &error) const
@@ -169,7 +169,7 @@ ActionStatus CraftAction::perform()
 			outcomeModel->createItem(actor->getName(), material, false,
 									 ItemQuality::Normal, production->quantity);
 		if (newItem == nullptr) {
-			Logger::log(LogLevel::Error, "Crafted item is a null pointer.");
+			MudLog(LogLevel::Error, "Crafted item is a null pointer.");
 			actor->sendMsg("\nYou have failed your action.\n");
 			return ActionStatus::Error;
 		}
@@ -179,7 +179,7 @@ ActionStatus CraftAction::perform()
 			// Create the item.
 			auto newItem = outcomeModel->createItem(actor->getName(), material);
 			if (newItem == nullptr) {
-				Logger::log(LogLevel::Error, "Crafted item is a null pointer.");
+				MudLog(LogLevel::Error, "Crafted item is a null pointer.");
 				// Delete all the items created so far.
 				for (auto createdItem : createdItems) {
 					MudUpdater::instance().addItemToDestroy(createdItem);
@@ -222,12 +222,12 @@ unsigned int CraftAction::getCooldown()
 	assert(actor && "Actor is nullptr");
 	assert(production && "Production is nullptr");
 	double requiredTime = production->time;
-	Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+	MudLog(LogLevel::Debug, "Base time  :%s", requiredTime);
 	for (auto knowledge : production->requiredKnowledge) {
 		requiredTime -=
 			(requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
 	}
-	Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
+	MudLog(LogLevel::Debug, "With skill :%s", requiredTime);
 	return static_cast<unsigned int>(requiredTime);
 }
 

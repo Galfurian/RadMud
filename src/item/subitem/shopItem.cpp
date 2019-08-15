@@ -58,12 +58,12 @@ bool ShopItem::updateOnDB()
 	arguments.emplace_back(ToString(shopSellTax));
 	arguments.emplace_back(ToString(balance));
 	arguments.emplace_back(
-		(shopKeeper != nullptr) ? ToString(shopKeeper->vnum) : "");
+		(shopKeeper != nullptr) ? ToString(shopKeeper->vnum) : "0");
 	arguments.emplace_back(ToString(openingHour));
 	arguments.emplace_back(ToString(closingHour));
 	if (SQLiteDbms::instance().insertInto("Shop", arguments, false, true))
 		return true;
-	Logger::log(LogLevel::Error, "Failed INSERT Shop '%s'", this->getName());
+	MudLog(LogLevel::Error, "Failed INSERT Shop '%s'", this->getName());
 	return false;
 }
 
@@ -79,13 +79,13 @@ bool ShopItem::removeOnDB()
 	// Call parent function.
 	status &= Item::removeOnDB();
 	if (!SQLiteDbms::instance().deleteFrom("Shop", { item_pair })) {
-		Logger::log(LogLevel::Error, "Remove from table 'Shop'.");
+		MudLog(LogLevel::Error, "Remove from table 'Shop'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
 	if (!SQLiteDbms::instance().deleteFrom("ShopDefaultStock",
 										   { stock_pair })) {
-		Logger::log(LogLevel::Error, "Remove from table 'ShopDefaultStock'.");
+		MudLog(LogLevel::Error, "Remove from table 'ShopDefaultStock'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}

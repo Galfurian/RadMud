@@ -21,57 +21,37 @@
 
 #pragma once
 
-#include <type_traits>
 #include <sstream>
 
-/// @brief Allows to build a string from a series of arguments.
-class StringBuilder {
-private:
-	/// @brief Constructor.
-	StringBuilder()
-	{
-		// Nothing to do.
-	}
+inline std::string BuildStr(std::string const &format)
+{
+	return format;
+}
 
-public:
-	/// @brief Replaces all the occurrences of the pattern '%s' with
-	///         the arguments.
-	/// @param str The string that has to be built.
-	/// @return The customized string.
-	static std::string build(const std::string &str)
-	{
-		return str;
-	}
+inline std::string BuildStr(std::stringstream &ss, size_t cpos,
+							std::string const &format)
+{
+	ss << format.substr(cpos);
+	return ss.str();
+}
 
-	/// @brief Replaces all the occurrences of the pattern '%s' with
-	///         the arguments.
-	/// @param str   The string that has to be built.
-	/// @param first The first unpacked argument.
-	/// @param args  Packed arguments.
-	/// @return The customized string.
-	template <typename... Args>
-	static std::string build(const std::string &str, const std::string &first,
-							 const Args &... args)
-	{
-		std::string::size_type pos = str.find("%s");
-		if (pos == std::string::npos) {
-			return str;
-		} else {
-			std::string working = str;
-			working.replace(pos, 2, first);
-			return build(working, args...);
-		}
+template <typename T, typename... Targs>
+inline std::string BuildStr(std::stringstream &ss, size_t cpos,
+							std::string const &format, T value, Targs... args)
+{
+	std::string::size_type pos = format.find("%s", cpos);
+	if (pos == std::string::npos) {
+		return BuildStr(ss, cpos, format);
+	} else {
+		ss << format.substr(cpos, pos - cpos);
+		ss << value;
+		return BuildStr(ss, pos + 2, format, args...);
 	}
+}
 
-	/// @brief Cover the case in which the first argument is a signed value.
-	template <
-		typename T, typename... Args,
-		typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
-	static std::string build(const std::string &str, const T &first,
-							 const Args &... args)
-	{
-		std::stringstream ss;
-		ss << first;
-		return build(str, ss.str(), args...);
-	}
-};
+template <typename T, typename... Targs>
+inline std::string BuildStr(std::string const &format, T value, Targs... args)
+{
+	std::stringstream ss;
+	return BuildStr(ss, 0, format, value, args...);
+}

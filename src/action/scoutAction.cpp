@@ -30,14 +30,14 @@
 ScoutAction::ScoutAction(Character *_actor) : GeneralAction(_actor)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created ScoutAction.");
+	MudLog(LogLevel::Debug, "Created ScoutAction.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 ScoutAction::~ScoutAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted scout action.");
+	MudLog(LogLevel::Debug, "Deleted scout action.");
 }
 
 bool ScoutAction::check(std::string &error) const
@@ -46,11 +46,11 @@ bool ScoutAction::check(std::string &error) const
 		return false;
 	}
 	if (actor->room == nullptr) {
-		Logger::log(LogLevel::Error, "The actor's room is a nullptr.");
+		MudLog(LogLevel::Error, "The actor's room is a nullptr.");
 		return false;
 	}
 	if (actor->room->area == nullptr) {
-		Logger::log(LogLevel::Error, "The room's area is a nullptr.");
+		MudLog(LogLevel::Error, "The room's area is a nullptr.");
 		return false;
 	}
 	if (this->getConsumedStamina(actor) > actor->stamina) {

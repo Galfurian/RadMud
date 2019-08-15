@@ -579,7 +579,7 @@ void Character::addInventoryItem(Item *&item)
 	// Set the owner of the item.
 	item->owner = this;
 	// Log it.
-	Logger::log(LogLevel::Debug, "Item '%s' added to '%s' inventory;",
+	MudLog(LogLevel::Debug, "Item '%s' added to '%s' inventory;",
 				item->getName(), this->getName());
 }
 
@@ -590,7 +590,7 @@ void Character::addEquipmentItem(Item *&item)
 	// Set the owner of the item.
 	item->owner = this;
 	// Log it.
-	Logger::log(LogLevel::Debug, "Item '%s' added to '%s' equipment;",
+	MudLog(LogLevel::Debug, "Item '%s' added to '%s' equipment;",
 				item->getName(), this->getName());
 }
 
@@ -603,7 +603,7 @@ bool Character::remInventoryItem(Item *item)
 	// Clear the owner of the item.
 	item->owner = nullptr;
 	// Log it.
-	Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';",
+	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';",
 				item->getName(), this->getName());
 	return true;
 }
@@ -619,7 +619,7 @@ bool Character::remEquipmentItem(Item *item)
 	// Empty the occupied body parts.
 	item->occupiedBodyParts.clear();
 	// Log it.
-	Logger::log(LogLevel::Debug, "Item '%s' removed from '%s';",
+	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';",
 				item->getName(), this->getName());
 	return true;
 }
@@ -657,10 +657,10 @@ Character::canWield(Item *item, std::string &error) const
 	std::vector<std::shared_ptr<BodyPart> > occupiedBodyParts;
 	// Get the compatible body parts.
 	for (auto const &bodyPart : race->bodyParts) {
-		Logger::log(LogLevel::Debug, "0: %d", bodyPart->flags);
+		MudLog(LogLevel::Debug, "0: %d", bodyPart->flags);
 		if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
 			continue;
-		Logger::log(LogLevel::Debug, "1: %d", bodyPart->flags);
+		MudLog(LogLevel::Debug, "1: %d", bodyPart->flags);
 		if (this->findItemAtBodyPart(bodyPart) != nullptr)
 			continue;
 		occupiedBodyParts.emplace_back(bodyPart);
@@ -976,9 +976,9 @@ void Character::luaAddEquipment(Item *item)
 	std::string error;
 	auto occupiedBodyParts = this->canWear(item, error);
 	if (occupiedBodyParts.empty()) {
-		Logger::log(LogLevel::Error, "The mobile %s cannot equip %s.",
+		MudLog(LogLevel::Error, "The mobile %s cannot equip %s.",
 					this->getName(), item->getName());
-		Logger::log(LogLevel::Error, "Error: %s", error);
+		MudLog(LogLevel::Error, "Error: %s", error);
 		return;
 	} else {
 		item->setOccupiedBodyParts(occupiedBodyParts);

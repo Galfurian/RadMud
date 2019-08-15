@@ -123,7 +123,7 @@ bool LoadSkill(ResultSet *result)
 	if (!Mud::instance().addSkill(skill)) {
 		throw SQLiteException("Error during skill insertion.");
 	}
-	Logger::log(LogLevel::Debug, "\t%s%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s%s",
 				Align(skill->name, align::left, 25),
 				Align(skill->ability.toString(), align::left, 15),
 				skill->description);
@@ -146,7 +146,7 @@ bool LoadSkillPrerequisite(ResultSet *result)
 	}
 	skill->requiredSkill.emplace_back(requiredSkillVnum);
 	requiredSkill->usedForSkill.emplace_back(skillVnum);
-	Logger::log(LogLevel::Debug, "\t%s requires %s",
+	MudLog(LogLevel::Debug, "\t%s requires %s",
 				Align(skill->name, align::left, 25),
 				Align(requiredSkill->name, align::left, 25));
 	return true;
@@ -168,7 +168,7 @@ bool LoadSkillAbilityModifier(ResultSet *result)
 	auto modifier = result->getNextInteger();
 	skill->modifierManager->setAbilityMod(ability, modifier);
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s%s",
 				Align(skill->name, align::left, 25),
 				Align(ability.toString(), align::left, 35),
 				Align(modifier, align::left, 35));
@@ -191,7 +191,7 @@ bool LoadSkillStatusModifier(ResultSet *result)
 	auto modifier = result->getNextInteger();
 	skill->modifierManager->setStatusMod(statusModifier, modifier);
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s%s",
 				Align(skill->name, align::left, 25),
 				Align(statusModifier.toString(), align::left, 35),
 				Align(modifier, align::left, 35));
@@ -214,7 +214,7 @@ bool LoadSkillCombatModifier(ResultSet *result)
 	auto modifier = result->getNextInteger();
 	skill->modifierManager->setCombatMod(combatModifier, modifier);
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s%s",
 				Align(skill->name, align::left, 25),
 				Align(combatModifier.toString(), align::left, 35),
 				Align(modifier, align::left, 35));
@@ -236,7 +236,7 @@ bool LoadSkillKnowledge(ResultSet *result)
 	}
 	skill->modifierManager->setKnowledge(knowledge, 1);
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s", Align(skill->name, align::left, 25),
+	MudLog(LogLevel::Debug, "\t%s%s", Align(skill->name, align::left, 25),
 				Align(knowledge.toString(), align::left, 35));
 	return true;
 }
@@ -380,7 +380,7 @@ bool LoadRaceBodyPart(ResultSet *result)
 	// Add the body part to the race.
 	race->bodyParts.emplace_back(bodyPart);
 	// Log the body part.
-	Logger::log(LogLevel::Debug, "\t%s%s", Align(race->name, align::left, 25),
+	MudLog(LogLevel::Debug, "\t%s%s", Align(race->name, align::left, 25),
 				Align(bodyPart->name, align::left, 25));
 	return true;
 }
@@ -401,7 +401,7 @@ bool LoadRaceBaseSkill(ResultSet *result)
 	// Set the base skill of the race.
 	race->skills.emplace_back(std::make_shared<SkillData>(skill, skillLevel));
 	// Log the skill.
-	Logger::log(LogLevel::Debug, "\t%s%s%s", Align(race->name, align::left, 25),
+	MudLog(LogLevel::Debug, "\t%s%s%s", Align(race->name, align::left, 25),
 				Align(skill->name, align::left, 25), skillLevel);
 	return true;
 }
@@ -709,7 +709,7 @@ bool LoadProduction(ResultSet *result)
 	}
 	profession->productions.emplace_back(production);
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s",
 				Align(production->name, align::left, 25),
 				Align(profession->command, align::left, 35));
 	return true;
@@ -731,7 +731,7 @@ bool LoadProductionTool(ResultSet *result)
 	}
 	production->tools.emplace_back(toolType);
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s",
 				Align(production->name, align::left, 25),
 				Align(toolType.toString(), align::left, 35));
 	return true;
@@ -754,7 +754,7 @@ bool LoadProductionOutcome(ResultSet *result)
 	production->outcome = outcome;
 	production->quantity = result->getNextUnsignedInteger();
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s%s",
 				Align(production->name, align::left, 25),
 				Align(outcome->name, align::left, 35),
 				Align(production->quantity, align::left, 35));
@@ -781,7 +781,7 @@ bool LoadProductionIngredient(ResultSet *result)
 	}
 	production->ingredients.insert(std::make_pair(ingredient, quantity));
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s%s",
 				Align(production->name, align::left, 25),
 				Align(ingredient.toString(), align::left, 35),
 				Align(quantity, align::left, 35));
@@ -804,7 +804,7 @@ bool LoadProductionKnowledge(ResultSet *result)
 	}
 	production->requiredKnowledge.emplace_back(knowledge);
 	// Log it.
-	Logger::log(LogLevel::Debug, "\t%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s",
 				Align(production->name, align::left, 25),
 				Align(knowledge.toString(), align::left, 35));
 	return true;
@@ -906,7 +906,7 @@ bool LoadBuilding(ResultSet *result)
 	if (!Mud::instance().addBuilding(building)) {
 		throw SQLiteException("Error during building insertion.");
 	}
-	Logger::log(LogLevel::Debug, "\t%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s",
 				Align(building->vnum, align::left, 25),
 				Align(building->name, align::left, 35));
 	return true;
@@ -927,7 +927,7 @@ bool LoadBuildingTool(ResultSet *result)
 							  ToString(toolId));
 	}
 	building->tools.emplace_back(tool);
-	Logger::log(LogLevel::Debug, "\t%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s",
 				Align(building->name, align::left, 25),
 				Align(tool.toString(), align::left, 35));
 	return true;
@@ -949,7 +949,7 @@ bool LoadBuildingIngredient(ResultSet *result)
 	}
 	auto quantity = result->getNextUnsignedInteger();
 	building->ingredients.insert(std::make_pair(ingredient, quantity));
-	Logger::log(LogLevel::Debug, "\t%s%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s%s",
 				Align(building->name, align::left, 25),
 				Align(ingredient.toString(), align::left, 35),
 				Align(quantity, align::left, 35));
@@ -971,7 +971,7 @@ bool LoadBuildingKnowledge(ResultSet *result)
 							  ToString(knowledgeId));
 	}
 	building->requiredKnowledge.emplace_back(knowledge);
-	Logger::log(LogLevel::Debug, "\t[%s] %s%s",
+	MudLog(LogLevel::Debug, "\t[%s] %s%s",
 				Align(building->vnum, align::left, 4),
 				Align(building->name, align::left, 25),
 				Align(knowledge.toString(), align::left, 35));
@@ -1069,7 +1069,7 @@ bool LoadTerrain(ResultSet *result)
 		throw SQLiteException("Can't add the terrain " +
 							  ToString(terrain->vnum) + " - " + terrain->name);
 	}
-	Logger::log(LogLevel::Debug, "\t%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s",
 				Align(terrain->vnum, align::left, 25),
 				Align(terrain->name, align::left, 25));
 	return true;
@@ -1090,7 +1090,7 @@ bool LoadTerrainLiquid(ResultSet *result)
 	}
 	auto quantity = result->getNextUnsignedInteger();
 	terrain->liquidContent = std::make_pair(liquid, quantity);
-	Logger::log(LogLevel::Debug, "\t%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s",
 				Align(terrain->name, align::left, 25),
 				Align(liquid->name, align::left, 25));
 	return true;
@@ -1112,7 +1112,7 @@ bool LoadTerrainLiquidSources(ResultSet *result)
 	auto probability = result->getNextUnsignedInteger();
 	// Add the liquid source.
 	terrain->addLiquidSource(liquid, probability);
-	Logger::log(LogLevel::Debug, "\t%s%s%s",
+	MudLog(LogLevel::Debug, "\t%s%s%s",
 				Align(terrain->name, align::left, 25),
 				Align(liquid->name, align::left, 25),
 				Align(probability, align::left, 25));

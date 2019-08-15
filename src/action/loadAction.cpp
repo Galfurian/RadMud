@@ -37,14 +37,14 @@ LoadAction::LoadAction(Character *_actor, MagazineItem *_magazine,
 	amount(_amount)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created LoadAction.");
+	MudLog(LogLevel::Debug, "Created LoadAction.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 LoadAction::~LoadAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted load action.");
+	MudLog(LogLevel::Debug, "Deleted load action.");
 }
 
 bool LoadAction::check(std::string &error) const
@@ -53,12 +53,12 @@ bool LoadAction::check(std::string &error) const
 		return false;
 	}
 	if (magazine == nullptr) {
-		Logger::log(LogLevel::Error, "The magazine is a null pointer.");
+		MudLog(LogLevel::Error, "The magazine is a null pointer.");
 		error = "You don't have a valid magazine to load.";
 		return false;
 	}
 	if (projectile == nullptr) {
-		Logger::log(LogLevel::Error, "The projectile is a null pointer.");
+		MudLog(LogLevel::Error, "The projectile is a null pointer.");
 		error = "You don't have valid projectiles to load.";
 		return false;
 	}

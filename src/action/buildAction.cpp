@@ -41,14 +41,14 @@ BuildAction::BuildAction(
 	ingredients(_ingredients)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created BuildAction.");
+	MudLog(LogLevel::Debug, "Created BuildAction.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 BuildAction::~BuildAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted building action.");
+	MudLog(LogLevel::Debug, "Deleted building action.");
 }
 
 bool BuildAction::check(std::string &error) const
@@ -169,12 +169,12 @@ unsigned int BuildAction::getCooldown()
 	assert(actor && "Actor is nullptr");
 	assert(schematics && "Schematics is nullptr");
 	double requiredTime = schematics->time;
-	Logger::log(LogLevel::Debug, "Base time  :%s", requiredTime);
+	MudLog(LogLevel::Debug, "Base time  :%s", requiredTime);
 	for (auto knowledge : schematics->requiredKnowledge) {
 		requiredTime -=
 			(requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
 	}
-	Logger::log(LogLevel::Debug, "With skill :%s", requiredTime);
+	MudLog(LogLevel::Debug, "With skill :%s", requiredTime);
 	return static_cast<unsigned int>(requiredTime);
 }
 

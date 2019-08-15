@@ -48,13 +48,13 @@ std::string CorpseModel::getTypeName() const
 bool CorpseModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+		MudLog(LogLevel::Error, "Function list is empty (%s).",
 					this->name);
 		return false;
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 0) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Wrong number of parameters for Corpse Model (%s).",
 					this->name);
 		return false;
@@ -76,7 +76,7 @@ void CorpseModel::getSheet(Table &sheet) const
 Item *CorpseModel::createItem(std::string, Material *, bool,
 							  const ItemQuality &, const unsigned int &)
 {
-	Logger::log(LogLevel::Error, "Use the proper createCorpse function.");
+	MudLog(LogLevel::Error, "Use the proper createCorpse function.");
 	return nullptr;
 }
 
@@ -85,7 +85,7 @@ Item *CorpseModel::createCorpse(std::string maker, const double &weight)
 	// Instantiate the new item.
 	auto newCorpse = new CorpseItem();
 	if (newCorpse == nullptr) {
-		Logger::log(LogLevel::Error, "Cannot create the new item.");
+		MudLog(LogLevel::Error, "Cannot create the new item.");
 		// Return pointer to nothing.
 		return nullptr;
 	}

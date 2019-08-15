@@ -527,7 +527,7 @@ public:
 	template <typename... Args>
 	void sendMsg(const std::string &msg, const Args &... args)
 	{
-		this->sendMsg(StringBuilder::build(msg, args...));
+		this->sendMsg(BuildStr(msg, args...));
 	}
 
 protected:

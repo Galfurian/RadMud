@@ -35,14 +35,14 @@ ReloadAction::ReloadAction(Character *_actor, RangedWeaponItem *_weapon,
 	magazine(_magazine)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created ReloadAction.");
+	MudLog(LogLevel::Debug, "Created ReloadAction.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 ReloadAction::~ReloadAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted reload action.");
+	MudLog(LogLevel::Debug, "Deleted reload action.");
 }
 
 bool ReloadAction::check(std::string &error) const
@@ -51,17 +51,17 @@ bool ReloadAction::check(std::string &error) const
 		return false;
 	}
 	if (weapon == nullptr) {
-		Logger::log(LogLevel::Error, "The weapon is a null pointer.");
+		MudLog(LogLevel::Error, "The weapon is a null pointer.");
 		error = "The weapon you want to reaload is missing.";
 		return false;
 	}
 	if (magazine == nullptr) {
-		Logger::log(LogLevel::Error, "The magazine is a null pointer.");
+		MudLog(LogLevel::Error, "The magazine is a null pointer.");
 		error = "The magazine you want to use is missing.";
 		return false;
 	}
 	if (!weapon->isEmpty()) {
-		Logger::log(LogLevel::Error, "The weapon already contains a magazine.");
+		MudLog(LogLevel::Error, "The weapon already contains a magazine.");
 		error = "The weapon already contains a magazine.";
 		return false;
 	}

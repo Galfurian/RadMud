@@ -45,7 +45,7 @@ Item::Item() :
 
 Item::~Item()
 {
-	Logger::log(LogLevel::Debug, "Deleted item\t\t[%s]\t\t(%s)",
+	MudLog(LogLevel::Debug, "Deleted item\t\t[%s]\t\t(%s)",
 				ToString(this->vnum), this->getNameCapital());
 }
 
@@ -63,24 +63,24 @@ bool Item::check()
 
 void Item::removeFromMud()
 {
-	Logger::log(LogLevel::Debug, "Removing %s from MUD...", this->getName());
+	MudLog(LogLevel::Debug, "Removing %s from MUD...", this->getName());
 	// Remove the item from the game, this means: Room, Player, Container.
 	if (room != nullptr) {
 		auto itemRoom = room;
 		if (room->removeItem(this)) {
-			Logger::log(LogLevel::Debug, "Removing item '%s' from room '%s'.",
+			MudLog(LogLevel::Debug, "Removing item '%s' from room '%s'.",
 						this->getName(), itemRoom->name);
 		}
 	}
 	if (owner != nullptr) {
 		auto itemOwner = owner;
 		if (owner->equipment.removeItem(this)) {
-			Logger::log(LogLevel::Debug,
+			MudLog(LogLevel::Debug,
 						"Removing item '%s' from '%s' equipment.",
 						this->getName(), itemOwner->getName());
 		}
 		if (owner->inventory.removeItem(this)) {
-			Logger::log(LogLevel::Debug,
+			MudLog(LogLevel::Debug,
 						"Removing item '%s' from '%s' inventory.",
 						this->getName(), itemOwner->getName());
 		}
@@ -88,14 +88,14 @@ void Item::removeFromMud()
 	if (container != nullptr) {
 		auto itemContainer = container;
 		if (container->content.removeItem(this)) {
-			Logger::log(LogLevel::Debug,
+			MudLog(LogLevel::Debug,
 						"Removing item '%s' from container '%s'.",
 						this->getName(), itemContainer->getName());
 		}
 	}
 	if (this->model->getType() != ModelType::Corpse) {
 		if (Mud::instance().remItem(this)) {
-			Logger::log(LogLevel::Debug, "Removing item '%s' from MUD items.",
+			MudLog(LogLevel::Debug, "Removing item '%s' from MUD items.",
 						this->getName());
 		}
 	}
@@ -115,7 +115,7 @@ bool Item::updateOnDB()
 	arguments.emplace_back(ToString(this->flags));
 	if (SQLiteDbms::instance().insertInto("Item", arguments, false, true))
 		return true;
-	Logger::log(LogLevel::Error, "Failed INSERT Item '%s'", this->getName());
+	MudLog(LogLevel::Error, "Failed INSERT Item '%s'", this->getName());
 	return false;
 }
 
@@ -126,7 +126,7 @@ bool Item::removeOnDB()
 	static WhereClause item_pair = std::make_pair("item", "-1");
 	static WhereClause container_pair = std::make_pair("container", "-1");
 	// Log.
-	Logger::log(LogLevel::Debug, "Removing '%s' from DB...",
+	MudLog(LogLevel::Debug, "Removing '%s' from DB...",
 				this->getName(true));
 	// Update/Prepare variables.
 	status = true;
@@ -135,33 +135,33 @@ bool Item::removeOnDB()
 	container_pair.second = ToString(vnum);
 	// Remove from DB.
 	if (!SQLiteDbms::instance().deleteFrom("Item", { vnum_pair })) {
-		Logger::log(LogLevel::Error, "Remove from table 'Item'.");
+		MudLog(LogLevel::Error, "Remove from table 'Item'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
 	if (!SQLiteDbms::instance().deleteFrom("ItemPlayer", { item_pair })) {
-		Logger::log(LogLevel::Error, "Remove from table 'ItemPlayer'.");
+		MudLog(LogLevel::Error, "Remove from table 'ItemPlayer'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
 	if (!SQLiteDbms::instance().deleteFrom("ItemRoom", { item_pair })) {
-		Logger::log(LogLevel::Error, "Remove from table 'ItemRoom'.");
+		MudLog(LogLevel::Error, "Remove from table 'ItemRoom'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
 	if (!SQLiteDbms::instance().deleteFrom("ItemContent", { item_pair })) {
-		Logger::log(LogLevel::Error, "Remove from table 'ItemContent'.");
+		MudLog(LogLevel::Error, "Remove from table 'ItemContent'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
 	if (!SQLiteDbms::instance().deleteFrom("ItemContent", { container_pair })) {
-		Logger::log(LogLevel::Error, "Remove from table 'ItemContent'.");
+		MudLog(LogLevel::Error, "Remove from table 'ItemContent'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
 	if (!SQLiteDbms::instance().deleteFrom("ItemLiquidContent",
 										   { container_pair })) {
-		Logger::log(LogLevel::Error, "Remove from table 'ItemLiquidContent'.");
+		MudLog(LogLevel::Error, "Remove from table 'ItemLiquidContent'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
@@ -491,7 +491,7 @@ void Item::putInside(Item *&item, bool updateDB)
 			false, true);
 	}
 	// Log it.
-	Logger::log(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(),
+	MudLog(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(),
 				this->getName());
 }
 
@@ -508,7 +508,7 @@ bool Item::takeOut(Item *item, bool updateDB)
 			"ItemContent", { std::make_pair("item", ToString(item->vnum)) });
 	}
 	// Log it.
-	Logger::log(LogLevel::Debug, "Item '%s' taken out from '%s';",
+	MudLog(LogLevel::Debug, "Item '%s' taken out from '%s';",
 				item->getName(), this->getName());
 	return true;
 }
@@ -537,7 +537,7 @@ void Item::setOccupiedBodyParts(
 
 bool Item::operator<(Item &rhs) const
 {
-	Logger::log(LogLevel::Debug, "%s < %s", ToString(this->vnum),
+	MudLog(LogLevel::Debug, "%s < %s", ToString(this->vnum),
 				ToString(rhs.vnum));
 	return getName() < rhs.getName();
 }

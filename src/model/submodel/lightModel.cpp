@@ -47,12 +47,12 @@ std::string LightModel::getTypeName() const
 bool LightModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		Logger::log(LogLevel::Error, "Function list is empty (%s).", name);
+		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
 	auto functionList = SplitString(source, " ");
 	if (functionList.size() != 4) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Wrong number of parameters for Light Model (%s)[%s].",
 					name, source);
 		return false;

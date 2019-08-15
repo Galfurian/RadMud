@@ -36,7 +36,7 @@ Material::Material() :
 
 Material::~Material()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted material\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);

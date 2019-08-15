@@ -30,14 +30,14 @@
 Flee::Flee(Character *_actor) : CombatAction(_actor)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created Flee.");
+	MudLog(LogLevel::Debug, "Created Flee.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 Flee::~Flee()
 {
-	Logger::log(LogLevel::Debug, "Deleted Flee.");
+	MudLog(LogLevel::Debug, "Deleted Flee.");
 }
 
 bool Flee::check(std::string &error) const
@@ -75,7 +75,7 @@ bool Flee::start()
 		return false;
 	}
 	// Notify the character.
-	character->sendMsg("You prepare to flee...\n");
+	actor->sendMsg("You prepare to flee...\n");
 	// Send the starting message.
 	return true;
 }
@@ -120,7 +120,7 @@ ActionStatus Flee::perform()
 			destinations.at(TRand<size_t>(0, destinations.size() - 1));
 		// Check that the picked destination is not a null pointer.
 		if (destination == nullptr) {
-			Logger::log(LogLevel::Error, "Flee selected null destination.");
+			MudLog(LogLevel::Error, "Flee selected null destination.");
 			actor->sendMsg("You were not able to escape.\n\n");
 		} else {
 			// Consume the stamina.

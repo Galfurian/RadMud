@@ -27,7 +27,7 @@
 
 bool SQLiteDbms::loadPlayer(Player *player)
 {
-	Logger::log(LogLevel::Debug, "Loading player " + player->getName() + ".");
+	MudLog(LogLevel::Debug, "Loading player " + player->getName() + ".");
 	Stopwatch<std::chrono::milliseconds> stopwatch("LoadPlayer");
 	stopwatch.start();
 	// Retrieve the information concerning the player.
@@ -54,28 +54,28 @@ bool SQLiteDbms::loadPlayer(Player *player)
 		}
 	}
 	if (!this->loadPlayerItems(player)) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Encountered an error during loading Player Items.");
 		return false;
 	}
 	if (!this->loadPlayerSkill(player)) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Encountered an error during loading Player Skills.");
 		return false;
 	}
 	if (!this->loadPlayerLuaVariables(player)) {
-		Logger::log(
+		MudLog(
 			LogLevel::Error,
 			"Encountered an error during loading Player Lua Variables.");
 		return false;
 	}
 	// Check the loaded player.
 	if (!player->check()) {
-		Logger::log(LogLevel::Error, "Error during error checking.");
+		MudLog(LogLevel::Error, "Error during error checking.");
 		return false;
 	}
 	// Log the elapsed time.
-	Logger::log(LogLevel::Debug,
+	MudLog(LogLevel::Debug,
 				"Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
 	return true;
 }
@@ -240,7 +240,7 @@ bool SQLiteDbms::loadPlayerInformation(ResultSet *result, Player *player)
 	if (player->room == nullptr) {
 		player->room = Mud::instance().findRoom(player->rent_room);
 		if (player->room == nullptr) {
-			Logger::log(LogLevel::Error, "No room has been set.");
+			MudLog(LogLevel::Error, "No room has been set.");
 			status = false;
 		}
 	}
@@ -259,7 +259,7 @@ bool SQLiteDbms::loadPlayerItems(Player *player)
 	auto result = dbConnection.executeSelect(query.c_str());
 	// Check the result.
 	if (result == nullptr) {
-		Logger::log(LogLevel::Error, "Query result is empty.");
+		MudLog(LogLevel::Error, "Query result is empty.");
 		this->showLastError();
 		return false;
 	}
@@ -271,18 +271,18 @@ bool SQLiteDbms::loadPlayerItems(Player *player)
 		auto bodyPart =
 			Mud::instance().findBodyPart(result->getNextUnsignedInteger());
 		if (item == nullptr) {
-			Logger::log(LogLevel::Error, "Item not found!");
+			MudLog(LogLevel::Error, "Item not found!");
 			status = false;
 			break;
 		}
 		if (item->room != nullptr) {
-			Logger::log(LogLevel::Error, "The item is no more available.");
+			MudLog(LogLevel::Error, "The item is no more available.");
 			status = false;
 			break;
 		}
 		if (item->owner != nullptr) {
 			if (item->owner != player) {
-				Logger::log(LogLevel::Error, "The item is no more available.");
+				MudLog(LogLevel::Error, "The item is no more available.");
 				status = false;
 				break;
 			}
@@ -325,7 +325,7 @@ bool SQLiteDbms::loadPlayerSkill(Player *player)
 	auto result = dbConnection.executeSelect(query.c_str());
 	// Check the result.
 	if (result == nullptr) {
-		Logger::log(LogLevel::Error, "Query result is empty.");
+		MudLog(LogLevel::Error, "Query result is empty.");
 		this->showLastError();
 		return false;
 	}
@@ -336,7 +336,7 @@ bool SQLiteDbms::loadPlayerSkill(Player *player)
 			Mud::instance().findSkill(result->getNextUnsignedInteger());
 		auto value = result->getNextUnsignedInteger();
 		if (skill == nullptr) {
-			Logger::log(LogLevel::Error, "Wrong skill id.");
+			MudLog(LogLevel::Error, "Wrong skill id.");
 			status = false;
 			break;
 		}
@@ -357,7 +357,7 @@ bool SQLiteDbms::loadPlayerLuaVariables(Player *player)
 	auto result = dbConnection.executeSelect(query.c_str());
 	// Check the result.
 	if (result == nullptr) {
-		Logger::log(LogLevel::Error, "Query result is empty.");
+		MudLog(LogLevel::Error, "Query result is empty.");
 		this->showLastError();
 		return false;
 	}
@@ -367,7 +367,7 @@ bool SQLiteDbms::loadPlayerLuaVariables(Player *player)
 		std::string variableName = result->getNextString();
 		std::string variableValue = result->getNextString();
 		player->luaVariables[variableName] = variableValue;
-		Logger::log(LogLevel::Debug,
+		MudLog(LogLevel::Debug,
 					variableName + " = " + variableValue + ";");
 	}
 	// release the resource.

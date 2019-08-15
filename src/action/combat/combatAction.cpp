@@ -29,12 +29,12 @@
 
 CombatAction::CombatAction(Character *_actor) : GeneralAction(_actor)
 {
-	Logger::log(LogLevel::Debug, "Created CombatAction.");
+	MudLog(LogLevel::Debug, "Created CombatAction.");
 }
 
 CombatAction::~CombatAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted CombatAction.");
+	MudLog(LogLevel::Debug, "Deleted CombatAction.");
 }
 
 bool CombatAction::check(std::string &error) const

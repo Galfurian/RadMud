@@ -32,7 +32,7 @@ Faction::Faction() : vnum(), name(), description(), currency()
 
 Faction::~Faction()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted faction\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);

@@ -91,7 +91,7 @@ std::string ArgumentHandler::substr(const size_t &startingArgument)
 		}
 		return result;
 	} else {
-		Logger::log(LogLevel::Error, "Starting argument out of bound!");
+		MudLog(LogLevel::Error, "Starting argument out of bound!");
 		return original;
 	}
 }
@@ -103,14 +103,14 @@ void ArgumentHandler::erase(const size_t &position)
 		std::advance(it, position);
 		arguments.erase(it);
 	} else {
-		Logger::log(LogLevel::Error, "Position out of bound!");
+		MudLog(LogLevel::Error, "Position out of bound!");
 	}
 }
 
 void ArgumentHandler::dump() const
 {
 	for (size_t it = 0; it < arguments.size(); ++it) {
-		Logger::log(LogLevel::Debug, "[%s] %s", it,
+		MudLog(LogLevel::Debug, "[%s] %s", it,
 					arguments.at(it).getOriginal());
 	}
 }

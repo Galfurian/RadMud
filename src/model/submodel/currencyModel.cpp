@@ -49,7 +49,7 @@ bool CurrencyModel::setModel(const std::string &source)
 {
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 0) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Wrong number of parameters for Currency Model (%s).",
 					this->name);
 		return false;
@@ -75,7 +75,7 @@ Item *CurrencyModel::createItem(std::string maker, Material *composition,
 		return ItemModel::createItem(maker, composition, isForMobile,
 									 itemQuality, quantity);
 	} else {
-		Logger::log(LogLevel::Error, "Material is not allowed.");
+		MudLog(LogLevel::Error, "Material is not allowed.");
 		return nullptr;
 	}
 }

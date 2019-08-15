@@ -174,7 +174,7 @@ bool SaveArea(Area *area)
 	// Start a transaction.
 	SQLiteDbms::instance().beginTransaction();
 	if (!SQLiteDbms::instance().insertInto("Area", args, false, true)) {
-		Logger::log(LogLevel::Error, "I was not able to save the area.");
+		MudLog(LogLevel::Error, "I was not able to save the area.");
 		SQLiteDbms::instance().rollbackTransection();
 		return false;
 	}
@@ -197,7 +197,7 @@ bool SaveRoom(Room *room)
 	// Start a transaction.
 	SQLiteDbms::instance().beginTransaction();
 	if (!SQLiteDbms::instance().insertInto("Room", args, false, true)) {
-		Logger::log(LogLevel::Error, "I was not able to save the room.");
+		MudLog(LogLevel::Error, "I was not able to save the room.");
 		SQLiteDbms::instance().rollbackTransection();
 		return false;
 	}
@@ -214,7 +214,7 @@ bool SaveAreaList(Area *area, Room *room)
 	// Start a transaction.
 	SQLiteDbms::instance().beginTransaction();
 	if (!SQLiteDbms::instance().insertInto("AreaList", args, false, true)) {
-		Logger::log(LogLevel::Error, "I was not able to save the area list.");
+		MudLog(LogLevel::Error, "I was not able to save the area list.");
 		SQLiteDbms::instance().rollbackTransection();
 		return false;
 	}
@@ -233,7 +233,7 @@ bool SaveRoomExit(const std::shared_ptr<Exit> &roomExit)
 	// Start a transaction.
 	SQLiteDbms::instance().beginTransaction();
 	if (!SQLiteDbms::instance().insertInto("Exit", args, false, true)) {
-		Logger::log(LogLevel::Error, "I was not able to save the exit.");
+		MudLog(LogLevel::Error, "I was not able to save the exit.");
 		SQLiteDbms::instance().rollbackTransection();
 		return false;
 	}

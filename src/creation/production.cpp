@@ -44,7 +44,7 @@ Production::Production() :
 
 Production::~Production()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted production\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);

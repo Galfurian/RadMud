@@ -42,7 +42,7 @@ Race::Race() :
 
 Race::~Race()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted race\t\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);

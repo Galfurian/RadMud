@@ -51,13 +51,13 @@ std::string ContainerModel::getTypeName() const
 bool ContainerModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+		MudLog(LogLevel::Error, "Function list is empty (%s).",
 					this->name);
 		return false;
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 4) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Wrong number of parameters for Container Model (%s).",
 					this->name);
 		return false;

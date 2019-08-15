@@ -57,7 +57,7 @@ Player::~Player()
 	// Close connection if active.
 	if (this->checkConnection()) {
 		if (!Mud::instance().closeSocket(psocket)) {
-			Logger::log(LogLevel::Error, "Error during player socket closure.");
+			MudLog(LogLevel::Error, "Error during player socket closure.");
 		}
 	}
 	// Unlink the inventory items.
@@ -72,7 +72,7 @@ Player::~Player()
 	if (room != nullptr) {
 		room->removeCharacter(this);
 	}
-	//Logger::log(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
+	//MudLog(LogLevel::Debug, "Deleted player\t\t\t\t(%s)", this->getNameCapital());
 }
 
 bool Player::check() const
@@ -198,15 +198,15 @@ bool Player::hasPendingOutput() const
 bool Player::updateOnDB()
 {
 	if (!SavePlayer(this)) {
-		Logger::log(LogLevel::Error, "Creating player on DB.");
+		MudLog(LogLevel::Error, "Creating player on DB.");
 		return false;
 	}
 	if (!SavePlayerSkills(this)) {
-		Logger::log(LogLevel::Error, "Saving player skills on DB.");
+		MudLog(LogLevel::Error, "Saving player skills on DB.");
 		return false;
 	}
 	if (!SavePlayerLuaVariables(this)) {
-		Logger::log(LogLevel::Error, "Saving player lua variables on DB.");
+		MudLog(LogLevel::Error, "Saving player lua variables on DB.");
 		return false;
 	}
 	return true;
@@ -310,14 +310,14 @@ void Player::processRead()
 	}
 	ssize_t nRead = recv(psocket, &buffer, BUFSIZE - 1, MSG_DONTWAIT);
 	if (nRead <= 0) {
-		Logger::log(LogLevel::Error, "Socket recv failed: %s", ToString(errno));
+		MudLog(LogLevel::Error, "Socket recv failed: %s", ToString(errno));
 		// Close the socket.
 		if (Mud::instance().closeSocket(psocket)) {
-			Logger::log(LogLevel::Error,
+			MudLog(LogLevel::Error,
 						"Something has gone wrong during socket closure.");
 		}
 		// Log the error.
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Connection " + ToString(psocket) + " closed.");
 		// Clear the socket.
 		this->psocket = NO_SOCKET_COMMUNICATION;
@@ -388,10 +388,10 @@ void Player::processWrite()
 		// Check for bad write.
 		if (nWrite <= 0) {
 			if (errno == EPIPE) {
-				Logger::log(LogLevel::Error,
+				MudLog(LogLevel::Error,
 							"Sending on a closed connection...");
 			} else {
-				Logger::log(LogLevel::Error, "Unknown error during Send...");
+				MudLog(LogLevel::Error, "Unknown error during Send...");
 			}
 			return;
 		}

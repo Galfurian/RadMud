@@ -36,14 +36,14 @@ Chase::Chase(Character *_actor, Character *_target) :
 	RoomCheckFunction()
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created Chase.");
+	MudLog(LogLevel::Debug, "Created Chase.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 Chase::~Chase()
 {
-	Logger::log(LogLevel::Debug, "Deleted Chase.");
+	MudLog(LogLevel::Debug, "Deleted Chase.");
 }
 
 bool Chase::check(std::string &error) const
@@ -106,7 +106,7 @@ ActionStatus Chase::perform()
 	} else {
 		// If the path to the target is empty or the target has changed room.
 		if (path.empty() || (target->room->vnum != lastRoom->vnum)) {
-			Logger::log(LogLevel::Debug, "Evaluating the path...");
+			MudLog(LogLevel::Debug, "Evaluating the path...");
 			// Find the path from the actor to the target.
 			if (!this->updatePath()) {
 				actor->sendMsg("There is no path to your target.\n\n");
@@ -192,12 +192,12 @@ bool Chase::updatePath()
 bool Chase::moveTowardsTarget()
 {
 	if (path.empty()) {
-		Logger::log(LogLevel::Debug, "Path is empty.");
+		MudLog(LogLevel::Debug, "Path is empty.");
 		return false;
 	}
 	Room *nextRoom = path.front();
 	if (nextRoom == nullptr) {
-		Logger::log(LogLevel::Debug, "Next room is a nullptr.");
+		MudLog(LogLevel::Debug, "Next room is a nullptr.");
 		return false;
 	}
 	// Get the direction of the next room.
@@ -209,7 +209,7 @@ bool Chase::moveTowardsTarget()
 							 direction.toString() + ".\n",
 						 actor->getNameCapital() + " arrives from " +
 							 direction.getOpposite().toString() + ".\n")) {
-		Logger::log(LogLevel::Debug, "Cannot move to the next room.");
+		MudLog(LogLevel::Debug, "Cannot move to the next room.");
 		return false;
 	}
 	// Apply the disturbed aim effect.

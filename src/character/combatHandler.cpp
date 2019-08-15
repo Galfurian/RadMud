@@ -50,7 +50,7 @@ bool CombatHandler::addOpponent(Character *character, unsigned int initAggro)
 		opponents.push_back(std::make_shared<Aggression>(character, initAggro));
 		// Sort the list.
 		this->sortList();
-		Logger::log(LogLevel::Debug, "%s engage %s with %s.",
+		MudLog(LogLevel::Debug, "%s engage %s with %s.",
 					owner->getNameCapital(), character->getName(), initAggro);
 		this->printList();
 		return true;
@@ -77,7 +77,7 @@ bool CombatHandler::remOpponent(Character *character)
 					predefinedTarget = nullptr;
 				}
 			}
-			Logger::log(LogLevel::Debug, "%s disengages %s",
+			MudLog(LogLevel::Debug, "%s disengages %s",
 						owner->getNameCapital(), character->getName());
 			this->printList();
 			// If the list of opponents is empty, stop the fighting.
@@ -91,7 +91,7 @@ bool CombatHandler::remOpponent(Character *character)
 			return true;
 		}
 	}
-	Logger::log(LogLevel::Debug, "Cannot find %s among the aggressors of %s",
+	MudLog(LogLevel::Debug, "Cannot find %s among the aggressors of %s",
 				character->getName(), owner->getNameCapital());
 	this->printList();
 	return false;
@@ -235,14 +235,14 @@ void CombatHandler::resetList()
 {
 	for (auto it : opponents) {
 		if (it->aggressor == nullptr) {
-			Logger::log(LogLevel::Error, "Found a nullptr aggressor.");
+			MudLog(LogLevel::Error, "Found a nullptr aggressor.");
 		} else {
 			// Remove the owner from its list.
 			if (it->aggressor->combatHandler.remOpponent(owner)) {
-				Logger::log(LogLevel::Debug, "%s disengages %s",
+				MudLog(LogLevel::Debug, "%s disengages %s",
 							owner->getNameCapital(), it->aggressor->getName());
 			} else {
-				Logger::log(LogLevel::Error,
+				MudLog(LogLevel::Error,
 							"Could not remove %s from opponents of %s.",
 							owner->getName(), it->aggressor->getName());
 			}

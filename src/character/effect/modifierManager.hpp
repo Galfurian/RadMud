@@ -25,11 +25,11 @@
 #include "combatModifier.hpp"
 #include "statusModifier.hpp"
 #include "knowledge.hpp"
+#include "logger.hpp"
 #include "utils.hpp"
+#include "align.hpp"
 
 #include <memory>
-#include <utilities/logger.hpp>
-#include "align.hpp"
 
 /// @brief Addition-Assignment operator for two Ability Modifier maps.
 template <typename ModifierType>
@@ -285,7 +285,7 @@ public:
 				msg += Align(it2.second, align::right, 5) + "\n";
 			}
 		}
-		Logger::log(LogLevel::Debug, msg);
+		MudLog(LogLevel::Debug, msg);
 	}
 };
 

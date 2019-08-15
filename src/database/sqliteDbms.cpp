@@ -130,7 +130,7 @@ bool SQLiteDbms::loadTables()
 	// Status variable for loading operation.
 	bool status = true;
 	for (auto iterator : loaders) {
-		Logger::log(LogLevel::Debug,
+		MudLog(LogLevel::Debug,
 					"    Loading Table: " + iterator.table + ".");
 		// Execute the query.
 		auto result = dbConnection.executeSelect(iterator.getQuery().c_str());
@@ -145,7 +145,7 @@ bool SQLiteDbms::loadTables()
 				iterator.loadFunction(result);
 			}
 		} catch (SQLiteException &e) {
-			Logger::log(LogLevel::Error, std::string(e.what()));
+			MudLog(LogLevel::Error, std::string(e.what()));
 			// Release the resource.
 			result->release();
 			status = false;
@@ -236,7 +236,7 @@ bool SQLiteDbms::updatePlayers()
 	for (auto player : Mud::instance().mudPlayers) {
 		if (player->isPlaying()) {
 			if (!player->updateOnDB()) {
-				Logger::log(LogLevel::Error, "Can't save the player '%s'.",
+				MudLog(LogLevel::Error, "Can't save the player '%s'.",
 							player->getName());
 				this->showLastError();
 			}
@@ -253,7 +253,7 @@ bool SQLiteDbms::updateItems()
 	//    dbConnection.beginTransaction();
 	for (auto it : Mud::instance().mudItems) {
 		if (!it.second->updateOnDB()) {
-			Logger::log(LogLevel::Error, "Can't save the item '%s'.",
+			MudLog(LogLevel::Error, "Can't save the item '%s'.",
 						it.second->getName());
 			this->showLastError();
 		}
@@ -269,7 +269,7 @@ bool SQLiteDbms::updateRooms()
 	//    dbConnection.beginTransaction();
 	for (auto it : Mud::instance().mudRooms) {
 		if (!it.second->updateOnDB()) {
-			Logger::log(LogLevel::Error, "Can't save the room '%s'.",
+			MudLog(LogLevel::Error, "Can't save the room '%s'.",
 						it.second->name);
 			this->showLastError();
 		}
@@ -301,8 +301,8 @@ void SQLiteDbms::endTransaction()
 
 void SQLiteDbms::showLastError() const
 {
-	Logger::log(LogLevel::Error,
+	MudLog(LogLevel::Error,
 				"Error code :" + ToString(dbConnection.getLastErrorCode()));
-	Logger::log(LogLevel::Error,
+	MudLog(LogLevel::Error,
 				"Last error :" + dbConnection.getLastErrorMsg());
 }

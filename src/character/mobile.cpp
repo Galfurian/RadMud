@@ -62,7 +62,7 @@ Mobile::~Mobile()
 	if (this->isAlive()) {
 		room->removeCharacter(this);
 	}
-	Logger::log(LogLevel::Debug, "Deleted mobile\t\t\t\t(%s)",
+	MudLog(LogLevel::Debug, "Deleted mobile\t\t\t\t(%s)",
 				this->getNameCapital());
 }
 
@@ -133,7 +133,7 @@ void Mobile::respawn()
 	behaviourTimer =
 		std::chrono::system_clock::now() + std::chrono::seconds(level);
 	// Log to the mud.
-	//Logger::log(LogLevel::Debug, "Respawning " + this->id);
+	//MudLog(LogLevel::Debug, "Respawning " + this->id);
 }
 
 bool Mobile::isAlive() const
@@ -297,11 +297,11 @@ void Mobile::sendMsg(const std::string &msg)
 bool Mobile::saveOnDB()
 {
 	if (model == nullptr) {
-		Logger::log(LogLevel::Error, "No model set for mobile.");
+		MudLog(LogLevel::Error, "No model set for mobile.");
 		return false;
 	}
 	if (room == nullptr) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Trying to save mobile while it is in no room.");
 		return false;
 	}
@@ -350,7 +350,7 @@ void Mobile::triggerEventFight(Character *character)
 
 void Mobile::triggerEventEnter(Character *character)
 {
-	Logger::log(LogLevel::Trace, "Activating EventEnter.");
+	MudLog(LogLevel::Trace, "Activating EventEnter.");
 	this->mobileThread("EventEnter", character, "");
 	behaviourTimer = std::chrono::system_clock::now() - std::chrono::seconds(1);
 }
@@ -426,7 +426,7 @@ bool Mobile::mobileThread(std::string event, Character *character,
 				}
 			}
 		} catch (luabridge::LuaException const &e) {
-			Logger::log(LogLevel::Error, e.what());
+			MudLog(LogLevel::Error, e.what());
 		}
 	}
 	return true;

@@ -235,7 +235,7 @@ public:
 				   const std::vector<Character *> &exceptions,
 				   const Args &... args)
 	{
-		sendToAll(StringBuilder::build(message, args...), exceptions);
+		sendToAll(BuildStr(message, args...), exceptions);
 	}
 
 	/// @brief Send a message to all the characters inside the room which
@@ -256,7 +256,7 @@ public:
 					   std::function<bool(Character *character)> checkException,
 					   const Args &... args)
 	{
-		funcSendToAll(StringBuilder::build(message, args...), checkException);
+		funcSendToAll(BuildStr(message, args...), checkException);
 	}
 
 	/// @brief Define operator lesser than.

@@ -32,12 +32,12 @@ GeneralAction::GeneralAction(Character *_actor, const bool &_lastAction) :
 	actionCooldown()
 {
 	// Debugging message.
-	//Logger::log(LogLevel::Debug, "Created GeneralAction.");
+	//MudLog(LogLevel::Debug, "Created GeneralAction.");
 }
 
 GeneralAction::~GeneralAction()
 {
-	//Logger::log(LogLevel::Debug, "Deleted GeneralAction.");
+	//MudLog(LogLevel::Debug, "Deleted GeneralAction.");
 }
 
 bool GeneralAction::checkElapsed() const

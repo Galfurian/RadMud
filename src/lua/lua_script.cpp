@@ -35,7 +35,7 @@
 void LuaLog(std::string message)
 {
 	if (!message.empty()) {
-		Logger::log(LogLevel::Info, "[LUA]" + message);
+		MudLog(LogLevel::Info, "[LUA]" + message);
 	}
 }
 
@@ -54,12 +54,12 @@ Item *LuaLoadItem(Character *character, unsigned int vnumModel,
 {
 	auto model = Mud::instance().findItemModel(vnumModel);
 	if (model == nullptr) {
-		Logger::log(LogLevel::Error, "Can't find model : %s", vnumModel);
+		MudLog(LogLevel::Error, "Can't find model : %s", vnumModel);
 		return nullptr;
 	}
 	auto composition = Mud::instance().findMaterial(vnumMaterial);
 	if (composition == nullptr) {
-		Logger::log(LogLevel::Error, "Can't find material :", vnumMaterial);
+		MudLog(LogLevel::Error, "Can't find material :", vnumMaterial);
 		return nullptr;
 	}
 	// Create the item.
@@ -612,8 +612,8 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 	// Load the script.
 	auto path = Mud::instance().getMudSystemDirectory() + "lua/" + scriptFile;
 	if (luaL_dofile(L, path.c_str()) != LUABRIDGE_LUA_OK) {
-		Logger::log(LogLevel::Error, "Can't open script %s.", scriptFile);
-		Logger::log(LogLevel::Error, "Error :%s",
+		MudLog(LogLevel::Error, "Can't open script %s.", scriptFile);
+		MudLog(LogLevel::Error, "Error :%s",
 					std::string(lua_tostring(L, -1)));
 	}
 }

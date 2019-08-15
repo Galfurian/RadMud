@@ -34,14 +34,14 @@ DismemberAction::DismemberAction(Character *_actor, CorpseItem *_corpse,
 	bodyPart(_bodyPart)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created DismemberAction.");
+	MudLog(LogLevel::Debug, "Created DismemberAction.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 DismemberAction::~DismemberAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted DismemberAction.");
+	MudLog(LogLevel::Debug, "Deleted DismemberAction.");
 }
 
 bool DismemberAction::check(std::string &error) const
@@ -108,7 +108,7 @@ ActionStatus DismemberAction::perform()
 		// Roll the DC and check if the action is a success. However, the
 		// actor can keep all the things he has dismembered til now.
 		auto DCRoll = TRand<int>(1, 20) + butchery;
-		Logger::log(LogLevel::Debug, "DC: %s vs %s", DCRoll,
+		MudLog(LogLevel::Debug, "DC: %s vs %s", DCRoll,
 					resources.difficulty);
 		if (DCRoll < resources.difficulty) {
 			actor->sendMsg("You stop to dismember %s.", corpse->getName(true));
@@ -149,10 +149,10 @@ unsigned int DismemberAction::getCooldown()
 	assert(corpse && "Corpse is nullptr");
 	assert(bodyPart && "BodyPart is nullptr");
 	double required = 6;
-	Logger::log(LogLevel::Debug, "Base time  :%s", required);
+	MudLog(LogLevel::Debug, "Base time  :%s", required);
 	required -=
 		(required * actor->effectManager.getKnowledge(Knowledge::Butchery)) /
 		100;
-	Logger::log(LogLevel::Debug, "With skill :%s", required);
+	MudLog(LogLevel::Debug, "With skill :%s", required);
 	return static_cast<unsigned int>(required);
 }

@@ -42,7 +42,7 @@ Area::Area() :
 
 Area::~Area()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted area\t\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);
@@ -129,12 +129,12 @@ bool Area::addRoom(Room *room)
 			room->area = this;
 			return true;
 		} else {
-			Logger::log(LogLevel::Error,
+			MudLog(LogLevel::Error,
 						"Room's insertion could not be completed %s.",
 						room->coord.toString());
 		}
 	} else {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Room's coordinates are not inside the boundaries %s.",
 					room->coord.toString());
 	}

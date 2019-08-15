@@ -1,5 +1,5 @@
 /// @file   logger.cpp
-/// @brief  Define the logger class.
+/// @brief  Define the logging functions.
 /// @author Enrico Fraccaroli
 /// @date   May 28 2016
 /// @copyright
@@ -19,91 +19,19 @@
 #include "logger.hpp"
 #include "utils.hpp"
 
-#include <thread>
 #include <mutex>
+#include <fstream>
+#include <cstring>
 
-Logger::Logger()
-{
-	// Nothing to do.
-}
+#define FILENAME(FILE)                                                         \
+	(strrchr((FILE), '/') ? strrchr((FILE), '/') + 1 : (FILE))
 
-Logger::~Logger()
-{
-	// Nothing to do.
-}
+/// Output file.
+static std::fstream log_file;
+/// Define a mutex for the log function.
+static std::mutex log_mutex;
 
-Logger &Logger::instance()
-{
-	// Since it's a static variable, if the class has already been created,
-	// It won't be created again. And it **is** thread-safe in C++11.
-	static Logger instance;
-	// Return a reference to our instance.
-	return instance;
-}
-
-bool Logger::openLog(const std::string &filename)
-{
-	if (!Logger::getStream().is_open()) {
-		Logger::getStream().open(filename.c_str(),
-								 std::ios::in | std::ios::out | std::ios::app);
-	}
-	return Logger::getStream().is_open();
-}
-
-bool Logger::getLog(const LogLevel &level, std::string *result)
-{
-	if (Logger::getStream().is_open()) {
-		// Clear the output string.
-		result->clear();
-		std::streamoff totalSize = Logger::getStream().tellg();
-		if (totalSize > 0) {
-			// Resize the log string.
-			result->resize(static_cast<std::size_t>(totalSize));
-			// Move the input position to the beginning of the string.
-			Logger::getStream().seekg(0, std::ios::beg);
-			// Create a string which contains the given level.
-			std::string logLevel = "[" + Logger::levelToString(level) + "]";
-			for (std::string line; std::getline(Logger::getStream(), line);) {
-				if (BeginWith(line, logLevel)) {
-					result->append(line + "\n");
-				}
-			}
-			return true;
-		}
-	}
-	return false;
-}
-
-LogLevel Logger::castFromInt(const unsigned int &level)
-{
-	return static_cast<LogLevel>(level);
-}
-
-void Logger::log(const LogLevel &level, const std::string &msg)
-{
-	// Define a mutex for the log function.
-	static std::mutex logMutex;
-	std::lock_guard<std::mutex> lock(logMutex);
-	if (Logger::getStream().is_open()) {
-		// Write the log message inside the file.
-		Logger::getStream()
-			<< "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
-			<< "[" << Logger::levelToString(level) << "]"
-			<< "[" << Logger::getDateTime() << "] " << msg << "\n";
-	}
-	Logger::getOutputStream(level)
-		<< "[" << std::hex << std::this_thread::get_id() << std::dec << "]"
-		<< "[" << Logger::levelToString(level) << "]"
-		<< "[" << Logger::getDateTime() << "] " << msg << "\n";
-}
-
-std::fstream &Logger::getStream()
-{
-	static std::fstream out_stream;
-	return out_stream;
-}
-
-std::string Logger::getDateTime()
+static inline std::string LogGetDateTime()
 {
 	time_t now = time(nullptr);
 	char buffer[32];
@@ -112,54 +40,45 @@ std::string Logger::getDateTime()
 	return std::string(buffer);
 }
 
-std::ostream &Logger::getOutputStream(const LogLevel &level)
+static inline std::string LogLevelToString(const LogLevel &level)
 {
-	if (level == LogLevel::Global) {
-		return std::cout;
-	}
-	if (level == LogLevel::Debug) {
-		return std::cout;
-	}
-	if (level == LogLevel::Info) {
-		return std::cout;
-	}
-	if (level == LogLevel::Warning) {
-		return std::cerr;
-	}
-	if (level == LogLevel::Error) {
-		return std::cerr;
-	}
-	if (level == LogLevel::Fatal) {
-		return std::cout;
-	}
-	if (level == LogLevel::Trace) {
-		return std::cout;
-	}
-	return std::cout;
+	if (level == LogLevel::Global)
+		return " GLOBAL";
+	if (level == LogLevel::Debug)
+		return "  DEBUG";
+	if (level == LogLevel::Info)
+		return "   INFO";
+	if (level == LogLevel::Warning)
+		return "WARNING";
+	if (level == LogLevel::Error)
+		return "  ERROR";
+	if (level == LogLevel::Fatal)
+		return "  FATAL";
+	if (level == LogLevel::Trace)
+		return "  TRACE";
+	return "UNKNOWN";
 }
 
-std::string Logger::levelToString(const LogLevel &level)
+bool OpenLog(const std::string &filename)
 {
-	if (level == LogLevel::Global) {
-		return " GLOBAL";
+	if (!log_file.is_open())
+		log_file.open(filename.c_str(), std::ios::out | std::ios::app);
+	return log_file.is_open();
+}
+
+void _mudlog(const char *file, int line, const LogLevel &level,
+			 const std::string &msg)
+{
+	std::lock_guard<std::mutex> lock(log_mutex);
+	if (log_file.is_open()) {
+		// Write the log message inside the file.
+		log_file << '[' << LogGetDateTime() << ']';
+		log_file << '[' << LogLevelToString(level) << ']';
+		log_file << '[' << FILENAME(file) << ':' << line << "] ";
+		log_file << msg << "\n";
 	}
-	if (level == LogLevel::Debug) {
-		return "  DEBUG";
-	}
-	if (level == LogLevel::Info) {
-		return "   INFO";
-	}
-	if (level == LogLevel::Warning) {
-		return "WARNING";
-	}
-	if (level == LogLevel::Error) {
-		return "  ERROR";
-	}
-	if (level == LogLevel::Fatal) {
-		return "  FATAL";
-	}
-	if (level == LogLevel::Trace) {
-		return "  TRACE";
-	}
-	return "UNKNOWN";
+	std::cout << '[' << LogGetDateTime() << ']';
+	std::cout << '[' << LogLevelToString(level) << "] ";
+	std::cout << '[' << FILENAME(file) << ':' << line << "] ";
+	std::cout << msg << "\n";
 }

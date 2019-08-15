@@ -34,25 +34,25 @@ AimAction::AimAction(Character *_actor, Character *_target) :
 	target(_target)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created aim action.");
+	MudLog(LogLevel::Debug, "Created aim action.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 AimAction::~AimAction()
 {
-	Logger::log(LogLevel::Debug, "Deleted aim action.");
+	MudLog(LogLevel::Debug, "Deleted aim action.");
 }
 
 bool AimAction::check(std::string &error) const
 {
 	if (!GeneralAction::check(error)) {
-		Logger::log(LogLevel::Error, "Error with the general action.");
+		MudLog(LogLevel::Error, "Error with the general action.");
 		error = "You failed your action.";
 		return false;
 	}
 	if (target == nullptr) {
-		Logger::log(LogLevel::Error, "The target is a null pointer.");
+		MudLog(LogLevel::Error, "The target is a null pointer.");
 		error = "You don't have a valid target.";
 		return false;
 	}

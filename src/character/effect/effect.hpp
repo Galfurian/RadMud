@@ -67,13 +67,13 @@ public:
 		tremain(_tremain),
 		functions(std::move(_functions))
 	{
-		Logger::log(LogLevel::Debug, "Created effect %s.", name);
+		MudLog(LogLevel::Debug, "Created effect %s.", name);
 	}
 
 	/// @brief Destructor.
 	~Effect()
 	{
-		Logger::log(LogLevel::Debug, "Deleted effect %s.", name);
+		MudLog(LogLevel::Debug, "Deleted effect %s.", name);
 	}
 
 	/// @brief Update the remaining tics.

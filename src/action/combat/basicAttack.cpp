@@ -34,14 +34,14 @@
 BasicAttack::BasicAttack(Character *_actor) : CombatAction(_actor)
 {
 	// Debugging message.
-	Logger::log(LogLevel::Debug, "Created BasicAttack.");
+	MudLog(LogLevel::Debug, "Created BasicAttack.");
 	// Reset the cooldown of the action.
 	this->resetCooldown(this->getCooldown());
 }
 
 BasicAttack::~BasicAttack()
 {
-	Logger::log(LogLevel::Debug, "Deleted BasicAttack.");
+	MudLog(LogLevel::Debug, "Deleted BasicAttack.");
 }
 
 bool BasicAttack::check(std::string &error) const
@@ -157,7 +157,7 @@ ActionStatus BasicAttack::perform()
 					actor->sendMsg(error + "\n\n");
 				}
 			} else {
-				Logger::log(LogLevel::Error, "Top aggro is a nullptr!");
+				MudLog(LogLevel::Error, "Top aggro is a nullptr!");
 			}
 		}
 		actor->sendMsg("Try to get closer to your enemy.\n\n");
@@ -224,25 +224,25 @@ bool BasicAttack::setPredefinedTarget()
 {
 	// If there is a predefined target, check if it is a valid target.
 	if (actor->combatHandler.getPredefinedTarget() != nullptr) {
-		Logger::log(LogLevel::Debug, "[%s] Has a predefined target.",
+		MudLog(LogLevel::Debug, "[%s] Has a predefined target.",
 					actor->getNameCapital());
 		if (this->checkTarget(actor->combatHandler.getPredefinedTarget())) {
-			Logger::log(LogLevel::Debug,
+			MudLog(LogLevel::Debug,
 						"[%s] Predefined target is a valid target.",
 						actor->getNameCapital());
 			return true;
 		}
-		Logger::log(LogLevel::Debug,
+		MudLog(LogLevel::Debug,
 					"[%s] Predefined target is NOT a valid target.",
 					actor->getNameCapital());
 	} else {
-		Logger::log(LogLevel::Debug, "[%s] Has no predefined target.",
+		MudLog(LogLevel::Debug, "[%s] Has no predefined target.",
 					actor->getNameCapital());
 	}
 	// Take a valid target.
 	for (auto const &it : actor->combatHandler) {
 		if (this->checkTarget(it->aggressor)) {
-			Logger::log(LogLevel::Debug, "[%s] Has a new predefined target: %s",
+			MudLog(LogLevel::Debug, "[%s] Has a new predefined target: %s",
 						actor->getNameCapital(),
 						it->aggressor->getNameCapital());
 			actor->combatHandler.setPredefinedTarget(it->aggressor);
@@ -256,13 +256,13 @@ bool BasicAttack::checkTarget(Character *target)
 {
 	// Check characters.
 	if ((actor == nullptr) || (target == nullptr)) {
-		Logger::log(LogLevel::Debug,
+		MudLog(LogLevel::Debug,
 					"Either the actor or the target is a nullptr.");
 		return false;
 	}
 	// Check their rooms.
 	if ((actor->room == nullptr) || (target->room == nullptr)) {
-		Logger::log(
+		MudLog(
 			LogLevel::Debug,
 			"[%s] Either the actor or the target are in a nullptr room.",
 			actor->getNameCapital());
@@ -270,14 +270,14 @@ bool BasicAttack::checkTarget(Character *target)
 	}
 	// Check if they are at close range.
 	if (actor->room->coord == target->room->coord) {
-		Logger::log(LogLevel::Debug,
+		MudLog(LogLevel::Debug,
 					"[%s] The actor and the target are in the same room.",
 					actor->getNameCapital());
 		return true;
 	}
 	// Check if there is no aimed character.
 	if (actor->combatHandler.getAimedTarget() == nullptr) {
-		Logger::log(
+		MudLog(
 			LogLevel::Debug,
 			"[%s] The actor has no aimed character, so the target cannot be attacked.",
 			actor->getNameCapital());
@@ -285,7 +285,7 @@ bool BasicAttack::checkTarget(Character *target)
 	}
 	// If at long range, check if the target is the aimed character.
 	if (actor->combatHandler.getAimedTarget() == target) {
-		Logger::log(
+		MudLog(
 			LogLevel::Debug,
 			"[%s] The aimed character and the target are the same character.",
 			actor->getNameCapital());
@@ -293,7 +293,7 @@ bool BasicAttack::checkTarget(Character *target)
 		auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(actor);
 		// Check if the actor has no ranged weapon equipped.
 		if (rangedWeapons.empty()) {
-			Logger::log(LogLevel::Debug,
+			MudLog(LogLevel::Debug,
 						"[%s] The actor has no ranged weapon equipped.",
 						actor->getNameCapital());
 			return false;
@@ -303,14 +303,14 @@ bool BasicAttack::checkTarget(Character *target)
 		// TODO: This does not check if the weapon is USABLE!
 		for (auto weapon : rangedWeapons) {
 			if (actor->isAtRange(target, weapon->getRange())) {
-				Logger::log(LogLevel::Debug,
+				MudLog(LogLevel::Debug,
 							"[%s] The target is at range with %s.",
 							actor->getNameCapital(), weapon->getName(false));
 				return true;
 			}
 		}
 	}
-	Logger::log(LogLevel::Debug, "[%s] No valid target has been found.",
+	MudLog(LogLevel::Debug, "[%s] No valid target has been found.",
 				actor->getNameCapital());
 	return false;
 }

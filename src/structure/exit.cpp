@@ -40,7 +40,7 @@ Exit::Exit(Room *_source, Room *_destination, Direction _direction,
 
 Exit::~Exit()
 {
-	//    Logger::log(LogLevel::Debug, "Deleted: Exit.");
+	//    MudLog(LogLevel::Debug, "Deleted: Exit.");
 }
 
 bool Exit::check() const

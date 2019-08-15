@@ -137,7 +137,7 @@ Generator::Generator()
 
 Generator::~Generator()
 {
-	//Logger::log(LogLevel::Debug, "Deleted: Generator.");
+	//MudLog(LogLevel::Debug, "Deleted: Generator.");
 }
 
 Generator &Generator::instance()

@@ -67,7 +67,7 @@ ItemModel::ItemModel() :
 
 ItemModel::~ItemModel()
 {
-	//    Logger::log(LogLevel::Debug,
+	//    MudLog(LogLevel::Debug,
 	//                "Deleted model\t\t[%s]\t\t(%s)",
 	//                ToString(this->vnum),
 	//                this->name);
@@ -108,17 +108,17 @@ Item *ItemModel::createItem(std::string maker, Material *composition,
 							const unsigned int &quantity)
 {
 	if (composition == nullptr) {
-		Logger::log(LogLevel::Error, "Received nullptr material.");
+		MudLog(LogLevel::Error, "Received nullptr material.");
 		return nullptr;
 	}
 	if (composition->type != this->material) {
-		Logger::log(LogLevel::Error, "Wrong type of material.");
+		MudLog(LogLevel::Error, "Wrong type of material.");
 		return nullptr;
 	}
 	// Instantiate the new item.
 	auto newItem = ItemFactory::newItem(this->getType());
 	if (newItem == nullptr) {
-		Logger::log(LogLevel::Error, "Cannot create the new item.");
+		MudLog(LogLevel::Error, "Cannot create the new item.");
 		// Return pointer to nothing.
 		return nullptr;
 	}
@@ -145,7 +145,7 @@ Item *ItemModel::createItem(std::string maker, Material *composition,
 	}
 
 	if (!newItem->check()) {
-		Logger::log(LogLevel::Error, "Cannot create the new item.");
+		MudLog(LogLevel::Error, "Cannot create the new item.");
 		// Delete the item.
 		delete (newItem);
 		// Return pointer to nothing.
@@ -153,7 +153,7 @@ Item *ItemModel::createItem(std::string maker, Material *composition,
 	}
 	//
 	if (!newItem->updateOnDB()) {
-		Logger::log(LogLevel::Error, "Cannot save the new item on DB.");
+		MudLog(LogLevel::Error, "Cannot save the new item on DB.");
 		// Delete the item.
 		delete (newItem);
 		// Return pointer to nothing.
@@ -161,7 +161,7 @@ Item *ItemModel::createItem(std::string maker, Material *composition,
 	}
 	// Insert into the item_list the new item.
 	if (!Mud::instance().addItem(newItem)) {
-		Logger::log(LogLevel::Error, "Cannot save the new item on MUD.");
+		MudLog(LogLevel::Error, "Cannot save the new item on MUD.");
 		// Delete the item.
 		delete (newItem);
 		// Return pointer to nothing.

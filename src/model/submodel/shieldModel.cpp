@@ -47,13 +47,13 @@ std::string ShieldModel::getTypeName() const
 bool ShieldModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		Logger::log(LogLevel::Error, "Function list is empty (%s).",
+		MudLog(LogLevel::Error, "Function list is empty (%s).",
 					this->name);
 		return false;
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 2) {
-		Logger::log(LogLevel::Error,
+		MudLog(LogLevel::Error,
 					"Wrong number of parameters for Shield Model (%s).",
 					this->name);
 		return false;
