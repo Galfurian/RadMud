@@ -58,6 +58,7 @@ class ColorHandler(logging.StreamHandler):
             self.text_edit.insertPlainText("%s:%d : " % (record.funcName, record.lineno))
             self.text_edit.setTextColor(self.rgb_colors[color_id])
             self.text_edit.insertPlainText("%s\n" % (record.getMessage()))
+            self.text_edit.ensureCursorVisible()
 
 
 class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -71,6 +72,7 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         # === MODELS ==========================================================
         # MODEL
         self.mdl_model = None
+        self.mdl_model_body_part = None
         # MATERIAL
         self.mdl_material = None
         # BODYPART
@@ -304,6 +306,12 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
         self.set_relation(self.mdl_model, "type", "ModelType", "id", "name")
         self.set_relation(self.mdl_model, "material", "MaterialType", "id", "name")
         self.tbl_model.setModel(self.mdl_model)
+        self.tbl_model.clicked.connect(self.model_clicked)
+
+        self.mdl_model_body_part = self.init_model('modelbodypart')
+        self.set_relation(self.mdl_model_body_part, "model", "model", "vnum", "name")
+        self.set_relation(self.mdl_model_body_part, "bodypart", "bodypart", "vnum", "name")
+        self.tbl_model_body_part.setModel(self.mdl_model_body_part)
 
         # === MATERIAL ========================================================
         self.mdl_material = self.init_model('material')
@@ -506,6 +514,11 @@ class RadMudEditor(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Issue an update of all the models.
         self.update_models()
+
+    def model_clicked(self, current):
+        vnum = self.mdl_model.data(self.mdl_model.index(current.row(), 0))
+        self.mdl_model_body_part.setFilter("model = {}".format(vnum))
+        self.update_status_bar("Filtering activated: Press ESC to reset filtering.")
 
     def bodypart_clicked(self, current):
         vnum = self.mdl_bodypart.data(self.mdl_bodypart.index(current.row(), 0))

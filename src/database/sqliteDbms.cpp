@@ -72,6 +72,7 @@ SQLiteDbms::SQLiteDbms() : dbConnection(), loaders()
 	loaders.emplace_back(
 		TableLoader("ProductionKnowledge", LoadProductionKnowledge));
 	loaders.emplace_back(TableLoader("Currency", LoadCurrency));
+	loaders.emplace_back(TableLoader("ModelBodyPart", LoadModelBodyPart));
 	loaders.emplace_back(TableLoader("MobileModel", LoadMobileModel));
 	loaders.emplace_back(TableLoader("MobileSpawn", LoadMobileSpawn));
 	loaders.emplace_back(
@@ -130,8 +131,7 @@ bool SQLiteDbms::loadTables()
 	// Status variable for loading operation.
 	bool status = true;
 	for (auto iterator : loaders) {
-		MudLog(LogLevel::Debug,
-					"    Loading Table: " + iterator.table + ".");
+		MudLog(LogLevel::Debug, "    Loading Table: " + iterator.table + ".");
 		// Execute the query.
 		auto result = dbConnection.executeSelect(iterator.getQuery().c_str());
 		// Check the result.
@@ -237,7 +237,7 @@ bool SQLiteDbms::updatePlayers()
 		if (player->isPlaying()) {
 			if (!player->updateOnDB()) {
 				MudLog(LogLevel::Error, "Can't save the player '%s'.",
-							player->getName());
+					   player->getName());
 				this->showLastError();
 			}
 		}
@@ -254,7 +254,7 @@ bool SQLiteDbms::updateItems()
 	for (auto it : Mud::instance().mudItems) {
 		if (!it.second->updateOnDB()) {
 			MudLog(LogLevel::Error, "Can't save the item '%s'.",
-						it.second->getName());
+				   it.second->getName());
 			this->showLastError();
 		}
 	}
@@ -270,7 +270,7 @@ bool SQLiteDbms::updateRooms()
 	for (auto it : Mud::instance().mudRooms) {
 		if (!it.second->updateOnDB()) {
 			MudLog(LogLevel::Error, "Can't save the room '%s'.",
-						it.second->name);
+				   it.second->name);
 			this->showLastError();
 		}
 	}
@@ -302,7 +302,6 @@ void SQLiteDbms::endTransaction()
 void SQLiteDbms::showLastError() const
 {
 	MudLog(LogLevel::Error,
-				"Error code :" + ToString(dbConnection.getLastErrorCode()));
-	MudLog(LogLevel::Error,
-				"Last error :" + dbConnection.getLastErrorMsg());
+		   "Error code :" + ToString(dbConnection.getLastErrorCode()));
+	MudLog(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
 }

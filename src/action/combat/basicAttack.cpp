@@ -89,12 +89,10 @@ ActionStatus BasicAttack::perform()
 		// Return that the action is finished.
 		return ActionStatus::Finished;
 	}
-	// Flag used to determine if the actor WAS able to attack the target.
-	bool hasAttackedTheTarget = false;
+	// Set the progressive number of the attack to 0.
+	unsigned int attacks = 0;
 	// Find a valid predefined target.
 	if (this->setPredefinedTarget()) {
-		// Set the progressive number of the attack to 0.
-		unsigned int attackNumber = 0;
 		// Get the predefined target.
 		Character *predefined = actor->combatHandler.getPredefinedTarget();
 		// If the actor and the pred-target are in the same room,
@@ -105,10 +103,9 @@ ActionStatus BasicAttack::perform()
 			// Perform the attack for each melee weapon.
 			for (auto weapon : meleeWeapons) {
 				// Perform the attack passing the melee weapon.
-				this->performMeleeAttack(predefined, weapon, attackNumber);
-
+				this->performMeleeAttack(predefined, weapon, attacks);
 				// Increment the number of executed attacks.
-				++attackNumber;
+				++attacks;
 			}
 		}
 		// Retrieve all the ranged weapons.
@@ -119,9 +116,9 @@ ActionStatus BasicAttack::perform()
 			if (actor->isAtRange(predefined, weapon->getRange())) {
 				// Set that the actor has actually attacked the target.
 				// Perform the attack passing the ranged weapon.
-				this->performRangedAttack(predefined, weapon, attackNumber);
+				this->performRangedAttack(predefined, weapon, attacks);
 				// Increment the number of executed attacks.
-				++attackNumber;
+				++attacks;
 			}
 		}
 		// Retrieve all the natural weapons.
@@ -132,44 +129,43 @@ ActionStatus BasicAttack::perform()
 			if (actor->isAtRange(predefined, weapon->range)) {
 				// Set that the actor has actually attacked the target.
 				// Perform the attack passing the melee weapon.
-				this->performAttackNaturalWeapon(predefined, weapon,
-												 attackNumber);
+				this->performAttackNaturalWeapon(predefined, weapon, attacks);
 				// Increment the number of executed attacks.
-				++attackNumber;
+				++attacks;
 			}
 		}
 	}
-	// Check if the actor has not attacked anyone.
-	if (!hasAttackedTheTarget) {
-		// Check if the actor is a mobile.
-		if (actor->isMobile()) {
-			// Take the enemy with the higher value of aggro.
-			auto topAggro = actor->combatHandler.getTopAggro();
-			if (topAggro != nullptr) {
-				auto chaseAction =
-					std::make_shared<Chase>(actor, topAggro->aggressor);
-				if (chaseAction->check(error)) {
-					// Add the action.
-					actor->pushAction(chaseAction);
-					// Return that the action is still running.
-					return ActionStatus::Running;
-				} else {
-					actor->sendMsg(error + "\n\n");
-				}
+	// Check if the actor has attacked someone.
+	if (attacks > 0) {
+		// Reset the cooldown.
+		actor->getAction()->resetCooldown();
+		// Return that the action is still running.
+		return ActionStatus::Running;
+	}
+	// Check if the actor is a mobile.
+	if (actor->isMobile()) {
+		// Take the enemy with the higher value of aggro.
+		auto topAggro = actor->combatHandler.getTopAggro();
+		if (topAggro != nullptr) {
+			auto chaseAction =
+				std::make_shared<Chase>(actor, topAggro->aggressor);
+			if (chaseAction->check(error)) {
+				// Add the action.
+				actor->pushAction(chaseAction);
+				// Return that the action is still running.
+				return ActionStatus::Running;
 			} else {
-				MudLog(LogLevel::Error, "Top aggro is a nullptr!");
+				actor->sendMsg(error + "\n\n");
 			}
+		} else {
+			MudLog(LogLevel::Error, "Top aggro is a nullptr!");
 		}
-		actor->sendMsg("Try to get closer to your enemy.\n\n");
-		// Stop the combat.
-		this->handleStop();
-		// Return that the action is finished.
-		return ActionStatus::Finished;
 	}
-	// Reset the cooldown.
-	actor->getAction()->resetCooldown();
-	// Return that the action is still running.
-	return ActionStatus::Running;
+	actor->sendMsg("Try to get closer to your enemy.\n\n");
+	// Stop the combat.
+	this->handleStop();
+	// Return that the action is finished.
+	return ActionStatus::Finished;
 }
 
 CombatActionType BasicAttack::getCombatActionType() const
@@ -225,26 +221,23 @@ bool BasicAttack::setPredefinedTarget()
 	// If there is a predefined target, check if it is a valid target.
 	if (actor->combatHandler.getPredefinedTarget() != nullptr) {
 		MudLog(LogLevel::Debug, "[%s] Has a predefined target.",
-					actor->getNameCapital());
+			   actor->getNameCapital());
 		if (this->checkTarget(actor->combatHandler.getPredefinedTarget())) {
-			MudLog(LogLevel::Debug,
-						"[%s] Predefined target is a valid target.",
-						actor->getNameCapital());
+			MudLog(LogLevel::Debug, "[%s] Predefined target is a valid target.",
+				   actor->getNameCapital());
 			return true;
 		}
-		MudLog(LogLevel::Debug,
-					"[%s] Predefined target is NOT a valid target.",
-					actor->getNameCapital());
+		MudLog(LogLevel::Debug, "[%s] Predefined target is NOT a valid target.",
+			   actor->getNameCapital());
 	} else {
 		MudLog(LogLevel::Debug, "[%s] Has no predefined target.",
-					actor->getNameCapital());
+			   actor->getNameCapital());
 	}
 	// Take a valid target.
 	for (auto const &it : actor->combatHandler) {
 		if (this->checkTarget(it->aggressor)) {
 			MudLog(LogLevel::Debug, "[%s] Has a new predefined target: %s",
-						actor->getNameCapital(),
-						it->aggressor->getNameCapital());
+				   actor->getNameCapital(), it->aggressor->getNameCapital());
 			actor->combatHandler.setPredefinedTarget(it->aggressor);
 			return true;
 		}
@@ -256,23 +249,21 @@ bool BasicAttack::checkTarget(Character *target)
 {
 	// Check characters.
 	if ((actor == nullptr) || (target == nullptr)) {
-		MudLog(LogLevel::Debug,
-					"Either the actor or the target is a nullptr.");
+		MudLog(LogLevel::Debug, "Either the actor or the target is a nullptr.");
 		return false;
 	}
 	// Check their rooms.
 	if ((actor->room == nullptr) || (target->room == nullptr)) {
-		MudLog(
-			LogLevel::Debug,
-			"[%s] Either the actor or the target are in a nullptr room.",
-			actor->getNameCapital());
+		MudLog(LogLevel::Debug,
+			   "[%s] Either the actor or the target are in a nullptr room.",
+			   actor->getNameCapital());
 		return false;
 	}
 	// Check if they are at close range.
 	if (actor->room->coord == target->room->coord) {
 		MudLog(LogLevel::Debug,
-					"[%s] The actor and the target are in the same room.",
-					actor->getNameCapital());
+			   "[%s] The actor and the target are in the same room.",
+			   actor->getNameCapital());
 		return true;
 	}
 	// Check if there is no aimed character.
@@ -294,8 +285,8 @@ bool BasicAttack::checkTarget(Character *target)
 		// Check if the actor has no ranged weapon equipped.
 		if (rangedWeapons.empty()) {
 			MudLog(LogLevel::Debug,
-						"[%s] The actor has no ranged weapon equipped.",
-						actor->getNameCapital());
+				   "[%s] The actor has no ranged weapon equipped.",
+				   actor->getNameCapital());
 			return false;
 		}
 		// Just check if AT LEAST one of the equipped ranged weapons can be used
@@ -303,15 +294,14 @@ bool BasicAttack::checkTarget(Character *target)
 		// TODO: This does not check if the weapon is USABLE!
 		for (auto weapon : rangedWeapons) {
 			if (actor->isAtRange(target, weapon->getRange())) {
-				MudLog(LogLevel::Debug,
-							"[%s] The target is at range with %s.",
-							actor->getNameCapital(), weapon->getName(false));
+				MudLog(LogLevel::Debug, "[%s] The target is at range with %s.",
+					   actor->getNameCapital(), weapon->getName(false));
 				return true;
 			}
 		}
 	}
 	MudLog(LogLevel::Debug, "[%s] No valid target has been found.",
-				actor->getNameCapital());
+		   actor->getNameCapital());
 	return false;
 }
 

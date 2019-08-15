@@ -28,6 +28,7 @@
 #include "lightItem.hpp"
 #include "armorItem.hpp"
 #include "mud.hpp"
+#include "armorModel.hpp"
 
 Character::Character() :
 	name(),
@@ -580,7 +581,7 @@ void Character::addInventoryItem(Item *&item)
 	item->owner = this;
 	// Log it.
 	MudLog(LogLevel::Debug, "Item '%s' added to '%s' inventory;",
-				item->getName(), this->getName());
+		   item->getName(), this->getName());
 }
 
 void Character::addEquipmentItem(Item *&item)
@@ -591,7 +592,7 @@ void Character::addEquipmentItem(Item *&item)
 	item->owner = this;
 	// Log it.
 	MudLog(LogLevel::Debug, "Item '%s' added to '%s' equipment;",
-				item->getName(), this->getName());
+		   item->getName(), this->getName());
 }
 
 bool Character::remInventoryItem(Item *item)
@@ -603,8 +604,8 @@ bool Character::remInventoryItem(Item *item)
 	// Clear the owner of the item.
 	item->owner = nullptr;
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';",
-				item->getName(), this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(),
+		   this->getName());
 	return true;
 }
 
@@ -619,8 +620,8 @@ bool Character::remEquipmentItem(Item *item)
 	// Empty the occupied body parts.
 	item->occupiedBodyParts.clear();
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';",
-				item->getName(), this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(),
+		   this->getName());
 	return true;
 }
 
@@ -656,14 +657,17 @@ Character::canWield(Item *item, std::string &error) const
 	// Prepare the list of occupied body parts.
 	std::vector<std::shared_ptr<BodyPart> > occupiedBodyParts;
 	// Get the compatible body parts.
-	for (auto const &bodyPart : race->bodyParts) {
-		MudLog(LogLevel::Debug, "0: %d", bodyPart->flags);
-		if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
+	auto compatibleBodyParts = item->model->getCompatibleBodyParts(race);
+	if (compatibleBodyParts.empty()) {
+		error = "It is not designed for your fisionomy.";
+		return occupiedBodyParts;
+	}
+	for (auto const &it : compatibleBodyParts) {
+		if (!HasFlag(it->flags, BodyPartFlag::CanWield))
 			continue;
-		MudLog(LogLevel::Debug, "1: %d", bodyPart->flags);
-		if (this->findItemAtBodyPart(bodyPart) != nullptr)
+		if (this->findItemAtBodyPart(it) != nullptr)
 			continue;
-		occupiedBodyParts.emplace_back(bodyPart);
+		occupiedBodyParts.emplace_back(it);
 		if (!HasFlag(item->model->modelFlags, ModelFlag::TwoHand))
 			break;
 		if (occupiedBodyParts.size() == 2)
@@ -681,16 +685,20 @@ Character::canWield(Item *item, std::string &error) const
 std::vector<std::shared_ptr<BodyPart> >
 Character::canWear(Item *item, std::string &error) const
 {
-	(void)item;
 	// Prepare the list of occupied body parts.
 	std::vector<std::shared_ptr<BodyPart> > occupiedBodyParts;
 	// Get the compatible body parts.
-	for (auto const &bodyPart : race->bodyParts) {
-		if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWear))
+	auto compatibleBodyParts = item->model->getCompatibleBodyParts(race);
+	if (compatibleBodyParts.empty()) {
+		error = "It is not designed for your fisionomy.";
+		return occupiedBodyParts;
+	}
+	for (auto const &it : compatibleBodyParts) {
+		if (!HasFlag(it->flags, BodyPartFlag::CanWear))
 			continue;
-		if (this->findItemAtBodyPart(bodyPart) != nullptr)
+		if (this->findItemAtBodyPart(it) != nullptr)
 			continue;
-		occupiedBodyParts.emplace_back(bodyPart);
+		occupiedBodyParts.emplace_back(it);
 		break;
 	}
 	if (occupiedBodyParts.empty())
@@ -700,13 +708,10 @@ Character::canWear(Item *item, std::string &error) const
 
 bool Character::inventoryIsLit() const
 {
-	for (auto it : inventory) {
-		if (it->getType() == ModelType::Light) {
-			if (dynamic_cast<LightItem *>(it)->isActive()) {
+	for (auto const &it : inventory)
+		if (it->getType() == ModelType::Light)
+			if (dynamic_cast<LightItem *>(it)->isActive())
 				return true;
-			}
-		}
-	}
 	return false;
 }
 
@@ -977,7 +982,7 @@ void Character::luaAddEquipment(Item *item)
 	auto occupiedBodyParts = this->canWear(item, error);
 	if (occupiedBodyParts.empty()) {
 		MudLog(LogLevel::Error, "The mobile %s cannot equip %s.",
-					this->getName(), item->getName());
+			   this->getName(), item->getName());
 		MudLog(LogLevel::Error, "Error: %s", error);
 		return;
 	} else {

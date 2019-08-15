@@ -183,4 +183,7 @@ bool LoadBodyPartResources(ResultSet *result);
 /// @brief Function used to load the attack properties of body parts.
 bool LoadBodyPartWeapon(ResultSet *result);
 
+/// @brief Function used to load the body parts where a model can be equipped.
+bool LoadModelBodyPart(ResultSet *result);
+
 ///@}

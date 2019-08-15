@@ -55,6 +55,7 @@ ItemModel::ItemModel() :
 	shortdesc(),
 	keys(),
 	description(),
+	bodyParts(),
 	modelFlags(),
 	baseWeight(),
 	basePrice(),
@@ -235,6 +236,17 @@ std::string ItemModel::getDescription(Material *itemMaterial,
 	std::string output = description;
 	replaceSymbols(output, itemMaterial, itemQuality);
 	return output;
+}
+
+std::vector<std::shared_ptr<BodyPart> >
+ItemModel::getCompatibleBodyParts(Race *race)
+{
+	std::vector<std::shared_ptr<BodyPart> > filteredBodyParts;
+	for (auto const &raceBodyPart : race->bodyParts)
+		for (auto const &bodyPart : bodyParts)
+			if (raceBodyPart->vnum == bodyPart->vnum)
+				filteredBodyParts.emplace_back(bodyPart);
+	return filteredBodyParts;
 }
 
 std::string ItemModel::getTile(int offset)
