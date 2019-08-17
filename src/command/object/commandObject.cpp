@@ -71,7 +71,8 @@ void LoadObjectCommands()
 	// ////////////////////////////////////////////////////////////////////////
 	// COMMAND CONTAINER
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoOrganize, "organize", "(name|weight) [(container)]",
+		DoOrganize, "organize",
+		"(name|weight|price) [(container|room|inventory)]",
 		"Order the desired container or if no target is passed, the room.",
 		false, false, false));
 	Mud::instance().addCommand(std::make_shared<Command>(

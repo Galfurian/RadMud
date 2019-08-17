@@ -24,7 +24,7 @@
 #include "containerItem.hpp"
 
 /// @brief Holds details about a magazine.
-class MagazineItem : public ContainerItem {
+class MagazineItem : public Item {
 public:
 	MagazineItem();
 

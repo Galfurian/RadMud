@@ -240,7 +240,7 @@ Item *findDoor(Room *room)
 	// Search the door.
 	for (auto it : room->items) {
 		// Check if the item is a mechanism.
-		if (it->model->getType() != ModelType::Mechanism)
+		if (it->getType() != ModelType::Mechanism)
 			continue;
 		// Check if the item is built.
 		if (HasFlag(it->flags, ItemFlag::Built))

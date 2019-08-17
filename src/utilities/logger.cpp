@@ -75,10 +75,10 @@ void _mudlog(const char *file, int line, const LogLevel &level,
 		log_file << '[' << LogGetDateTime() << ']';
 		log_file << '[' << LogLevelToString(level) << ']';
 		log_file << '[' << FILENAME(file) << ':' << line << "] ";
-		log_file << msg << "\n";
+		log_file << msg << "\n" << std::flush;
 	}
 	std::cout << '[' << LogGetDateTime() << ']';
 	std::cout << '[' << LogLevelToString(level) << "] ";
 	std::cout << '[' << FILENAME(file) << ':' << line << "] ";
-	std::cout << msg << "\n";
+	std::cout << msg << "\n" << std::flush;
 }

@@ -46,8 +46,7 @@ void ItemVector::emplace_back_item(Item *&item)
 bool ItemVector::removeItem(Item *item)
 {
 	for (auto it = this->begin(); it != this->end(); ++it) {
-		auto contained = (*it);
-		if (contained->vnum == item->vnum) {
+		if ((*it)->vnum == item->vnum) {
 			this->erase(it);
 			return true;
 		}

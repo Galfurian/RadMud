@@ -34,7 +34,7 @@ public:
 
 	virtual ~CorpseItem();
 
-	void removeFromMud() override;
+	bool removeFromMud() override;
 
 	bool updateOnDB() override;
 

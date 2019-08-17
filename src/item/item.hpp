@@ -106,7 +106,7 @@ public:
 	virtual bool check();
 
 	/// @brief This function is used to remove the item from everywhere.
-	virtual void removeFromMud();
+	virtual bool removeFromMud();
 
 	/// @brief Create or Update the item entry on database.
 	/// @return <b>True</b> if the execution goes well,<br>

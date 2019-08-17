@@ -876,7 +876,7 @@ unsigned int Character::getArmorClass() const
 	result += this->getAbilityModifier(Ability::Agility);
 	// + ARMOR BONUS
 	for (auto item : equipment) {
-		if (item->model->getType() == ModelType::Armor) {
+		if (item->getType() == ModelType::Armor) {
 			// Cast the item to armor.
 			result += static_cast<ArmorItem *>(item)->getArmorClass();
 		}
@@ -890,8 +890,8 @@ bool Character::canAttackWith(const std::shared_ptr<BodyPart> &bodyPart) const
 		auto wpn = this->findItemAtBodyPart(bodyPart);
 		if (wpn != nullptr) {
 			// Check if there is actually a weapon equipped.
-			if ((wpn->model->getType() == ModelType::MeleeWeapon) ||
-				(wpn->model->getType() == ModelType::RangedWeapon)) {
+			if ((wpn->getType() == ModelType::MeleeWeapon) ||
+				(wpn->getType() == ModelType::RangedWeapon)) {
 				return true;
 			}
 		}

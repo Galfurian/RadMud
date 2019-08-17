@@ -43,48 +43,71 @@ bool DoOrganize(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	auto order = ItemVector::Order::ByName;
-	if (BeginWith("name", ToLower(args[0].getContent()))) {
+	if (BeginWith("name", ToLower(args[0].getContent())))
 		order = ItemVector::Order::ByName;
-	} else if (BeginWith("weight", ToLower(args[0].getContent()))) {
+	else if (BeginWith("weight", ToLower(args[0].getContent())))
 		order = ItemVector::Order::ByWeight;
-	} else if (BeginWith("price", ToLower(args[0].getContent()))) {
+	else if (BeginWith("price", ToLower(args[0].getContent())))
 		order = ItemVector::Order::ByPrice;
-	}
+
 	auto name = ItemVector::orderToString(order);
 	if (args.size() == 1) {
 		character->room->items.orderBy(order);
 		character->sendMsg("You have organized the room by %s.\n", name);
-	} else if (args.size() == 2) {
-		auto item =
-			character->findNearbyItem(args[1].getContent(), args[1].getIndex());
-		if (item != nullptr) {
-			if (item->isAContainer()) {
-				// Cast the item to container.
-				if (item->isEmpty()) {
-					character->sendMsg("%s is empty\n",
-									   item->getNameCapital(true));
-					return false;
-				}
-				// Order the content of the container.
-				item->content.orderBy(order);
-				// Organize the target container.
-				character->sendMsg("You have organized %s, by %s.\n",
-								   item->getName(true), name);
-				return true;
-			}
-			character->sendMsg("You can't organize %s\n", item->getName(true));
-			return false;
-		} else if (BeginWith("inventory", args[1].getContent())) {
-			character->inventory.orderBy(order);
-			// Organize the target container.
-			character->sendMsg("You have organized your inventory, by %s.\n",
-							   name);
-			return true;
-		}
-		character->sendMsg("What do you want to organize?\n");
-	} else {
-		character->sendMsg("Too much arguments.\n");
+		return true;
 	}
+	if (args.size() != 2) {
+		character->sendMsg("Too much arguments.\n");
+		return false;
+	}
+	auto item =
+		character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+	if (item != nullptr) {
+		if (!item->isAContainer()) {
+			character->sendMsg(
+				"You can't organize %s, it is not a container.\n",
+				item->getName(true));
+			return false;
+		}
+		// Check if the item is a magazine.
+		if (item->getType() == ModelType::Magazine) {
+			character->sendMsg("You can't organize projectiles inside %s.\n",
+							   item->getName(true));
+			return false;
+		}
+		// Check if the item is a range weapon.
+		if (item->getType() == ModelType::RangedWeapon) {
+			character->sendMsg("You can't organize %s.\n", item->getName(true));
+			return false;
+		}
+		// Check if the item is a liquid container.
+		if (item->getType() == ModelType::LiquidContainer) {
+			character->sendMsg(
+				"You can't organize liquid molecules inside %s.\n",
+				item->getName(true));
+			return false;
+		}
+		// Cast the item to container.
+		if (item->isEmpty()) {
+			character->sendMsg("%s is empty\n", item->getNameCapital(true));
+			return false;
+		}
+		item->content.orderBy(order);
+		character->sendMsg("You have organized %s, by %s.\n",
+						   item->getName(true), name);
+		return true;
+	}
+	if (BeginWith("inventory", args[1].getContent())) {
+		character->inventory.orderBy(order);
+		character->sendMsg("You have organized your inventory, by %s.\n", name);
+		return true;
+	}
+	if (BeginWith("room", args[1].getContent())) {
+		character->room->items.orderBy(order);
+		character->sendMsg("You have organized the room by %s.\n", name);
+		return true;
+	}
+	character->sendMsg("What do you want to organize?\n");
 	return false;
 }
 
@@ -151,13 +174,11 @@ bool DoOpen(Character *character, ArgumentHandler &args)
 			character->room->sendToAll("%s opens a door.\n", { character },
 									   character->getNameCapital());
 		}
-		for (auto it : destination->exits) {
-			if (it->destination == nullptr) {
+		for (auto const &it : destination->exits) {
+			if (it->destination == nullptr)
 				continue;
-			}
-			if (it->destination == character->room) {
+			if (it->destination == character->room)
 				continue;
-			}
 			if (HasFlag(it->flags, ExitFlag::Hidden)) {
 				// Show the action in the next room.
 				it->destination->sendToAll(
@@ -278,13 +299,11 @@ bool DoClose(Character *character, ArgumentHandler &args)
 			character->room->sendToAll("%s closes a door.\n", { character },
 									   character->getNameCapital());
 		}
-		for (auto it : destination->exits) {
-			if (it->destination == nullptr) {
+		for (auto const &it : destination->exits) {
+			if (it->destination == nullptr)
 				continue;
-			}
-			if (it->destination == character->room) {
+			if (it->destination == character->room)
 				continue;
-			}
 			if (HasFlag(it->flags, ExitFlag::Hidden)) {
 				// Send the message inside the room.
 				it->destination->sendToAll(

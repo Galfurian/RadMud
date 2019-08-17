@@ -80,7 +80,7 @@ bool DoLiquidCreate(Character *character, ArgumentHandler &args)
 						   args[0].getContent());
 		return false;
 	}
-	if (item->model->getType() != ModelType::LiquidContainer) {
+	if (item->getType() != ModelType::LiquidContainer) {
 		character->sendMsg("The item is not a container of liquids.\n");
 		return false;
 	}

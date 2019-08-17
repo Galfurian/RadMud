@@ -35,13 +35,20 @@ CorpseItem::~CorpseItem()
 	// Nothing to do.
 }
 
-void CorpseItem::removeFromMud()
+bool CorpseItem::removeFromMud()
 {
-	Item::removeFromMud();
+	if (!Item::removeFromMud()) {
+		MudLog(LogLevel::Debug,
+			   "Failed to remove item '%s' from MUD, "
+			   "still, try to remove the corpse.",
+			   this->getName());
+	}
 	if (Mud::instance().remCorpse(this)) {
 		MudLog(LogLevel::Debug, "Removing item '%s' from MUD corpses.",
-					this->getName());
+			   this->getName());
+		return true;
 	}
+	return false;
 }
 
 bool CorpseItem::updateOnDB()

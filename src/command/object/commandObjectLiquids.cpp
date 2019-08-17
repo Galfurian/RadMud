@@ -72,7 +72,7 @@ bool DoDrink(Character *character, ArgumentHandler &args)
 						   source->getName(true));
 		return false;
 	}
-	if (source->model->getType() != ModelType::LiquidContainer) {
+	if (source->getType() != ModelType::LiquidContainer) {
 		character->sendMsg("%s is not a source for liquids.\n",
 						   source->getNameCapital(true));
 		return false;
@@ -168,7 +168,7 @@ bool DoFill(Character *character, ArgumentHandler &args)
 						   source->getName(true));
 		return false;
 	}
-	if (source->model->getType() != ModelType::LiquidContainer) {
+	if (source->getType() != ModelType::LiquidContainer) {
 		character->sendMsg("%s is not a suitable source of liquids.\n",
 						   source->getNameCapital());
 		return false;
@@ -189,7 +189,7 @@ bool DoFill(Character *character, ArgumentHandler &args)
 						   destination->getName(true));
 		return false;
 	}
-	if (destination->model->getType() != ModelType::LiquidContainer) {
+	if (destination->getType() != ModelType::LiquidContainer) {
 		character->sendMsg("%s is not a suitable destination.\n",
 						   destination->getNameCapital());
 		return false;
@@ -299,7 +299,7 @@ bool DoPour(Character *character, ArgumentHandler &args)
 						   source->getName(true));
 		return false;
 	}
-	if (source->model->getType() != ModelType::LiquidContainer) {
+	if (source->getType() != ModelType::LiquidContainer) {
 		character->sendMsg("%s is not a suitable source of liquids.\n",
 						   source->getNameCapital());
 		return false;
@@ -413,7 +413,7 @@ bool DoPour(Character *character, ArgumentHandler &args)
 						   destination->getName(true));
 		return false;
 	}
-	if (destination->model->getType() != ModelType::LiquidContainer) {
+	if (destination->getType() != ModelType::LiquidContainer) {
 		character->sendMsg("%s is not a suitable destination.\n",
 						   destination->getNameCapital());
 		return false;

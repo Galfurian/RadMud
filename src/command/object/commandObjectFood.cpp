@@ -59,7 +59,7 @@ bool DoEat(Character *character, ArgumentHandler &args)
 		character->sendMsg("You don't see '%s'.\n", args[0].getContent());
 		return false;
 	}
-	if (source->model->getType() != ModelType::Food) {
+	if (source->getType() != ModelType::Food) {
 		character->sendMsg("You cannot eat %s.\n", source->getName(true));
 		return false;
 	}

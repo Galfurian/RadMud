@@ -181,6 +181,19 @@ bool DoTake(Character *character, ArgumentHandler &args)
 							   container->getNameCapital(true));
 			return false;
 		}
+		// Check if the item is a magazine.
+		if ((container->getType() == ModelType::Magazine) ||
+			(container->getType() == ModelType::RangedWeapon)) {
+			character->sendMsg("%s is not a container, try unloading it.\n",
+							   container->getNameCapital(true));
+			return false;
+		}
+		// Check if the item is a liquid container.
+		if (container->getType() == ModelType::LiquidContainer) {
+			character->sendMsg("%s is not a container, try pouring.\n",
+							   container->getNameCapital(true));
+			return false;
+		}
 		// Check if it is locked.
 		if (HasFlag(container->flags, ItemFlag::Locked)) {
 			character->sendMsg("You have first to unlock %s first.\n",
@@ -402,7 +415,25 @@ bool DoPut(Character *character, ArgumentHandler &args)
 						   container->getNameCapital());
 		return false;
 	}
-	if (container->model->getType() == ModelType::Corpse) {
+	// Check if the item is a magazine.
+	if (container->getType() == ModelType::Magazine) {
+		character->sendMsg("%s is not a container, try to load it with ammo.\n",
+						   container->getNameCapital(true));
+		return false;
+	}
+	// Check if the item is a ranged weapon.
+	if (container->getType() == ModelType::RangedWeapon) {
+		character->sendMsg("%s is not a container, try to reload it.\n",
+						   container->getNameCapital(true));
+		return false;
+	}
+	// Check if the item is a liquid container.
+	if (container->getType() == ModelType::LiquidContainer) {
+		character->sendMsg("%s is not a container, try fill it with liquids.\n",
+						   container->getNameCapital(true));
+		return false;
+	}
+	if (container->getType() == ModelType::Corpse) {
 		character->sendMsg(
 			"You don't really want to put something inside that body...\n");
 		return false;

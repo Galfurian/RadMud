@@ -61,12 +61,12 @@ bool IsValidTool(Item *item, ItemVector const &exceptions,
 		return false;
 	}
 	// Check if the item is actually a tool.
-	if (item->model->getType() == ModelType::Tool) {
+	if (item->getType() == ModelType::Tool) {
 		// Check if the type of tool is the same.
 		return item->model->to<ToolModel>()->toolType == toolType;
 	}
 	if ((toolType == ToolType::CookingFire) &&
-		(item->model->getType() == ModelType::Light)) {
+		(item->getType() == ModelType::Light)) {
 		// Check if the light source can be used to cook.
 		return HasFlag(item->model->to<LightModel>()->lightSourceFlags,
 					   LightModelFlags::CanUseToCook);
@@ -82,7 +82,7 @@ bool IsValidResource(Item *item, const ResourceType &type)
 	// Check the pointer to the model.
 	if (item->model == nullptr)
 		return false;
-	auto modelType = item->model->getType();
+	auto modelType = item->getType();
 	// Check if the item has the correct type.
 	if (modelType == ModelType::Resource)
 		return (item->model->to<ResourceModel>()->resourceType == type);

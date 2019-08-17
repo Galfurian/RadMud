@@ -255,7 +255,7 @@ ItemVector Room::findBuildings(ModelType type)
 {
 	ItemVector buildingsList;
 	for (auto iterator : items) {
-		if ((iterator->model->getType() == type) &&
+		if ((iterator->getType() == type) &&
 			HasFlag(iterator->flags, ItemFlag::Built)) {
 			buildingsList.push_back(iterator);
 		}

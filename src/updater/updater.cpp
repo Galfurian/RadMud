@@ -172,8 +172,12 @@ void MudUpdater::advanceTime()
 		auto currentIt = it++;
 		// Delete the item.
 		auto item = (*currentIt);
-		item->removeFromMud();
-		item->removeOnDB();
+		if (!item->removeOnDB()) {
+			MudLog(LogLevel::Error, "Failed to remove item from DB");
+		}
+		if (!item->removeFromMud()) {
+			MudLog(LogLevel::Error, "Failed to remove item from MUD");
+		}
 		delete (item);
 		// Erase the element.
 		itemToDestroy.erase(currentIt);

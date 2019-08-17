@@ -48,11 +48,6 @@ bool ContainerItem::isAContainer() const
 	return true;
 }
 
-bool ContainerItem::isEmpty() const
-{
-	return content.empty();
-}
-
 double ContainerItem::getTotalSpace() const
 {
 	// The base space.

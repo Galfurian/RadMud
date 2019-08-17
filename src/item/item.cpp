@@ -46,7 +46,7 @@ Item::Item() :
 Item::~Item()
 {
 	MudLog(LogLevel::Debug, "Deleted item\t\t[%s]\t\t(%s)",
-				ToString(this->vnum), this->getNameCapital());
+		   ToString(this->vnum), this->getNameCapital());
 }
 
 bool Item::check()
@@ -61,44 +61,82 @@ bool Item::check()
 	return safe;
 }
 
-void Item::removeFromMud()
+bool Item::removeFromMud()
 {
 	MudLog(LogLevel::Debug, "Removing %s from MUD...", this->getName());
 	// Remove the item from the game, this means: Room, Player, Container.
 	if (room != nullptr) {
+		if (!room->characters.empty()) {
+			room->sendToAll("%s crumbles into pieces.", {},
+							this->getNameCapital());
+			if (!content.empty())
+				room->sendToAll("All its contents are scattered to the ground.",
+								{});
+		}
 		auto itemRoom = room;
+		// Move the content to the room.
+		for (auto it : content)
+			room->addItem(it, true);
+		// Remove the item.
 		if (room->removeItem(this)) {
 			MudLog(LogLevel::Debug, "Removing item '%s' from room '%s'.",
-						this->getName(), itemRoom->name);
+				   this->getName(), itemRoom->name);
+		} else {
+			MudLog(LogLevel::Error,
+				   "Failed to remove item '%s' from room '%s'.",
+				   this->getName(), itemRoom->name);
+			return false;
 		}
 	}
 	if (owner != nullptr) {
+		owner->sendMsg("%s crumbles into pieces.", this->getNameCapital());
+		if (!content.empty())
+			owner->sendMsg("All its contents are scattered in your inventory.");
 		auto itemOwner = owner;
+		// Move the content to the owner's inventory.
+		for (auto it : content)
+			owner->addInventoryItem(it);
+		// Remove the item from the owner.
 		if (owner->equipment.removeItem(this)) {
-			MudLog(LogLevel::Debug,
-						"Removing item '%s' from '%s' equipment.",
-						this->getName(), itemOwner->getName());
-		}
-		if (owner->inventory.removeItem(this)) {
-			MudLog(LogLevel::Debug,
-						"Removing item '%s' from '%s' inventory.",
-						this->getName(), itemOwner->getName());
+			MudLog(LogLevel::Debug, "Removing item '%s' from '%s' equipment.",
+				   this->getName(), itemOwner->getName());
+		} else if (owner->inventory.removeItem(this)) {
+			MudLog(LogLevel::Debug, "Removing item '%s' from '%s' inventory.",
+				   this->getName(), itemOwner->getName());
+		} else {
+			MudLog(LogLevel::Debug, "Failed to remove item '%s' from '%s'.",
+				   this->getName(), itemOwner->getName());
+			return false;
 		}
 	}
 	if (container != nullptr) {
 		auto itemContainer = container;
+		// Move the content to the container.
+		for (auto it : content)
+			container->putInside(it, true);
+		// Remove the item from the container.
 		if (container->content.removeItem(this)) {
-			MudLog(LogLevel::Debug,
-						"Removing item '%s' from container '%s'.",
-						this->getName(), itemContainer->getName());
+			MudLog(LogLevel::Debug, "Removing item '%s' from container '%s'.",
+				   this->getName(), itemContainer->getName());
+		} else {
+			MudLog(LogLevel::Error,
+				   "Failed to remove item '%s' from container '%s'.",
+				   this->getName(), itemContainer->getName());
+			return false;
 		}
 	}
-	if (this->model->getType() != ModelType::Corpse) {
+	if (this->getType() != ModelType::Corpse) {
 		if (Mud::instance().remItem(this)) {
 			MudLog(LogLevel::Debug, "Removing item '%s' from MUD items.",
-						this->getName());
+				   this->getName());
+		} else {
+			MudLog(LogLevel::Error,
+				   "Failed to remove item '%s' from MUD items.",
+				   this->getName());
+			return false;
 		}
 	}
+	return true;
 }
 
 bool Item::updateOnDB()
@@ -126,8 +164,7 @@ bool Item::removeOnDB()
 	static WhereClause item_pair = std::make_pair("item", "-1");
 	static WhereClause container_pair = std::make_pair("container", "-1");
 	// Log.
-	MudLog(LogLevel::Debug, "Removing '%s' from DB...",
-				this->getName(true));
+	MudLog(LogLevel::Debug, "Removing '%s' from DB...", this->getName(true));
 	// Update/Prepare variables.
 	status = true;
 	vnum_pair.second = ToString(vnum);
@@ -233,12 +270,12 @@ bool Item::canDeconstruct(std::string &error) const
 
 ModelType Item::getType() const
 {
-	return this->model->getType();
+	return model->getType();
 }
 
 std::string Item::getTypeName() const
 {
-	return this->model->getTypeName();
+	return model->getTypeName();
 }
 
 bool Item::canStackWith(Item *item) const
@@ -251,7 +288,7 @@ bool Item::canStackWith(Item *item) const
 		return false;
 	if (item->composition == nullptr)
 		return false;
-	return HasFlag(this->model->modelFlags, ModelFlag::CanBeStacked) &&
+	return HasFlag(model->modelFlags, ModelFlag::CanBeStacked) &&
 		   (model->vnum == item->model->vnum) &&
 		   (composition->vnum == item->composition->vnum);
 }
@@ -260,7 +297,7 @@ Item *Item::removeFromStack(Character *actor, unsigned int &_quantity)
 {
 	if (this->quantity > _quantity) {
 		// Generate a copty of this item with the given quantity.
-		auto newStack = this->model->createItem(actor->getName(), composition,
+		auto newStack = model->createItem(actor->getName(), composition,
 												false, quality, _quantity);
 		if (newStack != nullptr) {
 			// Actually reduce the quantity.
@@ -492,7 +529,7 @@ void Item::putInside(Item *&item, bool updateDB)
 	}
 	// Log it.
 	MudLog(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(),
-				this->getName());
+		   this->getName());
 }
 
 bool Item::takeOut(Item *item, bool updateDB)
@@ -508,8 +545,8 @@ bool Item::takeOut(Item *item, bool updateDB)
 			"ItemContent", { std::make_pair("item", ToString(item->vnum)) });
 	}
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' taken out from '%s';",
-				item->getName(), this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' taken out from '%s';", item->getName(),
+		   this->getName());
 	return true;
 }
 
@@ -538,7 +575,7 @@ void Item::setOccupiedBodyParts(
 bool Item::operator<(Item &rhs) const
 {
 	MudLog(LogLevel::Debug, "%s < %s", ToString(this->vnum),
-				ToString(rhs.vnum));
+		   ToString(rhs.vnum));
 	return getName() < rhs.getName();
 }
 
