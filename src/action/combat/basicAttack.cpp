@@ -78,62 +78,113 @@ std::string BasicAttack::stop()
 ActionStatus BasicAttack::perform()
 {
 	std::string error;
+	MudLog(LogLevel::Debug, "%s performs a BasicAttack.",
+		   actor->getNameCapital());
 	if (!this->check(error)) {
 		actor->sendMsg(error + "\n\n");
 		return ActionStatus::Error;
 	}
 	// If there are no enemies, just stop fighting.
 	if (actor->combatHandler.empty()) {
+		MudLog(LogLevel::Debug, "%s has no opponents.",
+			   actor->getNameCapital());
 		// Stop the combat.
 		this->handleStop();
 		// Return that the action is finished.
 		return ActionStatus::Finished;
 	}
+
 	// Set the progressive number of the attack to 0.
 	unsigned int attacks = 0;
-	// Find a valid predefined target.
-	if (this->setPredefinedTarget()) {
+
+	// Retrieve all the melee, ranged, and natural weapons.
+	auto meleeWeapons = GetActiveWeapons<MeleeWeaponItem>(actor);
+	auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(actor);
+	auto naturalWeapons = GetActiveNaturalWeapons(actor);
+
+	// Prepare iterators for each category of weapons.
+	auto melee_it = meleeWeapons.begin();
+	auto rangd_it = rangedWeapons.begin();
+	auto natrl_it = naturalWeapons.begin();
+
+	// Iterate until we have used all the weapons.
+	while ((melee_it != meleeWeapons.end()) ||
+		   (rangd_it != rangedWeapons.end()) ||
+		   (natrl_it != naturalWeapons.end())) {
+		// If we cannot find a valid target, stop.
+		if (!this->setPredefinedTarget()) {
+			MudLog(LogLevel::Debug, "%s cannot set predefined target, break.",
+				   actor->getNameCapital(), (*melee_it)->getName());
+			break;
+		}
 		// Get the predefined target.
-		Character *predefined = actor->combatHandler.getPredefinedTarget();
+		Character *pred = actor->combatHandler.getPredefinedTarget();
 		// If the actor and the pred-target are in the same room,
-		//  first use the melee weapons.
-		if (actor->room->coord == predefined->room->coord) {
-			// Retrieve all the melee weapons.
-			auto meleeWeapons = GetActiveWeapons<MeleeWeaponItem>(actor);
-			// Perform the attack for each melee weapon.
-			for (auto weapon : meleeWeapons) {
-				// Perform the attack passing the melee weapon.
-				this->performMeleeAttack(predefined, weapon, attacks);
-				// Increment the number of executed attacks.
-				++attacks;
-			}
-		}
-		// Retrieve all the ranged weapons.
-		auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(actor);
-		// Perform the attack for each weapon.
-		for (auto weapon : rangedWeapons) {
+		//  and there are still melee weapons to use, attack.
+		if (melee_it != meleeWeapons.end()) {
+			MudLog(LogLevel::Debug, "%s can MELEE attack with %s.",
+				   actor->getNameCapital(), (*melee_it)->getName());
 			// Check if the target is at range of the weapon.
-			if (actor->isAtRange(predefined, weapon->getRange())) {
-				// Set that the actor has actually attacked the target.
-				// Perform the attack passing the ranged weapon.
-				this->performRangedAttack(predefined, weapon, attacks);
-				// Increment the number of executed attacks.
-				++attacks;
+			if (!actor->isAtRange(pred, (*melee_it)->getRange())) {
+				actor->sendMsg("You can't reach %s with %s.\n\n",
+							   pred->getName(), (*melee_it)->getName());
+				++melee_it;
+				continue;
+			}
+			// Increment the number of executed attacks.
+			++attacks;
+			// Perform the attack, if we kill the target, continue.
+			if (this->performMeleeAttack(pred, *melee_it++, attacks) ==
+				AttackStatus ::Killed) {
+				continue;
 			}
 		}
-		// Retrieve all the natural weapons.
-		auto naturalWeapon = GetActiveNaturalWeapons(actor);
+		if (rangd_it != rangedWeapons.end()) {
+			MudLog(LogLevel::Debug, "%s can RANGED attack with %s.",
+				   actor->getNameCapital(), (*rangd_it)->getName());
+			// Check if the target is at range of the weapon.
+			if (!actor->isAtRange(pred, (*rangd_it)->getRange())) {
+				actor->sendMsg("You can't reach %s with %s.\n\n",
+							   pred->getName(), (*rangd_it)->getName());
+				++rangd_it;
+				continue;
+			}
+			// Increment the number of executed attacks.
+			++attacks;
+			// Perform the attack, if we kill the target, continue.
+			if (this->performRangedAttack(pred, *rangd_it++, attacks) ==
+				AttackStatus ::Killed) {
+				continue;
+			}
+		}
 		// Perform the attack for each natural weapon.
-		for (auto const &weapon : naturalWeapon) {
+		if (natrl_it != naturalWeapons.end()) {
+			MudLog(LogLevel::Debug, "%s can NAT attack with %s.",
+				   actor->getNameCapital(), (*natrl_it)->getName());
 			// Check if the target is at range of the weapon.
-			if (actor->isAtRange(predefined, weapon->range)) {
-				// Set that the actor has actually attacked the target.
-				// Perform the attack passing the melee weapon.
-				this->performAttackNaturalWeapon(predefined, weapon, attacks);
-				// Increment the number of executed attacks.
-				++attacks;
+			if (!actor->isAtRange(pred, (*natrl_it)->range)) {
+				actor->sendMsg("You can't reach %s with %s.\n\n",
+							   pred->getName(), (*natrl_it)->getName());
+				++natrl_it;
+				continue;
+			}
+			// Increment the number of executed attacks.
+			++attacks;
+			// Perform the attack, if we kill the target, continue.
+			if (this->performAttackNaturalWeapon(pred, *natrl_it++, attacks) ==
+				AttackStatus ::Killed) {
+				continue;
 			}
 		}
+	}
+	// Check if all the opponents are dead.
+	if (actor->combatHandler.empty()) {
+		MudLog(LogLevel::Debug, "%s has no more opponents.",
+			   actor->getNameCapital());
+		// Stop the combat.
+		this->handleStop();
+		// Return that the action is finished.
+		return ActionStatus::Finished;
 	}
 	// Check if the actor has attacked someone.
 	if (attacks > 0) {
@@ -147,21 +198,20 @@ ActionStatus BasicAttack::perform()
 		// Take the enemy with the higher value of aggro.
 		auto topAggro = actor->combatHandler.getTopAggro();
 		if (topAggro != nullptr) {
-			auto chaseAction =
-				std::make_shared<Chase>(actor, topAggro->aggressor);
-			if (chaseAction->check(error)) {
+			auto chase = std::make_shared<Chase>(actor, topAggro->aggressor);
+			if (chase->check(error)) {
 				// Add the action.
-				actor->pushAction(chaseAction);
+				actor->pushAction(chase);
 				// Return that the action is still running.
 				return ActionStatus::Running;
-			} else {
-				actor->sendMsg(error + "\n\n");
 			}
-		} else {
-			MudLog(LogLevel::Error, "Top aggro is a nullptr!");
+			actor->sendMsg(error + "\n\n");
+			return ActionStatus::Error;
 		}
+		MudLog(LogLevel::Error, "Top aggro is a nullptr!");
+		return ActionStatus::Error;
 	}
-	actor->sendMsg("Try to get closer to your enemy.\n\n");
+	MudLog(LogLevel::Error, "Something went wrong!");
 	// Stop the combat.
 	this->handleStop();
 	// Return that the action is finished.
@@ -390,9 +440,8 @@ BasicAttack::AttackStatus BasicAttack::performAttackNaturalWeapon(
 			// TODO: This is a solution in case the attack is a one-shot and
 			// the target does not has the actor among the opponents.
 			// Remove the target from the list of opponents.
-			if (actor->combatHandler.hasOpponent(target)) {
+			if (actor->combatHandler.hasOpponent(target))
 				actor->combatHandler.remOpponent(target);
-			}
 			// Interrupt the function.
 			return AttackStatus::Killed;
 		}
@@ -444,7 +493,7 @@ BasicAttack::performMeleeAttack(Character *target, MeleeWeaponItem *weapon,
 	// Phase 2: Roll the hit and damage.
 	// -------------------------------------------------------------------------
 	// Evaluate the natural roll for the attack.
-	unsigned int hitRoll = TRand<unsigned int>(1, 20);
+	auto hitRoll = TRand<unsigned int>(1, 20);
 	// Boolean variable which identifies if the hit is a critical hit.
 	bool isCritical = (hitRoll == 20);
 	// Apply the penalty due to multi-wield, check if:
@@ -509,9 +558,8 @@ BasicAttack::performMeleeAttack(Character *target, MeleeWeaponItem *weapon,
 			// TODO: This is a solution in case the attack is a one-shot and
 			// the target does not has the actor among the opponents.
 			// Remove the target from the list of opponents.
-			if (actor->combatHandler.hasOpponent(target)) {
+			if (actor->combatHandler.hasOpponent(target))
 				actor->combatHandler.remOpponent(target);
-			}
 			// Interrupt the function.
 			return AttackStatus::Killed;
 		}
@@ -628,9 +676,8 @@ BasicAttack::performRangedAttack(Character *target, RangedWeaponItem *weapon,
 			// TODO: This is a solution in case the attack is a one-shot and
 			// the target does not has the actor among the opponents.
 			// Remove the target from the list of opponents.
-			if (actor->combatHandler.hasOpponent(target)) {
+			if (actor->combatHandler.hasOpponent(target))
 				actor->combatHandler.remOpponent(target);
-			}
 			// Interrupt the function.
 			return AttackStatus::Killed;
 		}

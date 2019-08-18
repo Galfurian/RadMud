@@ -39,11 +39,10 @@ operator+=(std::map<ModifierType, int> &left,
 {
 	for (const auto &rightModifier : right) {
 		auto leftModifier = left.find(rightModifier.first);
-		if (leftModifier != left.end()) {
+		if (leftModifier != left.end())
 			leftModifier->second += rightModifier.second;
-		} else {
+		else
 			left.insert(rightModifier);
-		}
 	}
 	return left;
 }
@@ -54,11 +53,10 @@ operator+=(std::map<Knowledge, int> &left,
 {
 	for (const auto &rightModifier : right) {
 		auto leftModifier = left.find(rightModifier.first);
-		if (leftModifier != left.end()) {
+		if (leftModifier != left.end())
 			leftModifier->second = true;
-		} else {
+		else
 			left.insert(rightModifier);
-		}
 	}
 	return left;
 }
@@ -73,9 +71,8 @@ operator-=(std::map<ModifierType, int> &left,
 		auto leftModifier = left.find(rightModifier.first);
 		if (leftModifier != left.end()) {
 			leftModifier->second -= rightModifier.second;
-			if (leftModifier->second < 0) {
+			if (leftModifier->second < 0)
 				leftModifier->second = 0;
-			}
 		}
 	}
 	return left;
@@ -98,11 +95,10 @@ inline void ApplyModifier(std::map<ModifierType, int> &receiver,
 		auto modifier = providerIt.second * multiplier;
 		// Otherwise add the modifier based on the skill rank.
 		receiverIt = receiver.find(providerIt.first);
-		if (receiverIt == receiver.end()) {
+		if (receiverIt == receiver.end())
 			receiver.insert(std::make_pair(providerIt.first, modifier));
-		} else {
+		else
 			receiverIt->second += modifier;
-		}
 	}
 }
 

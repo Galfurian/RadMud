@@ -40,4 +40,7 @@ public:
 
 	/// Provides the maximum damage.
 	unsigned int getMaxDamage() const;
+
+	/// Provides the range of this weapon.
+	int getRange() const;
 };

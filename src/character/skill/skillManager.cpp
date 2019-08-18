@@ -34,16 +34,28 @@ SkillManager::SkillManager(Character *_owner) :
 	// Nothing to do.
 }
 
+bool SkillManager::addSkill(const std::shared_ptr<Skill> &skill,
+							const unsigned int &skillLevel)
+{
+	MudLog(LogLevel::Debug, "Add skill %s to %s.", skill->name,
+		   owner->getName());
+	// Check if the skill is already present.
+	if (this->findSkill(skill->vnum) != nullptr)
+		return false;
+	// Create a new skill data for the given skill.
+	auto skillData = std::make_shared<SkillData>(skill, skillLevel);
+	// Add the new skill data to the list of skills.
+	skills.emplace_back(skillData);
+	// Update the effects due to the new skill.
+	this->updateSkillEffect(skillData);
+	return true;
+}
+
 void SkillManager::checkIfUnlockedSkills()
 {
+	MudLog(LogLevel::Debug, "Checking if %s has unlocked some skills.",
+		   owner->getName());
 	std::vector<unsigned int> masterSkills;
-	// Create a list for all the master skills.
-	for (const auto &it : skills) {
-		// Get the current skill rank.
-		if (it->getSkillRank() == SkillRank::Master) {
-			masterSkills.emplace_back(it->skillVnum);
-		}
-	}
 	// Checks if the character has the pre-requisite for the skill.
 	auto HasPrerequisites =
 		[&masterSkills](const std::shared_ptr<Skill> &skill) {
@@ -55,18 +67,24 @@ void SkillManager::checkIfUnlockedSkills()
 			}
 			return true;
 		};
-
+	// Create a list for all the master skills.
+	for (auto const &it : skills)
+		if (it->getSkillRank() == SkillRank::Master)
+			masterSkills.emplace_back(it->skillVnum);
+	// Check if the character has the pre-requisite for the skill.
 	for (const auto &skill : Mud::instance().mudSkills) {
-		// Check if the character has the pre-requisite for the skill.
 		if (HasPrerequisites(skill)) {
-			// Add the new skill to the character.
 			this->addSkill(skill);
+			MudLog(LogLevel::Debug, "%s has unlocked %s.",
+				   owner->getNameCapital(), skill->name);
 		}
 	}
 }
 
 void SkillManager::updateSkillEffect(std::shared_ptr<SkillData> &skillData)
 {
+	MudLog(LogLevel::Debug, "Updating skills effects for %s, with skill %s.",
+		   owner->getName(), skillData->skill->name);
 	// Get the skill.
 	const auto &skill = skillData->skill;
 	// Save the skill rank.
@@ -86,6 +104,7 @@ void SkillManager::updateSkillEffect(std::shared_ptr<SkillData> &skillData)
 
 void SkillManager::improveAbility(const Ability &abilityModifier)
 {
+	MudLog(LogLevel::Debug, "Improving ability for %s.", owner->getName());
 	for (auto &skillData : skills) {
 		// Get the skill.
 		const auto &skill = skillData->skill;
@@ -114,6 +133,7 @@ void SkillManager::improveAbility(const Ability &abilityModifier)
 
 void SkillManager::improveStatus(const StatusModifier &statusModifier)
 {
+	MudLog(LogLevel::Debug, "Improving status for %s.", owner->getName());
 	for (auto &skillData : skills) {
 		// Get the skill.
 		const auto &skill = skillData->skill;
@@ -142,13 +162,14 @@ void SkillManager::improveStatus(const StatusModifier &statusModifier)
 
 void SkillManager::improveCombat(const CombatModifier &combatModifier)
 {
+	MudLog(LogLevel::Debug, "Improving combat skills for %s.",
+		   owner->getName());
 	for (auto &skillData : skills) {
 		// Get the skill.
 		const auto &skill = skillData->skill;
 		// Check if the skill provides the given modifier.
-		if (skill->modifierManager->getCombatMod(combatModifier) <= 0) {
+		if (skill->modifierManager->getCombatMod(combatModifier) <= 0)
 			continue;
-		}
 		// Get the current skill rank.
 		auto oldSkillRank = skillData->getSkillRank();
 		// Improve the skill.
@@ -170,13 +191,13 @@ void SkillManager::improveCombat(const CombatModifier &combatModifier)
 
 void SkillManager::improveKnowledge(const Knowledge &knowledge)
 {
+	MudLog(LogLevel::Debug, "Improving knowledge for %s.", owner->getName());
 	for (auto &skillData : skills) {
 		// Get the skill.
 		const auto &skill = skillData->skill;
 		// Check if the skill provides the given knowledge.
-		if (skill->modifierManager->getKnowledge(knowledge) <= 0) {
+		if (skill->modifierManager->getKnowledge(knowledge) <= 0)
 			continue;
-		}
 		// Get the current skill rank.
 		auto skillRank = skillData->getSkillRank();
 		// Improve the skill.

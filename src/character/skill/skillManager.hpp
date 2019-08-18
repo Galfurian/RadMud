@@ -47,32 +47,17 @@ public:
 	/// @param skill        A pointer to the skill.
 	/// @param skillLevel   The initial level of the skill.
 	/// @return The outcome.
-	inline bool addSkill(const std::shared_ptr<Skill> &skill,
-						 const unsigned int &skillLevel = 1)
-	{
-		// Check if the skill is already present.
-		if (this->findSkill(skill->vnum) != nullptr) {
-			return false;
-		}
-		// Create a new skill data for the given skill.
-		auto skillData = std::make_shared<SkillData>(skill, skillLevel);
-		// Add the new skill data to the list of skills.
-		skills.emplace_back(skillData);
-		// Update the effects due to the new skill.
-		this->updateSkillEffect(skillData);
-		return true;
-	}
+	bool addSkill(const std::shared_ptr<Skill> &skill,
+				  const unsigned int &skillLevel = 1);
 
 	/// @brief Finds the given skill data.
 	/// @param vnum The vnum of the skill.
 	/// @return A pointer to the skill data.
 	inline std::shared_ptr<SkillData> findSkill(const unsigned int &vnum)
 	{
-		for (auto skillData : skills) {
-			if (skillData->skillVnum == vnum) {
+		for (auto const &skillData : skills)
+			if (skillData->skillVnum == vnum)
 				return skillData;
-			}
-		}
 		return nullptr;
 	}
 
@@ -98,11 +83,9 @@ private:
 	inline std::shared_ptr<SkillEffect>
 	getSkillEffect(const std::shared_ptr<SkillData> &skillData)
 	{
-		for (const auto &it : skillEffects) {
-			if (it->skillData == skillData) {
+		for (const auto &it : skillEffects)
+			if (it->skillData == skillData)
 				return it;
-			}
-		}
 		return nullptr;
 	}
 

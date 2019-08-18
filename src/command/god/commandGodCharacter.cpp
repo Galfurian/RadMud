@@ -110,7 +110,7 @@ bool DoHurt(Character *character, ArgumentHandler &args)
 	// Set health to 1.
 	target->setHealth(1);
 	// Notify.
-	character->sendMsg("You point your finger, %s cry in pain.\n",
+	character->sendMsg("You point your finger, %s cries in pain.\n",
 					   target->getName());
 	target->sendMsg("%s points the finger towards you, you cry in pain.\n",
 					character->getNameCapital());

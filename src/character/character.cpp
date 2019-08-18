@@ -945,9 +945,8 @@ void Character::kill()
 	// Reset the list of opponents.
 	this->combatHandler.resetList();
 	// Remove the character from the current room.
-	if (room != nullptr) {
+	if (room != nullptr)
 		room->removeCharacter(this);
-	}
 }
 
 Item *Character::createCorpse()

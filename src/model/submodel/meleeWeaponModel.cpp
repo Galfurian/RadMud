@@ -27,7 +27,8 @@
 MeleeWeaponModel::MeleeWeaponModel() :
 	meleeWeaponType(),
 	minDamage(),
-	maxDamage()
+	maxDamage(),
+	range()
 {
 	// Nothing to do.
 }
@@ -50,21 +51,20 @@ std::string MeleeWeaponModel::getTypeName() const
 bool MeleeWeaponModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		MudLog(LogLevel::Error, "Function list is empty (%s).",
-					this->name);
+		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 3) {
+	std::vector<std::string> lst = SplitString(source, " ");
+	if (lst.size() != 4) {
 		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Weapon Model (%s).",
-					this->name);
+			   "Wrong number of parameters for Weapon Model (%s).", name);
 		return false;
 	}
-	this->meleeWeaponType =
-		static_cast<MeleeWeaponType>(ToNumber<unsigned int>(functionList[0]));
-	this->minDamage = ToNumber<unsigned int>(functionList[1]);
-	this->maxDamage = ToNumber<unsigned int>(functionList[2]);
+	meleeWeaponType =
+		static_cast<MeleeWeaponType>(ToNumber<unsigned int>(lst[0]));
+	minDamage = ToNumber<unsigned int>(lst[1]);
+	maxDamage = ToNumber<unsigned int>(lst[2]);
+	range = ToNumber<int>(lst[3]);
 	return true;
 }
 
@@ -76,9 +76,9 @@ void MeleeWeaponModel::getSheet(Table &sheet) const
 	sheet.addDivider();
 	// Set the values.
 	sheet.addRow(
-		{ "Melee Weapon Type", GetMeleeWeaponTypeName(this->meleeWeaponType) });
-	sheet.addRow({ "Minimum Damage", ToString(this->minDamage) });
-	sheet.addRow({ "Maximum Damage", ToString(this->maxDamage) });
+		{ "Melee Weapon Type", GetMeleeWeaponTypeName(meleeWeaponType) });
+	sheet.addRow({ "Minimum Damage", ToString(minDamage) });
+	sheet.addRow({ "Maximum Damage", ToString(maxDamage) });
 }
 
 std::string GetMeleeWeaponTypeName(MeleeWeaponType type)

@@ -51,27 +51,32 @@ unsigned int MeleeWeaponItem::rollDamage() const
 unsigned int MeleeWeaponItem::getMinDamage() const
 {
 	// Add the base value.
-	auto valBase = this->model->to<MeleeWeaponModel>()->minDamage;
+	auto base = this->model->to<MeleeWeaponModel>()->minDamage;
 	// Evaluate the modifier due to item's quality.
-	auto valQuality =
-		static_cast<unsigned int>(valBase * quality.getModifier());
+	auto qual = static_cast<unsigned int>(base * quality.getModifier());
 	// Evaluate the modifier due to item's condition.
-	auto valCondition =
-		static_cast<unsigned int>(valBase * this->getConditionModifier());
-	// The resulting value.
-	return ((valBase + valQuality + valCondition) / 3);
+	auto cond = static_cast<unsigned int>(base * this->getConditionModifier());
+	return ((base + qual + cond) / 3);
 }
 
 unsigned int MeleeWeaponItem::getMaxDamage() const
 {
 	// Add the base value.
-	auto valBase = this->model->to<MeleeWeaponModel>()->maxDamage;
+	auto base = this->model->to<MeleeWeaponModel>()->maxDamage;
 	// Evaluate the modifier due to item's quality.
-	auto valQuality =
-		static_cast<unsigned int>(valBase * quality.getModifier());
+	auto qual = static_cast<unsigned int>(base * quality.getModifier());
 	// Evaluate the modifier due to item's condition.
-	auto valCondition =
-		static_cast<unsigned int>(valBase * this->getConditionModifier());
-	// The resulting value.
-	return ((valBase + valQuality + valCondition) / 3);
+	auto cond = static_cast<unsigned int>(base * this->getConditionModifier());
+	return (base + qual + cond) / 3;
+}
+
+int MeleeWeaponItem::getRange() const
+{
+	// Add the base value.
+	auto base = this->model->to<MeleeWeaponModel>()->range;
+	// Evaluate the modifier due to item's quality.
+	auto qual = static_cast<int>(base * quality.getModifier());
+	// Evaluate the modifier due to item's condition.
+	auto cond = static_cast<int>(base * this->getConditionModifier());
+	return (base + qual + cond) / 3;
 }

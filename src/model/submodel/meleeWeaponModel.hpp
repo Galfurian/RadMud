@@ -42,6 +42,8 @@ public:
 	unsigned int minDamage;
 	/// The maximum damage of the weapon.
 	unsigned int maxDamage;
+	/// The range of the weapon.
+	int range;
 
 	MeleeWeaponModel();
 
