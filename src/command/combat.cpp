@@ -346,39 +346,46 @@ bool DoAim(Character *character, ArgumentHandler &args)
 	}
 	// Stop any action the character is executing.
 	StopAction(character);
-	if (args.empty()) {
-		if (character->combatHandler.charactersInSight.empty()) {
-			character->sendMsg("Who or what do you want to aim?\n");
-		} else {
-			character->sendMsg("You are able to aim at:\n");
-			for (auto it : character->combatHandler.charactersInSight) {
-				if (!it)
-					continue;
-				if (!it->room)
-					continue;
-				character->sendMsg("  [%s] %s\n",
-								   StructUtils::getRoomDistance(character->room,
-																it->room),
-								   it->getName());
-			}
-		}
-		return true;
-	} else if (args.size() > 1) {
-		character->sendMsg("Too many arguments.\n");
-		return false;
-	}
+	// Check if the character is actually wielding a ranged weapon.
 	if (GetActiveWeapons<RangedWeaponItem>(character).empty()) {
 		character->sendMsg("You don't have a ranged weapon equipped.\n");
 		return false;
 	}
-	// Prepare a pointer to the aimed character.
-	Character *aimedCharacter = nullptr;
+	// If no target is provided, update and show the list of characters in sight.
+	if (args.empty()) {
+		if (character->combatHandler.getAimedTarget()) {
+			character->sendMsg(
+				"You are aiming at %s.\n",
+				character->combatHandler.getAimedTarget()->getName());
+		}
+		character->combatHandler.updateCharactersInSight();
+		if (character->combatHandler.charactersInSight.empty()) {
+			character->sendMsg("You have found nothing...\n");
+			return true;
+		}
+		character->sendMsg("You are able to aim at:\n");
+		for (auto it : character->combatHandler.charactersInSight) {
+			if (!it)
+				continue;
+			if (!it->room)
+				continue;
+			character->sendMsg("  [%s] %s\n",
+							   StructUtils::getRoomDistance(character->room,
+															it->room),
+							   it->getName());
+		}
+		return true;
+	}
+	if (args.size() > 1) {
+		character->sendMsg("Too many arguments.\n");
+		return false;
+	}
 	// Create a single CharacterVector which contains
 	//  a unique list of all the targets.
 	CharacterVector targets = character->room->characters;
 	targets.addUnique(character->combatHandler.charactersInSight);
 	// First try to search the target inside the same room.
-	aimedCharacter =
+	auto aimedCharacter =
 		targets.findCharacter(args[0].getContent(), args[0].getIndex());
 	// Otherwise try to find the target inside the list
 	//  of characters in sight.
