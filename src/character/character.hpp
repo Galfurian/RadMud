@@ -464,6 +464,10 @@ public:
 	/// @return The armor class.
 	unsigned int getArmorClass() const;
 
+	/// @brief Provides the overall parry chance.
+	/// @return The parry chance.
+	unsigned int getParryChace() const;
+
 	/// @brief Function which checks if the character can attack
 	///         with a weapon equipped at the given body part.
 	/// @param bodyPart The body part at which the weapon could be.

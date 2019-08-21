@@ -92,7 +92,7 @@ bool DoQuit(Character *character, ArgumentHandler & /*args*/)
 									{ character }, player->getName());
 		}
 		MudLog(LogLevel::Global, "Player %s has left the game.",
-					player->getName());
+			   player->getName());
 		// End of properly connected.
 		player->closeConnection();
 		return true;
@@ -394,67 +394,61 @@ bool DoStatistics(Character *character, ArgumentHandler & /*args*/)
 		return false;
 	}
 	auto player = character->toPlayer();
-
-	auto BLD = [](std::string s) {
-		return Formatter::bold() + s + Formatter::reset();
-	};
-	auto MAG = [](std::string s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg += MAG("Name        : ") + player->getName() + " ";
-	msg += MAG("Gender : ") + GetGenderTypeName(player->gender) + " ";
-	msg += MAG("Race : ") + player->race->name + "\n";
-	msg += MAG("Weight      : ") + ToString(player->weight) + " ";
-	msg += Mud::instance().getWeightMeasure() + "\n";
-	msg += MAG("Affiliation : ") + player->faction->name + "\n";
-	msg += MAG("Experience  : ") + ToString(player->experience) + " px\n";
+	std::stringstream ss;
+	ss << Formatter::magenta("Name        : ") << player->getName() << " ";
+	ss << Formatter::magenta("Gender : ") << GetGenderTypeName(player->gender)
+	   << " ";
+	ss << Formatter::magenta("Race : ") << player->race->name << "\n";
+	ss << Formatter::magenta("Weight      : ") << player->weight << " ";
+	ss << Mud::instance().getWeightMeasure() << "\n";
+	ss << Formatter::magenta("Affiliation : ") << player->faction->name << "\n";
+	ss << Formatter::magenta("Experience  : ") << player->experience << " px\n";
 	// Add the abilities.
 	// STRENGTH
 	for (auto const &ability : player->abilities) {
-		msg += "    " + MAG(ability.first.getAbbreviation()) + "    ";
-		msg += Align(player->getAbility(ability.first), align::right, 5) + "(";
-		msg +=
-			Align(player->getAbilityModifier(ability.first), align::right, 3) +
-			")\n";
+		ss << "    " << Formatter::magenta(ability.first.getAbbreviation())
+		   << "    " << std::right << std::setw(5)
+		   << player->getAbility(ability.first) << "(" << std::right
+		   << std::setw(3) << player->getAbilityModifier(ability.first)
+		   << ")\n";
 	}
 	// HEALTH
-	msg += "    " + MAG("Health  ");
-	msg += ToString(player->health) + "/" + ToString(player->getMaxHealth());
-	msg += "\n";
-	msg += "    " + MAG("Stamina ");
-	msg += ToString(player->stamina) + "/" + ToString(player->getMaxStamina());
-	msg += "\n";
+	ss << "    " << Formatter::magenta("Health  ");
+	ss << player->health << "/" << player->getMaxHealth() << "\n";
+	ss << "    " << Formatter::magenta("Stamina ");
+	ss << player->stamina << "/" << player->getMaxStamina() << "\n";
 	// Add the Armor Class.
-	msg += "    " + MAG("Armor Class ") + ToString(player->getArmorClass());
-	msg += "\n";
+	ss << "    " << Formatter::magenta("Armor Class ")
+	   << player->getArmorClass() << "\n";
+	ss << "    " << Formatter::magenta("Parry Chance ")
+	   << player->getParryChace() << "\n";
 	// Add the health and stamina conditions.
-	msg += "You " + BLD(player->getHealthCondition(true)) + ".\n";
-	msg += "You " + BLD(player->getStaminaCondition()) + ".\n";
+	ss << "You " << Formatter::bold(player->getHealthCondition(true)) << ".\n";
+	ss << "You " << Formatter::bold(player->getStaminaCondition()) << ".\n";
 	// Add the hunger and thirst conditions.
-	msg += "You " + BLD(player->getHungerCondition()) + ".\n";
-	msg += "You " + BLD(player->getThirstCondition()) + ".\n";
+	ss << "You " << Formatter::bold(player->getHungerCondition()) << ".\n";
+	ss << "You " << Formatter::bold(player->getThirstCondition()) << ".\n";
 	// Add the posture.
-	msg += "You are " + BLD(player->posture.getAction()) + ".\n\n";
+	ss << "You are " << Formatter::bold(player->posture.getAction()) << ".\n\n";
 	// [IF EXIST] Add the current action.
 	if (player->getAction() != ActionType::Wait) {
-		msg += "You are ";
-		msg += BLD(player->getAction()->getDescription());
-		msg += ".\n";
+		ss << "You are "
+		   << Formatter::bold(player->getAction()->getDescription()) << ".\n";
 	}
 	// [IF EXIST] Add the current opponent.
 	if (player->combatHandler.getPredefinedTarget() != nullptr) {
-		msg += "You are fighting with ";
-		msg += BLD(player->combatHandler.getPredefinedTarget()->getName());
-		msg += ".\n";
+		ss << "You are fighting with "
+		   << Formatter::bold(
+				  player->combatHandler.getPredefinedTarget()->getName())
+		   << ".\n";
 	}
 	// [IF EXIST] Add the current aimed opponent.
 	if (player->combatHandler.getAimedTarget() != nullptr) {
-		msg += "You are aiming at ";
-		msg += BLD(player->combatHandler.getAimedTarget()->getName());
-		msg += ".\n";
+		ss << "You are aiming at "
+		   << Formatter::bold(player->combatHandler.getAimedTarget()->getName())
+		   << ".\n";
 	}
-	player->sendMsg(msg);
+	player->sendMsg(ss.str());
 	return true;
 }
 

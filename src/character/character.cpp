@@ -29,6 +29,7 @@
 #include "armorItem.hpp"
 #include "mud.hpp"
 #include "armorModel.hpp"
+#include "shieldModel.hpp"
 
 Character::Character() :
 	name(),
@@ -880,6 +881,24 @@ unsigned int Character::getArmorClass() const
 			// Cast the item to armor.
 			result += static_cast<ArmorItem *>(item)->getArmorClass();
 		}
+	}
+	return result;
+}
+
+unsigned int Character::getParryChace() const
+{
+	unsigned int result = 0;
+	Item *wielded = nullptr;
+	auto agilityMod = this->getAbilityModifier(Ability::Agility);
+	for (auto const &bodyPart : race->bodyParts) {
+		if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield))
+			continue;
+		if ((wielded = this->findItemAtBodyPart(bodyPart)) == nullptr)
+			continue;
+		if (wielded->getType() == ModelType::MeleeWeapon)
+			result += agilityMod;
+		else if (wielded->getType() == ModelType::Shield)
+			result += wielded->model->to<ShieldModel>()->parryChance;
 	}
 	return result;
 }

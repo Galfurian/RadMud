@@ -114,7 +114,7 @@ ActionStatus BasicAttack::perform()
 		// If we cannot find a valid target, stop.
 		if (!this->setPredefinedTarget()) {
 			MudLog(LogLevel::Debug, "%s cannot set predefined target, break.",
-				   actor->getNameCapital(), (*melee_it)->getName());
+				   actor->getNameCapital());
 			break;
 		}
 		// Get the predefined target.
