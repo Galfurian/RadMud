@@ -26,31 +26,34 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessPlayerName::process(Character *character, ArgumentHandler &args)
+bool ProcessPlayerName::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
 	// Name can't be blank.
 	if (input.empty()) {
-		this->advance(character, "Name cannot be blank.");
+		error = "Name cannot be blank.";
+		this->advance();
 	} else if (ToLower(input) == "new") {
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewName>();
+		auto newStep = std::make_shared<ProcessNewName>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	} else if (ToLower(input) == "quit") {
 		player->closeConnection();
 	} else if (input.find_first_not_of(VALID_CHARACTERS_NAME) !=
 			   std::string::npos) {
-		this->advance(character,
-					  "That player name contains disallowed characters.");
+		error = "That player name contains disallowed characters.";
+		this->advance();
 	} else if (Mud::instance().findPlayer(input)) {
-		this->advance(character, input + " is already connected.");
+		error = input + " is already connected.";
+		this->advance();
 	} else if (!SQLiteDbms::instance().searchPlayer(ToCapitals(input))) {
-		this->advance(character, "That player doesen't exist.");
+		error = "That player doesen't exist.";
+		this->advance();
 	} else {
 		// Save the name of the player.
 		player->name = ToCapitals(input);
@@ -60,11 +63,11 @@ bool ProcessPlayerName::process(Character *character, ArgumentHandler &args)
 			// Set to 0 the current password attempts.
 			player->password_attempts = 0;
 			// Create a shared pointer to the next step.
-			auto newStep = std::make_shared<ProcessPlayerPassword>();
+			auto newStep = std::make_shared<ProcessPlayerPassword>(character);
 			// Set the handler.
 			player->inputProcessor = newStep;
 			// Advance to the next step.
-			newStep->advance(character);
+			newStep->advance();
 			return true;
 		} else {
 			player->closeConnection();
@@ -73,43 +76,41 @@ bool ProcessPlayerName::process(Character *character, ArgumentHandler &args)
 	return false;
 }
 
-void ProcessPlayerName::advance(Character *character, const std::string &error)
+void ProcessPlayerName::advance()
 {
-	std::string msg;
-	msg += Formatter::clearScreen();
-	msg += "\nWelcome to RadMud!\n";
-	msg += Formatter::red();
-	msg += "#--------------------------------------------#\n";
-	msg += "                 XXXXXXXXXXXXX                \n";
-	msg += "      /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    \n";
-	msg += "      \\##/#/#XXXXXXXX /O\\ XXXXXXXX#\\'\\##/ \n";
-	msg += "       \\/#/#XXXXXXXXX \\O/ XXXXXXXXX#\\#\\/  \n";
-	msg += "        \\/##XXXXXXXXXX   XXXXXXXXXX##\\/     \n";
-	msg += "         ###XXXX  ''-.XXX.-''  XXXX###        \n";
-	msg += "           \\XXXX               XXXX/         \n";
-	msg += "             XXXXXXXXXXXXXXXXXXXXX            \n";
-	msg += "             XXXX XXXX X XXXX XXXX            \n";
-	msg += "             XXX # XXX X XXX # XXX            \n";
-	msg += "            /XXXX XXX XXX XXX XXXX\\          \n";
-	msg += "           ##XXXXXXX X   X XXXXXXX##          \n";
-	msg += "          ##   XOXXX X   X XXXOX   ##         \n";
-	msg += "          ##    #XXXX XXX XXX #    ##         \n";
-	msg += "           ##..##  XXXXXXXXX  ##..##          \n";
-	msg += "            ###      XXXXX     ####           \n";
-	msg += "#--------------------------------------------#\n";
-	msg += "| Created by : Enrico Fraccaroli.            |\n";
-	msg += "| In Date    : 21 Agosto 2014                |\n";
-	msg += "#--------------------------------------------#\n";
-	msg += Formatter::reset();
-	msg += "# Enter your name, or type '" + Formatter::magenta() + "new" +
-		   Formatter::reset() + "' in order to create a new character!\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	std::stringstream ss;
+	ss << Formatter::clearScreen();
+	ss << "\nWelcome to RadMud!\n";
+	ss << Formatter::red();
+	ss << "#--------------------------------------------#\n";
+	ss << "                 XXXXXXXXXXXXX                \n";
+	ss << "      /'--_###XXXXXXXXXXXXXXXXXXX###_--'\\    \n";
+	ss << "      \\##/#/#XXXXXXXX /O\\ XXXXXXXX#\\'\\##/ \n";
+	ss << "       \\/#/#XXXXXXXXX \\O/ XXXXXXXXX#\\#\\/  \n";
+	ss << "        \\/##XXXXXXXXXX   XXXXXXXXXX##\\/     \n";
+	ss << "         ###XXXX  ''-.XXX.-''  XXXX###        \n";
+	ss << "           \\XXXX               XXXX/         \n";
+	ss << "             XXXXXXXXXXXXXXXXXXXXX            \n";
+	ss << "             XXXX XXXX X XXXX XXXX            \n";
+	ss << "             XXX # XXX X XXX # XXX            \n";
+	ss << "            /XXXX XXX XXX XXX XXXX\\          \n";
+	ss << "           ##XXXXXXX X   X XXXXXXX##          \n";
+	ss << "          ##   XOXXX X   X XXXOX   ##         \n";
+	ss << "          ##    #XXXX XXX XXX #    ##         \n";
+	ss << "           ##..##  XXXXXXXXX  ##..##          \n";
+	ss << "            ###      XXXXX     ####           \n";
+	ss << "#--------------------------------------------#\n";
+	ss << "| Created by : Enrico Fraccaroli.            |\n";
+	ss << "| In Date    : 21 Agosto 2014                |\n";
+	ss << "#--------------------------------------------#\n";
+	ss << Formatter::reset();
+	ss << "# Enter your name, or type '" << Formatter::magenta("new")
+	   << "' in order to create a new character!\n";
+	character->sendMsg(ss.str());
+	this->printError();
 }
 
-void ProcessPlayerName::rollBack(Character *character)
+void ProcessPlayerName::rollBack()
 {
-	this->advance(character);
+	this->advance();
 }

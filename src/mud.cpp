@@ -794,11 +794,11 @@ bool Mud::processNewConnection()
 		MudLog(LogLevel::Global, " Port    : " + ToString(port));
 		MudLog(LogLevel::Global, "#----------------------------------#");
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessPlayerName>();
+		auto newStep = std::make_shared<ProcessPlayerName>(player);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(player);
+		newStep->advance();
 		//        // Activate the procedure of negotiation.
 		//        NegotiateProtocol(player, ConnectionState::NegotiatingMSDP);
 		//        // Create a shared pointer to the next step.

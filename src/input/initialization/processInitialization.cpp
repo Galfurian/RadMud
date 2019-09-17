@@ -24,91 +24,69 @@
 #include "formatter.hpp"
 #include "player.hpp"
 
-ProcessInitialization::ProcessInitialization()
+static inline void print_ability(std::stringstream &ss, Player *player,
+								 Ability const &ability)
 {
-	// Nothing to do.
+	auto value = player->getAbility(ability, false);
+	ss << "# " << std::setw(13) << std::left << ability.toString() << ":";
+	if (value > 0)
+		ss << value;
+	ss << "\n";
 }
 
-ProcessInitialization::~ProcessInitialization()
-{
-	// Nothing to do.
-}
-
-void ProcessInitialization::printChoices(Character *character)
+void ProcessInitialization::printChoices()
 {
 	auto player = character->toPlayer();
-	std::string preview = std::string();
-	preview += Formatter::clearScreen();
-	preview += "# ------------ Character Creation ------------ #\n";
-	// NAME
-	preview += "# Name         :";
-	if (!player->name.empty()) {
-		preview += player->name;
+	std::stringstream ss;
+	ss << Formatter::clearScreen();
+	ss << "# ------------ Character Creation ------------ #\n";
+	// == NAME ================================================================
+	ss << "# Name         :" << player->name << "\n";
+
+	// == PASSWORD ============================================================
+	for (size_t i = 0; i < player->password.size(); ++i)
+		ss << "*";
+	ss << "\n";
+
+	// == RACE ================================================================
+	ss << "# Race         :";
+	if (player->race != nullptr)
+		ss << player->race->name;
+	ss << "\n";
+
+	// == ABILITY =============================================================
+	print_ability(ss, player, Ability::Strength);
+	print_ability(ss, player, Ability::Agility);
+	print_ability(ss, player, Ability::Perception);
+	print_ability(ss, player, Ability::Constitution);
+	print_ability(ss, player, Ability::Intelligence);
+
+	// == GENDER ==============================================================
+	ss << "# Gender       :" + GetGenderTypeName(player->gender) + "\n";
+
+	// == AGE =================================================================
+	ss << "# Age          :";
+	if (player->age > 0)
+		ss << player->age;
+	ss << "\n";
+
+	// == DESCRIPTION =========================================================
+	ss << "# Description  :" << player->description << "\n";
+
+	// == WEIGHT ==============================================================
+	ss << "# Weight       :";
+	if (player->weight > 0)
+		ss << ToString(player->weight);
+	ss << "\n";
+
+	ss << "# -------------------------------------------- #\n";
+	player->sendMsg(ss.str());
+}
+
+void ProcessInitialization::printError()
+{
+	if (!error.empty()) {
+		character->sendMsg("# " + error + "\n");
+		error.clear();
 	}
-	preview += "\n";
-	// PASSWORD
-	if (!player->password.empty()) {
-		for (unsigned int i = 0; i < player->password.size(); i++) {
-			preview += "*";
-		}
-	}
-	preview += "\n";
-	// RACE
-	preview += "# Race         :";
-	if (player->race != nullptr) {
-		preview += player->race->name;
-	}
-	preview += "\n";
-	// STRENGTH
-	preview += "# Strength     :";
-	if (player->getAbility(Ability::Strength, false) > 0) {
-		preview += ToString(player->getAbility(Ability::Strength, false));
-	}
-	preview += "\n";
-	// AGILITY
-	preview += "# Agility      :";
-	if (player->getAbility(Ability::Agility, false) > 0) {
-		preview += ToString(player->getAbility(Ability::Agility, false));
-	}
-	preview += "\n";
-	// PERCEPTION
-	preview += "# Perception   :";
-	if (player->getAbility(Ability::Perception, false) > 0) {
-		preview += ToString(player->getAbility(Ability::Perception, false));
-	}
-	preview += "\n";
-	// CONSTITUTION
-	preview += "# Constitution :";
-	if (player->getAbility(Ability::Constitution, false) > 0) {
-		preview += ToString(player->getAbility(Ability::Constitution, false));
-	}
-	preview += "\n";
-	// INTELLIGENCE
-	preview += "# Intelligence :";
-	if (player->getAbility(Ability::Intelligence, false) > 0) {
-		preview += ToString(player->getAbility(Ability::Intelligence, false));
-	}
-	preview += "\n";
-	// GENDER
-	preview += "# Gender       :" + GetGenderTypeName(player->gender) + "\n";
-	// AGE
-	preview += "# Age          :";
-	if (player->age > 0) {
-		preview += ToString(player->age);
-	}
-	preview += "\n";
-	// DESCRIPTION
-	preview += "# Description  :";
-	if (!player->description.empty()) {
-		preview += player->description;
-	}
-	preview += "\n";
-	// WEIGHT
-	preview += "# Weight       :";
-	if (player->weight > 0) {
-		preview += ToString(player->weight);
-	}
-	preview += "\n";
-	preview += "# -------------------------------------------- #\n";
-	player->sendMsg(preview);
 }

@@ -51,7 +51,7 @@ Character::Character() :
 	L(luaL_newstate()),
 	actionQueue(),
 	actionQueueMutex(),
-	inputProcessor(std::make_shared<ProcessInput>()),
+	inputProcessor(std::make_shared<ProcessInput>(this)),
 	outbuffer(),
 	effectManager(),
 	skillManager(this),
@@ -981,7 +981,7 @@ Item *Character::createCorpse()
 bool Character::doCommand(const std::string &command)
 {
 	ArgumentHandler argumentHandler(command);
-	return inputProcessor->process(this, argumentHandler);
+	return inputProcessor->process(argumentHandler);
 }
 
 Player *Character::toPlayer()

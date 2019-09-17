@@ -26,70 +26,63 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessNewGender::process(Character *character, ArgumentHandler &args)
+bool ProcessNewGender::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
 	// Check if the player has typed BACK.
 	if (ToLower(input) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewAttributes>();
+		auto newStep = std::make_shared<ProcessNewAttributes>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	} else if (input == "1") {
 		player->gender = GenderType::Male;
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewAge>();
+		auto newStep = std::make_shared<ProcessNewAge>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	} else if (input == "2") {
 		player->gender = GenderType::Female;
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewAge>();
+		auto newStep = std::make_shared<ProcessNewAge>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	}
-	this->advance(character, "Not a valid gender.");
+	error = "Not a valid gender.";
+	this->advance();
 	return false;
 }
 
-void ProcessNewGender::advance(Character *character, const std::string &error)
+void ProcessNewGender::advance()
 {
 	// Print the choices.
-	this->printChoices(character);
-	auto Bold = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	auto Magenta = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg += "# " + Bold("Character's Gender.") + "\n";
-	msg += "#    [1] Male.\n";
-	msg += "#    [2] Female.\n";
-	msg += "#\n";
-	msg +=
-		"# Choose one of the above gender by typing the correspondent number.\n";
-	msg += "#\n";
-	msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	this->printChoices();
+	std::stringstream ss;
+	ss << "# " + Formatter::bold("Character's Gender.") << "\n";
+	ss << "#    [1] Male.\n";
+	ss << "#    [2] Female.\n";
+	ss << "#\n";
+	ss << "# Choose one of the above gender by typing the correspondent number.\n";
+	ss << "#\n";
+	ss << "# Type [" + Formatter::magenta("back")
+	   << "] to return to the previous step.\n";
+	character->sendMsg(ss.str());
+	this->printError();
 }
 
-void ProcessNewGender::rollBack(Character *character)
+void ProcessNewGender::rollBack()
 {
 	auto player = character->toPlayer();
 	player->gender = GenderType::None;
-	this->advance(character);
+	this->advance();
 }

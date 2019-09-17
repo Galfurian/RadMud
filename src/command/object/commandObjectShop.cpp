@@ -72,10 +72,19 @@ bool DoDeposit(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto quantity = args[0].getMultiplier();
+	auto multiplier = args[0].getMultiplier();
+	if ((multiplier <= 0) && (multiplier != -1)) {
+		character->sendMsg("You must provide a valid amount!\n");
+		return false;
+	}
+	auto quantity = item->quantity;
+	if (multiplier)
+		quantity = static_cast<unsigned int>(multiplier);
+	if (item->quantity < quantity)
+		quantity = item->quantity;
 	// Cast the building to shop.
 	auto shopBuilding = static_cast<ShopItem *>(building);
-	if (item->quantity <= quantity) {
+	if (item->quantity == quantity) {
 		shopBuilding->balance += item->getPrice(true);
 		MudUpdater::instance().addItemToDestroy(item);
 	} else {
@@ -134,17 +143,22 @@ bool DoBuy(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto quantity = args[0].getMultiplier();
-	if (item->quantity < quantity) {
-		quantity = item->quantity;
+	auto multiplier = args[0].getMultiplier();
+	if ((multiplier <= 0) && (multiplier != -1)) {
+		character->sendMsg("You must provide a valid amount!\n");
+		return false;
 	}
+	auto quantity = item->quantity;
+	if (multiplier)
+		quantity = static_cast<unsigned int>(multiplier);
+	if (item->quantity < quantity)
+		quantity = item->quantity;
 	if (!character->canCarry(item, quantity)) {
 		auto phrase =
 			"It seems that you can't carry " + item->getName(true) + ".\n";
 		shopKeeper->doCommand("say " + character->getName() + " " + phrase);
 		return false;
 	}
-
 	// Check if the character has enough coins.
 	auto availableCoins = FindPosessedCoins(character);
 	ItemVector changedCoins;
@@ -261,10 +275,16 @@ bool DoSell(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto quantity = args[0].getMultiplier();
-	if (item->quantity < quantity) {
-		quantity = item->quantity;
+	auto multiplier = args[0].getMultiplier();
+	if ((multiplier <= 0) && (multiplier != -1)) {
+		character->sendMsg("You must provide a valid amount!\n");
+		return false;
 	}
+	auto quantity = item->quantity;
+	if (multiplier)
+		quantity = static_cast<unsigned int>(multiplier);
+	if (item->quantity < quantity)
+		quantity = item->quantity;
 	// Cast the item to shop.
 	auto shop = static_cast<ShopItem *>(target);
 	// Check if the shop can be used.

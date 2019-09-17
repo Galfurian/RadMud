@@ -26,20 +26,21 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessNewAttributes::process(Character *character, ArgumentHandler &args)
+bool ProcessNewAttributes::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	if ((args.size() != 1) && (args.size() != 2)) {
-		this->advance(character, "Invalid input.");
+		error = "Invalid input.";
+		this->advance();
 		return false;
 	}
 	if (ToLower(args[0].getContent()) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewRace>();
+		auto newStep = std::make_shared<ProcessNewRace>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	}
 	if (ToLower(args[0].getContent()) == "reset") {
@@ -48,36 +49,36 @@ bool ProcessNewAttributes::process(Character *character, ArgumentHandler &args)
 			player->setAbility(ability.first,
 							   player->race->getAbility(ability.first));
 		}
-		this->advance(character, Formatter::cyan() +
-									 "Attribute has been set by default." +
-									 Formatter::reset() + "\n");
+		error = Formatter::cyan("Attribute has been set by default.\n");
+		this->advance();
 		return true;
 	}
 	if (BeginWith(ToLower(args[0].getContent()), "continue")) {
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewGender>();
+		auto newStep = std::make_shared<ProcessNewGender>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	}
 	if (BeginWith(ToLower(args[0].getContent()), "help")) {
 		if (args.size() != 2) {
-			this->advance(character, "Specify the attribute number.");
+			error = "Specify the attribute number.";
+			this->advance();
 		}
 		// Get the ability number.
 		auto abilityNumber = ToNumber<unsigned int>(args[1].getContent());
 		// Get and check the ability.
 		Ability ability = Ability(abilityNumber);
 		if (ability == Ability::None) {
-			this->advance(character, "Must select a valid attribute.");
+			error = "Must select a valid attribute.";
+			this->advance();
 			return false;
 		}
-		std::string help;
-		help += "Help about " + ability.toString() + ".\n";
-		help += Formatter::italic() + ability.getDescription() + "\n";
-		this->advance(character, help);
+		error = "Help about " + ability.toString() + ".\n";
+		error += Formatter::italic() + ability.getDescription() + "\n";
+		this->advance();
 		return true;
 	} else {
 		if (args.size() == 2) {
@@ -86,14 +87,16 @@ bool ProcessNewAttributes::process(Character *character, ArgumentHandler &args)
 			// Get and check the ability.
 			Ability ability = Ability(abilityNumber);
 			if (ability == Ability::None) {
-				this->advance(character, "Must select a valid attribute.");
+				error = "Must select a valid attribute.";
+				this->advance();
 				return false;
 			}
 			// Get the modifier.
 			int modifier = ToNumber<int>(args[1].getContent());
 			// Check for errors.
 			if (player->remaining_points < modifier) {
-				this->advance(character, "You don't have enough points left.");
+				error = "You don't have enough points left.";
+				this->advance();
 				return false;
 			}
 			// Create an help string.
@@ -107,14 +110,14 @@ bool ProcessNewAttributes::process(Character *character, ArgumentHandler &args)
 			int lowerBound = ((base - 5) > 0) ? (base - 5) : 0;
 			// Check if the result is inside the boundaries.
 			if (result < lowerBound) {
-				this->advance(character, ability.toString() +
-											 " can't go below " +
-											 ToString(lowerBound) + ".");
+				error = ability.toString() + " can't go below " +
+						ToString(lowerBound) + ".";
+				this->advance();
 				return false;
 			} else if (result > upperBound) {
-				this->advance(character, ability.toString() +
-											 " can't go above " +
-											 ToString(upperBound) + ".");
+				error = ability.toString() + " can't go above " +
+						ToString(upperBound) + ".";
+				this->advance();
 			}
 			// Decrease the remaining points.
 			player->remaining_points -= modifier;
@@ -122,64 +125,58 @@ bool ProcessNewAttributes::process(Character *character, ArgumentHandler &args)
 			player->setAbility(ability, static_cast<unsigned int>(result));
 			return true;
 		} else {
-			this->advance(character, "Type [#attribute +/-(value)].");
+			error = "Type [#attribute +/-(value)].";
+			this->advance();
 		}
 	}
 	return false;
 }
 
-void ProcessNewAttributes::advance(Character *character,
-								   const std::string &error)
+void ProcessNewAttributes::advance()
 {
 	// Transform the character into player.
 	auto player = character->toPlayer();
 	// Print the choices.
-	this->printChoices(character);
-	auto Bold = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	auto Magenta = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg += "# " + Bold("Character's Attributes.") + "\n";
+	this->printChoices();
+
+	std::stringstream ss;
+	ss << "# " << Formatter::bold("Character's Attributes.") << "\n";
 	for (auto const &ability : player->abilities) {
-		msg += "#    [" + ToString(ability.first.toUInt()) + "]";
-		msg += Align(ability.first.toString(), align::left, 15);
-		msg += " : ";
-		msg += ToString(player->getAbility(Ability::Strength, false));
-		msg += "\n";
+		ss << "#    [" << ToString(ability.first.toUInt()) << "]";
+		ss << Align(ability.first.toString(), align::left, 15);
+		ss << " : ";
+		ss << ToString(player->getAbility(Ability::Strength, false));
+		ss << "\n";
 	}
-	msg += "#\n";
-	msg += "# Remaining Points: ";
-	msg +=
-		(player->remaining_points > 0) ? Formatter::green() : Formatter::red();
-	msg += ToString(player->remaining_points);
-	msg += Formatter::reset();
-	msg += "#\n";
-	msg += "# Type [" + Magenta("(number)") + "]";
-	msg += "[" + Magenta("+/-modifier") + "]";
-	msg += " to decrease or increase the value of an attribute.\n";
-	msg += "# Type [" + Magenta("help (number)") + "]";
-	msg += " to read a brief description of the attribute.\n";
-	msg += "# Type [" + Magenta("reset") + "]";
-	msg += " to reset the values as default.\n";
-	msg += "# Type [" + Magenta("continue") + "]";
-	msg += " to continue character creation.\n";
-	msg += "# Type [" + Magenta("back") + "]";
-	msg += " to return to the previous step.\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	ss << "#\n";
+	ss << "# Remaining Points: ";
+	ss << ((player->remaining_points > 0) ? Formatter::green() :
+											Formatter::red());
+	ss << player->remaining_points << Formatter::reset() << "\n";
+	ss << "#\n";
+	ss << "# Type [" << Formatter::magenta("(number)") << "]"
+	   << "[" << Formatter::magenta("+/-modifier") << "]"
+	   << " to decrease or increase the value of an attribute.\n";
+
+	ss << "# Type [" << Formatter::magenta("help (number)") << "]"
+	   << " to read a brief description of the attribute.\n";
+
+	ss << "# Type [" << Formatter::magenta("reset") << "]"
+	   << " to reset the values as default.\n";
+
+	ss << "# Type [" << Formatter::magenta("continue") << "]"
+	   << " to continue character creation.\n";
+
+	ss << "# Type [" << Formatter::magenta("back") << "]"
+	   << " to return to the previous step.\n";
+	character->sendMsg(ss.str());
+	this->printError();
 }
 
-void ProcessNewAttributes::rollBack(Character *character)
+void ProcessNewAttributes::rollBack()
 {
 	auto player = character->toPlayer();
-	for (auto &ability : player->abilities) {
-		player->setAbility(ability.first,
-						   player->race->getAbility(ability.first));
-	}
-	this->advance(character);
+	for (auto &it : player->abilities)
+		player->setAbility(it.first, player->race->getAbility(it.first));
+	this->advance();
 }

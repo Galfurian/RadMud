@@ -150,15 +150,43 @@ std::vector<Item *> LuaGetItemsInSight(Character *character)
 	return result;
 }
 
+int SetLuaPath(lua_State *L, const char *path)
+{
+	lua_getglobal(L, "package");
+	// Get field "path" from table at top of stack (-1)
+	lua_getfield(L, -1, "path");
+	// Grab path string from top of stack
+	std::string cur_path = lua_tostring(L, -1);
+	// Do your path magic here
+	MudLog(LogLevel::Debug, "Lua old package.path : %s", cur_path.c_str());
+	cur_path.push_back(';');
+	cur_path.append(path);
+	MudLog(LogLevel::Debug, "Lua new package.path : %s", cur_path.c_str());
+	// Get rid of the string on the stack we just pushed on line 5
+	lua_pop(L, 1);
+	// Push the new one
+	lua_pushstring(L, cur_path.c_str());
+	// Set the field "path" in table at -2 with value at top of stack
+	lua_setfield(L, -2, "path");
+	// Get rid of package table from top of stack
+	lua_pop(L, 1);
+	return 0;
+}
+
 void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 {
 	// -------------------------------------------------------------------------
 	// Open lua libraries.
 	luaL_openlibs(L);
+
+	// -------------------------------------------------------------------------
+	// Update package.path
+	SetLuaPath(L, "../system/lua/lib/?.lua");
+
 	// -------------------------------------------------------------------------
 	// Register all the utility functions.
 	luabridge::getGlobalNamespace(L)
-		.beginNamespace("Mud")
+		.beginNamespace("MudFunction")
 		.addFunction("log", LuaLog)
 		.addFunction("random", LuaRandom)
 		.addFunction("stop", LuaStopScript)
@@ -613,7 +641,6 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 	auto path = Mud::instance().getMudSystemDirectory() + "lua/" + scriptFile;
 	if (luaL_dofile(L, path.c_str()) != LUABRIDGE_LUA_OK) {
 		MudLog(LogLevel::Error, "Can't open script %s.", scriptFile);
-		MudLog(LogLevel::Error, "Error :%s",
-					std::string(lua_tostring(L, -1)));
+		MudLog(LogLevel::Error, "Error :%s", std::string(lua_tostring(L, -1)));
 	}
 }

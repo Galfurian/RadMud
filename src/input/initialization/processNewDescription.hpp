@@ -24,10 +24,16 @@
 /// @brief Allows to choose the player description.
 class ProcessNewDescription : public ProcessInitialization {
 public:
-	bool process(Character *character, ArgumentHandler &args);
+	/// @brief Constructor.
+	explicit ProcessNewDescription(Character *_character) :
+		ProcessInitialization(_character)
+	{
+		// Nothing to do.
+	}
 
-	void advance(Character *character,
-				 const std::string &error = std::string());
+	bool process(ArgumentHandler &args) override;
 
-	void rollBack(Character *character);
+	void advance() override;
+
+	void rollBack() override;
 };

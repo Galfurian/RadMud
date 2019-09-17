@@ -121,16 +121,22 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		// Set the quantity.
-		auto quantity = args[0].getMultiplier();
-		if (item->quantity < quantity) {
-			quantity = item->quantity;
+		auto multiplier = args[0].getMultiplier();
+		if ((multiplier <= 0) && (multiplier != -1)) {
+			character->sendMsg("You must provide a valid amount!\n");
+			return false;
 		}
+		auto quantity = item->quantity;
+		if (multiplier)
+			quantity = static_cast<unsigned int>(multiplier);
+		if (item->quantity < quantity)
+			quantity = item->quantity;
 		// Check if the player can carry the item.
 		if (!character->canCarry(item, quantity)) {
 			character->sendMsg("You can't carry %s!\n", item->getName(true));
 			return false;
 		}
-		if (item->quantity <= quantity) {
+		if (item->quantity == quantity) {
 			// Remove the item from the room.
 			room->removeItem(item);
 			// Add the item to the player's inventory.
@@ -261,17 +267,23 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		// Set the quantity.
-		auto quantity = args[0].getMultiplier();
-		if (item->quantity < quantity) {
-			quantity = item->quantity;
+		auto multiplier = args[0].getMultiplier();
+		if ((multiplier <= 0) && (multiplier != -1)) {
+			character->sendMsg("You must provide a valid amount!\n");
+			return false;
 		}
+		auto quantity = item->quantity;
+		if (multiplier)
+			quantity = static_cast<unsigned int>(multiplier);
+		if (item->quantity < quantity)
+			quantity = item->quantity;
 		// Check if the player can carry the item.
 		if (!character->canCarry(item, quantity)) {
 			character->sendMsg(
 				"You are not strong enough to carry that object.\n");
 			return false;
 		}
-		if (item->quantity <= quantity) {
+		if (item->quantity == quantity) {
 			// Remove the item from the container.
 			container->takeOut(item);
 			// Add the item to the player's inventory.
@@ -358,11 +370,17 @@ bool DoDrop(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto quantity = args[0].getMultiplier();
-	if (item->quantity < quantity) {
-		quantity = item->quantity;
+	auto multiplier = args[0].getMultiplier();
+	if ((multiplier <= 0) && (multiplier != -1)) {
+		character->sendMsg("You must provide a valid amount!\n");
+		return false;
 	}
-	if (item->quantity <= quantity) {
+	auto quantity = item->quantity;
+	if (multiplier)
+		quantity = static_cast<unsigned int>(multiplier);
+	if (item->quantity < quantity)
+		quantity = item->quantity;
+	if (item->quantity == quantity) {
 		// Remove the item from the player's inventory.
 		character->remInventoryItem(item);
 		// Put the item inside the room.
@@ -494,17 +512,23 @@ bool DoPut(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto quantity = args[0].getMultiplier();
-	if (item->quantity < quantity) {
-		quantity = item->quantity;
+	auto multiplier = args[0].getMultiplier();
+	if ((multiplier <= 0) && (multiplier != -1)) {
+		character->sendMsg("You must provide a valid amount!\n");
+		return false;
 	}
+	auto quantity = item->quantity;
+	if (multiplier)
+		quantity = static_cast<unsigned int>(multiplier);
+	if (item->quantity < quantity)
+		quantity = item->quantity;
 	// Check if the item can be contained inside the destination.
 	if (!container->canContain(item, quantity)) {
 		character->sendMsg("%s can't contain any more items.\n",
 						   container->getNameCapital());
 		return false;
 	}
-	if (item->quantity <= quantity) {
+	if (item->quantity == quantity) {
 		// Remove the item from the player's inventory.
 		character->remInventoryItem(item);
 		// Put the item inside the container.
@@ -579,11 +603,17 @@ bool DoGive(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto quantity = args[0].getMultiplier();
-	if (item->quantity < quantity) {
-		quantity = item->quantity;
+	auto multiplier = args[0].getMultiplier();
+	if ((multiplier <= 0) && (multiplier != -1)) {
+		character->sendMsg("You must provide a valid amount!\n");
+		return false;
 	}
-	if (item->quantity <= quantity) {
+	auto quantity = item->quantity;
+	if (multiplier)
+		quantity = static_cast<unsigned int>(multiplier);
+	if (item->quantity < quantity)
+		quantity = item->quantity;
+	if (item->quantity == quantity) {
 		// Remove the item from the character inventory.
 		character->remInventoryItem(item);
 		// Add the item to the target inventory.

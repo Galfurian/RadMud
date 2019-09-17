@@ -26,73 +26,67 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessNewDescription::process(Character *character, ArgumentHandler &args)
+bool ProcessNewDescription::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
 	// Player_password can't be blank.
 	if (input.empty()) {
-		this->advance(character, "Invalid input.");
+		error = "Invalid input.";
+		this->advance();
 	} else if (ToLower(input) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewAge>();
+		auto newStep = std::make_shared<ProcessNewAge>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	} else if (ToLower(input) == "skip") {
 		// Check if the player has typed SKIP.
 		player->description = "You see " + ToLower(player->name) + " here.";
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewWeight>();
+		auto newStep = std::make_shared<ProcessNewWeight>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	} else if (input.find_first_not_of(VALID_CHARACTERS_DESC) !=
 			   std::string::npos) {
-		this->advance(character,
-					  "Description cannot contain disallowed characters.");
+		error = "Description cannot contain disallowed characters.";
+		this->advance();
 	} else {
 		player->description = input;
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewWeight>();
+		auto newStep = std::make_shared<ProcessNewWeight>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	}
 	return false;
 }
 
-void ProcessNewDescription::advance(Character *character,
-									const std::string &error)
+void ProcessNewDescription::advance()
 {
 	// Print the choices.
-	this->printChoices(character);
-	auto Bold = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	auto Magenta = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg += "# " + Bold("Character's Description.") + "\n";
-	msg += "# Insert a brief description of your character, its optional.\n";
-	msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
-	msg += "# Type [" + Magenta("skip") + "] to just pass to the next step.\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	this->printChoices();
+	std::stringstream ss;
+	ss << "# " << Formatter::bold("Character's Description.") << "\n";
+	ss << "# Insert a brief description of your character, its optional.\n";
+	ss << "# Type [" << Formatter::magenta("back")
+	   << "] to return to the previous step.\n";
+	ss << "# Type [" << Formatter::magenta("skip")
+	   << "] to just pass to the next step.\n";
+	character->sendMsg(ss.str());
+	this->printError();
 }
 
-void ProcessNewDescription::rollBack(Character *character)
+void ProcessNewDescription::rollBack()
 {
 	auto player = character->toPlayer();
 	player->description = "";
-	this->advance(character);
+	this->advance();
 }

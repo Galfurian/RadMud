@@ -21,9 +21,10 @@
 
 #pragma once
 
-#include <string>
+#include <climits>
+#include "utils.hpp"
 
-/// @brief Allows to easely manage input arguments from players.
+/// @brief Allows to easily manage input arguments from players.
 class Argument {
 public:
 	/// The original argument string.
@@ -33,28 +34,116 @@ public:
 	/// The provided index.
 	int index;
 	/// The provided multiplier.
-	unsigned int multiplier;
+	int multiplier;
+	/// The provided index, which can be changed by algorithms.
+	int temporary_index;
 
 public:
 	/// @brief Constructor.
-	Argument(const std::string &_original);
+	explicit Argument(const std::string &_original) :
+		original(_original),
+		content(_original),
+		index(1),
+		multiplier(1),
+		temporary_index(1)
+	{
+		// First, evaluate the multiplier.
+		this->evaluateMultiplier();
+		// Then, evaluate the index.
+		this->evaluateIndex();
+	}
 
 	/// Provides the original argument.
-	std::string getOriginal() const;
+	inline std::string getOriginal() const
+	{
+		return original;
+	}
 
 	/// Provides the content with both index and multiplier removed.
-	std::string getContent() const;
+	inline std::string getContent() const
+	{
+		return content;
+	}
 
 	/// Provides the index.
-	int &getIndex();
+	inline int getOriginalIndex() const
+	{
+		return index;
+	}
+
+	/// Provides the index.
+	inline int &getIndex()
+	{
+		return temporary_index;
+	}
 
 	/// Provides the multiplier.
-	unsigned int getMultiplier() const;
+	inline int getMultiplier() const
+	{
+		return multiplier;
+	}
+
+	/// Sets the content of the argument.
+	inline void setString(std::string const &s)
+	{
+		original = content = s;
+		// First, evaluate the multiplier.
+		this->evaluateMultiplier();
+		// Then, evaluate the index.
+		this->evaluateIndex();
+	}
 
 private:
 	/// Evaluates the index.
-	void evaluateIndex();
+	void evaluateIndex()
+	{
+		// If the entire string is a number, skip it.
+		if (IsNumber(content))
+			return;
+		// Otherwise try to find a number if there is one.
+		std::string::size_type pos = content.find('.');
+		if (pos == std::string::npos)
+			return;
+		// Extract the digits.
+		std::string digits = content.substr(0, pos);
+		// Check the digits.
+		if (IsNumber(digits)) {
+			// Get the number and set it.
+			int number = ToNumber<int>(digits);
+			if ((number >= 0) && (number < INT_MAX)) {
+				// Set the number.
+				temporary_index = index = number;
+			}
+			// Remove the digits.
+			content = content.substr(pos + 1, content.size());
+		} else if ((digits == "all") || (digits == "tutto")) {
+			multiplier = -1;
+			// Remove the quantity.
+			content = content.substr(pos + 1, content.size());
+		}
+	}
 
 	/// Evaluates the multiplier.
-	void evaluateMultiplier();
+	void evaluateMultiplier()
+	{
+		// If the entire string is a number, skip it.
+		if (IsNumber(content))
+			return;
+		// Otherwise try to find a number if there is one.
+		std::string::size_type pos = content.find('*');
+		if (pos == std::string::npos)
+			return;
+		// Extract the digits.
+		std::string digits = content.substr(0, pos);
+		// Check the digits.
+		if (IsNumber(digits)) {
+			// Get the number and set it.
+			int number = ToNumber<int>(digits);
+			if ((number >= 0) && (number < INT_MAX)) {
+				multiplier = number;
+			}
+			// Remove the digits.
+			content = content.substr(pos + 1, content.size());
+		}
+	}
 };

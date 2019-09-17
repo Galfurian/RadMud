@@ -357,6 +357,7 @@ void Mobile::triggerEventEnter(Character *character)
 
 void Mobile::triggerEventExit(Character *character)
 {
+	MudLog(LogLevel::Trace, "Activating EventEnter.");
 	this->mobileThread("EventExit", character, "");
 }
 

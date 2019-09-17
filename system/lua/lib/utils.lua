@@ -18,6 +18,7 @@
 --- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 --- FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 --- DEALINGS IN THE SOFTWARE.
+
 function MessageContains(message, what)
     return string.match(' ' .. message .. ' ', '%W' .. what .. '%W') ~= nil
 end
@@ -26,7 +27,7 @@ end
 FindPathAndMoveToDestination = function(self, room, minDelay, maxDelay)
     print("Moving to location " .. room.vnum)
     -- Get the path to the given room.
-    local path = Mud.findPath(self, room)
+    local path = mud.find_path(self, room)
     -- If the path is not empty, then move to destination.
     if (not path:empty()) then
         -- Try to move to the destination.
@@ -46,7 +47,6 @@ GetToDestination = function(self, path, minDelay, maxDelay)
         if (not self:doCommand(direction:toString())) then
             return false
         end
-        Mud.sleep(Mud.random(minDelay, maxDelay))
     end
     return true
 end

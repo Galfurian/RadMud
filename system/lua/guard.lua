@@ -1,19 +1,22 @@
+local utils = require("utils")
+require("mud")
+
 -- Handle the actions when the character is created.
 EventInit = function(self)
     -- Put event code here.
-    local helm = Mud.loadItem(self, 1500, 10, Mud.random(1, 5))
+    local helm = mud.load_item(self, 1500, 10, mud.random(1, 5))
     if (helm ~= nil) then
         self:equipmentAdd(helm)
     end
-    local cuirass = Mud.loadItem(self, 1501, 10, Mud.random(1, 5))
+    local cuirass = mud.load_item(self, 1501, 10, mud.random(1, 5))
     if (cuirass ~= nil) then
         self:equipmentAdd(cuirass)
     end
-    local greave = Mud.loadItem(self, 1502, 10, Mud.random(1, 5))
+    local greave = mud.load_item(self, 1502, 10, mud.random(1, 5))
     if (greave ~= nil) then
         self:equipmentAdd(greave)
     end
-    local boots = Mud.loadItem(self, 1503, 10, Mud.random(1, 5))
+    local boots = mud.load_item(self, 1503, 10, mud.random(1, 5))
     if (boots ~= nil) then
         self:equipmentAdd(boots)
     end
@@ -24,36 +27,51 @@ EventFight = function(self, character)
     -- Put event code here.
 end
 
-local EventEnterState = 0
-local EventEnterCounter = 0
+local enter_state_look = 0
+local enter_state_speak = 1
+local enter_state_again = 2
+local enter_state_char = { }
+
 -- Handle the actions when a character enters the room.
 EventEnter = function(self, character)
-    print("EventEnterState " .. EventEnterState)
-    print("EventEnterCounter " .. EventEnterCounter)
-    if (EventEnterState == 0) then
-        if (Mud.random(1, 10) < 7) then
-            return true
-        end
+    if (enter_state_char[character.name] == nil) then
+        enter_state_char[character.name] = { }
+        enter_state_char[character.name].state = enter_state_look
+        enter_state_char[character.name].counter = 0
+    end
+    if (enter_state_char[character.name].state == enter_state_look) then
         self:doCommand("look " .. character.name)
-        EventEnterState = 1
-    elseif (EventEnterState == 1) then
-        self:doCommand("say " .. character.name .. " Stand aside, citizen!")
-        EventEnterState = 2
-    elseif (EventEnterState == 2) then
-        if (EventEnterCounter >= 3) then
+        enter_state_char[character.name].state = enter_state_speak
+    elseif (enter_state_char[character.name].state == enter_state_speak) then
+        if (enter_state_char[character.name].counter >= 3) then
+            self:doCommand("say " .. character.name .. " Stand aside, citizen!")
+            enter_state_char[character.name].state = enter_state_again
+            enter_state_char[character.name].counter = 0
+        end
+        enter_state_char[character.name].counter = enter_state_char[character.name].counter + 1
+    elseif (enter_state_char[character.name].state == enter_state_again) then
+        if (enter_state_char[character.name].counter >= 3) then
             self:doCommand("say " .. character.name .. " Are you still here?!?")
-            EventEnterState = 0
-            EventEnterCounter = 0
+            enter_state_char[character.name].state = enter_state_look
+            enter_state_char[character.name].counter = 0
             return true
         end
-        EventEnterCounter = EventEnterCounter + 1
+        enter_state_char[character.name].counter = enter_state_char[character.name].counter + 1
     end
     return false
 end
 
 -- Handle the actions when a character exits the room.
 EventExit = function(self, character)
-    -- Put event code here.
+    print("EventExit")
+    if (enter_state_char[character.name] ~= nil) then
+        if (enter_state_char[character.name].state == enter_state_look) then
+            self:doCommand("nod " .. character.name)
+        elseif (enter_state_char[character.name].state == enter_state_speak) then
+            self:doCommand("say " .. character.name .. " Wise choice...")
+        end
+    end
+    return true
 end
 
 -- Handle conversation.

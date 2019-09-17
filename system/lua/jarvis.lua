@@ -1,5 +1,4 @@
-package.path = package.path .. ";../system/lua/lib/?.lua"
-require 'utils'
+require("utils")
 
 -- Handle the actions when the character is created.
 EventInit = function(self)
@@ -14,7 +13,7 @@ end
 -- Handle the actions when a character enters the room.
 EventEnter = function(self, character)
     -- Put event code here.
-    if (Mud.random(1, 10) > 5)
+    if (mud.random(1, 10) > 5)
     then
         self:doCommand("look " .. character.name);
     end

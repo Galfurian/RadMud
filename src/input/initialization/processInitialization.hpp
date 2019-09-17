@@ -43,22 +43,29 @@
 class ProcessInitialization : public ProcessInput {
 public:
 	/// @brief Constructor.
-	ProcessInitialization();
+	explicit ProcessInitialization(Character *_character) :
+		ProcessInput(_character),
+		error()
+	{
+		// Nothing to do.
+	}
 
 	/// @brief Destructor.
-	virtual ~ProcessInitialization();
+	~ProcessInitialization() = default;
 
 	/// @brief Print the values inserted until now.
-	/// @param character The player whose creating a new character.
-	void printChoices(Character *character);
+	void printChoices();
+
+	/// @brief Prints the error message and clears it.
+	void printError();
 
 	/// @brief Print the advancement in the character creation.
-	/// @param character The player whose creating a new character.
-	/// @param error     An optional message used only during error handling.
-	virtual void advance(Character *character,
-						 const std::string &error = std::string()) = 0;
+	virtual void advance() = 0;
 
 	/// @brief Reset the informations inserted in the previous state.
-	/// @param character The player whose creating a new character.
-	virtual void rollBack(Character *character) = 0;
+	virtual void rollBack() = 0;
+
+protected:
+	/// @brief Error to report.
+	std::string error;
 };

@@ -1,8 +1,5 @@
---package.path = package.path .. ";../system/lua/luann.lua"
---local luann = require("luann")
-package.path = package.path .. ";../system/lua/lib/?.lua"
-require 'explorer'
-require 'utils'
+require("utils")
+require("explorer")
 
 local JhonExplorer = Explorer()
 
@@ -80,25 +77,25 @@ end
 --- Handle the main behaviour of the character.
 -- @param self The character linked to the event.
 EventMain = function(self)
---    if (not EquipPosessedAxe(self)) then
---        JhonExplorer:reset()
---        local axe = SearchAxe(self);
---        if (axe == nil) then
---            -- There is no axe in the area!
---            Mud.sleep(15)
---        else
---            -- I've found an axe!
---            JhonExplorer:reset()
---            --            local tree = SearchTree(self);
---            --            if (tree == nil) then
---            --                -- There is no tree in the area!
---            --                Mud.sleep(15)
---            --            else
---            --                -- I've found a tree!
---            --                self:doCommand("cut tree");
---            --            end
---        end
---    end
+    --    if (not EquipPosessedAxe(self)) then
+    --        JhonExplorer:reset()
+    --        local axe = SearchAxe(self);
+    --        if (axe == nil) then
+    --            -- There is no axe in the area!
+    --            Mud.sleep(15)
+    --        else
+    --            -- I've found an axe!
+    --            JhonExplorer:reset()
+    --            --            local tree = SearchTree(self);
+    --            --            if (tree == nil) then
+    --            --                -- There is no tree in the area!
+    --            --                Mud.sleep(15)
+    --            --            else
+    --            --                -- I've found a tree!
+    --            --                self:doCommand("cut tree");
+    --            --            end
+    --        end
+    --    end
 end
 
 --------------------------------------------------------------------------------
@@ -128,7 +125,7 @@ SearchAxe = function(self)
             --  Cannot find a path to nextRoom
             JhonExplorer.invalidRooms:pushfirst(nextRoom)
         end
---        Mud.sleep(4)
+        --        Mud.sleep(4)
     end
     return nil
 end
@@ -137,7 +134,7 @@ end
 --- Search for an axe inside the given room.
 SearchAxeNearby = function(self)
     -- Iterate through all the rooms in sight.
-    for room in Mud.getRoomsInSight(self):iter() do
+    for room in mud.get_rooms_in_sight(self):iter() do
         -- Check if the room contains an axe.
         local axe = SearchAxeRoom(room)
         -- If we have found an axe, move where it is.
@@ -178,7 +175,9 @@ end
 SearchTreeRoom = function(room)
     -- Get the list of items inside the current room.
     for item in room.items:iter() do
-        if (IsATree(item)) then return item end
+        if (IsATree(item)) then
+            return item
+        end
     end
     return nil
 end
@@ -207,11 +206,15 @@ end
 EquipPosessedAxe = function(self)
     -- Check if the character already has equipped an axe.
     for item in self.equipment:iter() do
-        if (IsAnAxe(item)) then return true end
+        if (IsAnAxe(item)) then
+            return true
+        end
     end
     -- Check if the character posesses an axe inside the inventory.
     for item in self.inventory:iter() do
-        if (IsAnAxe(item)) then return self:doCommand("wield axe") end
+        if (IsAnAxe(item)) then
+            return self:doCommand("wield axe")
+        end
     end
     return false
 end
@@ -219,13 +222,15 @@ end
 MoveToLocation = function(self, room)
     print("Moving to location " .. room.vnum)
     -- Get the path to the given room.
-    local pathToNextRoom = Mud.findPath(self, room)
+    local pathToNextRoom = mud.find_path(self, room)
     -- If the path is not empty, then move to destination.
     if next(pathToNextRoom) ~= nil then
         -- Try to move to the destination.
-        if (GetToDestination(self, pathToNextRoom)) then return true end
+        if (GetToDestination(self, pathToNextRoom)) then
+            return true
+        end
         -- Cannot reach an axe in sight!
-        Mud.stop()
+        mud.stop()
     else
         -- Cannot find a path to nextRoom
         JhonExplorer.invalidRooms:pushfirst(room)

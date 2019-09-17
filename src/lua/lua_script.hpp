@@ -78,5 +78,7 @@ std::vector<Character *> LuaGetCharactersInSight(Character *character);
 /// @brief Returns the list of items in sight.
 std::vector<Item *> LuaGetItemsInSight(Character *character);
 
+int SetLuaPath(lua_State *L, const char *path);
+
 /// @brief Register every mud element inside the Lua environment.
 void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile);

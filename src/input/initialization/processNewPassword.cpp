@@ -25,64 +25,58 @@
 #include "formatter.hpp"
 #include "player.hpp"
 
-bool ProcessNewPassword::process(Character *character, ArgumentHandler &args)
+bool ProcessNewPassword::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
 	// Player_password can't be blank.
 	if (input.empty()) {
-		this->advance(character, "Invalid input.");
+		error = "Invalid input.";
+		this->advance();
 	} else if (ToLower(input) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewName>();
+		auto newStep = std::make_shared<ProcessNewName>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	} else if (input.find_first_not_of(VALID_CHARACTERS_NAME) !=
 			   std::string::npos) {
-		this->advance(character,
-					  "Password cannot contain disallowed characters.");
+		error = "Password cannot contain disallowed characters.";
+		this->advance();
 	} else {
 		player->password = input;
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewPasswordConfirm>();
+		auto newStep = std::make_shared<ProcessNewPasswordConfirm>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	}
 	return false;
 }
 
-void ProcessNewPassword::advance(Character *character, const std::string &error)
+void ProcessNewPassword::advance()
 {
 	// Print the choices.
-	this->printChoices(character);
-	auto Bold = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	auto Magenta = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg += "# " + Bold("Character's Password.") + "\n";
-	msg += "# Choose a proper password, in order to protect the";
-	msg += "access to your character.\n";
-	msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	this->printChoices();
+	std::stringstream ss;
+	ss << "# " << Formatter::bold("Character's Password.") << "\n";
+	ss << "# Choose a proper password, in order to protect the";
+	ss << "access to your character.\n";
+	ss << "# Type [" << Formatter::magenta("back")
+	   << "] to return to the previous step.\n";
+	character->sendMsg(ss.str());
+	this->printError();
 }
 
-void ProcessNewPassword::rollBack(Character *character)
+void ProcessNewPassword::rollBack()
 {
 	auto player = character->toPlayer();
 	// Reset the values.
 	player->password = "";
 	// Advance to the current step.
-	this->advance(character);
+	this->advance();
 }

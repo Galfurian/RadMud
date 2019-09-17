@@ -1,3 +1,5 @@
+require("utils")
+
 -- Handle the actions when the character is created.
 EventInit = function(self)
     -- Put event code here.
@@ -25,7 +27,7 @@ end
 
 -- Handle a random action.
 EventRandom = function(self)
-    --    Mud.Log("[" .. self.name .. "] Searching for someone to follow.");
+    --    mud.log("[" .. self.name .. "] Searching for someone to follow.");
     --    local charactersInSight = self:getCharactersInSight();
     --    if (not charactersInSight:empty())
     --    then
@@ -67,16 +69,16 @@ end
 local EMState = 0
 -- Handle the main behaviour of the character.
 EventMain = function(self)
---    if (EMState == 0) then
---        Mud.log("State " .. EMState)
---        EMState = 1
---    elseif (EMState == 1) then
---        Mud.log("State " .. EMState)
---        EMState = 2
---    elseif (EMState == 2) then
---        Mud.log("State " .. EMState)
---        EMState = 0
---        return true
---    end
---    return false
+    --    if (EMState == 0) then
+    --        Mud.log("State " .. EMState)
+    --        EMState = 1
+    --    elseif (EMState == 1) then
+    --        Mud.log("State " .. EMState)
+    --        EMState = 2
+    --    elseif (EMState == 2) then
+    --        Mud.log("State " .. EMState)
+    --        EMState = 0
+    --        return true
+    --    end
+    --    return false
 end

@@ -24,58 +24,57 @@
 #include "processNewRace.hpp"
 #include "formatter.hpp"
 
-bool ProcessNewStory::process(Character *character, ArgumentHandler &args)
+bool ProcessNewStory::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
 	// Player_password can't be blank.
 	if (input.empty()) {
-		this->advance(character, "Invalid input.");
+		error = "Invalid input.";
+		this->advance();
 	} else if (ToLower(input) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewPassword>();
+		auto newStep = std::make_shared<ProcessNewPassword>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	} else if (input != "continue") {
-		this->advance(character,
-					  "Write 'continue' after you have reade the story.");
+		error = "Write 'continue' after you have reade the story.";
+		this->advance();
 	} else {
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewRace>();
+		auto newStep = std::make_shared<ProcessNewRace>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	}
 	return false;
 }
 
-void ProcessNewStory::advance(Character *character, const std::string &error)
+void ProcessNewStory::advance()
 {
 	// Print the choices.
-	this->printChoices(character);
-	auto Magenta = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg += "# The story of the Wasteland.\n";
-	msg += "#\n";
-	msg += "Year 374\n";
-	msg += "#\n";
-	msg +=
-		"# Type [" + Magenta("continue") + "] to continue to the next step.\n";
-	msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	this->printChoices();
+
+	std::stringstream ss;
+	ss << "# The story of the Wasteland.\n";
+	ss << "#\n";
+	ss << "Year 374\n";
+	ss << "#\n";
+	ss << "# Type [" << Formatter::magenta("continue")
+	   << "] to continue to the next step.\n";
+	ss << "# Type [" << Formatter::magenta("back")
+	   << "] to return to the previous step.\n";
+	character->sendMsg(ss.str());
+
+	this->printError();
 }
 
-void ProcessNewStory::rollBack(Character *character)
+void ProcessNewStory::rollBack()
 {
-	this->advance(character);
+	this->advance();
 }

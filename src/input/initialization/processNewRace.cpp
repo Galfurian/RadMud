@@ -24,26 +24,28 @@
 #include "processNewStory.hpp"
 #include "formatter.hpp"
 
-bool ProcessNewRace::process(Character *character, ArgumentHandler &args)
+bool ProcessNewRace::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	// Player_password can't be blank.
 	if ((args.size() != 1) && (args.size() != 2)) {
-		this->advance(character, "Invalid input.");
+		error = "Invalid input.";
+		this->advance();
 		return false;
 	}
 	if (ToLower(args[0].getContent()) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewStory>();
+		auto newStep = std::make_shared<ProcessNewStory>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	}
 	if (BeginWith(ToLower(args[0].getContent()), "help")) {
 		if (args.size() == 1) {
-			this->advance(character, "You have to specify the race number.");
+			error = "You have to specify the race number.";
+			this->advance();
 			return false;
 		}
 		// Retrieve the number of the race.
@@ -51,40 +53,43 @@ bool ProcessNewRace::process(Character *character, ArgumentHandler &args)
 		// Get the race.
 		auto race = Mud::instance().findRace(raceVnum);
 		if (race == nullptr) {
-			this->advance(character, "No help for that race.");
+			error = "No help for that race.";
+			this->advance();
 			return false;
 		}
 		if (!race->player_allow) {
-			this->advance(character, "No help for that race.");
+			error = "No help for that race.";
+			this->advance();
 			return false;
 		}
-		std::string help;
-		help += "Help about '" + race->name + "'.\n";
+		error += "Help about '" + race->name + "'.\n";
 		for (auto const &it : TextWrap(race->description, 60)) {
-			help += it + "\n";
+			error += it + "\n";
 		}
-		help += "  Strength     " +
-				ToString(race->getAbility(Ability::Strength)) + "\n";
-		help += "  Agility      " +
-				ToString(race->getAbility(Ability::Agility)) + "\n";
-		help += "  Perception   " +
-				ToString(race->getAbility(Ability::Perception)) + "\n";
-		help += "  Constitution " +
-				ToString(race->getAbility(Ability::Constitution)) + "\n";
-		help += "  Intelligence " +
-				ToString(race->getAbility(Ability::Intelligence)) + "\n";
-		this->advance(character, help);
+		error += "  Strength     " +
+				 ToString(race->getAbility(Ability::Strength)) + "\n";
+		error += "  Agility      " +
+				 ToString(race->getAbility(Ability::Agility)) + "\n";
+		error += "  Perception   " +
+				 ToString(race->getAbility(Ability::Perception)) + "\n";
+		error += "  Constitution " +
+				 ToString(race->getAbility(Ability::Constitution)) + "\n";
+		error += "  Intelligence " +
+				 ToString(race->getAbility(Ability::Intelligence)) + "\n";
+		this->advance();
 		return true;
 	}
 	// Get the race.
 	auto race =
 		Mud::instance().findRace(ToNumber<unsigned int>(args[0].getContent()));
 	if (race == nullptr) {
-		this->advance(character, "Not a valid race.");
+		error = "Not a valid race.";
+		this->advance();
 		return false;
 	}
 	if (!race->player_allow) {
-		this->advance(character, "Not a valid race.");
+		error = "Not a valid race.";
+		this->advance();
 		return false;
 	}
 	// Set the race.
@@ -104,46 +109,37 @@ bool ProcessNewRace::process(Character *character, ArgumentHandler &args)
 	// Set the remaining points.
 	player->remaining_points = 0;
 	// Create a shared pointer to the next step.
-	auto newStep = std::make_shared<ProcessNewAttributes>();
+	auto newStep = std::make_shared<ProcessNewAttributes>(character);
 	// Set the handler.
 	player->inputProcessor = newStep;
 	// Advance to the next step.
-	newStep->advance(character);
+	newStep->advance();
 	return true;
 }
 
-void ProcessNewRace::advance(Character *character, const std::string &error)
+void ProcessNewRace::advance()
 {
 	// Print the choices.
-	this->printChoices(character);
-	auto Bold = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	auto Magenta = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg += "# " + Bold("Character's Race.") + "\n";
-	for (auto iterator : Mud::instance().mudRaces) {
-		if (iterator.second->player_allow) {
-			msg += "#    [" + ToString(iterator.second->vnum) + "] ";
-			msg += iterator.second->name + ".\n";
-		}
-	}
-	msg += "#\n";
-	msg +=
-		"# Choose one of the above race by typing the correspondent number.\n";
-	msg += "#\n";
-	msg += "# Type [" + Magenta("help [Number]");
-	msg += "] to read a brief description of the race.\n";
-	msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	this->printChoices();
+
+	std::stringstream ss;
+	ss << "# " << Formatter::bold("Character's Race.") << "\n";
+	for (auto const &it : Mud::instance().mudRaces)
+		if (it.second->player_allow)
+			ss << "# [" << it.second->vnum << "] " << it.second->name << ".\n";
+	ss << "#\n";
+	ss << "# Choose one of the above race by typing the correspondent number.\n";
+	ss << "#\n";
+	ss << "# Type [" << Formatter::magenta("help [Number]");
+	ss << "] to read a brief description of the race.\n";
+	ss << "# Type [" << Formatter::magenta("back")
+	   << "] to return to the previous step.\n";
+	character->sendMsg(ss.str());
+
+	this->printError();
 }
 
-void ProcessNewRace::rollBack(Character *character)
+void ProcessNewRace::rollBack()
 {
 	auto player = character->toPlayer();
 	// Reset the values.
@@ -157,5 +153,5 @@ void ProcessNewRace::rollBack(Character *character)
 	player->setAbility(Ability::Intelligence, 0);
 	player->remaining_points = 0;
 	// Advance to the current step.
-	this->advance(character);
+	this->advance();
 }

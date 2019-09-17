@@ -26,17 +26,17 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessNewConfirm::process(Character *character, ArgumentHandler &args)
+bool ProcessNewConfirm::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
 	if (ToLower(input) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewWeight>();
+		auto newStep = std::make_shared<ProcessNewWeight>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	} else if (ToLower(input) == "confirm") {
 		// Initialize the player.
@@ -54,7 +54,7 @@ bool ProcessNewConfirm::process(Character *character, ArgumentHandler &args)
 		SQLiteDbms::instance().beginTransaction();
 		if (player->updateOnDB()) {
 			// Set the handler.
-			player->inputProcessor = std::make_shared<ProcessInput>();
+			player->inputProcessor = std::make_shared<ProcessInput>(character);
 			// Entered the MUD.
 			player->enterGame();
 			// Set the connection state to playing.
@@ -66,36 +66,29 @@ bool ProcessNewConfirm::process(Character *character, ArgumentHandler &args)
 		player->closeConnection();
 		SQLiteDbms::instance().endTransaction();
 	} else {
-		this->advance(character, "You must write 'confirm' if you agree.");
+		error = "You must write 'confirm' if you agree.";
+		this->advance();
 	}
 	return false;
 }
 
-void ProcessNewConfirm::advance(Character *character, const std::string &error)
+void ProcessNewConfirm::advance()
 {
 	// Print the choices.
-	this->printChoices(character);
-	auto Green = [](const std::string &s) {
-		return Formatter::green() + s + Formatter::reset();
-	};
-	auto Magenta = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg +=
-		"# Give a look to the information you have provided, now it's the right time";
-	msg += " to decide if you want to change something.\n";
-	msg += "# Type [" + Magenta("confirm") +
-		   "] to conclude the character creation.\n";
-	msg +=
-		"# Type [" + Magenta("back") + "]    to return to the previous step.\n";
-	msg += Green("Do you confirm?") + "\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	this->printChoices();
+
+	std::stringstream ss;
+	ss << "# Give a look to the information you have provided, now it's the right time";
+	ss << " to decide if you want to change something.\n";
+	ss << "# Type [" << Formatter::magenta("confirm")
+	   << "] to conclude the character creation.\n";
+	ss << "# Type [" << Formatter::magenta("back")
+	   << "]    to return to the previous step.\n";
+	ss << Formatter::green("Do you confirm?") << "\n";
+	character->sendMsg(ss.str());
+	this->printError();
 }
 
-void ProcessNewConfirm::rollBack(Character *)
+void ProcessNewConfirm::rollBack()
 {
 }

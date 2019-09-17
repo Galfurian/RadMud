@@ -24,50 +24,46 @@
 #include "processNewStory.hpp"
 #include "formatter.hpp"
 
-bool ProcessNewPasswordConfirm::process(Character *character,
-										ArgumentHandler &args)
+bool ProcessNewPasswordConfirm::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
 	// Check if the player has typed BACK.
 	if (ToLower(input) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewPassword>();
+		auto newStep = std::make_shared<ProcessNewPassword>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	} else if (input != player->password) {
-		this->advance(character, "Password and confirmation do not agree.");
+		error = "Password and confirmation do not agree.";
+		this->advance();
 	} else {
 		// Create a shared pointer to the next step.
-		auto newStep = std::make_shared<ProcessNewStory>();
+		auto newStep = std::make_shared<ProcessNewStory>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->advance(character);
+		newStep->advance();
 		return true;
 	}
 	return false;
 }
 
-void ProcessNewPasswordConfirm::advance(Character *character,
-										const std::string &error)
+void ProcessNewPasswordConfirm::advance()
 {
 	// Print the choices.
-	this->printChoices(character);
-	character->sendMsg("%sRe-enter the password...%s\n", Formatter::green(),
-					   Formatter::reset());
-	if (!error.empty()) {
-		character->sendMsg("# " + error + "\n");
-	}
+	this->printChoices();
+	character->sendMsg(Formatter::green("Re-enter the password...\n"));
+	this->printError();
 }
 
-void ProcessNewPasswordConfirm::rollBack(Character *character)
+void ProcessNewPasswordConfirm::rollBack()
 {
 	// Do not stop this step, just go back to ProcessNewPassword.
-	auto newStep = std::make_shared<ProcessNewPassword>();
+	auto newStep = std::make_shared<ProcessNewPassword>(character);
 	character->inputProcessor = newStep;
-	newStep->rollBack(character);
+	newStep->rollBack();
 }

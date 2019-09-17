@@ -26,64 +26,62 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessNewWeight::process(Character *character, ArgumentHandler &args)
+bool ProcessNewWeight::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
 	// Check if the player has typed BACK.
 	if (ToLower(input) == "back") {
 		// Create a shared pointer to the previous step.
-		auto newStep = std::make_shared<ProcessNewDescription>();
+		auto newStep = std::make_shared<ProcessNewDescription>(character);
 		// Set the handler.
 		player->inputProcessor = newStep;
 		// Advance to the next step.
-		newStep->rollBack(character);
+		newStep->rollBack();
 		return true;
 	} else if (!IsNumber(input)) {
-		this->advance(character, "Not a valid weight.");
+		error = "Not a valid weight.";
+		this->advance();
 	} else {
 		int weight = ToNumber<int>(input);
 		if (weight < 40) {
-			this->advance(character, "You can't be a feather.");
+			error = "You can't be a feather.";
+			this->advance();
 		} else if (weight > 120) {
-			this->advance(character, "Too much.");
+			error = "Too much.";
+			this->advance();
 		} else {
 			player->weight = static_cast<unsigned int>(weight);
 			// Create a shared pointer to the next step.
-			auto newStep = std::make_shared<ProcessNewConfirm>();
+			auto newStep = std::make_shared<ProcessNewConfirm>(character);
 			// Set the handler.
 			player->inputProcessor = newStep;
 			// Advance to the next step.
-			newStep->advance(character);
+			newStep->advance();
 			return true;
 		}
 	}
 	return false;
 }
 
-void ProcessNewWeight::advance(Character *character, const std::string &error)
+void ProcessNewWeight::advance()
 {
 	// Print the choices.
-	this->printChoices(character);
-	auto Bold = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	auto Magenta = [](const std::string &s) {
-		return Formatter::magenta() + s + Formatter::reset();
-	};
-	std::string msg;
-	msg += "# " + Bold("Character's Weight.") + "\n";
-	msg += "# Choose the weight of your character.\n";
-	msg += "# Type [" + Magenta("back") + "] to return to the previous step.\n";
-	if (!error.empty()) {
-		msg += "# " + error + "\n";
-	}
-	character->sendMsg(msg);
+	this->printChoices();
+
+	std::stringstream ss;
+	ss << "# " << Formatter::bold("Character's Weight.") << "\n";
+	ss << "# Choose the weight of your character.\n";
+	ss << "# Type [" << Formatter::magenta("back")
+	   << "] to return to the previous step.\n";
+	character->sendMsg(ss.str());
+
+	this->printError();
 }
 
-void ProcessNewWeight::rollBack(Character *character)
+void ProcessNewWeight::rollBack()
 {
 	auto player = character->toPlayer();
 	player->weight = 0;
-	this->advance(character);
+	this->advance();
 }

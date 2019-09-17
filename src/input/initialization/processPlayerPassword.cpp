@@ -23,7 +23,7 @@
 #include "player.hpp"
 #include "mud.hpp"
 
-bool ProcessPlayerPassword::process(Character *character, ArgumentHandler &args)
+bool ProcessPlayerPassword::process(ArgumentHandler &args)
 {
 	auto player = character->toPlayer();
 	auto input = args.getOriginal();
@@ -35,11 +35,12 @@ bool ProcessPlayerPassword::process(Character *character, ArgumentHandler &args)
 			player->sendMsg("Goodbye!\n");
 			player->sendMsg("Too many attempts to guess the password!\n");
 		} else {
-			this->advance(character, "Incorrect password.");
+			error = "Incorrect password.";
+			this->advance();
 		}
 	} else {
 		// Set the handler.
-		player->inputProcessor = std::make_shared<ProcessInput>();
+		player->inputProcessor = std::make_shared<ProcessInput>(character);
 		// Entered the MUD.
 		player->enterGame();
 		// Set the connection state to playing.
@@ -49,14 +50,11 @@ bool ProcessPlayerPassword::process(Character *character, ArgumentHandler &args)
 	return false;
 }
 
-void ProcessPlayerPassword::advance(Character *character,
-									const std::string &error)
+void ProcessPlayerPassword::advance()
 {
-	if (!error.empty()) {
-		character->sendMsg("# " + error + "\n");
-	}
+	this->printError();
 }
 
-void ProcessPlayerPassword::rollBack(Character *)
+void ProcessPlayerPassword::rollBack()
 {
 }

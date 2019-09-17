@@ -23,6 +23,8 @@
 
 #include "argumentHandler.hpp"
 
+#include <cassert>
+
 class Character;
 
 /// @brief The main input processing function.
@@ -32,15 +34,21 @@ class Character;
 class ProcessInput {
 public:
 	/// @brief Constructor.
-	ProcessInput();
+	/// @param character The character which activated the processing function.
+	explicit ProcessInput(Character *_character) : character(_character)
+	{
+		assert(_character);
+	}
 
 	/// @brief Destructor.
-	virtual ~ProcessInput();
+	~ProcessInput() = default;
 
 	/// @brief Process the input with the given 'character'.
-	/// @param character The character which activated the processing function.
 	/// @param args      An argument handler which contains the input.
 	/// @return <b>True</b> with a correct execution,<br>
 	/// <b>False</b> otherwise.
-	virtual bool process(Character *character, ArgumentHandler &args);
+	virtual bool process(ArgumentHandler &args);
+
+protected:
+	Character *character;
 };
