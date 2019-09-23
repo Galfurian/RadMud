@@ -222,12 +222,12 @@ unsigned int CraftAction::getCooldown()
 	assert(actor && "Actor is nullptr");
 	assert(production && "Production is nullptr");
 	double requiredTime = production->time;
-	MudLog(LogLevel::Debug, "Base time  :%s", requiredTime);
-	for (auto knowledge : production->requiredKnowledge) {
+	MudLog(LogLevel::Debug, "Base time  : %f", requiredTime);
+	for (auto const &knowledge : production->requiredKnowledge) {
 		requiredTime -=
 			(requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
 	}
-	MudLog(LogLevel::Debug, "With skill :%s", requiredTime);
+	MudLog(LogLevel::Debug, "With skill : %f", requiredTime);
 	return static_cast<unsigned int>(requiredTime);
 }
 

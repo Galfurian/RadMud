@@ -37,11 +37,11 @@ SkillManager::SkillManager(Character *_owner) :
 bool SkillManager::addSkill(const std::shared_ptr<Skill> &skill,
 							const unsigned int &skillLevel)
 {
-	MudLog(LogLevel::Debug, "Add skill %s to %s.", skill->name,
-		   owner->getName());
 	// Check if the skill is already present.
 	if (this->findSkill(skill->vnum) != nullptr)
 		return false;
+//	MudLog(LogLevel::Debug, "Add skill %s to %s.", skill->name,
+//		   owner->getName());
 	// Create a new skill data for the given skill.
 	auto skillData = std::make_shared<SkillData>(skill, skillLevel);
 	// Add the new skill data to the list of skills.
@@ -53,8 +53,8 @@ bool SkillManager::addSkill(const std::shared_ptr<Skill> &skill,
 
 void SkillManager::checkIfUnlockedSkills()
 {
-	MudLog(LogLevel::Debug, "Checking if %s has unlocked some skills.",
-		   owner->getName());
+//	MudLog(LogLevel::Debug, "Checking if %s has unlocked some skills.",
+//		   owner->getName());
 	std::vector<unsigned int> masterSkills;
 	// Checks if the character has the pre-requisite for the skill.
 	auto HasPrerequisites =
@@ -74,17 +74,17 @@ void SkillManager::checkIfUnlockedSkills()
 	// Check if the character has the pre-requisite for the skill.
 	for (const auto &skill : Mud::instance().mudSkills) {
 		if (HasPrerequisites(skill)) {
+//			MudLog(LogLevel::Debug, "%s has unlocked %s.",
+//				   owner->getNameCapital(), skill->name);
 			this->addSkill(skill);
-			MudLog(LogLevel::Debug, "%s has unlocked %s.",
-				   owner->getNameCapital(), skill->name);
 		}
 	}
 }
 
 void SkillManager::updateSkillEffect(std::shared_ptr<SkillData> &skillData)
 {
-	MudLog(LogLevel::Debug, "Updating skills effects for %s, with skill %s.",
-		   owner->getName(), skillData->skill->name);
+//	MudLog(LogLevel::Debug, "Updating skills effects for %s, with skill %s.",
+//		   owner->getName(), skillData->skill->name);
 	// Get the skill.
 	const auto &skill = skillData->skill;
 	// Save the skill rank.
@@ -93,9 +93,15 @@ void SkillManager::updateSkillEffect(std::shared_ptr<SkillData> &skillData)
 	auto skillEffect = this->getSkillEffect(skillData);
 	if (skillEffect == nullptr) {
 		skillEffect = this->createSkillEffect(skillData);
+		MudLog(LogLevel::Debug, "Creating new skill effect %s.",
+			   skillEffect->name);
+		skillEffect->dump();
 	} else {
 		*(this) -= (*(skillEffect.get()));
 		skillEffect->reset();
+		MudLog(LogLevel::Debug, "Resetting skill effect    %s.",
+			   skillEffect->name);
+		skillEffect->dump();
 	}
 	// Update the skill effect.
 	skillEffect->applyModifier(skill->modifierManager, skillRank);

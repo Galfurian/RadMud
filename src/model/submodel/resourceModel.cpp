@@ -47,21 +47,18 @@ std::string ResourceModel::getTypeName() const
 bool ResourceModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		MudLog(LogLevel::Error, "Function list is empty (%s).",
-					this->name);
+		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 1) {
 		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Resource Model (%s).",
-					this->name);
+			   "Wrong number of parameters for Resource Model (%s).", name);
 		return false;
 	}
 	this->resourceType = ResourceType(ToNumber<unsigned int>(functionList[0]));
 	if (this->resourceType == ResourceType::None) {
-		MudLog(LogLevel::Error, "Wrong type of resource (%s).",
-					this->name);
+		MudLog(LogLevel::Error, "Wrong type of resource (%s).", name);
 		return false;
 	}
 	return true;

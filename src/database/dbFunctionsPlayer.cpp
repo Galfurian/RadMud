@@ -55,18 +55,17 @@ bool SQLiteDbms::loadPlayer(Player *player)
 	}
 	if (!this->loadPlayerItems(player)) {
 		MudLog(LogLevel::Error,
-					"Encountered an error during loading Player Items.");
+			   "Encountered an error during loading Player Items.");
 		return false;
 	}
 	if (!this->loadPlayerSkill(player)) {
 		MudLog(LogLevel::Error,
-					"Encountered an error during loading Player Skills.");
+			   "Encountered an error during loading Player Skills.");
 		return false;
 	}
 	if (!this->loadPlayerLuaVariables(player)) {
-		MudLog(
-			LogLevel::Error,
-			"Encountered an error during loading Player Lua Variables.");
+		MudLog(LogLevel::Error,
+			   "Encountered an error during loading Player Lua Variables.");
 		return false;
 	}
 	// Check the loaded player.
@@ -75,8 +74,7 @@ bool SQLiteDbms::loadPlayer(Player *player)
 		return false;
 	}
 	// Log the elapsed time.
-	MudLog(LogLevel::Debug,
-				"Elapsed Time (" + ToString(stopwatch.elapsed()) + " ms).");
+	MudLog(LogLevel::Debug, "Elapsed Time (%f ms).", stopwatch.elapsed());
 	return true;
 }
 
@@ -367,8 +365,7 @@ bool SQLiteDbms::loadPlayerLuaVariables(Player *player)
 		std::string variableName = result->getNextString();
 		std::string variableValue = result->getNextString();
 		player->luaVariables[variableName] = variableValue;
-		MudLog(LogLevel::Debug,
-					variableName + " = " + variableValue + ";");
+		MudLog(LogLevel::Debug, "%s = %s;", variableName, variableValue);
 	}
 	// release the resource.
 	result->release();

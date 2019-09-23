@@ -39,7 +39,7 @@ static fd_set exc_set;
 void Bailout(int signal)
 {
 	std::cout << "\n";
-	MudLog(LogLevel::Global, "Received signal " + ToString(signal) + "!");
+	MudLog(LogLevel::Global, "Received signal %d!", signal);
 	Mud::instance().shutDownSignal();
 }
 
@@ -712,8 +712,8 @@ void Mud::removeInactivePlayers()
 		// Get the player at the given position.
 		auto player = *iterator;
 		// Log the action of removing.
-		MudLog(LogLevel::Global,
-			   "Removing inactive player : " + player->getName());
+		MudLog(LogLevel::Global, "Removing inactive player : %s",
+			   player->getName());
 		// Only if the player has successfully logged in, save its state on DB.
 		if (player->logged_in) {
 			SQLiteDbms::instance().beginTransaction();
@@ -779,8 +779,7 @@ bool Mud::processNewConnection()
 		int port = ntohs(socketAddress.sin_port);
 		// Immediately close connections from blocked IP addresses.
 		if (blockedIPs.find(address) != blockedIPs.end()) {
-			MudLog(LogLevel::Global,
-				   "Rejected connection from " + address + "!");
+			MudLog(LogLevel::Global, "Rejected connection from %s!", address);
 			closeSocket(socketFileDescriptor);
 			continue;
 		}
@@ -788,10 +787,9 @@ bool Mud::processNewConnection()
 		// Insert the player in the list of players.
 		this->addPlayer(player);
 		MudLog(LogLevel::Global, "#--------- New Connection ---------#");
-		MudLog(LogLevel::Global,
-			   " Socket  : " + ToString(socketFileDescriptor));
-		MudLog(LogLevel::Global, " Address : " + address);
-		MudLog(LogLevel::Global, " Port    : " + ToString(port));
+		MudLog(LogLevel::Global, " Socket  : %d", socketFileDescriptor);
+		MudLog(LogLevel::Global, " Address : %s", address);
+		MudLog(LogLevel::Global, " Port    : %d", port);
 		MudLog(LogLevel::Global, "#----------------------------------#");
 		// Create a shared pointer to the next step.
 		auto newStep = std::make_shared<ProcessPlayerName>(player);
@@ -1006,8 +1004,7 @@ bool Mud::startMud()
 			   "Something gone wrong during initialization of comunication.");
 		return false;
 	}
-	MudLog(LogLevel::Global,
-		   "Booting Done (" + ToString(stopwatch.elapsed()) + ").");
+	MudLog(LogLevel::Global, "Booting Done (%f).", stopwatch.elapsed());
 	if (!this->afterBootActions()) {
 		MudLog(LogLevel::Error, "Afterboot actions went wrong.");
 		return false;
@@ -1035,8 +1032,7 @@ bool Mud::stopMud()
 	if (!SQLiteDbms::instance().closeDatabase()) {
 		MudLog(LogLevel::Error, "The database has not been closed correctly.");
 	}
-	MudLog(LogLevel::Global,
-		   "Shutdown Completed (" + ToString(stopwatch.elapsed()) + ").");
+	MudLog(LogLevel::Global, "Shutdown Completed (%f).", stopwatch.elapsed());
 
 	///////////////////////////////////////////////////////////////////////////
 	size_t bIn = MudUpdater::instance().getBandIn();
@@ -1045,9 +1041,9 @@ bool Mud::stopMud()
 	// Print some statistics.
 	MudLog(LogLevel::Info, "");
 	MudLog(LogLevel::Info, "Statistics");
-	MudLog(LogLevel::Info, "    In            = " + ToString(bIn) + " Bytes.");
-	MudLog(LogLevel::Info, "    Output        = " + ToString(bOut) + " Bytes.");
-	MudLog(LogLevel::Info, "    Uncompressed  = " + ToString(bUnc) + " Bytes.");
+	MudLog(LogLevel::Info, "    In            = %d Bytes.", bIn);
+	MudLog(LogLevel::Info, "    Output        = %d Bytes.", bOut);
+	MudLog(LogLevel::Info, "    Uncompressed  = %d Bytes.", bUnc);
 	MudLog(LogLevel::Info, "");
 	return true;
 }

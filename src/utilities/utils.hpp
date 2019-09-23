@@ -36,14 +36,14 @@
 #define CorrectAssert(e)                                                       \
 	((e) ? true :                                                              \
 		   (std::cerr << "Assertion :" #e << "\n",                             \
-			std::cerr << "File      :" << std::string(__FILE__) << "\n",       \
-			std::cerr << "Line      :" << ToString(__LINE__) << "\n", false))
+			std::cerr << "File      :" << __FILE__ << "\n",       \
+			std::cerr << "Line      :" << __LINE__ << "\n", false))
 
 /// Allows to define a non-aborting assertion for wrong guards.
 #define WrongAssert(e)                                                         \
 	((e) ? (std::cerr << "Assertion :" #e << "\n",                             \
-			std::cerr << "File      :" << std::string(__FILE__) << "\n",       \
-			std::cerr << "Line      :" << ToString(__LINE__) << "\n", true) :  \
+			std::cerr << "File      :" << __FILE__ << "\n",       \
+			std::cerr << "Line      :" << __LINE__ << "\n", true) :  \
 		   false)
 
 #define Abs(x) ((x) < 0 ? -(x) : (x))

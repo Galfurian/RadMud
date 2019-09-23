@@ -108,8 +108,7 @@ ActionStatus DismemberAction::perform()
 		// Roll the DC and check if the action is a success. However, the
 		// actor can keep all the things he has dismembered til now.
 		auto DCRoll = TRand<int>(1, 20) + butchery;
-		MudLog(LogLevel::Debug, "DC: %s vs %s", DCRoll,
-					resources.difficulty);
+		MudLog(LogLevel::Debug, "DC: %d vs %d", DCRoll, resources.difficulty);
 		if (DCRoll < resources.difficulty) {
 			actor->sendMsg("You stop to dismember %s.", corpse->getName(true));
 			return ActionStatus::Error;
@@ -149,10 +148,10 @@ unsigned int DismemberAction::getCooldown()
 	assert(corpse && "Corpse is nullptr");
 	assert(bodyPart && "BodyPart is nullptr");
 	double required = 6;
-	MudLog(LogLevel::Debug, "Base time  :%s", required);
+	MudLog(LogLevel::Debug, "Base time  : %f", required);
 	required -=
 		(required * actor->effectManager.getKnowledge(Knowledge::Butchery)) /
 		100;
-	MudLog(LogLevel::Debug, "With skill :%s", required);
+	MudLog(LogLevel::Debug, "With skill : %f", required);
 	return static_cast<unsigned int>(required);
 }

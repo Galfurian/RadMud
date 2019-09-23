@@ -231,11 +231,13 @@ public:
 	/// @param exceptions The list of exceptions.
 	/// @param args  Packed arguments.
 	template <typename... Args>
-	void sendToAll(const std::string &message,
+	void sendToAll(std::string const &fmt,
 				   const std::vector<Character *> &exceptions,
 				   const Args &... args)
 	{
-		sendToAll(BuildStr(message, args...), exceptions);
+		std::stringstream ss;
+		tfm::format(ss, fmt.c_str(), args...);
+		sendToAll(ss.str(), exceptions);
 	}
 
 	/// @brief Send a message to all the characters inside the room which
@@ -248,15 +250,17 @@ public:
 
 	/// @brief Send a message to all the characters inside the room
 	///         which pass the checking function.
-	/// @param message        The message to send.
+	/// @param fmt            The message to send.
 	/// @param checkException The checking function.
 	/// @param args           The rest of the arguments.
 	template <typename... Args>
-	void funcSendToAll(const std::string &message,
+	void funcSendToAll(std::string const &fmt,
 					   std::function<bool(Character *character)> checkException,
 					   const Args &... args)
 	{
-		funcSendToAll(BuildStr(message, args...), checkException);
+		std::stringstream ss;
+		tfm::format(ss, fmt.c_str(), args...);
+		funcSendToAll(ss.str(), checkException);
 	}
 
 	/// @brief Define operator lesser than.

@@ -48,15 +48,13 @@ std::string ArmorModel::getTypeName() const
 bool ArmorModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		MudLog(LogLevel::Error, "Function list is empty (%s).",
-					this->name);
+		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 3) {
 		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Armor Model (%s).",
-					this->name);
+			   "Wrong number of parameters for Armor Model (%s).", name);
 		return false;
 	}
 	this->size =

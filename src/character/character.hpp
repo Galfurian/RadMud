@@ -31,7 +31,6 @@
 #include "item.hpp"
 #include "faction.hpp"
 #include "bodyPart.hpp"
-#include "stringBuilder.hpp"
 #include "effectManager.hpp"
 #include "processInput.hpp"
 #include "combatAction.hpp"
@@ -526,12 +525,14 @@ public:
 	virtual void sendMsg(const std::string &msg);
 
 	/// @brief Sends a message to the character.
-	/// @param msg   The message to send
-	/// @param args  Packed arguments.
+	/// @param fmt  The message to send
+	/// @param args Packed arguments.
 	template <typename... Args>
-	void sendMsg(const std::string &msg, const Args &... args)
+	void sendMsg(std::string const &fmt, const Args &... args)
 	{
-		this->sendMsg(BuildStr(msg, args...));
+		std::stringstream ss;
+		tfm::format(ss, fmt.c_str(), args...);
+		this->sendMsg(ss.str());
 	}
 
 protected:

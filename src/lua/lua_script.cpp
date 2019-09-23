@@ -35,7 +35,7 @@
 void LuaLog(std::string message)
 {
 	if (!message.empty()) {
-		MudLog(LogLevel::Info, "[LUA]" + message);
+		MudLog(LogLevel::Info, "[LUA] %s", message);
 	}
 }
 
@@ -158,10 +158,10 @@ int SetLuaPath(lua_State *L, const char *path)
 	// Grab path string from top of stack
 	std::string cur_path = lua_tostring(L, -1);
 	// Do your path magic here
-	MudLog(LogLevel::Debug, "Lua old package.path : %s", cur_path.c_str());
+	MudLog(LogLevel::Debug, "Lua old package.path : %s", cur_path);
 	cur_path.push_back(';');
 	cur_path.append(path);
-	MudLog(LogLevel::Debug, "Lua new package.path : %s", cur_path.c_str());
+	MudLog(LogLevel::Debug, "Lua new package.path : %s", cur_path);
 	// Get rid of the string on the stack we just pushed on line 5
 	lua_pop(L, 1);
 	// Push the new one
@@ -641,6 +641,6 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 	auto path = Mud::instance().getMudSystemDirectory() + "lua/" + scriptFile;
 	if (luaL_dofile(L, path.c_str()) != LUABRIDGE_LUA_OK) {
 		MudLog(LogLevel::Error, "Can't open script %s.", scriptFile);
-		MudLog(LogLevel::Error, "Error :%s", std::string(lua_tostring(L, -1)));
+		MudLog(LogLevel::Error, "Error :%s", lua_tostring(L, -1));
 	}
 }

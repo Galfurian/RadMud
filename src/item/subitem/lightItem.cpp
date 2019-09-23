@@ -155,8 +155,8 @@ bool LightItem::getAmountToRefill(Item *item, unsigned int &amount,
 	}
 	// Check if the weight of the fuel exceeds the available space.
 	if ((maxWeight - contentWeight) < fuelWeight) {
-		MudLog(LogLevel::Debug, "(%s - %s) < %s", maxWeight, contentWeight,
-					fuelWeight);
+		MudLog(LogLevel::Debug, "(%f - %f) < %f", maxWeight, contentWeight,
+			   fuelWeight);
 		error = this->getNameCapital(true) + " is already at full capacity.";
 		return false;
 	}

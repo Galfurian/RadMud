@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "stringBuilder.hpp"
+#include "tinyformat.hpp"
 
 /// @brief Enumerator which identifies the severity of the log entry.
 enum class LogLevel {
@@ -44,10 +44,12 @@ void _mudlog(const char *file, int line, const LogLevel &level,
 /// @param msg   The message to log.
 /// @param args  Packed arguments.
 template <typename... Args>
-inline void _mudlog(const char *file, int line, const LogLevel &level,
-					const std::string &msg, const Args &... args)
+void _mudlog(const char *file, int line, const LogLevel &level,
+			 std::string const &fmt, const Args &... args)
 {
-	_mudlog(file, line, level, BuildStr(msg, args...));
+	std::stringstream ss;
+	tfm::format(ss, fmt.c_str(), args...);
+	_mudlog(file, line, level, ss.str());
 }
 
 #define MudLog(level, ...) _mudlog(__FILE__, __LINE__, level, __VA_ARGS__)

@@ -50,7 +50,7 @@ bool CombatHandler::addOpponent(Character *character, unsigned int initAggro)
 		opponents.push_back(std::make_shared<Aggression>(character, initAggro));
 		// Sort the list.
 		this->sortList();
-		MudLog(LogLevel::Debug, "%s engage %s with %s.",
+		MudLog(LogLevel::Debug, "%s engage %s with %d.",
 					owner->getNameCapital(), character->getName(), initAggro);
 		this->printList();
 		return true;

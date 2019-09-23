@@ -45,8 +45,8 @@ Item::Item() :
 
 Item::~Item()
 {
-	MudLog(LogLevel::Debug, "Deleted item\t\t[%s]\t\t(%s)",
-		   ToString(this->vnum), this->getNameCapital());
+	MudLog(LogLevel::Debug, "Deleted item\t\t[%d]\t\t(%s)", vnum,
+		   this->getNameCapital());
 }
 
 bool Item::check()
@@ -297,8 +297,8 @@ Item *Item::removeFromStack(Character *actor, unsigned int &_quantity)
 {
 	if (this->quantity > _quantity) {
 		// Generate a copty of this item with the given quantity.
-		auto newStack = model->createItem(actor->getName(), composition,
-												false, quality, _quantity);
+		auto newStack = model->createItem(actor->getName(), composition, false,
+										  quality, _quantity);
 		if (newStack != nullptr) {
 			// Actually reduce the quantity.
 			this->quantity -= _quantity;
@@ -574,8 +574,7 @@ void Item::setOccupiedBodyParts(
 
 bool Item::operator<(Item &rhs) const
 {
-	MudLog(LogLevel::Debug, "%s < %s", ToString(this->vnum),
-		   ToString(rhs.vnum));
+	MudLog(LogLevel::Debug, "%s < %s", vnum, rhs.vnum);
 	return getName() < rhs.getName();
 }
 

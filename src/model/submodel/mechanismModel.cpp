@@ -53,15 +53,13 @@ std::string MechanismModel::getTypeName() const
 bool MechanismModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		MudLog(LogLevel::Error, "Function list is empty (%s).",
-					this->name);
+		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 6) {
 		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Mechanism Model (%s).",
-					this->name);
+			   "Wrong number of parameters for Mechanism Model (%s).", name);
 		return false;
 	}
 	this->mechanismType =

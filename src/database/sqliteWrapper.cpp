@@ -99,8 +99,8 @@ bool SQLiteWrapper::updateInMemoryDatabase()
 	errorCode = this->loadOrSaveDb(true);
 	errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
 	if (errorCode != SQLITE_OK) {
-		MudLog(LogLevel::Error, "Error while saving the "
-									 "in-memory database to file.");
+		MudLog(LogLevel::Error,
+			   "Error while saving the in-memory database to file.");
 		return false;
 	}
 	return true;
@@ -151,8 +151,8 @@ ResultSet *SQLiteWrapper::executeSelect(const char *query)
 		}
 		errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
 		errorCode = sqlite3_finalize(dbDetails.dbStatement);
-		MudLog(LogLevel::Error, "Error code :" + ToString(errorCode));
-		MudLog(LogLevel::Error, "Last error :" + errorMessage);
+		MudLog(LogLevel::Error, "Error code : %d", errorCode);
+		MudLog(LogLevel::Error, "Last error : %s", errorMessage);
 	}
 	return nullptr;
 }
@@ -160,15 +160,14 @@ ResultSet *SQLiteWrapper::executeSelect(const char *query)
 int SQLiteWrapper::executeQuery(const char *query)
 {
 	if (!isConnected()) {
-		MudLog(LogLevel::Error,
-					"Cannot execute query, db is not connected!");
+		MudLog(LogLevel::Error, "Cannot execute query, db is not connected!");
 		return 0;
 	}
 	errorCode = sqlite3_exec(dbDetails.dbConnection, query, NULL, NULL, NULL);
 	errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
 	if (errorCode != SQLITE_OK) {
-		MudLog(LogLevel::Error, "Error code :" + ToString(errorCode));
-		MudLog(LogLevel::Error, "Last error :" + errorMessage);
+		MudLog(LogLevel::Error, "Error code : %d", errorCode);
+		MudLog(LogLevel::Error, "Last error : %s", errorMessage);
 		return 0;
 	}
 	return sqlite3_total_changes(dbDetails.dbConnection);
@@ -206,8 +205,8 @@ bool SQLiteWrapper::release()
 	errorCode = sqlite3_finalize(dbDetails.dbStatement);
 	if (errorCode != SQLITE_OK) {
 		errorMessage = sqlite3_errmsg(dbDetails.dbConnection);
-		MudLog(LogLevel::Error, "Error code :" + ToString(errorCode));
-		MudLog(LogLevel::Error, "Last error :" + errorMessage);
+		MudLog(LogLevel::Error, "Error code : %d", errorCode);
+		MudLog(LogLevel::Error, "Last error : %s", errorMessage);
 		return false;
 	}
 	num_col = 0;

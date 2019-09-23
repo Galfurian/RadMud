@@ -51,7 +51,7 @@ bool CurrencyModel::setModel(const std::string &source)
 	if (functionList.size() != 0) {
 		MudLog(LogLevel::Error,
 					"Wrong number of parameters for Currency Model (%s).",
-					this->name);
+					name);
 		return false;
 	}
 	return true;

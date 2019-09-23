@@ -47,15 +47,13 @@ std::string SeedModel::getTypeName() const
 bool SeedModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		MudLog(LogLevel::Error, "Function list is empty (%s).",
-					this->name);
+		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 1) {
 		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Seed Model (%s).",
-					this->name);
+			   "Wrong number of parameters for Seed Model (%s).", name);
 		return false;
 	}
 	this->seedType =

@@ -310,15 +310,14 @@ void Player::processRead()
 	}
 	ssize_t nRead = recv(psocket, &buffer, BUFSIZE - 1, MSG_DONTWAIT);
 	if (nRead <= 0) {
-		MudLog(LogLevel::Error, "Socket recv failed: %s", ToString(errno));
+		MudLog(LogLevel::Error, "Socket recv failed: %d", errno);
 		// Close the socket.
 		if (Mud::instance().closeSocket(psocket)) {
 			MudLog(LogLevel::Error,
-						"Something has gone wrong during socket closure.");
+				   "Something has gone wrong during socket closure.");
 		}
 		// Log the error.
-		MudLog(LogLevel::Error,
-					"Connection " + ToString(psocket) + " closed.");
+		MudLog(LogLevel::Error, "Connection %d closed.", psocket);
 		// Clear the socket.
 		this->psocket = NO_SOCKET_COMMUNICATION;
 		// Close the connection.
@@ -388,8 +387,7 @@ void Player::processWrite()
 		// Check for bad write.
 		if (nWrite <= 0) {
 			if (errno == EPIPE) {
-				MudLog(LogLevel::Error,
-							"Sending on a closed connection...");
+				MudLog(LogLevel::Error, "Sending on a closed connection...");
 			} else {
 				MudLog(LogLevel::Error, "Unknown error during Send...");
 			}

@@ -130,10 +130,10 @@ bool SQLiteDbms::loadTables()
 {
 	// Status variable for loading operation.
 	bool status = true;
-	for (auto iterator : loaders) {
-		MudLog(LogLevel::Debug, "    Loading Table: " + iterator.table + ".");
+	for (auto const &it : loaders) {
+		MudLog(LogLevel::Debug, "    Loading Table: %s.", it.table);
 		// Execute the query.
-		auto result = dbConnection.executeSelect(iterator.getQuery().c_str());
+		auto result = dbConnection.executeSelect(it.getQuery().c_str());
 		// Check the result.
 		if (result == nullptr) {
 			return false;
@@ -142,10 +142,10 @@ bool SQLiteDbms::loadTables()
 			// Iterate through the rows.
 			while (result->next()) {
 				// Call the row parsing function.
-				iterator.loadFunction(result);
+				it.loadFunction(result);
 			}
 		} catch (SQLiteException &e) {
-			MudLog(LogLevel::Error, std::string(e.what()));
+			MudLog(LogLevel::Error, e.what());
 			// Release the resource.
 			result->release();
 			status = false;
@@ -301,7 +301,6 @@ void SQLiteDbms::endTransaction()
 
 void SQLiteDbms::showLastError() const
 {
-	MudLog(LogLevel::Error,
-		   "Error code :" + ToString(dbConnection.getLastErrorCode()));
-	MudLog(LogLevel::Error, "Last error :" + dbConnection.getLastErrorMsg());
+	MudLog(LogLevel::Error, "Error code : %d", dbConnection.getLastErrorCode());
+	MudLog(LogLevel::Error, "Last error : %s", dbConnection.getLastErrorMsg());
 }

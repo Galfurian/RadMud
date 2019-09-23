@@ -169,12 +169,12 @@ unsigned int BuildAction::getCooldown()
 	assert(actor && "Actor is nullptr");
 	assert(schematics && "Schematics is nullptr");
 	double requiredTime = schematics->time;
-	MudLog(LogLevel::Debug, "Base time  :%s", requiredTime);
-	for (auto knowledge : schematics->requiredKnowledge) {
+	MudLog(LogLevel::Debug, "Base time  : %f", requiredTime);
+	for (auto const &knowledge : schematics->requiredKnowledge) {
 		requiredTime -=
 			(requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
 	}
-	MudLog(LogLevel::Debug, "With skill :%s", requiredTime);
+	MudLog(LogLevel::Debug, "With skill : %f", requiredTime);
 	return static_cast<unsigned int>(requiredTime);
 }
 

@@ -218,7 +218,7 @@ bool GetFileContents(const char *filename, std::string &contents)
 		}
 		return true;
 	}
-	MudLog(LogLevel::Error, "Can't open :" + std::string(filename));
+	MudLog(LogLevel::Error, "Can't open : %s", filename);
 	return false;
 }
 

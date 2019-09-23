@@ -47,15 +47,13 @@ std::string KeyModel::getTypeName() const
 bool KeyModel::setModel(const std::string &source)
 {
 	if (source.empty()) {
-		MudLog(LogLevel::Error, "Function list is empty (%s).",
-					this->name);
+		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 0) {
 		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Key Model (%s).",
-					this->name);
+			   "Wrong number of parameters for Key Model (%s).", name);
 		return false;
 	}
 	return true;
