@@ -26,6 +26,7 @@
 #include "character/mobileModel.hpp"
 #include "utilities/CMacroWrapper.hpp"
 #include "utilities/stopwatch.hpp"
+
 #include <unistd.h>
 #include <signal.h>
 

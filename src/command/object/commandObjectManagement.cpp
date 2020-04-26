@@ -69,6 +69,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 				room->removeItem(iterator);
 				// Add the item to the player's inventory.
 				character->addInventoryItem(iterator);
+				// If the item was a temporary item, make it permanent.
+				ClearFlag(iterator->flags, ItemFlag::Temporary);
 				// Set that he has picked up something.
 				pickedUpSomething = true;
 			}
@@ -141,6 +143,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			room->removeItem(item);
 			// Add the item to the player's inventory.
 			character->addInventoryItem(item);
+			// If the item was a temporary item, make it permanent.
+			ClearFlag(item->flags, ItemFlag::Temporary);
 			// Send the messages.
 			character->sendMsg("You take %s.\n", item->getName(true));
 			room->sendToAll("%s has picked up %s.\n", { character },
@@ -155,6 +159,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			}
 			// Add the item to the player's inventory.
 			character->addInventoryItem(newStack);
+			// If the item was a temporary item, make it permanent.
+			ClearFlag(newStack->flags, ItemFlag::Temporary);
 			// Send the messages.
 			character->sendMsg("You take a part of %s.\n", item->getName(true));
 			room->sendToAll("%s has picked up part of %s.\n", { character },
@@ -234,6 +240,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 				container->takeOut(iterator);
 				// Add the item to the player's inventory.
 				character->addInventoryItem(iterator);
+				// If the item was a temporary item, make it permanent.
+				ClearFlag(iterator->flags, ItemFlag::Temporary);
 				// Set that he has picked up something.
 				takenSomething = true;
 			}
@@ -288,6 +296,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			container->takeOut(item);
 			// Add the item to the player's inventory.
 			character->addInventoryItem(item);
+			// If the item was a temporary item, make it permanent.
+			ClearFlag(item->flags, ItemFlag::Temporary);
 			// Send the messages.
 			character->sendMsg("You take out %s from %s.\n",
 							   item->getName(true), container->getName(true));
@@ -304,6 +314,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			}
 			// Add the item to the player's inventory.
 			character->addInventoryItem(newStack);
+			// If the item was a temporary item, make it permanent.
+			ClearFlag(newStack->flags, ItemFlag::Temporary);
 			// Send the messages.
 			character->sendMsg("You take out part of %s from %s.\n",
 							   item->getName(true), container->getName(true));

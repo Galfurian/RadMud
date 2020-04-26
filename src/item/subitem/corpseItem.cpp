@@ -68,7 +68,7 @@ void CorpseItem::getSheet(Table &sheet) const
 	// Add a divider.
 	sheet.addDivider();
 	// Set the values.
-	for (auto it : remainingBodyParts) {
+	for (const auto &it : remainingBodyParts) {
 		sheet.addRow({ "Body Part", it->name });
 	}
 }

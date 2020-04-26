@@ -63,7 +63,7 @@ Mobile::~Mobile()
 		room->removeCharacter(this);
 	}
 	MudLog(LogLevel::Debug, "Deleted mobile\t\t\t\t(%s)",
-				this->getNameCapital());
+		   this->getNameCapital());
 }
 
 bool Mobile::setAbilities(const std::string &source)
@@ -225,10 +225,16 @@ void Mobile::kill()
 		// Add the item to the mud.
 		Mud::instance().addItem(item);
 		// Evaluate the minimum and maximum condition.
-		auto min = (item->getMaxCondition() / 100) * 10;
-		auto max = (item->getMaxCondition() / 100) * 50;
+		double max_cond = static_cast<float>(item->getMaxCondition());
+		double min = (max_cond / 100) * 10;
+		double max = (max_cond / 100) * 50;
 		// Set a random condition for the new item.
 		item->condition = TRandReal<double>(min, max);
+		// For debugging purposes print the condintion of the items.
+		MudLog(LogLevel::Debug,
+			   "Item [%d]'%s' condition : %d (max cond:%d, roll [%2d-%2d]).",
+			   item->vnum, item->getName().c_str(), item->condition,
+			   item->getMaxCondition(), min, max);
 	};
 	// Before calling the character kill function, set the vnum for the new
 	//  items, and set the item condition to a random value from 10% to 50%.
@@ -302,7 +308,7 @@ bool Mobile::saveOnDB()
 	}
 	if (room == nullptr) {
 		MudLog(LogLevel::Error,
-					"Trying to save mobile while it is in no room.");
+			   "Trying to save mobile while it is in no room.");
 		return false;
 	}
 	std::vector<std::string> args;

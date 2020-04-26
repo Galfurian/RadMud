@@ -23,7 +23,7 @@
 #pragma once
 
 #include <chrono>
-#include <list>
+#include <set>
 
 // Forward declarations.
 class Item;
@@ -68,7 +68,7 @@ private:
 
 	// Garbage collection structures.
 	/// List of item that has to be descroyed at the end of the mud cycle.
-	std::list<Item *> itemToDestroy;
+	std::set<Item *> itemToDestroy;
 
 	/// @brief Constructor.
 	MudUpdater();

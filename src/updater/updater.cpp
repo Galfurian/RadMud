@@ -78,7 +78,10 @@ void MudUpdater::updateBandUncompressed(const size_t &size)
 
 void MudUpdater::addItemToDestroy(Item *item)
 {
-	itemToDestroy.insert(itemToDestroy.end(), item);
+	if (!itemToDestroy.insert(item).second) {
+		MudLog(LogLevel::Debug,
+			   "Failed to insert item %d to the list of items to destroy.");
+	}
 }
 
 unsigned int MudUpdater::getTicSize() const
@@ -167,21 +170,22 @@ void MudUpdater::advanceTime()
 	// [DELTA] Perform characters pending actions.
 	this->performActions();
 	// [DELTA] Destroy all the registered items.
-	for (auto it = itemToDestroy.begin(); it != itemToDestroy.end(); ++it) {
-		// Back-up the iterator.
-		auto currentIt = it++;
-		// Delete the item.
-		auto item = (*currentIt);
-		if (!item->removeOnDB()) {
-			MudLog(LogLevel::Error, "Failed to remove item from DB");
+	for (const auto & item : itemToDestroy) {
+		// If the item is not temporary, remove it from DB.
+		if (!HasFlag(item->flags, ItemFlag::Temporary)) {
+			if (!item->removeOnDB()) {
+				MudLog(LogLevel::Error, "Failed to remove item from DB");
+			}
 		}
-		if (!item->removeFromMud()) {
+		if (item->removeFromMud()) {
+			MudLog(LogLevel::Debug, "Successfully removed item from MUD");
+		} else {
 			MudLog(LogLevel::Error, "Failed to remove item from MUD");
 		}
 		delete (item);
-		// Erase the element.
-		itemToDestroy.erase(currentIt);
 	}
+	// Erase the element.
+	itemToDestroy.clear();
 }
 
 bool MudUpdater::hasTicPassed()
