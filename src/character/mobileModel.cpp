@@ -31,7 +31,7 @@ Mobile *MobileModel::spawn(Room *spawnRoom, unsigned int mobileVnum)
 	if (spawnRoom == nullptr)
 		return nullptr;
 	if (mobileVnum == 0) {
-		mobileVnum = Mud::instance().getMaxVnumMobile() + 1;
+		mobileVnum = Mud::instance().getFreeVnumMobile();
 	}
 	// Initialize the mobile.
 	auto mob = new Mobile(shared_from_this());

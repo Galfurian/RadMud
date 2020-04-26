@@ -55,6 +55,7 @@ class MobileModel;
 
 #ifdef __linux__
 
+#include <unordered_set>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -116,11 +117,11 @@ private:
 	/// Contains the time when the mud has been booted.
 	time_t _bootTime;
 	/// Highest value of vnum for rooms.
-	unsigned int _maxVnumRoom;
+	std::unordered_set<unsigned int> _used_vnum_room;
 	/// Highest value of vnum for items.
-	unsigned int _maxVnumItem;
+	std::unordered_set<unsigned int> _used_vnum_item;
 	/// Highest value of vnum for mobiles.
-	unsigned int _maxVnumMobile;
+	std::unordered_set<unsigned int> _used_vnum_mobile;
 
 	/// Mud weight measure.
 	const std::string _mudMeasure;
@@ -416,18 +417,15 @@ public:
 
 	/// @brief Returns the current maximum vnum used for rooms.
 	/// @return The maximum rooms vnum.
-	unsigned int getMaxVnumRoom() const;
+	unsigned int getFreeVnumRoom() const;
 
 	/// @brief Returns the current maximum vnum used for items.
 	/// @return The maximum items vnum.
-	unsigned int getMaxVnumItem() const;
+	unsigned int getFreeVnumItem() const;
 
 	/// @brief Returns the current maximum vnum used for mobiles.
 	/// @return The maximum mobiles vnum.
-	inline unsigned int getMaxVnumMobile() const
-	{
-		return _maxVnumMobile;
-	}
+	unsigned int getFreeVnumMobile() const;
 
 	/// @brief Provides an unique vnum for an area.
 	unsigned int getUniqueAreaVnum() const;

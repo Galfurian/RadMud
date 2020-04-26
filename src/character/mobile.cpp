@@ -221,7 +221,7 @@ void Mobile::kill()
 {
 	auto generateItem = [&](Item *item) {
 		// Set the item vnum.
-		item->vnum = Mud::instance().getMaxVnumItem() + 1;
+		item->vnum = Mud::instance().getFreeVnumItem();
 		// Add the item to the mud.
 		Mud::instance().addItem(item);
 		// Evaluate the minimum and maximum condition.

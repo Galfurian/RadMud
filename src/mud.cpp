@@ -26,6 +26,7 @@
 #include "character/mobileModel.hpp"
 #include "utilities/CMacroWrapper.hpp"
 #include "utilities/stopwatch.hpp"
+#include "utilities/utils.hpp"
 
 #include <unistd.h>
 #include <signal.h>
@@ -50,9 +51,9 @@ Mud::Mud() :
 	_maxDesc(-1),
 	_shutdownSignal(),
 	_bootTime(time(NULL)),
-	_maxVnumRoom(1),
-	_maxVnumItem(1),
-	_maxVnumMobile(1),
+	_used_vnum_room(),
+	_used_vnum_item(),
+	_used_vnum_mobile(),
 	_mudMeasure("stones"),
 	_mudDatabaseName("radmud.db"),
 	_mudSystemDirectory("../system/"),
@@ -201,9 +202,11 @@ bool Mud::addMobile(Mobile *mobile)
 			return false;
 		}
 	}
-	_maxVnumMobile = std::max(mobile->vnum, _maxVnumMobile);
-	mudMobiles.emplace_back(mobile);
-	return true;
+	if (_used_vnum_mobile.insert(mobile->vnum).second) {
+		mudMobiles.emplace_back(mobile);
+		return true;
+	}
+	return false;
 }
 
 bool Mud::remMobile(unsigned int vnum)
@@ -214,14 +217,16 @@ bool Mud::remMobile(unsigned int vnum)
 			return true;
 		}
 	}
+	_used_vnum_mobile.erase(vnum);
 	return false;
 }
 
 bool Mud::addItem(Item *item)
 {
-	if (mudItems.insert(std::make_pair(item->vnum, item)).second) {
-		_maxVnumItem = std::max(_maxVnumItem, item->vnum);
-		return true;
+	if (_used_vnum_item.insert(item->vnum).second) {
+		if (mudItems.insert(std::make_pair(item->vnum, item)).second) {
+			return true;
+		}
 	}
 	return false;
 }
@@ -234,16 +239,18 @@ bool Mud::remItem(Item *item)
 			return true;
 		}
 	}
+	_used_vnum_item.erase(item->vnum);
 	return false;
 }
 
 bool Mud::addRoom(Room *room)
 {
-	bool result = mudRooms.insert(std::make_pair(room->vnum, room)).second;
-	if (result) {
-		_maxVnumRoom = std::max(_maxVnumRoom, room->vnum);
+	if (_used_vnum_room.insert(room->vnum).second) {
+		if (mudRooms.insert(std::make_pair(room->vnum, room)).second) {
+			return true;
+		}
 	}
-	return result;
+	return false;
 }
 
 bool Mud::remRoom(Room *room)
@@ -254,6 +261,7 @@ bool Mud::remRoom(Room *room)
 			return true;
 		}
 	}
+	_used_vnum_room.erase(room->vnum);
 	return false;
 }
 
@@ -649,14 +657,31 @@ double Mud::getUpTime() const
 	return difftime(time(NULL), _bootTime);
 }
 
-unsigned int Mud::getMaxVnumRoom() const
+unsigned int Mud::getFreeVnumRoom() const
 {
-	return _maxVnumRoom;
+	static unsigned int _min = 1UL, _max = 1000000UL;
+	unsigned int vnum;
+	while (_used_vnum_item.count(vnum = TRand<unsigned int>(_min, _max)) > 0)
+		;
+	return vnum;
 }
 
-unsigned int Mud::getMaxVnumItem() const
+unsigned int Mud::getFreeVnumItem() const
 {
-	return _maxVnumItem;
+	static unsigned int _min = 1UL, _max = 1000000UL;
+	unsigned int vnum;
+	while (_used_vnum_item.count(vnum = TRand<unsigned int>(_min, _max)) > 0)
+		;
+	return vnum;
+}
+
+unsigned int Mud::getFreeVnumMobile() const
+{
+	static unsigned int _min = 1UL, _max = 1000000UL;
+	unsigned int vnum;
+	while (_used_vnum_mobile.count(vnum = TRand<unsigned int>(_min, _max)) > 0)
+		;
+	return vnum;
 }
 
 unsigned int Mud::getUniqueAreaVnum() const

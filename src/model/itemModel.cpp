@@ -131,7 +131,7 @@ Item *ItemModel::createItem(std::string maker, Material *composition,
 		// Set the item a temporary.
 		SetFlag(newItem->flags, ItemFlag::Temporary);
 	} else {
-		newItem->vnum = Mud::instance().getMaxVnumItem() + 1;
+		newItem->vnum = Mud::instance().getFreeVnumItem();
 	}
 	newItem->model = this->shared_from_this();
 	newItem->quantity = quantity;

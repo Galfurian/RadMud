@@ -507,7 +507,7 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 	Room *new_room = new Room();
 	// Create a new room.
 	MudLog(LogLevel::Info, "[CreateRoom] Setting up the room...");
-	new_room->vnum = Mud::instance().getMaxVnumRoom() + 1;
+	new_room->vnum = Mud::instance().getFreeVnumRoom();
 	new_room->area = source_room->area;
 	new_room->coord = coord;
 	new_room->terrain = source_room->terrain;
