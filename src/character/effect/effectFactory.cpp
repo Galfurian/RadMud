@@ -20,8 +20,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "effectFactory.hpp"
-#include "character.hpp"
+#include "character/effect/effectFactory.hpp"
+#include "character/character.hpp"
 
 namespace EffectFactory
 {

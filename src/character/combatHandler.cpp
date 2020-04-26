@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "combatHandler.hpp"
+#include "character/combatHandler.hpp"
 
-#include "room.hpp"
-#include "area.hpp"
+#include "structure/room.hpp"
+#include "structure/area.hpp"
 
 CombatHandler::CombatHandler(Character *_owner) :
 	owner(_owner),

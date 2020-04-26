@@ -20,14 +20,14 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "aimAction.hpp"
+#include "action/aimAction.hpp"
 
-#include "character.hpp"
-#include "characterUtilities.hpp"
-#include "area.hpp"
-#include "room.hpp"
+#include "character/character.hpp"
+#include "character/characterUtilities.hpp"
+#include "structure/area.hpp"
+#include "structure/room.hpp"
 #include <cassert>
-#include "structureUtils.hpp"
+#include "structure/structureUtils.hpp"
 
 AimAction::AimAction(Character *_actor, Character *_target) :
 	GeneralAction(_actor),

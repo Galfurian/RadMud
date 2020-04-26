@@ -19,9 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "magazineItem.hpp"
-#include "magazineModel.hpp"
-#include "formatter.hpp"
+#include "item/subitem/magazineItem.hpp"
+#include "model/submodel/magazineModel.hpp"
+#include "utilities/formatter.hpp"
 
 MagazineItem::MagazineItem()
 {

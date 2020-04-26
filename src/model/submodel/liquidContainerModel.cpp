@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "liquidContainerModel.hpp"
+#include "model/submodel/liquidContainerModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 LiquidContainerModel::LiquidContainerModel() : maxWeight(), liquidFlags()
 {

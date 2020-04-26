@@ -21,8 +21,8 @@
 
 #include <cassert>
 
-#include "skillManager.hpp"
-#include "character.hpp"
+#include "character/skill/skillManager.hpp"
+#include "character/character.hpp"
 #include "mud.hpp"
 
 SkillManager::SkillManager(Character *_owner) :

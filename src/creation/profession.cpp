@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "profession.hpp"
-#include "production.hpp"
-#include "utils.hpp"
+#include "creation/profession.hpp"
+#include "creation/production.hpp"
+#include "utilities/utils.hpp"
 
 Profession::Profession() :
 	vnum(),

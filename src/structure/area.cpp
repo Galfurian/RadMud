@@ -20,11 +20,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "area.hpp"
+#include "structure/area.hpp"
 
-#include "structureUtils.hpp"
-#include "formatter.hpp"
-#include "structureDefines.hpp"
+#include "structure/structureUtils.hpp"
+#include "utilities/formatter.hpp"
+#include "structure/structureDefines.hpp"
 
 Area::Area() :
 	vnum(),

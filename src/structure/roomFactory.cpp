@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "roomFactory.hpp"
-#include "terrainFactory.hpp"
+#include "structure/roomFactory.hpp"
+#include "structure/terrain/terrainFactory.hpp"
 #include "mud.hpp"
 
 Room *RoomFactory::createRoomAir()

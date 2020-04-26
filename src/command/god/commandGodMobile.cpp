@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandGodMobile.hpp"
-#include "mobileModel.hpp"
+#include "command/god/commandGodMobile.hpp"
+#include "character/mobileModel.hpp"
 #include "mud.hpp"
 
 bool DoMobileModelList(Character *character, ArgumentHandler & /*args*/)

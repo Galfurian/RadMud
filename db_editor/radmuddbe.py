@@ -7,15 +7,14 @@
 # WARNING! All changes made in this file will be lost!
 
 
-from radmuddbe_gui import *
-
+import gc
+import logging
+import sys
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSql
 from PyQt5.QtGui import QColor
-from qtmodern import styles
-import gc
-import sys
-import logging
 from functools import partial
+from qtmodern import styles
+from radmuddbe_gui import *
 
 
 class ColorHandler(logging.StreamHandler):

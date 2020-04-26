@@ -20,11 +20,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "generalAction.hpp"
-#include "character.hpp"
-#include "production.hpp"
-#include "building.hpp"
-#include "mobile.hpp"
+#include "action/generalAction.hpp"
+#include "creation/production.hpp"
+#include "creation/building.hpp"
+#include "character/character.hpp"
+#include "character/mobile.hpp"
 
 GeneralAction::GeneralAction(Character *_actor, const bool &_lastAction) :
 	actor(_actor),

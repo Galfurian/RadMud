@@ -20,13 +20,13 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "lightItem.hpp"
+#include "item/subitem/lightItem.hpp"
 
-#include "lightModel.hpp"
-#include "resourceModel.hpp"
-#include "updater.hpp"
-#include "logger.hpp"
-#include "formatter.hpp"
+#include "model/submodel/lightModel.hpp"
+#include "model/submodel/resourceModel.hpp"
+#include "updater/updater.hpp"
+#include "utilities/logger.hpp"
+#include "utilities/formatter.hpp"
 
 LightItem::LightItem() : active()
 {

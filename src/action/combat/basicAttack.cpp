@@ -21,15 +21,15 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "basicAttack.hpp"
+#include "action/combat/basicAttack.hpp"
 
-#include "characterUtilities.hpp"
-#include "rangedWeaponModel.hpp"
-#include "formatter.hpp"
-#include "updater.hpp"
-#include "chase.hpp"
-#include "room.hpp"
-#include "area.hpp"
+#include "character/characterUtilities.hpp"
+#include "model/submodel/rangedWeaponModel.hpp"
+#include "utilities/formatter.hpp"
+#include "updater/updater.hpp"
+#include "action/combat/chase.hpp"
+#include "structure/room.hpp"
+#include "structure/area.hpp"
 
 BasicAttack::BasicAttack(Character *_actor) : CombatAction(_actor)
 {

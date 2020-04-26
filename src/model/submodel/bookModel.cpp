@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "bookModel.hpp"
+#include "model/submodel/bookModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 BookModel::BookModel() : maxParchments()
 {

@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "shopItem.hpp"
+#include "item/subitem/shopItem.hpp"
 
-#include "formatter.hpp"
-#include "shopModel.hpp"
+#include "utilities/formatter.hpp"
+#include "model/submodel/shopModel.hpp"
 #include "mud.hpp"
 
 ShopItem::ShopItem() :

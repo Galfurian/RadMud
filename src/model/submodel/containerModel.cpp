@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "containerModel.hpp"
+#include "model/submodel/containerModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 ContainerModel::ContainerModel() :
 	maxWeight(),

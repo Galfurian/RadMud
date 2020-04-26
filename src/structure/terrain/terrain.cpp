@@ -20,8 +20,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "terrain.hpp"
-#include "utils.hpp"
+#include "structure/terrain/terrain.hpp"
+#include "utilities/utils.hpp"
 
 Terrain::Terrain() :
 	vnum(),

@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "direction.hpp"
-#include "coordinates.hpp"
-#include "utils.hpp"
+#include "enumerators/direction.hpp"
+#include "structure/coordinates.hpp"
+#include "utilities/utils.hpp"
 
 Direction::Direction(const std::string &_direction, const bool &exact) :
 	BaseEnumerator()

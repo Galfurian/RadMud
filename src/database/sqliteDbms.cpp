@@ -20,12 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "sqliteDbms.hpp"
+#include "database/sqliteDbms.hpp"
 
-#include "sqliteLoadFunctions.hpp"
-#include "logger.hpp"
+#include "database/sqliteLoadFunctions.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
-#include "sqliteException.hpp"
+#include "database/sqliteException.hpp"
 
 SQLiteDbms::SQLiteDbms() : dbConnection(), loaders()
 {

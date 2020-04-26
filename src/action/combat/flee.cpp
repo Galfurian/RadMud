@@ -21,10 +21,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "flee.hpp"
+#include "action/combat/flee.hpp"
 
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
 #include <cassert>
 
 Flee::Flee(Character *_actor) : CombatAction(_actor)

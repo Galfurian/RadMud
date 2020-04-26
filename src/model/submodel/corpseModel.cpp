@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "corpseModel.hpp"
-#include "corpseItem.hpp"
-#include "logger.hpp"
+#include "model/submodel/corpseModel.hpp"
+#include "item/subitem/corpseItem.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 CorpseModel::CorpseModel() : corpseRace(), corpseComposition()

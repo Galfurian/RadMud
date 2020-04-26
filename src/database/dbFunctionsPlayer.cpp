@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "sqliteDbms.hpp"
-#include "stopwatch.hpp"
-#include "logger.hpp"
+#include "database/sqliteDbms.hpp"
+#include "utilities/stopwatch.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 bool SQLiteDbms::loadPlayer(Player *player)

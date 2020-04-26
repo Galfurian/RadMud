@@ -20,7 +20,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "characterPosture.hpp"
+#include "enumerators/characterPosture.hpp"
 
 std::string CharacterPosture::toString() const
 {

@@ -21,10 +21,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "combatAction.hpp"
+#include "action/combat/combatAction.hpp"
 
-#include "logger.hpp"
-#include "room.hpp"
+#include "utilities/logger.hpp"
+#include "structure/room.hpp"
 #include <cassert>
 
 CombatAction::CombatAction(Character *_actor) : GeneralAction(_actor)

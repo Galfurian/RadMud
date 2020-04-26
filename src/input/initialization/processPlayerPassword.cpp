@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processPlayerPassword.hpp"
-#include "player.hpp"
+#include "input/initialization/processPlayerPassword.hpp"
+#include "character/player.hpp"
 #include "mud.hpp"
 
 bool ProcessPlayerPassword::process(ArgumentHandler &args)

@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "armorModel.hpp"
+#include "model/submodel/armorModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 ArmorModel::ArmorModel() : size(), armorClass(), allowedAnatomy()

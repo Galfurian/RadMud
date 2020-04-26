@@ -91,37 +91,7 @@ include_directories(
     ${LUA_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
     ${SQLITE3_INCLUDE_DIR}
-    ${CMAKE_SOURCE_DIR}/src
-    ${CMAKE_SOURCE_DIR}/src/action
-    ${CMAKE_SOURCE_DIR}/src/action/combat
-    ${CMAKE_SOURCE_DIR}/src/action/object
-    ${CMAKE_SOURCE_DIR}/src/character
-    ${CMAKE_SOURCE_DIR}/src/character/effect
-    ${CMAKE_SOURCE_DIR}/src/character/race
-    ${CMAKE_SOURCE_DIR}/src/character/skill
-    ${CMAKE_SOURCE_DIR}/src/character/behaviour
-    ${CMAKE_SOURCE_DIR}/src/command
-    ${CMAKE_SOURCE_DIR}/src/command/god
-    ${CMAKE_SOURCE_DIR}/src/command/object
-    ${CMAKE_SOURCE_DIR}/src/creation
-    ${CMAKE_SOURCE_DIR}/src/database
-    ${CMAKE_SOURCE_DIR}/src/enumerators
-    ${CMAKE_SOURCE_DIR}/src/input
-    ${CMAKE_SOURCE_DIR}/src/input/initialization
-    ${CMAKE_SOURCE_DIR}/src/item
-    ${CMAKE_SOURCE_DIR}/src/item/subitem
-    ${CMAKE_SOURCE_DIR}/src/lua
-    ${CMAKE_SOURCE_DIR}/src/lua/luabridge
-    ${CMAKE_SOURCE_DIR}/src/lua/luabridge/detail
-    ${CMAKE_SOURCE_DIR}/src/model
-    ${CMAKE_SOURCE_DIR}/src/model/submodel
-    ${CMAKE_SOURCE_DIR}/src/structure
-    ${CMAKE_SOURCE_DIR}/src/structure/algorithms
-    ${CMAKE_SOURCE_DIR}/src/structure/algorithms/AStar
-    ${CMAKE_SOURCE_DIR}/src/structure/terrain
-    ${CMAKE_SOURCE_DIR}/src/updater
-    ${CMAKE_SOURCE_DIR}/src/utilities/
-    ${CMAKE_SOURCE_DIR}/src/utilities/name_generator
+    ${CMAKE_SOURCE_DIR}/include
 )
 
 # -----------------------------------------------------------------------------
@@ -283,7 +253,7 @@ set(PROJECT_SRC
     ${CMAKE_SOURCE_DIR}/src/utilities/CMacroWrapper.cpp
     ${CMAKE_SOURCE_DIR}/src/utilities/logger.cpp
     ${CMAKE_SOURCE_DIR}/src/utilities/utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/utilities/name_generator/nameGenerator.cpp
+    ${CMAKE_SOURCE_DIR}/src/utilities/namegen.cpp
     )
 
 # -----------------------------------------------------------------------------

@@ -20,8 +20,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "effectManager.hpp"
-#include "effect.hpp"
+#include "character/effect/effectManager.hpp"
+#include "character/effect/effect.hpp"
 
 EffectManager::EffectManager() : activeEffects(), pendingEffects()
 {

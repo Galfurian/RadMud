@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processNewRace.hpp"
-#include "processNewAttributes.hpp"
-#include "processNewStory.hpp"
-#include "formatter.hpp"
+#include "input/initialization/processNewRace.hpp"
+#include "input/initialization/processNewAttributes.hpp"
+#include "input/initialization/processNewStory.hpp"
+#include "utilities/formatter.hpp"
 
 bool ProcessNewRace::process(ArgumentHandler &args)
 {

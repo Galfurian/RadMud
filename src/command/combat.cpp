@@ -19,17 +19,17 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "combat.hpp"
+#include "command/combat.hpp"
 #include "mud.hpp"
-#include "scoutAction.hpp"
-#include "reloadAction.hpp"
-#include "loadAction.hpp"
-#include "unloadAction.hpp"
-#include "aimAction.hpp"
-#include "basicAttack.hpp"
-#include "characterUtilities.hpp"
-#include "flee.hpp"
-#include "structureUtils.hpp"
+#include "action/scoutAction.hpp"
+#include "action/reloadAction.hpp"
+#include "action/loadAction.hpp"
+#include "action/unloadAction.hpp"
+#include "action/aimAction.hpp"
+#include "action/combat/basicAttack.hpp"
+#include "character/characterUtilities.hpp"
+#include "action/combat/flee.hpp"
+#include "structure/structureUtils.hpp"
 
 void LoadCombatCommands()
 {

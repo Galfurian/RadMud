@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "corpseItem.hpp"
+#include "item/subitem/corpseItem.hpp"
 
-#include "formatter.hpp"
-#include "logger.hpp"
+#include "utilities/formatter.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 CorpseItem::CorpseItem() : remainingBodyParts()

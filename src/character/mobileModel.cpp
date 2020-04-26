@@ -20,8 +20,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "mobileModel.hpp"
-#include "mobile.hpp"
+#include "character/mobileModel.hpp"
+#include "character/mobile.hpp"
 #include "mud.hpp"
 
 Mobile *MobileModel::spawn(Room *spawnRoom, unsigned int mobileVnum)

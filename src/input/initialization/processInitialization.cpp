@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processInitialization.hpp"
-#include "character.hpp"
-#include "formatter.hpp"
-#include "player.hpp"
+#include "input/initialization/processInitialization.hpp"
+#include "character/character.hpp"
+#include "utilities/formatter.hpp"
+#include "character/player.hpp"
 
 static inline void print_ability(std::stringstream &ss, Player *player,
 								 Ability const &ability)

@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObjectFood.hpp"
-#include "foodModel.hpp"
-#include "command.hpp"
-#include "room.hpp"
+#include "command/object/commandObjectFood.hpp"
+#include "model/submodel/foodModel.hpp"
+#include "command/command.hpp"
+#include "structure/room.hpp"
 #include "mud.hpp"
 
 bool DoEat(Character *character, ArgumentHandler &args)

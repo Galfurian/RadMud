@@ -1,7 +1,6 @@
-from os.path import join, dirname, abspath
-
-from PyQt5.QtGui import QPalette, QColor
 from PyQt5.QtCore import QT_VERSION_STR
+from PyQt5.QtGui import QPalette, QColor
+from os.path import join, dirname, abspath
 
 _QT_VERSION = tuple(int(v) for v in QT_VERSION_STR.split('.'))
 """ tuple: Qt version. """

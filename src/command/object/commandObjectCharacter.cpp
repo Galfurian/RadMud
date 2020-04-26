@@ -19,12 +19,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObjectCharacter.hpp"
+#include "command/object/commandObjectCharacter.hpp"
 
-#include "characterUtilities.hpp"
-#include "formatter.hpp"
-#include "command.hpp"
-#include "room.hpp"
+#include "character/characterUtilities.hpp"
+#include "utilities/formatter.hpp"
+#include "command/command.hpp"
+#include "structure/room.hpp"
 #include "mud.hpp"
 
 bool DoEquipments(Character *character, ArgumentHandler & /*args*/)

@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "movement.hpp"
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
-#include "moveAction.hpp"
+#include "command/movement.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
+#include "action/moveAction.hpp"
 #include "mud.hpp"
 
 void LoadMovementCommands()

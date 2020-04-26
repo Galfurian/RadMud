@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "characterUtilities.hpp"
-#include "resourceModel.hpp"
-#include "production.hpp"
-#include "toolModel.hpp"
-#include "room.hpp"
+#include "character/characterUtilities.hpp"
+#include "model/submodel/resourceModel.hpp"
+#include "creation/production.hpp"
+#include "model/submodel/toolModel.hpp"
+#include "structure/room.hpp"
 
 std::vector<std::shared_ptr<BodyPart::BodyWeapon> >
 GetActiveNaturalWeapons(Character *character)

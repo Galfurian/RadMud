@@ -19,9 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "itemVector.hpp"
-#include "updater.hpp"
-#include "item.hpp"
+#include "item/itemVector.hpp"
+#include "updater/updater.hpp"
+#include "item/item.hpp"
 
 ItemVector::ItemVector()
 {

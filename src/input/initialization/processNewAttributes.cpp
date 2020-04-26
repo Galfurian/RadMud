@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processNewAttributes.hpp"
-#include "processNewGender.hpp"
-#include "processNewRace.hpp"
-#include "formatter.hpp"
-#include "player.hpp"
+#include "input/initialization/processNewAttributes.hpp"
+#include "input/initialization/processNewGender.hpp"
+#include "input/initialization/processNewRace.hpp"
+#include "utilities/formatter.hpp"
+#include "character/player.hpp"
 #include "mud.hpp"
 
 bool ProcessNewAttributes::process(ArgumentHandler &args)

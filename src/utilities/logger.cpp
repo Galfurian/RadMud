@@ -16,8 +16,8 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "logger.hpp"
-#include "utils.hpp"
+#include "utilities/logger.hpp"
+#include "utilities/utils.hpp"
 
 #include <mutex>
 #include <fstream>

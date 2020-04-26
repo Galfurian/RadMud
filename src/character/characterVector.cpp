@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "characterVector.hpp"
-#include "character.hpp"
-#include "player.hpp"
-#include "mobile.hpp"
+#include "character/characterVector.hpp"
+#include "character/character.hpp"
+#include "character/player.hpp"
+#include "character/mobile.hpp"
 
 static inline bool IsAnException(Character *character,
 								 std::vector<Character *> const &ex)

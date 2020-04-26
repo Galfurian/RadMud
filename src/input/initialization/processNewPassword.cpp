@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processNewPassword.hpp"
-#include "processNewPasswordConfirm.hpp"
-#include "processNewName.hpp"
-#include "formatter.hpp"
-#include "player.hpp"
+#include "input/initialization/processNewPassword.hpp"
+#include "input/initialization/processNewPasswordConfirm.hpp"
+#include "input/initialization/processNewName.hpp"
+#include "utilities/formatter.hpp"
+#include "character/player.hpp"
 
 bool ProcessNewPassword::process(ArgumentHandler &args)
 {

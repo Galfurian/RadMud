@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processNewWeight.hpp"
-#include "processNewDescription.hpp"
-#include "processNewConfirm.hpp"
-#include "formatter.hpp"
-#include "player.hpp"
+#include "input/initialization/processNewWeight.hpp"
+#include "input/initialization/processNewDescription.hpp"
+#include "input/initialization/processNewConfirm.hpp"
+#include "utilities/formatter.hpp"
+#include "character/player.hpp"
 #include "mud.hpp"
 
 bool ProcessNewWeight::process(ArgumentHandler &args)

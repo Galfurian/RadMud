@@ -19,13 +19,13 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "bodyPart.hpp"
+#include "character/bodyPart.hpp"
 
 #include <cassert>
 
-#include "resourceModel.hpp"
-#include "formatter.hpp"
-#include "race.hpp"
+#include "model/submodel/resourceModel.hpp"
+#include "utilities/formatter.hpp"
+#include "character/race/race.hpp"
 
 BodyPart::BodyPart() : vnum(), name(), description(), flags(), resources()
 {

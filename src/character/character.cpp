@@ -20,16 +20,16 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "character.hpp"
+#include "character/character.hpp"
 
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
-#include "formatter.hpp"
-#include "lightItem.hpp"
-#include "armorItem.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
+#include "utilities/formatter.hpp"
+#include "item/subitem/lightItem.hpp"
+#include "item/subitem/armorItem.hpp"
 #include "mud.hpp"
-#include "armorModel.hpp"
-#include "shieldModel.hpp"
+#include "model/submodel/armorModel.hpp"
+#include "model/submodel/shieldModel.hpp"
 
 Character::Character() :
 	name(),

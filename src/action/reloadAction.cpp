@@ -20,11 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "reloadAction.hpp"
-
-#include "sqliteDbms.hpp"
-#include "character.hpp"
-#include "room.hpp"
+#include "action/reloadAction.hpp"
+#include "database/sqliteDbms.hpp"
+#include "character/character.hpp"
+#include "structure/room.hpp"
 
 #include <cassert>
 

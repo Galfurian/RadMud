@@ -22,10 +22,10 @@
 
 #include "mud.hpp"
 
-#include "processPlayerName.hpp"
-#include "CMacroWrapper.hpp"
-#include "mobileModel.hpp"
-#include "stopwatch.hpp"
+#include "input/initialization/processPlayerName.hpp"
+#include "character/mobileModel.hpp"
+#include "utilities/CMacroWrapper.hpp"
+#include "utilities/stopwatch.hpp"
 #include <unistd.h>
 #include <signal.h>
 

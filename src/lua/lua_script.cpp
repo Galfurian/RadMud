@@ -21,15 +21,15 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "lua_script.hpp"
-#include "structureUtils.hpp"
-#include "luaBridge.hpp"
-#include "armorItem.hpp"
-#include "corpseItem.hpp"
-#include "currencyItem.hpp"
-#include "toolModel.hpp"
-#include "shopItem.hpp"
-#include "aStar.hpp"
+#include "lua/lua_script.hpp"
+#include "structure/structureUtils.hpp"
+#include "lua/luabridge/luaBridge.hpp"
+#include "item/subitem/armorItem.hpp"
+#include "item/subitem/corpseItem.hpp"
+#include "item/subitem/currencyItem.hpp"
+#include "model/submodel/toolModel.hpp"
+#include "item/subitem/shopItem.hpp"
+#include "structure/algorithms/AStar/aStar.hpp"
 #include "mud.hpp"
 
 void LuaLog(std::string message)

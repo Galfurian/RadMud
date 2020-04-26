@@ -20,8 +20,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "sqliteException.hpp"
-#include "utils.hpp"
+#include "database/sqliteException.hpp"
+#include "utilities/utils.hpp"
 
 SQLiteException::SQLiteException(std::string const &_message) :
 	std::runtime_error("SQLiteException"),

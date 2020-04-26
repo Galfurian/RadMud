@@ -19,9 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "terrainFactory.hpp"
-#include "formatter.hpp"
-#include "terrain.hpp"
+#include "structure/terrain/terrainFactory.hpp"
+#include "utilities/formatter.hpp"
+#include "structure/terrain/terrain.hpp"
 
 std::shared_ptr<Terrain> TerrainFactory::getAir()
 {

@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "moveAction.hpp"
+#include "action/moveAction.hpp"
 
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
 #include <cassert>
 
 MoveAction::MoveAction(Character *_actor, Room *_destination,

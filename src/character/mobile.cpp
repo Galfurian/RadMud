@@ -20,12 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "mobile.hpp"
+#include "character/mobile.hpp"
 
-#include "generalBehaviour.hpp"
-#include "lua_script.hpp"
+#include "character/behaviour/generalBehaviour.hpp"
+#include "character/mobileModel.hpp"
+#include "lua/lua_script.hpp"
 #include "mud.hpp"
-#include "mobileModel.hpp"
 
 Mobile::Mobile(std::shared_ptr<MobileModel> const &_model) :
 	model(_model),

@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "player.hpp"
+#include "character/player.hpp"
 
-#include "sqliteWriteFunctions.hpp"
-#include "formatter.hpp"
+#include "database/sqliteWriteFunctions.hpp"
+#include "utilities/formatter.hpp"
 #include "mud.hpp"
 
 Player::Player(const int &_socket, const int &_port,

@@ -21,16 +21,16 @@
 /// DEALINGS IN THE SOFTWARE.
 
 // Basic Include.
-#include "command.hpp"
+#include "command/command.hpp"
 #include "mud.hpp"
-#include "combat.hpp"
-#include "communication.hpp"
-#include "crafting.hpp"
-#include "general.hpp"
-#include "manager.hpp"
-#include "commandObject.hpp"
-#include "commandGod.hpp"
-#include "movement.hpp"
+#include "command/combat.hpp"
+#include "command/communication.hpp"
+#include "command/crafting.hpp"
+#include "command/general.hpp"
+#include "command/manager.hpp"
+#include "command/object/commandObject.hpp"
+#include "command/god/commandGod.hpp"
+#include "command/movement.hpp"
 
 Command::Command() :
 	handler(),

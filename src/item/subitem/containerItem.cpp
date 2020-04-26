@@ -19,9 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "containerItem.hpp"
-#include "containerModel.hpp"
-#include "formatter.hpp"
+#include "item/subitem/containerItem.hpp"
+#include "model/submodel/containerModel.hpp"
+#include "utilities/formatter.hpp"
 #include "mud.hpp"
 
 ContainerItem::ContainerItem()

@@ -19,9 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObjectContainer.hpp"
-#include "structureUtils.hpp"
-#include "command.hpp"
+#include "command/object/commandObjectContainer.hpp"
+#include "structure/structureUtils.hpp"
+#include "command/command.hpp"
 
 bool DoOrganize(Character *character, ArgumentHandler &args)
 {

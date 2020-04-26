@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "armorItem.hpp"
-#include "armorModel.hpp"
+#include "item/subitem/armorItem.hpp"
+#include "model/submodel/armorModel.hpp"
 
 ArmorItem::ArmorItem()
 {

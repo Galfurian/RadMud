@@ -18,7 +18,7 @@
 
 // Basic Include.
 
-#include "utils.hpp"
+#include "utilities/utils.hpp"
 
 #include <dirent.h>
 #include <zconf.h>
@@ -27,7 +27,7 @@
 #include <fstream>
 #include <iterator>
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 double SafeLog10(const double &source)
 {

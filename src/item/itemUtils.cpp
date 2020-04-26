@@ -20,11 +20,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "itemUtils.hpp"
-#include "toolModel.hpp"
-#include "foodModel.hpp"
-#include "lightModel.hpp"
-#include "resourceModel.hpp"
+#include "item/itemUtils.hpp"
+#include "model/submodel/toolModel.hpp"
+#include "model/submodel/foodModel.hpp"
+#include "model/submodel/lightModel.hpp"
+#include "model/submodel/resourceModel.hpp"
 
 namespace ItemUtils
 {

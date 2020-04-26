@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "production.hpp"
+#include "creation/production.hpp"
 
-#include "itemModel.hpp"
-#include "character.hpp"
+#include "model/itemModel.hpp"
+#include "character/character.hpp"
 
 Production::Production() :
 	vnum(),

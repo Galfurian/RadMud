@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "race.hpp"
+#include "character/race/race.hpp"
 
 #include "mud.hpp"
-#include "formatter.hpp"
+#include "utilities/formatter.hpp"
 
 Race::Race() :
 	vnum(),

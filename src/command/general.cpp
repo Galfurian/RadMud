@@ -20,11 +20,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "general.hpp"
+#include "command/general.hpp"
 
-#include "characterUtilities.hpp"
-#include "nameGenerator.hpp"
-#include "formatter.hpp"
+#include "character/characterUtilities.hpp"
+#include "utilities/formatter.hpp"
+#include "utilities/namegen.hpp"
 #include "mud.hpp"
 
 void LoadGeneralCommands()

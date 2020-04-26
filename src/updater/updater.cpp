@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "updater.hpp"
-#include "generalBehaviour.hpp"
-#include "formatter.hpp"
+#include "updater/updater.hpp"
+#include "character/behaviour/generalBehaviour.hpp"
+#include "utilities/formatter.hpp"
 #include "mud.hpp"
 
 // //////////////////////////////////////////////////////////
