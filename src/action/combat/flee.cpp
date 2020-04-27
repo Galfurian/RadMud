@@ -105,15 +105,20 @@ ActionStatus Flee::perform()
 		// Consume half the stamina.
 		actor->remStamina(consumedStamina / 2, true);
 	} else {
+		// Prepare the movement options.
+		MovementOptions options;
+		options.character = actor;
+		options.allowedInCloseCombat = true;
 		// Get the list of available destinations.
 		std::vector<Room *> destinations;
 		for (auto it : StructUtils::getConnectedRooms(actor->room)) {
-			// Prepare the movement options.
-			MovementOptions options;
-			options.character = actor;
 			if (StructUtils::checkConnection(options, actor->room, it, error)) {
 				destinations.emplace_back(it);
 			}
+		}
+		if (destinations.empty()) {
+			actor->sendMsg("There is nowhere to flee.\n\n");
+			return ActionStatus::Error;
 		}
 		// Pick a random direction, from the poll of the available ones.
 		auto destination =
@@ -122,6 +127,7 @@ ActionStatus Flee::perform()
 		if (destination == nullptr) {
 			MudLog(LogLevel::Error, "Flee selected null destination.");
 			actor->sendMsg("You were not able to escape.\n\n");
+			return ActionStatus::Error;
 		} else {
 			// Consume the stamina.
 			actor->remStamina(consumedStamina, true);
