@@ -183,6 +183,7 @@ set(PROJECT_SRC
     ${CMAKE_SOURCE_DIR}/src/enumerators/combatModifier.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/characterPosture.cpp
     ${CMAKE_SOURCE_DIR}/src/input/processInput.cpp
+    ${CMAKE_SOURCE_DIR}/src/input/argument.cpp
     ${CMAKE_SOURCE_DIR}/src/input/initialization/processInitialization.cpp
     ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewAge.cpp
     ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewAttributes.cpp

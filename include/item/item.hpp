@@ -251,7 +251,7 @@ public:
 	/// @param search_parameter The item to search.
 	/// @param number           Position of the item we want to look for.
 	/// @return The item, if it's in the container.
-	Item *findContent(std::string search_parameter, int &number);
+	Item *findContent(std::string search_parameter, unsigned int &number);
 
 	/// @brief Set the body parts occupied by the item.
 	/// @param _occupiedBodyParts The occupied body parts.

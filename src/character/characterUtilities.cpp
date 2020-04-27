@@ -70,7 +70,7 @@ ItemVector FindPosessedCoins(Character *character)
 	return foundCoins;
 }
 
-Item *FindNearbyItem(Character *character, std::string const &key, int &number,
+Item *FindNearbyItem(Character *character, std::string const &key, unsigned int &number,
 					 const SearchOptionsCharacter &searchOptions)
 {
 	// Check the lights.

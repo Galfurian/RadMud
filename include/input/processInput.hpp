@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "input/argumentHandler.hpp"
+#include "input/argument.hpp"
 
 #include <cassert>
 

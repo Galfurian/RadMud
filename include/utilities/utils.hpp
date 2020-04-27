@@ -121,14 +121,16 @@ template <typename Enum> void ClearFlag(unsigned int &flags, Enum flag)
 /// @param prefix Prefix string.
 /// @return <b>True</b> if the source begin with the given prefix,<br>
 ///         <b>False</b> otherwise.
-bool BeginWith(const std::string &source, const std::string &prefix);
+bool BeginWith(const std::string &source, const std::string &prefix,
+			   bool sensitive = false, int n = -1);
 
 /// @brief Check if the source string end with a given string.
 /// @param source Source string.
 /// @param suffix Final string.
 /// @return <b>True</b> if the source end with the given postfix,<br>
 ///         <b>False</b> otherwise.
-bool EndWith(const std::string &source, const std::string &suffix);
+bool EndWith(const std::string &source, const std::string &suffix,
+			 bool sensitive = false, int n = -1);
 
 /// @brief Find and replace in a string.
 /// @param source      Source string.

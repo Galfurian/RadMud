@@ -35,11 +35,7 @@ bool DoItemCreate(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Get the quantity.
-	if (args[0].getMultiplier() < 0) {
-		character->sendMsg("You must provide a valid amount.\n");
-		return false;
-	}
-	auto quantity = static_cast<unsigned int>(args[0].getMultiplier());
+	auto quantity = args[0].getQuantity();
 	// Get the model.
 	auto modeVnum = ToNumber<unsigned int>(args[0].getContent());
 	auto itemModel = Mud::instance().findItemModel(modeVnum);

@@ -34,7 +34,7 @@
 #include "character/effect/effectManager.hpp"
 #include "input/processInput.hpp"
 #include "action/combat/combatAction.hpp"
-#include "input/argumentHandler.hpp"
+#include "input/argument.hpp"
 #include "item/subitem/meleeWeaponItem.hpp"
 #include "item/subitem/rangedWeaponItem.hpp"
 #include "enumerators/characterPosture.hpp"
@@ -335,7 +335,7 @@ public:
 	/// @param key    The item to search.
 	/// @param number Position of the item we want to look for.
 	/// @return The item, if it's in the character's inventory.
-	inline Item *findInventoryItem(std::string const &key, int &number)
+	inline Item *findInventoryItem(std::string const &key, unsigned int &number)
 	{
 		return ItemUtils::FindItemIn(inventory, key, number);
 	}
@@ -344,7 +344,7 @@ public:
 	/// @param key    The item to search.
 	/// @param number Position of the item we want to look for.
 	/// @return The item, if it's in the character's equipment.
-	Item *findEquipmentItem(std::string const &key, int &number)
+	Item *findEquipmentItem(std::string const &key, unsigned int &number)
 	{
 		return ItemUtils::FindItemIn(equipment, key, number);
 	}
@@ -353,7 +353,7 @@ public:
 	/// @param key    The item to search.
 	/// @param number Position of the item we want to look for.
 	/// @return The item, if it's found.
-	Item *findNearbyItem(std::string const &key, int &number);
+	Item *findNearbyItem(std::string const &key, unsigned int &number);
 
 	/// @brief Search the item at given position and return it.
 	/// @param bodyPart The body part where the method need to search the item.

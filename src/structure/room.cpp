@@ -95,8 +95,7 @@ void Room::addItem(Item *&item, bool updateDB)
 		SQLiteDbms::instance().insertInto(
 			"ItemRoom", { ToString(vnum), ToString(item->vnum) }, false, true);
 	}
-	MudLog(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(),
-				name);
+	MudLog(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), name);
 }
 
 void Room::addBuilding(Item *item, bool updateDB)
@@ -129,8 +128,8 @@ bool Room::removeItem(Item *item, bool updateDB)
 				"ItemRoom", { std::make_pair("item", ToString(item->vnum)) });
 		}
 		// Log it.
-		MudLog(LogLevel::Debug, "Item '%s' removed from '%s';",
-					item->getName(), name);
+		MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(),
+			   name);
 		return true;
 	}
 	return false;
@@ -213,13 +212,12 @@ bool Room::removeOnDB()
 {
 	if (items.size() > 0) {
 		MudLog(LogLevel::Error,
-					"[Room::RemoveOnDB] There are still items in the room!");
+			   "[Room::RemoveOnDB] There are still items in the room!");
 		return false;
 	}
 	if (characters.size() > 0) {
-		MudLog(
-			LogLevel::Error,
-			"[Room::RemoveOnDB] There are still characters in the room!");
+		MudLog(LogLevel::Error,
+			   "[Room::RemoveOnDB] There are still characters in the room!");
 		return false;
 	}
 	SQLiteDbms::instance().deleteFrom(
@@ -227,18 +225,11 @@ bool Room::removeOnDB()
 	return true;
 }
 
-Item *Room::findBuilding(std::string target, int &number)
+Item *Room::findBuilding(std::string target, unsigned int &number)
 {
-	for (auto iterator : items) {
-		if (iterator->hasKey(ToLower(target)) &&
-			HasFlag(iterator->flags, ItemFlag::Built)) {
-			if (number == 1) {
-				return iterator;
-			}
-			number -= 1;
-		}
-	}
-	return nullptr;
+	return ItemUtils::FindItemIn(items, target, number, [](Item *item) {
+		return HasFlag(item->flags, ItemFlag::Built);
+	});
 }
 
 Item *Room::findBuilding(unsigned int buildingVnum)
@@ -263,7 +254,7 @@ ItemVector Room::findBuildings(ModelType type)
 	return buildingsList;
 }
 
-Player *Room::findPlayer(std::string target, int &number,
+Player *Room::findPlayer(std::string target, unsigned int &number,
 						 const std::vector<Character *> &exceptions) const
 {
 	Character *foundCharacter =
@@ -274,7 +265,7 @@ Player *Room::findPlayer(std::string target, int &number,
 	return nullptr;
 }
 
-Mobile *Room::findMobile(std::string target, int &number,
+Mobile *Room::findMobile(std::string target, unsigned int &number,
 						 const std::vector<Character *> &exceptions) const
 {
 	Character *foundCharacter =
@@ -519,7 +510,7 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 
 	// Insert into table Room the newly created room.
 	MudLog(LogLevel::Info,
-				"[CreateRoom] Saving room details on the database...");
+		   "[CreateRoom] Saving room details on the database...");
 	std::vector<std::string> arguments;
 	arguments.push_back(ToString(new_room->vnum));
 	arguments.push_back(ToString(new_room->coord.x));
@@ -547,7 +538,7 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 	}
 	// Add the created room to the room_map.
 	MudLog(LogLevel::Info,
-				"[CreateRoom] Adding the room to the global list...");
+		   "[CreateRoom] Adding the room to the global list...");
 	if (!Mud::instance().addRoom(new_room)) {
 		MudLog(LogLevel::Error, "Cannot add the room to the mud.\n");
 		SQLiteDbms::instance().rollbackTransection();
@@ -583,7 +574,7 @@ bool ConnectRoom(Room *room)
 	bool status = true;
 	std::vector<std::shared_ptr<Exit> > generatedExits;
 	MudLog(LogLevel::Info,
-				"[ConnectRoom] Connecting the room to near rooms...");
+		   "[ConnectRoom] Connecting the room to near rooms...");
 	std::vector<Direction> directions = { Direction::North, Direction::South,
 										  Direction::West,	Direction::East,
 										  Direction::Up,	Direction::Down };
@@ -635,7 +626,7 @@ bool ConnectRoom(Room *room)
 		for (auto exitIterator : generatedExits) {
 			if (!exitIterator->unlink()) {
 				MudLog(LogLevel::Fatal,
-							"I was not able to remove an unwanted exit.");
+					   "I was not able to remove an unwanted exit.");
 			}
 		}
 	}

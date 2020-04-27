@@ -72,14 +72,7 @@ bool DoDeposit(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto multiplier = args[0].getMultiplier();
-	if ((multiplier <= 0) && (multiplier != -1)) {
-		character->sendMsg("You must provide a valid amount!\n");
-		return false;
-	}
-	auto quantity = item->quantity;
-	if (multiplier)
-		quantity = static_cast<unsigned int>(multiplier);
+	auto quantity = args[0].getQuantity();
 	if (item->quantity < quantity)
 		quantity = item->quantity;
 	// Cast the building to shop.
@@ -143,14 +136,7 @@ bool DoBuy(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto multiplier = args[0].getMultiplier();
-	if ((multiplier <= 0) && (multiplier != -1)) {
-		character->sendMsg("You must provide a valid amount!\n");
-		return false;
-	}
-	auto quantity = item->quantity;
-	if (multiplier)
-		quantity = static_cast<unsigned int>(multiplier);
+	auto quantity = args[0].getQuantity();
 	if (item->quantity < quantity)
 		quantity = item->quantity;
 	if (!character->canCarry(item, quantity)) {
@@ -275,14 +261,7 @@ bool DoSell(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto multiplier = args[0].getMultiplier();
-	if ((multiplier <= 0) && (multiplier != -1)) {
-		character->sendMsg("You must provide a valid amount!\n");
-		return false;
-	}
-	auto quantity = item->quantity;
-	if (multiplier)
-		quantity = static_cast<unsigned int>(multiplier);
+	auto quantity = args[0].getQuantity();
 	if (item->quantity < quantity)
 		quantity = item->quantity;
 	// Cast the item to shop.

@@ -24,7 +24,7 @@
 #pragma once
 
 #include "character/character.hpp"
-#include "input/argumentHandler.hpp"
+#include "input/argument.hpp"
 
 /// @brief Contains all the informations concerning a command,
 ///         including its handler.

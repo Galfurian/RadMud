@@ -37,16 +37,57 @@ double SafeLog10(const double &source)
 	return 0;
 }
 
-bool BeginWith(const std::string &source, const std::string &prefix)
+bool BeginWith(const std::string &source, const std::string &prefix,
+			   bool sensitive, int n)
 {
-	return source.compare(0, prefix.size(), prefix) == 0;
+	if (&prefix == &source)
+		return true;
+	if (prefix.length() > source.length())
+		return false;
+	if (source.empty() || prefix.empty())
+		return false;
+	std::string::const_iterator it0 = source.begin(), it1 = prefix.begin();
+	if (sensitive) {
+		while ((it1 != prefix.end()) && ((*it1) == (*it0))) {
+			if ((n > 0) && (--n <= 0))
+				return true;
+			++it0, ++it1;
+		}
+	} else {
+		while ((it1 != prefix.end()) && (tolower(*it1) == tolower(*it0))) {
+			if ((n > 0) && (--n <= 0))
+				return true;
+			++it0, ++it1;
+		}
+	}
+	return it1 == prefix.end();
 }
 
-bool EndWith(const std::string &source, const std::string &suffix)
+bool EndWith(const std::string &source, const std::string &suffix,
+			 bool sensitive, int n)
 {
-	return (source.size() >= suffix.size()) &&
-		   (source.compare(source.size() - suffix.size(), suffix.size(),
-						   suffix) == 0);
+	if (&suffix == &source)
+		return true;
+	if (suffix.length() > source.length())
+		return false;
+	if (source.empty() || suffix.empty())
+		return false;
+	std::string::const_reverse_iterator it0 = source.rbegin(),
+										it1 = suffix.rbegin();
+	if (sensitive) {
+		while ((it1 != suffix.rend()) && ((*it1) == (*it0))) {
+			if ((n > 0) && (--n <= 0))
+				return true;
+			++it0, ++it1;
+		}
+	} else {
+		while ((it1 != suffix.rend()) && (tolower(*it1) == tolower(*it0))) {
+			if ((n > 0) && (--n <= 0))
+				return true;
+			++it0, ++it1;
+		}
+	}
+	return it1 == suffix.rend();
 }
 
 void FindAndReplace(std::string *source, const std::string &target,
@@ -105,19 +146,19 @@ std::string ToCapitals(const std::string &source)
 	return working;
 }
 
-std::vector<std::string> SplitString(const std::string &source,
-									 const std::string &delimiter)
+std::vector<std::string> SplitString(const std::string &src,
+									 const std::string &del)
 {
 	std::vector<std::string> result;
-	size_t pos = 0;
-	std::string tmp = source;
-	while ((pos = tmp.find(delimiter)) != std::string::npos) {
-		result.push_back(tmp.substr(0, pos));
-		tmp.erase(0, pos + delimiter.length());
+	std::string::size_type curr = 0, next = 0;
+	while ((next = src.find_first_of(del, curr)) != std::string::npos) {
+		if (next - curr > 0)
+			result.push_back(src.substr(curr, next - curr));
+		curr = next + 1;
 	}
-	if (!tmp.empty()) {
-		result.push_back(tmp);
-	}
+	std::string last(src, curr);
+	if (!last.empty())
+		result.push_back(last);
 	return result;
 }
 
@@ -196,12 +237,9 @@ std::vector<std::string> GetAllFilesInFolder(const std::string &folder,
 
 bool IsNumber(const std::string &source)
 {
-	for (auto c : source) {
-		if (isdigit(c) == 0) {
-			return false;
-		}
-	}
-	return true;
+	if (source.empty())
+		return false;
+	return source.find_first_not_of("+-0123456789") == std::string::npos;
 }
 
 bool GetFileContents(const char *filename, std::string &contents)

@@ -123,14 +123,7 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		// Set the quantity.
-		auto multiplier = args[0].getMultiplier();
-		if ((multiplier <= 0) && (multiplier != -1)) {
-			character->sendMsg("You must provide a valid amount!\n");
-			return false;
-		}
-		auto quantity = item->quantity;
-		if (multiplier)
-			quantity = static_cast<unsigned int>(multiplier);
+		auto quantity = args[0].getQuantity();
 		if (item->quantity < quantity)
 			quantity = item->quantity;
 		// Check if the player can carry the item.
@@ -275,14 +268,7 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		// Set the quantity.
-		auto multiplier = args[0].getMultiplier();
-		if ((multiplier <= 0) && (multiplier != -1)) {
-			character->sendMsg("You must provide a valid amount!\n");
-			return false;
-		}
-		auto quantity = item->quantity;
-		if (multiplier)
-			quantity = static_cast<unsigned int>(multiplier);
+		auto quantity = args[0].getQuantity();
 		if (item->quantity < quantity)
 			quantity = item->quantity;
 		// Check if the player can carry the item.
@@ -382,14 +368,7 @@ bool DoDrop(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto multiplier = args[0].getMultiplier();
-	if ((multiplier <= 0) && (multiplier != -1)) {
-		character->sendMsg("You must provide a valid amount!\n");
-		return false;
-	}
-	auto quantity = item->quantity;
-	if (multiplier)
-		quantity = static_cast<unsigned int>(multiplier);
+	auto quantity = args[0].getQuantity();
 	if (item->quantity < quantity)
 		quantity = item->quantity;
 	if (item->quantity == quantity) {
@@ -524,14 +503,7 @@ bool DoPut(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto multiplier = args[0].getMultiplier();
-	if ((multiplier <= 0) && (multiplier != -1)) {
-		character->sendMsg("You must provide a valid amount!\n");
-		return false;
-	}
-	auto quantity = item->quantity;
-	if (multiplier)
-		quantity = static_cast<unsigned int>(multiplier);
+	auto quantity = args[0].getQuantity();
 	if (item->quantity < quantity)
 		quantity = item->quantity;
 	// Check if the item can be contained inside the destination.
@@ -615,14 +587,7 @@ bool DoGive(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Set the quantity.
-	auto multiplier = args[0].getMultiplier();
-	if ((multiplier <= 0) && (multiplier != -1)) {
-		character->sendMsg("You must provide a valid amount!\n");
-		return false;
-	}
-	auto quantity = item->quantity;
-	if (multiplier)
-		quantity = static_cast<unsigned int>(multiplier);
+	auto quantity = args[0].getQuantity();
 	if (item->quantity < quantity)
 		quantity = item->quantity;
 	if (item->quantity == quantity) {

@@ -38,7 +38,7 @@ CharacterVector::CharacterVector()
 }
 
 Character *
-CharacterVector::findCharacter(const std::string &target, int &number,
+CharacterVector::findCharacter(const std::string &target, unsigned int &number,
 							   const std::vector<Character *> &exceptions,
 							   bool skipMobile, bool skipPlayer) const
 {

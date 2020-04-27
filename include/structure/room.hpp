@@ -141,7 +141,7 @@ public:
 	/// @param key    The item to search.
 	/// @param number Position of the item we want to look for.
 	/// @return The item, if it's in the room.
-	inline Item *findItem(std::string const &key, int &number)
+	inline Item *findItem(std::string const &key, unsigned int &number)
 	{
 		return ItemUtils::FindItemIn(items, key, number);
 	}
@@ -150,7 +150,7 @@ public:
 	/// @param target The building to search.
 	/// @param number Position of the building we want to look for.
 	/// @return The building, if it's in the room.
-	Item *findBuilding(std::string target, int &number);
+	Item *findBuilding(std::string target, unsigned int &number);
 
 	/// @brief Search for the building in the room.
 	/// @param buildingVnum The vnum of the building to search.
@@ -167,7 +167,7 @@ public:
 	/// @param number    Number of the player we are looking for.
 	/// @param exceptions The list of exceptions.
 	/// @return The character, if it's in the room.
-	inline Character *findCharacter(std::string const &target, int &number,
+	inline Character *findCharacter(std::string const &target, unsigned int &number,
 									std::vector<Character *> const &exceptions =
 										std::vector<Character *>()) const
 	{
@@ -179,7 +179,7 @@ public:
 	/// @param number    Number of the player we are looking for.
 	/// @param exceptions The list of exceptions.
 	/// @return The player, if it's in the room.
-	Player *findPlayer(std::string target, int &number,
+	Player *findPlayer(std::string target, unsigned int &number,
 					   const std::vector<Character *> &exceptions =
 						   std::vector<Character *>()) const;
 
@@ -188,7 +188,7 @@ public:
 	/// @param number    Number of the mobile we are looking for.
 	/// @param exceptions The list of exceptions.
 	/// @return The mobile, if it's in the room.
-	Mobile *findMobile(std::string target, int &number,
+	Mobile *findMobile(std::string target, unsigned int &number,
 					   const std::vector<Character *> &exceptions =
 						   std::vector<Character *>()) const;
 

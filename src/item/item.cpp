@@ -550,17 +550,10 @@ bool Item::takeOut(Item *item, bool updateDB)
 	return true;
 }
 
-Item *Item::findContent(std::string search_parameter, int &number)
+Item *Item::findContent(std::string search_parameter, unsigned int &number)
 {
 	if (this->isAContainer()) {
-		for (auto iterator : content) {
-			if (iterator->hasKey(ToLower(search_parameter))) {
-				if (number == 1) {
-					return iterator;
-				}
-				number -= 1;
-			}
-		}
+		return ItemUtils::FindItemIn(content, search_parameter, number);
 	}
 	return nullptr;
 }

@@ -135,7 +135,7 @@ public:
 };
 
 /// @brief Search the given item name nearby the character.
-Item *FindNearbyItem(Character *character, std::string const &key, int &number,
+Item *FindNearbyItem(Character *character, std::string const &key, unsigned int &number,
 					 const SearchOptionsCharacter &searchOptions);
 
 /// @brief Search the list of ingredients nearby the character.

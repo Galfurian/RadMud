@@ -548,7 +548,7 @@ void Character::resetActionQueue()
 	actionQueue.emplace_back(std::make_shared<GeneralAction>(this, true));
 }
 
-Item *Character::findNearbyItem(std::string const &key, int &number)
+Item *Character::findNearbyItem(std::string const &key, unsigned int &number)
 {
 	auto item = ItemUtils::FindItemIn(inventory, key, number);
 	if (item != nullptr)
