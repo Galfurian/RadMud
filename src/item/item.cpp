@@ -23,6 +23,7 @@
 #include "item/item.hpp"
 
 #include "utilities/formatter.hpp"
+#include "item/itemUtils.hpp"
 #include "mud.hpp"
 
 Item::Item() :
@@ -550,12 +551,12 @@ bool Item::takeOut(Item *item, bool updateDB)
 	return true;
 }
 
-Item *Item::findContent(std::string search_parameter, unsigned int &number)
+Item *Item::findContent(std::string search_parameter, unsigned int number,
+						unsigned int *number_ptr)
 {
-	if (this->isAContainer()) {
-		return ItemUtils::FindItemIn(content, search_parameter, number);
-	}
-	return nullptr;
+	if (!this->isAContainer())
+		return nullptr;
+	return ItemUtils::FindItemIn(content, search_parameter, number, number_ptr);
 }
 
 void Item::setOccupiedBodyParts(

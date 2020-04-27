@@ -25,9 +25,10 @@
 #include "model/submodel/lightModel.hpp"
 #include "item/subitem/lightItem.hpp"
 #include "structure/generator.hpp"
-#include "mud.hpp"
 #include "structure/structureUtils.hpp"
 #include "utilities/formatter.hpp"
+#include "item/itemUtils.hpp"
+#include "mud.hpp"
 
 Room::Room() :
 	vnum(),
@@ -225,11 +226,18 @@ bool Room::removeOnDB()
 	return true;
 }
 
-Item *Room::findBuilding(std::string target, unsigned int &number)
+Item *Room::findItem(std::string const &key, unsigned int number,
+					 unsigned int *number_ptr)
 {
-	return ItemUtils::FindItemIn(items, target, number, [](Item *item) {
-		return HasFlag(item->flags, ItemFlag::Built);
-	});
+	return ItemUtils::FindItemIn(items, key, number, number_ptr);
+}
+
+Item *Room::findBuilding(std::string target, unsigned int number,
+						 unsigned int *number_ptr)
+{
+	return ItemUtils::FindItemIn(
+		items, target, number, number_ptr,
+		[](Item *item) { return HasFlag(item->flags, ItemFlag::Built); });
 }
 
 Item *Room::findBuilding(unsigned int buildingVnum)
@@ -254,22 +262,24 @@ ItemVector Room::findBuildings(ModelType type)
 	return buildingsList;
 }
 
-Player *Room::findPlayer(std::string target, unsigned int &number,
+Player *Room::findPlayer(std::string target, unsigned int number,
+						 unsigned int *number_ptr,
 						 const std::vector<Character *> &exceptions) const
 {
 	Character *foundCharacter =
-		characters.findCharacter(target, number, exceptions, true);
+		characters.findCharacter(target, number, number_ptr, exceptions, true);
 	if (foundCharacter != nullptr) {
 		return foundCharacter->toPlayer();
 	}
 	return nullptr;
 }
 
-Mobile *Room::findMobile(std::string target, unsigned int &number,
+Mobile *Room::findMobile(std::string target, unsigned int number,
+						 unsigned int *number_ptr,
 						 const std::vector<Character *> &exceptions) const
 {
-	Character *foundCharacter =
-		characters.findCharacter(target, number, exceptions, false, true);
+	Character *foundCharacter = characters.findCharacter(
+		target, number, number_ptr, exceptions, false, true);
 	if (foundCharacter != nullptr) {
 		return foundCharacter->toMobile();
 	}

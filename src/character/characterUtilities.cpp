@@ -24,6 +24,7 @@
 #include "creation/production.hpp"
 #include "model/submodel/toolModel.hpp"
 #include "structure/room.hpp"
+#include "item/itemUtils.hpp"
 
 std::vector<std::shared_ptr<BodyPart::BodyWeapon> >
 GetActiveNaturalWeapons(Character *character)
@@ -70,7 +71,8 @@ ItemVector FindPosessedCoins(Character *character)
 	return foundCoins;
 }
 
-Item *FindNearbyItem(Character *character, std::string const &key, unsigned int &number,
+Item *FindNearbyItem(Character *character, std::string const &key,
+					 unsigned int number, unsigned int *number_ptr,
 					 const SearchOptionsCharacter &searchOptions)
 {
 	// Check the lights.
@@ -83,11 +85,12 @@ Item *FindNearbyItem(Character *character, std::string const &key, unsigned int 
 	// Get the item.
 	Item *item = nullptr;
 	if (searchOptions.searchInRoom && (character->room != nullptr) && roomLit) {
-		item = character->room->findItem(key, number);
+		item = character->room->findItem(key, number, number_ptr);
 	}
 	if (searchOptions.searchInEquipment && (item == nullptr)) {
 		if (roomLit || inventoryLit) {
-			item = ItemUtils::FindItemIn(character->equipment, key, number);
+			item = ItemUtils::FindItemIn(character->equipment, key, number,
+										 number_ptr);
 		} else if (searchOptions.randomIfNoLight &&
 				   (!character->equipment.empty())) {
 			auto it = TRand<size_t>(0, character->equipment.size() - 1);
@@ -96,7 +99,8 @@ Item *FindNearbyItem(Character *character, std::string const &key, unsigned int 
 	}
 	if (searchOptions.searchInInventory && (item == nullptr)) {
 		if (roomLit || inventoryLit) {
-			item = ItemUtils::FindItemIn(character->inventory, key, number);
+			item = ItemUtils::FindItemIn(character->inventory, key, number,
+										 number_ptr);
 		} else if (searchOptions.randomIfNoLight &&
 				   (!character->inventory.empty())) {
 			auto it = TRand<size_t>(0, character->inventory.size() - 1);
@@ -163,7 +167,7 @@ bool FindNearbyResouces(
 			}
 		}
 		MudLog(LogLevel::Debug, "[%s] %s/%s", resource.first.toString(),
-					required, resource.second);
+			   required, resource.second);
 		// If the ingredients are still not enough, return false.
 		if (required > 0) {
 			missing = resource.first;
@@ -298,8 +302,7 @@ bool HasRequiredKnowledge(Character *character,
 			   [&character](Knowledge const &k) {
 				   if (!((character->skillManager.getKnowledge(k) > 0) ||
 						 (character->effectManager.getKnowledge(k) > 0))) {
-					   MudLog(LogLevel::Debug, "Missing: %s",
-								   k.toString());
+					   MudLog(LogLevel::Debug, "Missing: %s", k.toString());
 					   return false;
 				   }
 				   return true;

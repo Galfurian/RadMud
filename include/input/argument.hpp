@@ -80,7 +80,7 @@ public:
 	}
 
 	/// Provides the index.
-	inline unsigned int & getIndex()
+	inline unsigned int getIndex() const
 	{
 		return index;
 	}

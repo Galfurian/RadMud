@@ -80,7 +80,7 @@ bool DoKill(Character *character, ArgumentHandler &args)
 	}
 	// Retrieve the target.
 	auto target = character->room->findCharacter(
-		args[0].getContent(), args[0].getIndex(), { character });
+		args[0].getContent(), args[0].getIndex(), nullptr, { character });
 	if (!target) {
 		character->sendMsg("You don't see '%s' anywhere.\n",
 						   args[0].getContent());
@@ -190,34 +190,28 @@ bool DoLoad(Character *character, ArgumentHandler &args)
 		character->sendMsg("What do you want to load with what?\n");
 		return false;
 	}
-	// Search the magazine.
-	auto itemToLoad =
-		character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
-	if (itemToLoad == nullptr) {
-		itemToLoad = character->findInventoryItem(args[0].getContent(),
-												  args[0].getIndex());
-		if (itemToLoad == nullptr) {
-			character->sendMsg("You don't have %s.\n", args[0].getContent());
-			return false;
-		}
+	// Search the Item to Load.
+	unsigned int item_index = args[0].getIndex();
+	auto item = character->findPosessedItem(args[0].getContent(), item_index,
+											&item_index);
+	if (item == nullptr) {
+		character->sendMsg("You don't have %s.\n", args[0].getContent());
+		return false;
 	}
 	// Check if the item is a magazine.
-	if (itemToLoad->getType() != ModelType::Magazine) {
-		character->sendMsg("You can't load %s.\n", itemToLoad->getName(true));
+	if (item->getType() != ModelType::Magazine) {
+		character->sendMsg("You can't load %s.\n", item->getName(true));
 		return false;
 	}
 	// Transform the item into a magazine.
-	auto magazine = static_cast<MagazineItem *>(itemToLoad);
+	auto magazine = dynamic_cast<MagazineItem *>(item);
 	// Search the projectiles.
-	auto projectile =
-		character->findEquipmentItem(args[1].getContent(), args[1].getIndex());
+	auto projectile_index = args[1].getIndex();
+	auto projectile = character->findPosessedItem(
+		args[1].getContent(), projectile_index, &projectile_index);
 	if (projectile == nullptr) {
-		projectile = character->findInventoryItem(args[1].getContent(),
-												  args[1].getIndex());
-		if (projectile == nullptr) {
-			character->sendMsg("You don't have %s.\n", args[1].getContent());
-			return false;
-		}
+		character->sendMsg("You don't have %s.\n", args[1].getContent());
+		return false;
 	}
 	// Check if the projectiles can be loaded inside the magazine.
 	std::string error;
@@ -250,30 +244,26 @@ bool DoUnload(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Search the magazine.
-	auto itemToUnload =
-		character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
-	if (itemToUnload == nullptr) {
-		itemToUnload = character->findInventoryItem(args[0].getContent(),
-													args[0].getIndex());
-		if (itemToUnload == nullptr) {
-			character->sendMsg("You don't have %s.\n", args[0].getContent());
-			return false;
-		}
-	}
-	// Check if the item is a magazine or a ranged weapon.
-	if ((itemToUnload->getType() != ModelType::Magazine) &&
-		(itemToUnload->getType() != ModelType::RangedWeapon)) {
-		character->sendMsg("You can't unload %s.\n",
-						   itemToUnload->getName(true));
+	auto item_index = args[0].getIndex();
+	auto item = character->findPosessedItem(args[0].getContent(), item_index,
+											&item_index);
+	if (item == nullptr) {
+		character->sendMsg("You don't have %s.\n", args[0].getContent());
 		return false;
 	}
-	if (itemToUnload->isEmpty()) {
+	// Check if the item is a magazine or a ranged weapon.
+	if ((item->getType() != ModelType::Magazine) &&
+		(item->getType() != ModelType::RangedWeapon)) {
+		character->sendMsg("You can't unload %s.\n", item->getName(true));
+		return false;
+	}
+	if (item->isEmpty()) {
 		character->sendMsg("%s is already empty...\n",
-						   itemToUnload->getNameCapital(true));
+						   item->getNameCapital(true));
 		return false;
 	}
 	// Create the unload action.
-	auto act = std::make_shared<UnloadAction>(character, itemToUnload);
+	auto act = std::make_shared<UnloadAction>(character, item);
 	if (act->start()) {
 		character->pushAction(act);
 		return true;
@@ -294,33 +284,27 @@ bool DoReload(Character *character, ArgumentHandler &args)
 		character->sendMsg("What do you want to reload with what?\n");
 		return false;
 	}
-	auto itemToReload =
-		character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
-	if (itemToReload == nullptr) {
-		itemToReload = character->findInventoryItem(args[0].getContent(),
-													args[0].getIndex());
-		if (itemToReload == nullptr) {
-			character->sendMsg("You don't have %s.\n", args[0].getContent());
-			return false;
-		}
+	// Find the item to reload.
+	auto item_index = args[0].getIndex();
+	auto item = character->findPosessedItem(args[0].getContent(), item_index,
+											&item_index);
+	if (item == nullptr) {
+		character->sendMsg("You don't have %s.\n", args[0].getContent());
+		return false;
 	}
-	if (itemToReload->getType() != ModelType::RangedWeapon) {
-		character->sendMsg("You can't reload %s.\n",
-						   itemToReload->getName(true));
+	if (item->getType() != ModelType::RangedWeapon) {
+		character->sendMsg("You can't reload %s.\n", item->getName(true));
 		return false;
 	}
 	// Transform the item into a ranged weapons.
-	auto rangedWeapon = static_cast<RangedWeaponItem *>(itemToReload);
+	auto rangedWeapon = dynamic_cast<RangedWeaponItem *>(item);
 	// Search the magazine.
-	auto magazine =
-		character->findEquipmentItem(args[1].getContent(), args[1].getIndex());
+	auto magazine_index = args[1].getIndex();
+	auto magazine = character->findPosessedItem(
+		args[1].getContent(), magazine_index, &magazine_index);
 	if (magazine == nullptr) {
-		magazine = character->findInventoryItem(args[1].getContent(),
-												args[1].getIndex());
-		if (magazine == nullptr) {
-			character->sendMsg("You don't have %s.\n", args[1].getContent());
-			return false;
-		}
+		character->sendMsg("You don't have %s.\n", args[1].getContent());
+		return false;
 	}
 	if (magazine->getType() != ModelType::Magazine) {
 		character->sendMsg("You can't reload %s with %s.\n",

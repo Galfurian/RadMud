@@ -163,12 +163,16 @@ bool DoLook(Character *character, ArgumentHandler &args)
 	}
 	// If only one argument is provided, it wants to look at something.
 	if (args.size() == 1) {
+		// Store the index inside a variable.
+		auto target_index = args[0].getIndex();
 		// Check if the room is lit by a light. In that case, maybe the
 		// player is looking at someone.
 		if (character->room->isLit()) {
 			// Check if the character is looking at another character.
-			auto target = character->room->findCharacter(
-				args[0].getContent(), args[0].getIndex(), { character });
+			auto target =
+				character->room->findCharacter(args[0].getContent(),
+											   target_index, &target_index,
+											   { character });
 			if (target) {
 				if (character->canSee(target)) {
 					// Show the target.
@@ -188,7 +192,7 @@ bool DoLook(Character *character, ArgumentHandler &args)
 		auto options = SearchOptionsCharacter::allOptions();
 		options.randomIfNoLight = false;
 		auto item = FindNearbyItem(character, args[0].getContent(),
-								   args[0].getIndex(), options);
+								   target_index, &target_index, options);
 		if (item) {
 			character->sendMsg(item->getLook());
 			return true;
@@ -199,8 +203,10 @@ bool DoLook(Character *character, ArgumentHandler &args)
 		// Check if the room is lit by a light. In that case, maybe the
 		// player is looking at the equipment of someone.
 		if (character->room->isLit()) {
-			auto target = character->room->findCharacter(
-				args[1].getContent(), args[1].getIndex(), { character });
+			auto target =
+				character->room->findCharacter(args[1].getContent(),
+											   args[1].getIndex(), nullptr,
+											   { character });
 			if (target != nullptr) {
 				if (character->canSee(target)) {
 					auto item = target->findEquipmentItem(args[0].getContent(),
@@ -224,7 +230,7 @@ bool DoLook(Character *character, ArgumentHandler &args)
 		auto options = SearchOptionsCharacter::allOptions();
 		options.randomIfNoLight = false;
 		auto container = FindNearbyItem(character, args[1].getContent(),
-										args[1].getIndex(), options);
+										args[1].getIndex(), nullptr, options);
 		if (container == nullptr) {
 			character->sendMsg("You don't see the container '%s' anywhere.\n",
 							   args[1].getContent());

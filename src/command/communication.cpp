@@ -60,8 +60,9 @@ bool DoSay(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Check if the character are talking to another character.
-	auto receiver = character->room->findCharacter(
-		args.get(0).getContent(), args.get(0).getIndex(), { character });
+	auto receiver = character->room->findCharacter(args.get(0).getContent(),
+												   args.get(0).getIndex(),
+												   nullptr, { character });
 	if (receiver != nullptr) {
 		// Get the rest of the message, minus the first word.
 		auto message = args.substr(1);
@@ -118,7 +119,7 @@ bool DoWhisper(Character *character, ArgumentHandler &args)
 	}
 	// Check the existence of the target character.
 	auto receiver = character->room->findCharacter(
-		args[0].getContent(), args[0].getIndex(), { character });
+		args[0].getContent(), args[0].getIndex(), nullptr, { character });
 	if (receiver == nullptr) {
 		character->sendMsg("You don't see %s here.\n", args[0].getContent());
 		return false;

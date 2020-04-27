@@ -34,18 +34,24 @@ namespace ItemUtils
 /// @param number    Position of the item we want to look for.
 /// @return The item, if it's in the character's inventory.
 Item *FindItemIn(std::vector<Item *> const &container, std::string const &key,
-				 unsigned int &number, const FindPredicate &predicate)
+				 unsigned int number, unsigned int *number_ptr,
+				 const FindPredicate &predicate)
 {
+	Item *found_item = nullptr;
 	for (auto item : container) {
 		if (!item->hasKey(ToLower(key)))
 			continue;
 		if (predicate && !predicate(item))
 			continue;
-		if (number == 1)
-			return item;
+		if (number == 1) {
+			found_item = item;
+			break;
+		}
 		--number;
 	}
-	return nullptr;
+	if (number_ptr)
+		*number_ptr = number;
+	return found_item;
 }
 
 bool IsValidTool(Item *item, ItemVector const &exceptions,

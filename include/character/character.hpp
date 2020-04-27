@@ -40,7 +40,6 @@
 #include "enumerators/characterPosture.hpp"
 #include "characterVector.hpp"
 #include "character/skill/skillManager.hpp"
-#include "item/itemUtils.hpp"
 #include "combatHandler.hpp"
 
 #include <deque>
@@ -335,25 +334,29 @@ public:
 	/// @param key    The item to search.
 	/// @param number Position of the item we want to look for.
 	/// @return The item, if it's in the character's inventory.
-	inline Item *findInventoryItem(std::string const &key, unsigned int &number)
-	{
-		return ItemUtils::FindItemIn(inventory, key, number);
-	}
+	Item *findInventoryItem(std::string const &key, unsigned int number,
+							unsigned int *number_ptr = nullptr);
 
 	/// @brief Search for the item in equipment.
 	/// @param key    The item to search.
 	/// @param number Position of the item we want to look for.
 	/// @return The item, if it's in the character's equipment.
-	Item *findEquipmentItem(std::string const &key, unsigned int &number)
-	{
-		return ItemUtils::FindItemIn(equipment, key, number);
-	}
+	Item *findEquipmentItem(std::string const &key, unsigned int number,
+							unsigned int *number_ptr = nullptr);
 
 	/// @brief Search an item nearby, (eq, inv, room).
 	/// @param key    The item to search.
 	/// @param number Position of the item we want to look for.
 	/// @return The item, if it's found.
-	Item *findNearbyItem(std::string const &key, unsigned int &number);
+	Item *findPosessedItem(std::string const &key, unsigned int number,
+						   unsigned int *number_ptr = nullptr);
+
+	/// @brief Search an item nearby, (eq, inv, room).
+	/// @param key    The item to search.
+	/// @param number Position of the item we want to look for.
+	/// @return The item, if it's found.
+	Item *findNearbyItem(std::string const &key, unsigned int number,
+						 unsigned int *number_ptr = nullptr);
 
 	/// @brief Search the item at given position and return it.
 	/// @param bodyPart The body part where the method need to search the item.

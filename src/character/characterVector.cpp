@@ -38,10 +38,12 @@ CharacterVector::CharacterVector()
 }
 
 Character *
-CharacterVector::findCharacter(const std::string &target, unsigned int &number,
+CharacterVector::findCharacter(const std::string &target, unsigned int number,
+							   unsigned int *number_ptr,
 							   const std::vector<Character *> &exceptions,
 							   bool skipMobile, bool skipPlayer) const
 {
+	Character *found_character = nullptr;
 	for (auto character : (*this)) {
 		if ((skipMobile && character->isMobile()) ||
 			(skipPlayer && character->isPlayer())) {
@@ -52,22 +54,28 @@ CharacterVector::findCharacter(const std::string &target, unsigned int &number,
 		// Check if the character is a mobile or a player.
 		if (character->isMobile()) {
 			if (character->toMobile()->hasKey(ToLower(target))) {
-				if (number == 1)
-					return character->toMobile();
+				if (number == 1) {
+					found_character = character;
+					break;
+				}
 				--number;
 			}
 		} else {
 			if (character->toPlayer()->isPlaying()) {
 				if (BeginWith(character->toPlayer()->getName(),
 							  ToLower(target))) {
-					if (number == 1)
-						return character->toPlayer();
+					if (number == 1) {
+						found_character = character;
+						break;
+					}
 					--number;
 				}
 			}
 		}
 	}
-	return nullptr;
+	if (number_ptr)
+		*number_ptr = number;
+	return found_character;
 }
 
 bool CharacterVector::containsCharacter(Character *character) const

@@ -25,11 +25,12 @@
 #include "structure/structureUtils.hpp"
 #include "character/characterUtilities.hpp"
 #include "utilities/formatter.hpp"
-#include "item/subitem/lightItem.hpp"
-#include "item/subitem/armorItem.hpp"
-#include "mud.hpp"
 #include "model/submodel/armorModel.hpp"
 #include "model/submodel/shieldModel.hpp"
+#include "item/subitem/lightItem.hpp"
+#include "item/subitem/armorItem.hpp"
+#include "item/itemUtils.hpp"
+#include "mud.hpp"
 
 Character::Character() :
 	name(),
@@ -548,16 +549,38 @@ void Character::resetActionQueue()
 	actionQueue.emplace_back(std::make_shared<GeneralAction>(this, true));
 }
 
-Item *Character::findNearbyItem(std::string const &key, unsigned int &number)
+Item *Character::findInventoryItem(std::string const &key, unsigned int number,
+								   unsigned int *number_ptr)
 {
-	auto item = ItemUtils::FindItemIn(inventory, key, number);
+	return ItemUtils::FindItemIn(inventory, key, number, number_ptr);
+}
+
+Item *Character::findEquipmentItem(std::string const &key, unsigned int number,
+								   unsigned int *number_ptr)
+{
+	return ItemUtils::FindItemIn(equipment, key, number, number_ptr);
+}
+
+Item *Character::findPosessedItem(std::string const &key, unsigned int number,
+								  unsigned int *number_ptr)
+{
+	Item *item = ItemUtils::FindItemIn(equipment, key, number, number_ptr);
+	if (!item)
+		item = ItemUtils::FindItemIn(inventory, key, number, number_ptr);
+	return item;
+}
+
+Item *Character::findNearbyItem(std::string const &key, unsigned int number,
+								unsigned int *number_ptr)
+{
+	auto item = ItemUtils::FindItemIn(inventory, key, number, number_ptr);
 	if (item != nullptr)
 		return item;
-	item = ItemUtils::FindItemIn(equipment, key, number);
+	item = ItemUtils::FindItemIn(equipment, key, number, number_ptr);
 	if (item != nullptr)
 		return item;
 	if (room != nullptr)
-		return room->findItem(key, number);
+		return room->findItem(key, number, number_ptr);
 	return nullptr;
 }
 

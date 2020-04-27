@@ -575,7 +575,7 @@ bool DoGive(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	auto target = character->room->findCharacter(
-		args[1].getContent(), args[1].getIndex(), { character });
+		args[1].getContent(), args[1].getIndex(), nullptr, { character });
 	if (target == nullptr) {
 		character->sendMsg("You don't see that person.\n");
 		return false;

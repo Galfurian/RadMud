@@ -42,7 +42,8 @@ public:
 	///                     <b>False</b> count also the players.
 	/// @return The character if it has been found.
 	Character *findCharacter(
-		const std::string &target, unsigned int &number,
+		const std::string &target, unsigned int number,
+		unsigned int *number_ptr = nullptr,
 		const std::vector<Character *> &exceptions = std::vector<Character *>(),
 		bool skipMobile = false, bool skipPlayer = false) const;
 

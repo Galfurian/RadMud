@@ -44,7 +44,7 @@ bool DoTurn(Character *character, ArgumentHandler &args)
 	}
 	auto searchOptions = SearchOptionsCharacter::allOptions();
 	auto item = FindNearbyItem(character, args[0].getContent(),
-							   args[0].getIndex(), searchOptions);
+							   args[0].getIndex(), nullptr, searchOptions);
 	if (item == nullptr) {
 		character->sendMsg("You don't see '%s' anywhere.\n",
 						   args[0].getContent());
@@ -221,18 +221,16 @@ bool DoRefill(Character *character, ArgumentHandler &args)
 			character->findNearbyItem(args[0].getContent(), args[0].getIndex());
 		fuel =
 			character->findNearbyItem(args[1].getContent(), args[1].getIndex());
-	} else {
+	} else if (inventoryIsLit) {
 		// If the room is not lit but the inventory is.
-		if (inventoryIsLit) {
-			item = character->findInventoryItem(args[0].getContent(),
-												args[0].getIndex());
-			fuel = character->findInventoryItem(args[1].getContent(),
-												args[1].getIndex());
-		} else {
-			character->sendMsg("You can't do that without seeing,"
-							   "you could waste most of the fuel.\n");
-			return false;
-		}
+		item = character->findInventoryItem(args[0].getContent(),
+											args[0].getIndex());
+		fuel = character->findInventoryItem(args[1].getContent(),
+											args[1].getIndex());
+	} else {
+		character->sendMsg("You can't do that without seeing,"
+						   "you could waste most of the fuel.\n");
+		return false;
 	}
 	// Check the light source.
 	if (item == nullptr) {
