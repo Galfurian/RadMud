@@ -54,8 +54,7 @@ public:
 	/// @param newLiquidAmount  The amount of liquid.
 	/// @return <b>True</b> if it can be contained,<br>
 	///         <b>False</b> otherwise.
-	bool canContainLiquid(Liquid *newLiquidContent,
-						  const double &newLiquidAmount) const;
+	bool canContainLiquid(Liquid *newLiquidContent, const double &newLiquidAmount) const;
 
 	/// @brief Load some liquid inside the container and update the database.
 	/// @param newLiquidContent The liquid to pour in.
@@ -63,8 +62,7 @@ public:
 	/// @param updateDB         If the action has to be updated on the database.
 	/// @return <b>True</b> if the operation is a success,<br>
 	///         <b>False</b> otherwise.
-	bool pourIn(Liquid *newLiquidContent, const double &quantityToPourIn,
-				bool updateDB = true);
+	bool pourIn(Liquid *newLiquidContent, const double &quantityToPourIn, bool updateDB = true);
 
 	/// @brief Extract some liquid from the container and update the database.
 	/// @param amount   The amount of liquid.

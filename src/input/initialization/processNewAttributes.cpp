@@ -46,8 +46,7 @@ bool ProcessNewAttributes::process(ArgumentHandler &args)
 	if (ToLower(args[0].getContent()) == "reset") {
 		player->remaining_points = 0;
 		for (auto &ability : player->abilities) {
-			player->setAbility(ability.first,
-							   player->race->getAbility(ability.first));
+			player->setAbility(ability.first, player->race->getAbility(ability.first));
 		}
 		error = Formatter::cyan("Attribute has been set by default.\n");
 		this->advance();
@@ -110,13 +109,11 @@ bool ProcessNewAttributes::process(ArgumentHandler &args)
 			int lowerBound = ((base - 5) > 0) ? (base - 5) : 0;
 			// Check if the result is inside the boundaries.
 			if (result < lowerBound) {
-				error = ability.toString() + " can't go below " +
-						ToString(lowerBound) + ".";
+				error = ability.toString() + " can't go below " + ToString(lowerBound) + ".";
 				this->advance();
 				return false;
 			} else if (result > upperBound) {
-				error = ability.toString() + " can't go above " +
-						ToString(upperBound) + ".";
+				error = ability.toString() + " can't go above " + ToString(upperBound) + ".";
 				this->advance();
 			}
 			// Decrease the remaining points.
@@ -150,8 +147,7 @@ void ProcessNewAttributes::advance()
 	}
 	ss << "#\n";
 	ss << "# Remaining Points: ";
-	ss << ((player->remaining_points > 0) ? Formatter::green() :
-											Formatter::red());
+	ss << ((player->remaining_points > 0) ? Formatter::green() : Formatter::red());
 	ss << player->remaining_points << Formatter::reset() << "\n";
 	ss << "#\n";
 	ss << "# Type [" << Formatter::magenta("(number)") << "]"

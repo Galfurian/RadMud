@@ -24,11 +24,9 @@
 #include "input/processInput.hpp"
 
 /// Player names must consist of characters from this list.
-#define VALID_CHARACTERS_NAME                                                  \
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
+#define VALID_CHARACTERS_NAME "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-"
 /// Player descriptions must consist of characters from this list.
-#define VALID_CHARACTERS_DESC                                                  \
-	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
+#define VALID_CHARACTERS_DESC "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 ,.\n"
 
 /// @brief The abstract class used for implementing an initialization step.
 /// @details
@@ -43,9 +41,7 @@
 class ProcessInitialization : public ProcessInput {
 public:
 	/// @brief Constructor.
-	explicit ProcessInitialization(Character *_character) :
-		ProcessInput(_character),
-		error()
+	explicit ProcessInitialization(Character *_character) : ProcessInput(_character), error()
 	{
 		// Nothing to do.
 	}

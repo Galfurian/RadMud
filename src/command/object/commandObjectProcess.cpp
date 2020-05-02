@@ -56,8 +56,7 @@ bool DoDismember(Character *character, ArgumentHandler &args)
 		character->sendMsg("You cannot do that without light.\n");
 		return false;
 	}
-	auto item =
-		character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+	auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
 	if (item == nullptr) {
 		character->sendMsg("You cannot find '%s'.\n", args[0].getContent());
 		return false;
@@ -71,8 +70,7 @@ bool DoDismember(Character *character, ArgumentHandler &args)
 	// Get a valid body part.
 	auto bodyPart = corpse->getAvailableBodyPart();
 	if (bodyPart == nullptr) {
-		character->sendMsg("%s does not contain anything useful.\n",
-						   item->getNameCapital(true));
+		character->sendMsg("%s does not contain anything useful.\n", item->getNameCapital(true));
 		return false;
 	}
 	auto act = std::make_shared<DismemberAction>(character, corpse, bodyPart);

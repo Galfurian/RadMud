@@ -33,22 +33,14 @@
 #include "command/movement.hpp"
 
 Command::Command() :
-	handler(),
-	name(),
-	arguments(),
-	help(),
-	gods(),
-	canUseInCombat(),
-	typedCompletely()
+	handler(), name(), arguments(), help(), gods(), canUseInCombat(), typedCompletely()
 {
 	// Nothing to do.
 }
 
-Command::Command(const std::function<bool(Character *character,
-										  ArgumentHandler &args)> &_handler,
-				 const std::string &_name, const std::string &_arguments,
-				 const std::string &_help, const bool &_gods,
-				 const bool &_canUseInCombat, const bool &_typedCompletely) :
+Command::Command(const std::function<bool(Character *character, ArgumentHandler &args)> &_handler,
+				 const std::string &_name, const std::string &_arguments, const std::string &_help,
+				 const bool &_gods, const bool &_canUseInCombat, const bool &_typedCompletely) :
 	handler(_handler),
 	name(_name),
 	arguments(_arguments),

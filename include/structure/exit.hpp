@@ -58,8 +58,7 @@ public:
 	/// @param _destination The destination room.
 	/// @param _direction   The direction of the exit.
 	/// @param _flags       The exit flags.
-	Exit(Room *_source, Room *_destination, Direction _direction,
-		 unsigned int _flags);
+	Exit(Room *_source, Room *_destination, Direction _direction, unsigned int _flags);
 
 	/// Exit deconstructor.
 	~Exit();

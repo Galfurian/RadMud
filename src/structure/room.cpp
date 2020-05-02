@@ -93,8 +93,8 @@ void Room::addItem(Item *&item, bool updateDB)
 	item->room = this;
 	// Update the database.
 	if (updateDB && (item->getType() != ModelType::Corpse)) {
-		SQLiteDbms::instance().insertInto(
-			"ItemRoom", { ToString(vnum), ToString(item->vnum) }, false, true);
+		SQLiteDbms::instance().insertInto("ItemRoom", { ToString(vnum), ToString(item->vnum) },
+										  false, true);
 	}
 	MudLog(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), name);
 }
@@ -125,12 +125,11 @@ bool Room::removeItem(Item *item, bool updateDB)
 		item->room = nullptr;
 		// Update the database.
 		if (updateDB && (item->getType() != ModelType::Corpse)) {
-			SQLiteDbms::instance().deleteFrom(
-				"ItemRoom", { std::make_pair("item", ToString(item->vnum)) });
+			SQLiteDbms::instance().deleteFrom("ItemRoom",
+											  { std::make_pair("item", ToString(item->vnum)) });
 		}
 		// Log it.
-		MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(),
-			   name);
+		MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), name);
 		return true;
 	}
 	return false;
@@ -212,32 +211,26 @@ bool Room::updateOnDB()
 bool Room::removeOnDB()
 {
 	if (items.size() > 0) {
-		MudLog(LogLevel::Error,
-			   "[Room::RemoveOnDB] There are still items in the room!");
+		MudLog(LogLevel::Error, "[Room::RemoveOnDB] There are still items in the room!");
 		return false;
 	}
 	if (characters.size() > 0) {
-		MudLog(LogLevel::Error,
-			   "[Room::RemoveOnDB] There are still characters in the room!");
+		MudLog(LogLevel::Error, "[Room::RemoveOnDB] There are still characters in the room!");
 		return false;
 	}
-	SQLiteDbms::instance().deleteFrom(
-		"Room", { std::make_pair("vnum", ToString(vnum)) });
+	SQLiteDbms::instance().deleteFrom("Room", { std::make_pair("vnum", ToString(vnum)) });
 	return true;
 }
 
-Item *Room::findItem(std::string const &key, unsigned int number,
-					 unsigned int *number_ptr)
+Item *Room::findItem(std::string const &key, unsigned int number, unsigned int *number_ptr)
 {
 	return ItemUtils::FindItemIn(items, key, number, number_ptr);
 }
 
-Item *Room::findBuilding(std::string target, unsigned int number,
-						 unsigned int *number_ptr)
+Item *Room::findBuilding(std::string target, unsigned int number, unsigned int *number_ptr)
 {
-	return ItemUtils::FindItemIn(
-		items, target, number, number_ptr,
-		[](Item *item) { return HasFlag(item->flags, ItemFlag::Built); });
+	return ItemUtils::FindItemIn(items, target, number, number_ptr,
+								 [](Item *item) { return HasFlag(item->flags, ItemFlag::Built); });
 }
 
 Item *Room::findBuilding(unsigned int buildingVnum)
@@ -254,16 +247,14 @@ ItemVector Room::findBuildings(ModelType type)
 {
 	ItemVector buildingsList;
 	for (auto iterator : items) {
-		if ((iterator->getType() == type) &&
-			HasFlag(iterator->flags, ItemFlag::Built)) {
+		if ((iterator->getType() == type) && HasFlag(iterator->flags, ItemFlag::Built)) {
 			buildingsList.push_back(iterator);
 		}
 	}
 	return buildingsList;
 }
 
-Player *Room::findPlayer(std::string target, unsigned int number,
-						 unsigned int *number_ptr,
+Player *Room::findPlayer(std::string target, unsigned int number, unsigned int *number_ptr,
 						 const std::vector<Character *> &exceptions) const
 {
 	Character *foundCharacter =
@@ -274,12 +265,11 @@ Player *Room::findPlayer(std::string target, unsigned int number,
 	return nullptr;
 }
 
-Mobile *Room::findMobile(std::string target, unsigned int number,
-						 unsigned int *number_ptr,
+Mobile *Room::findMobile(std::string target, unsigned int number, unsigned int *number_ptr,
 						 const std::vector<Character *> &exceptions) const
 {
-	Character *foundCharacter = characters.findCharacter(
-		target, number, number_ptr, exceptions, false, true);
+	Character *foundCharacter =
+		characters.findCharacter(target, number, number_ptr, exceptions, false, true);
 	if (foundCharacter != nullptr) {
 		return foundCharacter->toMobile();
 	}
@@ -333,8 +323,7 @@ bool Room::isLit()
 	}
 	// Get the day phase.
 	auto dayPhase = MudUpdater::instance().getDayPhase();
-	if (!HasFlag(terrain->flags, TerrainFlag::Indoor) &&
-		(dayPhase != DayPhase::Night)) {
+	if (!HasFlag(terrain->flags, TerrainFlag::Indoor) && (dayPhase != DayPhase::Night)) {
 		//        MudLog(LogLevel::Debug,
 		//                    "Room is lit (outside)(!night)(%s us)",
 		//                    stopwatch.stop());
@@ -399,15 +388,13 @@ std::string Room::getLook(Character *actor)
 		if (area != nullptr) {
 			if (Formatter::getFormat() == Formatter::CLIENT) {
 				output += Formatter::doClearMap();
-				for (auto layer :
-					 area->drawFov(this, actor->getViewDistance())) {
+				for (auto layer : area->drawFov(this, actor->getViewDistance())) {
 					output += Formatter::doDrawMap();
 					output += layer;
 					output += Formatter::dontDrawMap();
 				}
 			} else {
-				output += area->drawASCIIFov(this, actor->getViewDistance(),
-											 actor->race->height);
+				output += area->drawASCIIFov(this, actor->getViewDistance(), actor->race->height);
 			}
 		}
 	}
@@ -427,12 +414,11 @@ std::string Room::getLook(Character *actor)
 			}
 			// If there are more of this item, show the counter.
 			if (it->quantity > 1) {
-				output += Formatter::cyan() + it->getNameCapital() +
-						  Formatter::reset() + " are here.[" +
-						  ToString(it->quantity) + "]\n";
+				output += Formatter::cyan() + it->getNameCapital() + Formatter::reset() +
+						  " are here.[" + ToString(it->quantity) + "]\n";
 			} else {
-				output += Formatter::cyan() + it->getNameCapital() +
-						  Formatter::reset() + " is here.\n";
+				output +=
+					Formatter::cyan() + it->getNameCapital() + Formatter::reset() + " is here.\n";
 			}
 		}
 		// List mobile in the same room.
@@ -440,28 +426,24 @@ std::string Room::getLook(Character *actor)
 			if (!actor->canSee(iterator)) {
 				continue;
 			}
-			output += Formatter::blue() + iterator->getStaticDesc() +
-					  Formatter::reset() + "\n";
+			output += Formatter::blue() + iterator->getStaticDesc() + Formatter::reset() + "\n";
 		}
 		// List other players in the same room.
 		for (auto iterator : getAllPlayer(actor)) {
 			if (!actor->canSee(iterator)) {
 				continue;
 			}
-			output += Formatter::gray() + iterator->getStaticDesc() +
-					  Formatter::reset() + "\n";
+			output += Formatter::gray() + iterator->getStaticDesc() + Formatter::reset() + "\n";
 		}
 	}
 	return output;
 }
 
-void Room::sendToAll(const std::string &message,
-					 const std::vector<Character *> &exceptions)
+void Room::sendToAll(const std::string &message, const std::vector<Character *> &exceptions)
 {
 	for (auto iterator : characters) {
 		if (!exceptions.empty()) {
-			if (std::find(exceptions.begin(), exceptions.end(), iterator) !=
-				exceptions.end()) {
+			if (std::find(exceptions.begin(), exceptions.end(), iterator) != exceptions.end()) {
 				continue;
 			}
 		}
@@ -469,9 +451,8 @@ void Room::sendToAll(const std::string &message,
 	}
 }
 
-void Room::funcSendToAll(
-	const std::string &message,
-	std::function<bool(Character *character)> checkException)
+void Room::funcSendToAll(const std::string &message,
+						 std::function<bool(Character *character)> checkException)
 {
 	for (auto iterator : characters) {
 		if (checkException) {
@@ -512,15 +493,14 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 	new_room->area = source_room->area;
 	new_room->coord = coord;
 	new_room->terrain = source_room->terrain;
-	new_room->name = Generator::instance().generateName(
-		source_room->area->type, source_room->area->status);
+	new_room->name =
+		Generator::instance().generateName(source_room->area->type, source_room->area->status);
 	new_room->description = Generator::instance().generateDescription(
 		source_room->area->type, source_room->area->status, new_room->name);
 	new_room->flags = 0;
 
 	// Insert into table Room the newly created room.
-	MudLog(LogLevel::Info,
-		   "[CreateRoom] Saving room details on the database...");
+	MudLog(LogLevel::Info, "[CreateRoom] Saving room details on the database...");
 	std::vector<std::string> arguments;
 	arguments.push_back(ToString(new_room->vnum));
 	arguments.push_back(ToString(new_room->coord.x));
@@ -547,8 +527,7 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 		return false;
 	}
 	// Add the created room to the room_map.
-	MudLog(LogLevel::Info,
-		   "[CreateRoom] Adding the room to the global list...");
+	MudLog(LogLevel::Info, "[CreateRoom] Adding the room to the global list...");
 	if (!Mud::instance().addRoom(new_room)) {
 		MudLog(LogLevel::Error, "Cannot add the room to the mud.\n");
 		SQLiteDbms::instance().rollbackTransection();
@@ -563,14 +542,12 @@ bool CreateRoom(Coordinates coord, Room *source_room)
 	if (!ConnectRoom(new_room)) {
 		SQLiteDbms::instance().rollbackTransection();
 		if (!Mud::instance().remRoom(new_room)) {
-			MudLog(
-				LogLevel::Error,
-				"During rollback I was not able to remove the room from the mud.\n");
+			MudLog(LogLevel::Error,
+				   "During rollback I was not able to remove the room from the mud.\n");
 		}
 		if (!new_room->area->remRoom(new_room)) {
-			MudLog(
-				LogLevel::Error,
-				"During rollback I was not able to remove the room from the area.\n");
+			MudLog(LogLevel::Error,
+				   "During rollback I was not able to remove the room from the area.\n");
 		}
 		delete (new_room);
 		return false;
@@ -583,11 +560,9 @@ bool ConnectRoom(Room *room)
 {
 	bool status = true;
 	std::vector<std::shared_ptr<Exit> > generatedExits;
-	MudLog(LogLevel::Info,
-		   "[ConnectRoom] Connecting the room to near rooms...");
-	std::vector<Direction> directions = { Direction::North, Direction::South,
-										  Direction::West,	Direction::East,
-										  Direction::Up,	Direction::Down };
+	MudLog(LogLevel::Info, "[ConnectRoom] Connecting the room to near rooms...");
+	std::vector<Direction> directions = { Direction::North, Direction::South, Direction::West,
+										  Direction::East,	Direction::Up,	  Direction::Down };
 	for (auto direction : directions) {
 		// Get the coordinate modifier.
 		auto coordinates = room->coord + direction.getCoordinates();
@@ -596,8 +571,7 @@ bool ConnectRoom(Room *room)
 		if (near != nullptr) {
 			// Create the two exits.
 			auto forward = std::make_shared<Exit>(room, near, direction, 0);
-			auto backward =
-				std::make_shared<Exit>(near, room, direction.getOpposite(), 0);
+			auto backward = std::make_shared<Exit>(near, room, direction.getOpposite(), 0);
 			generatedExits.push_back(forward);
 			generatedExits.push_back(backward);
 			// In case the connection is Up/Down set the presence of stairs.
@@ -635,8 +609,7 @@ bool ConnectRoom(Room *room)
 		MudLog(LogLevel::Error, "Disconnecting all the rooms.");
 		for (auto exitIterator : generatedExits) {
 			if (!exitIterator->unlink()) {
-				MudLog(LogLevel::Fatal,
-					   "I was not able to remove an unwanted exit.");
+				MudLog(LogLevel::Fatal, "I was not able to remove an unwanted exit.");
 			}
 		}
 	}

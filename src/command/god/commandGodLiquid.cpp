@@ -73,11 +73,9 @@ bool DoLiquidCreate(Character *character, ArgumentHandler &args)
 	// Get the number of arguments.
 	auto argv(args.size());
 	// Find the container.
-	auto item =
-		character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+	auto item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
 	if (item == nullptr) {
-		character->sendMsg("Can't find the desire container '%s'.\n",
-						   args[0].getContent());
+		character->sendMsg("Can't find the desire container '%s'.\n", args[0].getContent());
 		return false;
 	}
 	if (item->getType() != ModelType::LiquidContainer) {
@@ -87,9 +85,7 @@ bool DoLiquidCreate(Character *character, ArgumentHandler &args)
 	if (argv == 1) {
 		character->sendMsg("You can fill %s with:\n", item->getName());
 		for (auto const &it : Mud::instance().mudLiquids) {
-			character->sendMsg("    [%s] %s\n",
-							   Align(it.first, align::right, 4),
-							   it.second->name);
+			character->sendMsg("    [%s] %s\n", Align(it.first, align::right, 4), it.second->name);
 		}
 		return false;
 	}
@@ -120,8 +116,7 @@ bool DoLiquidCreate(Character *character, ArgumentHandler &args)
 		character->sendMsg("Item can't contain that quantity of liquid.\n");
 		return false;
 	}
-	character->sendMsg("You materialise %s units of %s inside %s.\n",
-					   ToString(quantity), liquid->getName(),
-					   item->getName(true));
+	character->sendMsg("You materialise %s units of %s inside %s.\n", ToString(quantity),
+					   liquid->getName(), item->getName(true));
 	return true;
 }

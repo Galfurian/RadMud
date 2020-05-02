@@ -29,12 +29,9 @@
 
 #include <cassert>
 
-LoadAction::LoadAction(Character *_actor, MagazineItem *_magazine,
-					   Item *_projectile, const unsigned int &_amount) :
-	GeneralAction(_actor),
-	magazine(_magazine),
-	projectile(_projectile),
-	amount(_amount)
+LoadAction::LoadAction(Character *_actor, MagazineItem *_magazine, Item *_projectile,
+					   const unsigned int &_amount) :
+	GeneralAction(_actor), magazine(_magazine), projectile(_projectile), amount(_amount)
 {
 	// Debugging message.
 	MudLog(LogLevel::Debug, "Created LoadAction.");
@@ -70,8 +67,7 @@ bool LoadAction::check(std::string &error) const
 			error = "You cannot stack the item with the one inside.";
 			return false;
 		}
-		if (magazine->model->to<MagazineModel>()->maxAmount <=
-			loadedProjectile->quantity) {
+		if (magazine->model->to<MagazineModel>()->maxAmount <= loadedProjectile->quantity) {
 			error = "The item is already at full capacity.";
 			return false;
 		}
@@ -99,9 +95,8 @@ bool LoadAction::start()
 	// Send the starting message.
 	actor->sendMsg("You start loading %s with %s.\n", magazine->getName(true),
 				   projectile->getName(true));
-	actor->room->sendToAll("%s starts loading %s with %s...\n", { actor },
-						   actor->getNameCapital(), magazine->getName(true),
-						   projectile->getName(true));
+	actor->room->sendToAll("%s starts loading %s with %s...\n", { actor }, actor->getNameCapital(),
+						   magazine->getName(true), projectile->getName(true));
 	return true;
 }
 
@@ -136,22 +131,20 @@ ActionStatus LoadAction::perform()
 			actor->remInventoryItem(projectile);
 			magazine->putInside(projectile);
 		} else {
-			auto newProjectileStack =
-				projectile->removeFromStack(actor, amount);
+			auto newProjectileStack = projectile->removeFromStack(actor, amount);
 			if (newProjectileStack == nullptr) {
 				// Rollback the transaction.
 				SQLiteDbms::instance().rollbackTransection();
-				actor->sendMsg(
-					"Something is gone wrong while you were loading %s.\n\n",
-					magazine->getName(true));
+				actor->sendMsg("Something is gone wrong while you were loading %s.\n\n",
+							   magazine->getName(true));
 				return ActionStatus::Error;
 			}
 			magazine->putInside(newProjectileStack);
 		}
 		SQLiteDbms::instance().endTransaction();
 	}
-	actor->sendMsg("You have finished loading %s with %s...\n\n",
-				   magazine->getName(true), projectile->getName(true));
+	actor->sendMsg("You have finished loading %s with %s...\n\n", magazine->getName(true),
+				   projectile->getName(true));
 	return ActionStatus::Finished;
 }
 

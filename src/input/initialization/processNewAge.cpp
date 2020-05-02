@@ -82,8 +82,7 @@ void ProcessNewAge::advance()
 	std::stringstream ss;
 	ss << "# " << Formatter::bold("Character's Age.") << "\n";
 	ss << "# Choose the age of your character.\n";
-	ss << "# Type [" << Formatter::magenta("back")
-	   << "] to return to the previous step.\n";
+	ss << "# Type [" << Formatter::magenta("back") << "] to return to the previous step.\n";
 	character->sendMsg(ss.str());
 	this->printError();
 }

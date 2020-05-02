@@ -196,8 +196,7 @@ public:
 	///                     ability value without the contribution due to
 	///                     the active effects.
 	/// @return The overall ability value.
-	unsigned int getAbility(const Ability &ability,
-							bool withEffects = true) const;
+	unsigned int getAbility(const Ability &ability, bool withEffects = true) const;
 
 	/// @brief Provides the modifier of the given ability.
 	/// @param ability The ability of which the modifier has to be
@@ -206,8 +205,7 @@ public:
 	///                     ability modifier without the contribution due
 	///                     to the active effects.
 	/// @return The overall ability modifer.
-	unsigned int getAbilityModifier(const Ability &ability,
-									bool withEffects = true) const;
+	unsigned int getAbilityModifier(const Ability &ability, bool withEffects = true) const;
 
 	/// @brief Provides the base ten logarithm of the desired ability
 	///         modifier, multiplied by an optional multiplier. Also,
@@ -402,15 +400,13 @@ public:
 	/// @param item  The item to wield.
 	/// @param error The error message.
 	/// @return Where the item can be wielded.
-	std::vector<std::shared_ptr<BodyPart> > canWield(Item *item,
-													 std::string &error) const;
+	std::vector<std::shared_ptr<BodyPart> > canWield(Item *item, std::string &error) const;
 
 	/// @brief Check if the character can wear a given item.
 	/// @param item  The item to wear.
 	/// @param error The error message.
 	/// @return Where the item can be worn.
-	std::vector<std::shared_ptr<BodyPart> > canWear(Item *item,
-													std::string &error) const;
+	std::vector<std::shared_ptr<BodyPart> > canWear(Item *item, std::string &error) const;
 
 	/// @brief Checks if inside the inventory there is a light source.
 	/// @return <b>True</b> if there is a light source,<br>
@@ -530,8 +526,7 @@ public:
 	/// @brief Sends a message to the character.
 	/// @param fmt  The message to send
 	/// @param args Packed arguments.
-	template <typename... Args>
-	void sendMsg(std::string const &fmt, const Args &... args)
+	template <typename... Args> void sendMsg(std::string const &fmt, const Args &... args)
 	{
 		std::stringstream ss;
 		tfm::format(ss, fmt.c_str(), args...);

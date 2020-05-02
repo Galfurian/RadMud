@@ -34,34 +34,30 @@
 void LoadCombatCommands()
 {
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoKill, "kill", "(target)", "Engage in combat the desired target.",
-		false, true, false));
+		DoKill, "kill", "(target)", "Engage in combat the desired target.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
 		DoFlee, "flee", "", "Try to flee from combat.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoScout, "scout", "",
-		"Provides information about the surrounding area.", false, true,
+		DoScout, "scout", "", "Provides information about the surrounding area.", false, true,
 		false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoLoad, "load", "(magazine) (projectiles)",
-		"Allows to load a magazine with projectiles.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoUnload, "unload", "(magazine)", "Allows to unload an magazine.",
+		DoLoad, "load", "(magazine) (projectiles)", "Allows to load a magazine with projectiles.",
 		false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoReload, "reload", "(firearm) (magazine)",
-		"Allows to reload a firearm with a magazine.", false, true, false));
+		DoUnload, "unload", "(magazine)", "Allows to unload an magazine.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoAim, "aim", "(target)",
-		"Allows to aim a target in sight.\n"
-		"If the target is not inside the same room,"
-		"you have first to scout the area.\n"
-		"If no arguments is provided it lists the available targets.",
+		DoReload, "reload", "(firearm) (magazine)", "Allows to reload a firearm with a magazine.",
 		false, true, false));
+	Mud::instance().addCommand(
+		std::make_shared<Command>(DoAim, "aim", "(target)",
+								  "Allows to aim a target in sight.\n"
+								  "If the target is not inside the same room,"
+								  "you have first to scout the area.\n"
+								  "If no arguments is provided it lists the available targets.",
+								  false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
 		DoFire, "fire", "(firearm) (magazine)",
-		"Allows to fire with an equipped ranged weapon to an aimed target.",
-		false, true, false));
+		"Allows to fire with an equipped ranged weapon to an aimed target.", false, true, false));
 }
 
 bool DoKill(Character *character, ArgumentHandler &args)
@@ -79,17 +75,15 @@ bool DoKill(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Retrieve the target.
-	auto target = character->room->findCharacter(
-		args[0].getContent(), args[0].getIndex(), nullptr, { character });
+	auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex(), nullptr,
+												 { character });
 	if (!target) {
-		character->sendMsg("You don't see '%s' anywhere.\n",
-						   args[0].getContent());
+		character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
 		return false;
 	}
 	// Check if the attacker can see the target.
 	if (!character->canSee(target)) {
-		character->sendMsg("You don't see '%s' anywhere.\n",
-						   args[0].getContent());
+		character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
 		return false;
 	}
 	// Check if the two characters are both already in combat.
@@ -98,21 +92,18 @@ bool DoKill(Character *character, ArgumentHandler &args)
 		//  with which is not in combat.
 		if (character->combatHandler.hasOpponent(target)) {
 			// Check if the current predefined target is the target.
-			auto predefinedTarget =
-				character->combatHandler.getPredefinedTarget();
+			auto predefinedTarget = character->combatHandler.getPredefinedTarget();
 			if (predefinedTarget != nullptr) {
 				if (predefinedTarget == target) {
-					character->sendMsg(
-						"You are already doing your best to kill %s!\n",
-						target->getName());
+					character->sendMsg("You are already doing your best to kill %s!\n",
+									   target->getName());
 					return false;
 				}
 			}
 			// Set the target as predefined target.
 			character->combatHandler.setPredefinedTarget(target);
 			// Notify to the character.
-			character->sendMsg("You focus your attacks on %s!\n",
-							   target->getName());
+			character->sendMsg("You focus your attacks on %s!\n", target->getName());
 			return true;
 		}
 		character->sendMsg("You have already your share of troubles!\n");
@@ -192,8 +183,7 @@ bool DoLoad(Character *character, ArgumentHandler &args)
 	}
 	// Search the Item to Load.
 	unsigned int item_index = args[0].getIndex();
-	auto item = character->findPosessedItem(args[0].getContent(), item_index,
-											&item_index);
+	auto item = character->findPosessedItem(args[0].getContent(), item_index, &item_index);
 	if (item == nullptr) {
 		character->sendMsg("You don't have %s.\n", args[0].getContent());
 		return false;
@@ -207,8 +197,8 @@ bool DoLoad(Character *character, ArgumentHandler &args)
 	auto magazine = dynamic_cast<MagazineItem *>(item);
 	// Search the projectiles.
 	auto projectile_index = args[1].getIndex();
-	auto projectile = character->findPosessedItem(
-		args[1].getContent(), projectile_index, &projectile_index);
+	auto projectile =
+		character->findPosessedItem(args[1].getContent(), projectile_index, &projectile_index);
 	if (projectile == nullptr) {
 		character->sendMsg("You don't have %s.\n", args[1].getContent());
 		return false;
@@ -221,8 +211,7 @@ bool DoLoad(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Create the load action.
-	auto act = std::make_shared<LoadAction>(character, magazine, projectile,
-											amountToLoad);
+	auto act = std::make_shared<LoadAction>(character, magazine, projectile, amountToLoad);
 	if (act->start()) {
 		character->pushAction(act);
 		return true;
@@ -245,21 +234,18 @@ bool DoUnload(Character *character, ArgumentHandler &args)
 	}
 	// Search the magazine.
 	auto item_index = args[0].getIndex();
-	auto item = character->findPosessedItem(args[0].getContent(), item_index,
-											&item_index);
+	auto item = character->findPosessedItem(args[0].getContent(), item_index, &item_index);
 	if (item == nullptr) {
 		character->sendMsg("You don't have %s.\n", args[0].getContent());
 		return false;
 	}
 	// Check if the item is a magazine or a ranged weapon.
-	if ((item->getType() != ModelType::Magazine) &&
-		(item->getType() != ModelType::RangedWeapon)) {
+	if ((item->getType() != ModelType::Magazine) && (item->getType() != ModelType::RangedWeapon)) {
 		character->sendMsg("You can't unload %s.\n", item->getName(true));
 		return false;
 	}
 	if (item->isEmpty()) {
-		character->sendMsg("%s is already empty...\n",
-						   item->getNameCapital(true));
+		character->sendMsg("%s is already empty...\n", item->getNameCapital(true));
 		return false;
 	}
 	// Create the unload action.
@@ -286,8 +272,7 @@ bool DoReload(Character *character, ArgumentHandler &args)
 	}
 	// Find the item to reload.
 	auto item_index = args[0].getIndex();
-	auto item = character->findPosessedItem(args[0].getContent(), item_index,
-											&item_index);
+	auto item = character->findPosessedItem(args[0].getContent(), item_index, &item_index);
 	if (item == nullptr) {
 		character->sendMsg("You don't have %s.\n", args[0].getContent());
 		return false;
@@ -300,20 +285,18 @@ bool DoReload(Character *character, ArgumentHandler &args)
 	auto rangedWeapon = dynamic_cast<RangedWeaponItem *>(item);
 	// Search the magazine.
 	auto magazine_index = args[1].getIndex();
-	auto magazine = character->findPosessedItem(
-		args[1].getContent(), magazine_index, &magazine_index);
+	auto magazine =
+		character->findPosessedItem(args[1].getContent(), magazine_index, &magazine_index);
 	if (magazine == nullptr) {
 		character->sendMsg("You don't have %s.\n", args[1].getContent());
 		return false;
 	}
 	if (magazine->getType() != ModelType::Magazine) {
-		character->sendMsg("You can't reload %s with %s.\n",
-						   rangedWeapon->getName(true),
+		character->sendMsg("You can't reload %s with %s.\n", rangedWeapon->getName(true),
 						   magazine->getName(true));
 		return false;
 	}
-	auto act =
-		std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
+	auto act = std::make_shared<ReloadAction>(character, rangedWeapon, magazine);
 	if (act->start()) {
 		character->pushAction(act);
 		return true;
@@ -338,9 +321,8 @@ bool DoAim(Character *character, ArgumentHandler &args)
 	// If no target is provided, update and show the list of characters in sight.
 	if (args.empty()) {
 		if (character->combatHandler.getAimedTarget()) {
-			character->sendMsg(
-				"You are aiming at %s.\n",
-				character->combatHandler.getAimedTarget()->getName());
+			character->sendMsg("You are aiming at %s.\n",
+							   character->combatHandler.getAimedTarget()->getName());
 		}
 		character->combatHandler.updateCharactersInSight();
 		if (character->combatHandler.charactersInSight.empty()) {
@@ -354,8 +336,7 @@ bool DoAim(Character *character, ArgumentHandler &args)
 			if (!it->room)
 				continue;
 			character->sendMsg("  [%s] %s\n",
-							   StructUtils::getRoomDistance(character->room,
-															it->room),
+							   StructUtils::getRoomDistance(character->room, it->room),
 							   it->getName());
 		}
 		return true;
@@ -369,13 +350,11 @@ bool DoAim(Character *character, ArgumentHandler &args)
 	CharacterVector targets = character->room->characters;
 	targets.addUnique(character->combatHandler.charactersInSight);
 	// First try to search the target inside the same room.
-	auto aimedCharacter =
-		targets.findCharacter(args[0].getContent(), args[0].getIndex());
+	auto aimedCharacter = targets.findCharacter(args[0].getContent(), args[0].getIndex());
 	// Otherwise try to find the target inside the list
 	//  of characters in sight.
 	if (aimedCharacter == nullptr) {
-		character->sendMsg("You don't see '%s' anywhere...\n",
-						   args[0].getContent());
+		character->sendMsg("You don't see '%s' anywhere...\n", args[0].getContent());
 		return false;
 	}
 	// Check the room of the target.
@@ -416,8 +395,7 @@ bool DoFire(Character *character, ArgumentHandler & /*args*/)
 	// Check if the target is still in sight.
 	if (!character->isAtRange(character->combatHandler.getAimedTarget(),
 							  character->getViewDistance())) {
-		character->sendMsg("%s is out of your line of sight...\n",
-						   aimedTarget->getNameCapital());
+		character->sendMsg("%s is out of your line of sight...\n", aimedTarget->getNameCapital());
 		return false;
 	}
 	// Retrieve the active ranged weapons.
@@ -428,20 +406,16 @@ bool DoFire(Character *character, ArgumentHandler & /*args*/)
 		return false;
 	}
 	// For each ranged weapon check if it is able to reach the target.
-	if (std::find_if(rangedWeapons.begin(), rangedWeapons.end(),
-					 [&](RangedWeaponItem *weapon) {
-						 return (character->isAtRange(aimedTarget,
-													  weapon->getRange()));
-					 }) == rangedWeapons.end()) {
-		character->sendMsg("%s is out of your reach...\n",
-						   aimedTarget->getNameCapital());
+	if (std::find_if(rangedWeapons.begin(), rangedWeapons.end(), [&](RangedWeaponItem *weapon) {
+			return (character->isAtRange(aimedTarget, weapon->getRange()));
+		}) == rangedWeapons.end()) {
+		character->sendMsg("%s is out of your reach...\n", aimedTarget->getNameCapital());
 		return false;
 	}
 	auto basicAttack = std::make_shared<BasicAttack>(character);
 	std::string error;
 	if (!basicAttack->check(error)) {
-		character->sendMsg("You were not able to fire at %s.\n",
-						   aimedTarget->getName());
+		character->sendMsg("You were not able to fire at %s.\n", aimedTarget->getName());
 		return false;
 	}
 	// Add the aimedTarget to the list of opponents.

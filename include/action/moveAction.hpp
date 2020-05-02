@@ -71,6 +71,6 @@ public:
 	///                       character is in close-combat.
 	/// @return <b>True</b> if the character can move to the given direction,<br>
 	///         <b>False</b> otherwise.
-	static bool canMoveTo(Character *character, const Direction &direction,
-						  std::string &error, bool allowInCombat);
+	static bool canMoveTo(Character *character, const Direction &direction, std::string &error,
+						  bool allowInCombat);
 };

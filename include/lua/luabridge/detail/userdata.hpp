@@ -146,8 +146,7 @@ private:
 			if (got == 0)
 				got = lua_typename(L, lua_type(L, index));
 
-			char const *const msg =
-				lua_pushfstring(L, "%s expected, got %s", expected, got);
+			char const *const msg = lua_pushfstring(L, "%s expected, got %s", expected, got);
 
 			if (narg > 0)
 				luaL_argerror(L, narg, msg);
@@ -167,8 +166,7 @@ private:
      the resulting Userdata represents to a const object. We do the type check
      first so that the error message is informative.
      */
-	static Userdata *getClass(lua_State *L, int index, void const *baseClassKey,
-							  bool canBeConst)
+	static Userdata *getClass(lua_State *L, int index, void const *baseClassKey, bool canBeConst)
 	{
 		assert(index > 0);
 		Userdata *ud = 0;
@@ -208,8 +206,7 @@ private:
 						if (isConst && !canBeConst) {
 							luaL_argerror(L, index, "cannot be const");
 						} else {
-							ud = static_cast<Userdata *>(
-								lua_touserdata(L, index));
+							ud = static_cast<Userdata *>(lua_touserdata(L, index));
 							break;
 						}
 					} else {
@@ -253,8 +250,7 @@ private:
 			if (got == 0)
 				got = lua_typename(L, lua_type(L, index));
 
-			char const *const msg =
-				lua_pushfstring(L, "%s expected, got %s", expected, got);
+			char const *const msg = lua_pushfstring(L, "%s expected, got %s", expected, got);
 
 			luaL_argerror(L, index, msg);
 		}
@@ -291,15 +287,13 @@ public:
      If the object is not the class or a subclass, or it violates the
      const-ness, a Lua error is raised.
      */
-	template <class T>
-	static inline T *get(lua_State *L, int index, bool canBeConst)
+	template <class T> static inline T *get(lua_State *L, int index, bool canBeConst)
 	{
 		if (lua_isnil(L, index))
 			return 0;
 		else
 			return static_cast<T *>(
-				getClass(L, index, ClassInfo<T>::getClassKey(), canBeConst)
-					->getPointer());
+				getClass(L, index, ClassInfo<T>::getClassKey(), canBeConst)->getPointer());
 	}
 };
 
@@ -350,8 +344,7 @@ public:
 	static void *place(lua_State *const L)
 	{
 		UserdataValue<T> *const ud =
-			new (lua_newuserdata(L, sizeof(UserdataValue<T>)))
-				UserdataValue<T>();
+			new (lua_newuserdata(L, sizeof(UserdataValue<T>))) UserdataValue<T>();
 		lua_rawgetp(L, LUA_REGISTRYINDEX, ClassInfo<T>::getClassKey());
 		// If this goes off it means you forgot to register the class!
 		assert(lua_istable(L, -1));
@@ -401,8 +394,7 @@ private:
 	static void push(lua_State *L, void const *const p, void const *const key)
 	{
 		if (p) {
-			new (lua_newuserdata(L, sizeof(UserdataPtr)))
-				UserdataPtr(const_cast<void *>(p));
+			new (lua_newuserdata(L, sizeof(UserdataPtr))) UserdataPtr(const_cast<void *>(p));
 			lua_rawgetp(L, LUA_REGISTRYINDEX, key);
 			// If this goes off it means you forgot to register the class!
 			assert(lua_istable(L, -1));
@@ -423,8 +415,7 @@ private:
 
 	friend class LuaRef;
 
-	static inline void push_raw(lua_State *const L, void *p,
-								const void *classkey)
+	static inline void push_raw(lua_State *const L, void *p, const void *classkey)
 	{
 		new (lua_newuserdata(L, sizeof(UserdataPtr))) UserdataPtr(p);
 		lua_rawgetp(L, LUA_REGISTRYINDEX, classkey);
@@ -445,8 +436,7 @@ public:
 
 	/** Push const pointer to object.
      */
-	template <class T>
-	static inline void push(lua_State *const L, T const *const p)
+	template <class T> static inline void push(lua_State *const L, T const *const p)
 	{
 		if (p)
 			push(L, p, ClassInfo<T>::getConstKey());
@@ -468,8 +458,7 @@ private:
 
 	UserdataShared<C> &operator=(UserdataShared<C> const &);
 
-	using T =
-		typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
+	using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
 	C m_c;
 
@@ -484,8 +473,7 @@ public:
      */
 	template <class U> explicit UserdataShared(U const &u) : m_c(u)
 	{
-		m_p = const_cast<void *>(
-			reinterpret_cast<void const *>((ContainerTraits<C>::get(m_c))));
+		m_p = const_cast<void *>(reinterpret_cast<void const *>((ContainerTraits<C>::get(m_c))));
 	}
 
 	/**
@@ -493,8 +481,7 @@ public:
      */
 	template <class U> explicit UserdataShared(U *u) : m_c(u)
 	{
-		m_p = const_cast<void *>(
-			reinterpret_cast<void const *>((ContainerTraits<C>::get(m_c))));
+		m_p = const_cast<void *>(reinterpret_cast<void const *>((ContainerTraits<C>::get(m_c))));
 	}
 };
 
@@ -505,14 +492,12 @@ public:
 
 // non-const objects
 template <class C, bool makeObjectConst> struct UserdataSharedHelper {
-	using T =
-		typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
+	using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
 	static void push(lua_State *L, C const &c)
 	{
 		if (ContainerTraits<C>::get(c) != 0) {
-			new (lua_newuserdata(L, sizeof(UserdataShared<C>)))
-				UserdataShared<C>(c);
+			new (lua_newuserdata(L, sizeof(UserdataShared<C>))) UserdataShared<C>(c);
 			lua_rawgetp(L, LUA_REGISTRYINDEX, ClassInfo<T>::getClassKey());
 			// If this goes off it means the class T is unregistered!
 			assert(lua_istable(L, -1));
@@ -525,8 +510,7 @@ template <class C, bool makeObjectConst> struct UserdataSharedHelper {
 	static void push(lua_State *L, T *const t)
 	{
 		if (t) {
-			new (lua_newuserdata(L, sizeof(UserdataShared<C>)))
-				UserdataShared<C>(t);
+			new (lua_newuserdata(L, sizeof(UserdataShared<C>))) UserdataShared<C>(t);
 			lua_rawgetp(L, LUA_REGISTRYINDEX, ClassInfo<T>::getClassKey());
 			// If this goes off it means the class T is unregistered!
 			assert(lua_istable(L, -1));
@@ -539,14 +523,12 @@ template <class C, bool makeObjectConst> struct UserdataSharedHelper {
 
 // const objects
 template <class C> struct UserdataSharedHelper<C, true> {
-	using T =
-		typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
+	using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
 	static void push(lua_State *L, C const &c)
 	{
 		if (ContainerTraits<C>::get(c) != 0) {
-			new (lua_newuserdata(L, sizeof(UserdataShared<C>)))
-				UserdataShared<C>(c);
+			new (lua_newuserdata(L, sizeof(UserdataShared<C>))) UserdataShared<C>(c);
 			lua_rawgetp(L, LUA_REGISTRYINDEX, ClassInfo<T>::getConstKey());
 			// If this goes off it means the class T is unregistered!
 			assert(lua_istable(L, -1));
@@ -559,8 +541,7 @@ template <class C> struct UserdataSharedHelper<C, true> {
 	static void push(lua_State *L, T *const t)
 	{
 		if (t) {
-			new (lua_newuserdata(L, sizeof(UserdataShared<C>)))
-				UserdataShared<C>(t);
+			new (lua_newuserdata(L, sizeof(UserdataShared<C>))) UserdataShared<C>(t);
 			lua_rawgetp(L, LUA_REGISTRYINDEX, ClassInfo<T>::getConstKey());
 			// If this goes off it means the class T is unregistered!
 			assert(lua_istable(L, -1));
@@ -583,12 +564,11 @@ template <class C> struct UserdataSharedHelper<C, true> {
 template <class C, bool byContainer, bool isEnum> struct StackHelper {
 	static inline void push(lua_State *L, C const &c)
 	{
-		UserdataSharedHelper<C, TypeTraits::isConst<typename ContainerTraits<
-									C>::Type>::value>::push(L, c);
+		UserdataSharedHelper<C, TypeTraits::isConst<typename ContainerTraits<C>::Type>::value>::push(
+			L, c);
 	}
 
-	using T =
-		typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
+	using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
 	static inline C get(lua_State *L, int index)
 	{
@@ -638,14 +618,13 @@ template <class T> struct Stack {
 public:
 	static inline void push(lua_State *L, T const &t)
 	{
-		StackHelper<T, TypeTraits::isContainer<T>::value,
-					TypeTraits::isEnum<T>::value>::push(L, t);
+		StackHelper<T, TypeTraits::isContainer<T>::value, TypeTraits::isEnum<T>::value>::push(L, t);
 	}
 
 	static inline T get(lua_State *L, int index)
 	{
-		return StackHelper<T, TypeTraits::isContainer<T>::value,
-						   TypeTraits::isEnum<T>::value>::get(L, index);
+		return StackHelper<T, TypeTraits::isContainer<T>::value, TypeTraits::isEnum<T>::value>::get(
+			L, index);
 	}
 };
 
@@ -731,12 +710,11 @@ template <class C, bool byContainer> struct RefStackHelper {
 
 	static inline void push(lua_State *L, C const &t)
 	{
-		UserdataSharedHelper<C, TypeTraits::isConst<typename ContainerTraits<
-									C>::Type>::value>::push(L, t);
+		UserdataSharedHelper<C, TypeTraits::isConst<typename ContainerTraits<C>::Type>::value>::push(
+			L, t);
 	}
 
-	using T =
-		typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
+	using T = typename TypeTraits::removeConst<typename ContainerTraits<C>::Type>::Type;
 
 	static return_type get(lua_State *L, int index)
 	{

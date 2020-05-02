@@ -47,19 +47,15 @@ private:
 		bool index;
 		/// @brief Constructor.
 		prefix_t(bool _all, bool _quantity, bool _index) :
-			all(_all),
-			quantity(_quantity),
-			index(_index) { }
+			all(_all), quantity(_quantity), index(_index)
+		{
+		}
 	} prefix;
 
 public:
 	/// @brief Constructor.
-	explicit Argument(const std::string& _original) :
-		original(_original),
-		content(_original),
-		index(1),
-		quantity(1),
-		prefix(false, false, false)
+	explicit Argument(const std::string &_original) :
+		original(_original), content(_original), index(1), quantity(1), prefix(false, false, false)
 	{
 		// First, evaluate the quantity.
 		this->evaluateQuantity();
@@ -124,7 +120,7 @@ public:
 	}
 
 	/// Sets the content of the argument.
-	inline void setString(std::string const& s)
+	inline void setString(std::string const &s)
 	{
 		original = content = s;
 		// First, evaluate the quantity.
@@ -133,8 +129,7 @@ public:
 		this->evaluateIndex();
 	}
 
-	template<typename T>
-	inline T toNumber() const
+	template <typename T> inline T toNumber() const
 	{
 		return ToNumber<T>(content);
 	}
@@ -165,9 +160,8 @@ public:
 	typedef std::vector<Argument>::const_iterator const_iterator;
 
 	/// @brief Constructor.
-	explicit ArgumentHandler(const char* _argument, bool skip_fill_words = false) :
-		original(),
-		arguments()
+	explicit ArgumentHandler(const char *_argument, bool skip_fill_words = false) :
+		original(), arguments()
 	{
 		if (_argument != NULL) {
 			if (_argument[0] != 0) {
@@ -179,9 +173,8 @@ public:
 	}
 
 	/// @brief Constructor.
-	explicit ArgumentHandler(std::string const& _argument, bool skip_fill_words = false) :
-		original(),
-		arguments()
+	explicit ArgumentHandler(std::string const &_argument, bool skip_fill_words = false) :
+		original(), arguments()
 	{
 		if (!_argument.empty()) {
 			original = _argument;
@@ -240,16 +233,16 @@ public:
 		return arguments.end();
 	}
 
-	const Argument* find(std::string const& s, bool exact = false);
+	const Argument *find(std::string const &s, bool exact = false);
 
 	/// Allows to retrieve the argument at the given position.
-	Argument& get(const size_t& position)
+	Argument &get(const size_t &position)
 	{
 		return arguments.at(position);
 	}
 
 	/// Allows to retrieve the argument at the given position.
-	Argument& operator[](const size_t& position)
+	Argument &operator[](const size_t &position)
 	{
 		if (position >= arguments.size()) {
 			static Argument empty("");
@@ -259,7 +252,7 @@ public:
 	}
 
 	/// Allows to retrieve const reference to argument at given position.
-	Argument const& operator[](const size_t& position) const
+	Argument const &operator[](const size_t &position) const
 	{
 		if (position >= arguments.size()) {
 			static Argument empty("");
@@ -272,14 +265,14 @@ public:
 	std::string substr(size_t _start, size_t _end = std::string::npos) const;
 
 	/// Erase the argument at the given position.
-	void erase(const size_t& position);
+	void erase(const size_t &position);
 
 	/// @brief Prints a log of all the contained arguments.
 	void dump() const;
 
 private:
 	/// @brief Checks if the given argument is a fill word.
-	bool isFillWord(const std::string& argument);
+	bool isFillWord(const std::string &argument);
 
 	/// Given that original string has been set, fills the vector of arguments.
 	void evaluateArguments(bool skip_fill_words = false);

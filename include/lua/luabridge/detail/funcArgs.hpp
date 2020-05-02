@@ -39,8 +39,7 @@ template <int Start> struct FuncArgs<None, Start> {
 	}
 };
 
-template <typename Head, typename Tail, int Start>
-struct FuncArgs<TypeList<Head, Tail>, Start> {
+template <typename Head, typename Tail, int Start> struct FuncArgs<TypeList<Head, Tail>, Start> {
 	static void refs(LuaRef l, TypeListValues<TypeList<Head, Tail> > tvl)
 	{
 		l[Start + 1] = tvl.hd;

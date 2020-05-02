@@ -59,8 +59,8 @@ public:
 	Functionality functions;
 
 	/// @brief Constructor.
-	Effect(Character *_affected, std::string _name, unsigned int _tdelay,
-		   unsigned int _tremain, Functionality _functions) :
+	Effect(Character *_affected, std::string _name, unsigned int _tdelay, unsigned int _tremain,
+		   Functionality _functions) :
 		affected(_affected),
 		name(std::move(_name)),
 		tdelay(_tdelay),

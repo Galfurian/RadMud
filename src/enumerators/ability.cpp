@@ -62,25 +62,20 @@ std::string Ability::getDescription() const
 			   " Strength requirements for some weapons and armors.";
 	}
 	if (value == Ability::Agility) {
-		return std::string() +
-			   "Besides increasing mobility in combat, it increases" +
+		return std::string() + "Besides increasing mobility in combat, it increases" +
 			   " the recharge speed of all the weapons, as well as" +
 			   " the ability to use light armor.";
 	}
 	if (value == Ability::Perception) {
-		return std::string() +
-			   "The ability to see, hear, taste and notice unusual" +
-			   " things. A high Perception is important for a" +
-			   " sharpshooter.";
+		return std::string() + "The ability to see, hear, taste and notice unusual" +
+			   " things. A high Perception is important for a" + " sharpshooter.";
 	}
 	if (value == Ability::Constitution) {
-		return std::string() +
-			   "Stamina and physical toughness. A character with" +
+		return std::string() + "Stamina and physical toughness. A character with" +
 			   " a high Endurance will survive where others may not.";
 	}
 	if (value == Ability::Intelligence) {
-		return std::string() +
-			   "Knowledge, wisdom and the value to think quickly," +
+		return std::string() + "Knowledge, wisdom and the value to think quickly," +
 			   " this attribute is important for any character.";
 	}
 	return "none";

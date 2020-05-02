@@ -24,8 +24,7 @@
 #include "utilities/formatter.hpp"
 #include "character/player.hpp"
 
-static inline void print_ability(std::stringstream &ss, Player *player,
-								 Ability const &ability)
+static inline void print_ability(std::stringstream &ss, Player *player, Ability const &ability)
 {
 	auto value = player->getAbility(ability, false);
 	ss << "# " << std::setw(13) << std::left << ability.toString() << ":";

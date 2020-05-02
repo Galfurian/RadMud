@@ -46,8 +46,7 @@ public:
 	/// @brief Constructor.
 	explicit GeneralBehaviour(const std::string &_functionName,
 							  const luabridge::LuaRef &_functionRef) :
-		functionName(_functionName),
-		functionRef(_functionRef)
+		functionName(_functionName), functionRef(_functionRef)
 	{
 		// Nothing to do.
 	}
@@ -83,10 +82,8 @@ private:
 	P1 p1;
 
 public:
-	BehaviourP1(const std::string &_functionName,
-				const luabridge::LuaRef &_func, P1 _p1) :
-		GeneralBehaviour(_functionName, _func),
-		p1(_p1)
+	BehaviourP1(const std::string &_functionName, const luabridge::LuaRef &_func, P1 _p1) :
+		GeneralBehaviour(_functionName, _func), p1(_p1)
 	{
 		// Nothing to do.
 	}
@@ -100,18 +97,14 @@ public:
 	}
 };
 
-template <typename P1, typename P2>
-class BehaviourP2 : public GeneralBehaviour {
+template <typename P1, typename P2> class BehaviourP2 : public GeneralBehaviour {
 private:
 	P1 p1;
 	P2 p2;
 
 public:
-	BehaviourP2(const std::string &_functionName,
-				const luabridge::LuaRef &_func, P1 _p1, P2 _p2) :
-		GeneralBehaviour(_functionName, _func),
-		p1(_p1),
-		p2(_p2)
+	BehaviourP2(const std::string &_functionName, const luabridge::LuaRef &_func, P1 _p1, P2 _p2) :
+		GeneralBehaviour(_functionName, _func), p1(_p1), p2(_p2)
 	{
 		// Nothing to do.
 	}
@@ -125,20 +118,16 @@ public:
 	}
 };
 
-template <typename P1, typename P2, typename P3>
-class BehaviourP3 : public GeneralBehaviour {
+template <typename P1, typename P2, typename P3> class BehaviourP3 : public GeneralBehaviour {
 private:
 	P1 p1;
 	P2 p2;
 	P3 p3;
 
 public:
-	BehaviourP3(const std::string &_functionName,
-				const luabridge::LuaRef &_func, P1 _p1, P2 _p2, P3 _p3) :
-		GeneralBehaviour(_functionName, _func),
-		p1(_p1),
-		p2(_p2),
-		p3(_p3)
+	BehaviourP3(const std::string &_functionName, const luabridge::LuaRef &_func, P1 _p1, P2 _p2,
+				P3 _p3) :
+		GeneralBehaviour(_functionName, _func), p1(_p1), p2(_p2), p3(_p3)
 	{
 		// Nothing to do.
 	}

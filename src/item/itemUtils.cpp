@@ -33,9 +33,8 @@ namespace ItemUtils
 /// @param key       The key of the item to search.
 /// @param number    Position of the item we want to look for.
 /// @return The item, if it's in the character's inventory.
-Item *FindItemIn(std::vector<Item *> const &container, std::string const &key,
-				 unsigned int number, unsigned int *number_ptr,
-				 const FindPredicate &predicate)
+Item *FindItemIn(std::vector<Item *> const &container, std::string const &key, unsigned int number,
+				 unsigned int *number_ptr, const FindPredicate &predicate)
 {
 	Item *found_item = nullptr;
 	for (auto item : container) {
@@ -54,18 +53,16 @@ Item *FindItemIn(std::vector<Item *> const &container, std::string const &key,
 	return found_item;
 }
 
-bool IsValidTool(Item *item, ItemVector const &exceptions,
-				 ToolType const &toolType)
+bool IsValidTool(Item *item, ItemVector const &exceptions, ToolType const &toolType)
 {
 	// Check the pointer to the model.
 	if (item->model == nullptr) {
 		return false;
 	}
 	// Check if the item is inside the exception list.
-	if (std::find_if(exceptions.begin(), exceptions.end(),
-					 [item](Item *exception) {
-						 return (item->vnum == exception->vnum);
-					 }) != exceptions.end()) {
+	if (std::find_if(exceptions.begin(), exceptions.end(), [item](Item *exception) {
+			return (item->vnum == exception->vnum);
+		}) != exceptions.end()) {
 		return false;
 	}
 	// Check if the item is actually a tool.
@@ -73,8 +70,7 @@ bool IsValidTool(Item *item, ItemVector const &exceptions,
 		// Check if the type of tool is the same.
 		return item->model->to<ToolModel>()->toolType == toolType;
 	}
-	if ((toolType == ToolType::CookingFire) &&
-		(item->getType() == ModelType::Light)) {
+	if ((toolType == ToolType::CookingFire) && (item->getType() == ModelType::Light)) {
 		// Check if the light source can be used to cook.
 		return HasFlag(item->model->to<LightModel>()->lightSourceFlags,
 					   LightModelFlags::CanUseToCook);

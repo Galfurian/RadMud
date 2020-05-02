@@ -33,9 +33,8 @@
 
 /// @brief Addition-Assignment operator for two Ability Modifier maps.
 template <typename ModifierType>
-inline std::map<ModifierType, int> &
-operator+=(std::map<ModifierType, int> &left,
-		   const std::map<ModifierType, int> &right)
+inline std::map<ModifierType, int> &operator+=(std::map<ModifierType, int> &left,
+											   const std::map<ModifierType, int> &right)
 {
 	for (const auto &rightModifier : right) {
 		auto leftModifier = left.find(rightModifier.first);
@@ -47,9 +46,8 @@ operator+=(std::map<ModifierType, int> &left,
 	return left;
 }
 
-inline std::map<Knowledge, int> &
-operator+=(std::map<Knowledge, int> &left,
-		   const std::map<Knowledge, int> &right)
+inline std::map<Knowledge, int> &operator+=(std::map<Knowledge, int> &left,
+											const std::map<Knowledge, int> &right)
 {
 	for (const auto &rightModifier : right) {
 		auto leftModifier = left.find(rightModifier.first);
@@ -63,9 +61,8 @@ operator+=(std::map<Knowledge, int> &left,
 
 /// @brief Subtraction-Assignment operator for two Ability Modifier maps.
 template <typename ModifierType>
-inline std::map<ModifierType, int> &
-operator-=(std::map<ModifierType, int> &left,
-		   const std::map<ModifierType, int> &right)
+inline std::map<ModifierType, int> &operator-=(std::map<ModifierType, int> &left,
+											   const std::map<ModifierType, int> &right)
 {
 	for (const auto &rightModifier : right) {
 		auto leftModifier = left.find(rightModifier.first);
@@ -85,8 +82,7 @@ operator-=(std::map<ModifierType, int> &left,
 /// @param multiplier The multiplying factor.
 template <typename ModifierType>
 inline void ApplyModifier(std::map<ModifierType, int> &receiver,
-						  std::map<ModifierType, int> &provider,
-						  const int &multiplier)
+						  std::map<ModifierType, int> &provider, const int &multiplier)
 {
 	typename std::map<ModifierType, int>::iterator receiverIt;
 	// Iterate through the modifiers of the skill.
@@ -286,9 +282,8 @@ public:
 };
 
 /// @brief Adds the modifiers of another manager.
-inline std::shared_ptr<ModifierManager> &
-operator+=(std::shared_ptr<ModifierManager> &left,
-		   const std::shared_ptr<ModifierManager> &right)
+inline std::shared_ptr<ModifierManager> &operator+=(std::shared_ptr<ModifierManager> &left,
+													const std::shared_ptr<ModifierManager> &right)
 {
 	left->modAbility += right->modAbility;
 	left->modCombat += right->modCombat;
@@ -298,9 +293,8 @@ operator+=(std::shared_ptr<ModifierManager> &left,
 }
 
 /// @brief Removes the modifiers of another manager.
-inline std::shared_ptr<ModifierManager> &
-operator-=(std::shared_ptr<ModifierManager> &left,
-		   const std::shared_ptr<ModifierManager> &right)
+inline std::shared_ptr<ModifierManager> &operator-=(std::shared_ptr<ModifierManager> &left,
+													const std::shared_ptr<ModifierManager> &right)
 {
 	left->modAbility -= right->modAbility;
 	left->modCombat -= right->modCombat;

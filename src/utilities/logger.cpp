@@ -23,8 +23,7 @@
 #include <fstream>
 #include <cstring>
 
-#define FILENAME(FILE)                                                         \
-	(strrchr((FILE), '/') ? strrchr((FILE), '/') + 1 : (FILE))
+#define FILENAME(FILE) (strrchr((FILE), '/') ? strrchr((FILE), '/') + 1 : (FILE))
 
 /// Output file.
 static std::fstream log_file;
@@ -66,8 +65,7 @@ bool OpenLog(const std::string &filename)
 	return log_file.is_open();
 }
 
-void _mudlog(const char *file, int line, const LogLevel &level,
-			 const std::string &msg)
+void _mudlog(const char *file, int line, const LogLevel &level, const std::string &msg)
 {
 	std::lock_guard<std::mutex> lock(log_mutex);
 	if (log_file.is_open()) {

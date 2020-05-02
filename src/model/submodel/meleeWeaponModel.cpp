@@ -24,11 +24,7 @@
 
 #include "utilities/logger.hpp"
 
-MeleeWeaponModel::MeleeWeaponModel() :
-	meleeWeaponType(),
-	minDamage(),
-	maxDamage(),
-	range()
+MeleeWeaponModel::MeleeWeaponModel() : meleeWeaponType(), minDamage(), maxDamage(), range()
 {
 	// Nothing to do.
 }
@@ -56,12 +52,10 @@ bool MeleeWeaponModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> lst = SplitString(source, " ");
 	if (lst.size() != 4) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Weapon Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Weapon Model (%s).", name);
 		return false;
 	}
-	meleeWeaponType =
-		static_cast<MeleeWeaponType>(ToNumber<unsigned int>(lst[0]));
+	meleeWeaponType = static_cast<MeleeWeaponType>(ToNumber<unsigned int>(lst[0]));
 	minDamage = ToNumber<unsigned int>(lst[1]);
 	maxDamage = ToNumber<unsigned int>(lst[2]);
 	range = ToNumber<int>(lst[3]);
@@ -75,8 +69,7 @@ void MeleeWeaponModel::getSheet(Table &sheet) const
 	// Add a divider.
 	sheet.addDivider();
 	// Set the values.
-	sheet.addRow(
-		{ "Melee Weapon Type", GetMeleeWeaponTypeName(meleeWeaponType) });
+	sheet.addRow({ "Melee Weapon Type", GetMeleeWeaponTypeName(meleeWeaponType) });
 	sheet.addRow({ "Minimum Damage", ToString(minDamage) });
 	sheet.addRow({ "Maximum Damage", ToString(maxDamage) });
 }

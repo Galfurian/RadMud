@@ -71,10 +71,8 @@ public:
 
 	double getTotalSpace() const override;
 
-	inline void addDefaultStock(std::shared_ptr<ItemModel> const &_model,
-								Material *_material,
-								ItemQuality const &_quality,
-								unsigned int const &_quantity)
+	inline void addDefaultStock(std::shared_ptr<ItemModel> const &_model, Material *_material,
+								ItemQuality const &_quality, unsigned int const &_quantity)
 	{
 		default_stock_t new_default_stock;
 		new_default_stock.model = _model;

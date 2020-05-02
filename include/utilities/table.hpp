@@ -36,19 +36,14 @@ public:
 		// Nothing to do.
 	}
 
-	TableRow(std::vector<std::string>::size_type const &size,
-			 std::string const &initializer) :
-		std::vector<std::string>(size, initializer),
-		divider(),
-		header()
+	TableRow(std::vector<std::string>::size_type const &size, std::string const &initializer) :
+		std::vector<std::string>(size, initializer), divider(), header()
 	{
 		// Nothing to do.
 	}
 
 	TableRow(std::initializer_list<std::string> const &initializer) :
-		std::vector<std::string>(initializer),
-		divider(),
-		header()
+		std::vector<std::string>(initializer), divider(), header()
 	{
 		// Nothing to do.
 	}
@@ -86,13 +81,9 @@ public:
 	/// @param _title     The column title.
 	/// @param _alignment The column alignment.
 	/// @param _width     The column width.
-	TableColumn(std::string _title, align::align_t _alignment,
-				std::string::size_type _width = 0,
+	TableColumn(std::string _title, align::align_t _alignment, std::string::size_type _width = 0,
 				const bool _autoAdjust = true) :
-		title(std::move(_title)),
-		alignment(_alignment),
-		width(_width),
-		autoAdjust(_autoAdjust)
+		title(std::move(_title)), alignment(_alignment), width(_width), autoAdjust(_autoAdjust)
 	{
 		if (autoAdjust) {
 			this->adjust(title);
@@ -180,11 +171,9 @@ public:
 	/// @param columnAlignment The column alignment.
 	/// @param columnWidth     The column width.
 	inline void addColumn(std::string const &_title, align::align_t _alignment,
-						  std::string::size_type _width = 0,
-						  const bool _autoAdjust = true)
+						  std::string::size_type _width = 0, const bool _autoAdjust = true)
 	{
-		columns.emplace_back(
-			TableColumn(_title, _alignment, _width, _autoAdjust));
+		columns.emplace_back(TableColumn(_title, _alignment, _width, _autoAdjust));
 	}
 
 	/// @brief Allows to add a row of values.
@@ -207,8 +196,7 @@ public:
 			} else if (cell.size() > column_it->width) {
 				auto wrappedText = TextWrap(cell, column_it->width);
 				if (wrappedText.size() > new_rows.size()) {
-					new_rows.resize(wrappedText.size(),
-									TableRow(row.size(), ""));
+					new_rows.resize(wrappedText.size(), TableRow(row.size(), ""));
 				}
 				size_t index = 0;
 				for (auto const &wrappedLine : wrappedText) {
@@ -269,17 +257,13 @@ public:
 			auto row = (*row_it);
 			if (row.isDivider()) {
 				ss << cross;
-				if ((row_it == rows.begin()) ||
-					(std::next(row_it) == rows.end())) {
+				if ((row_it == rows.begin()) || (std::next(row_it) == rows.end())) {
 					ss << std::string(
-						this->getTotalWidth() +
-							(marginSize * 2 + 1) * (columns.size()) - 1,
-						hdiv);
+						this->getTotalWidth() + (marginSize * 2 + 1) * (columns.size()) - 1, hdiv);
 					ss << cross;
 				} else {
 					for (auto column : columns) {
-						ss << std::string(column.width + marginSize * 2, hdiv)
-						   << cross;
+						ss << std::string(column.width + marginSize * 2, hdiv) << cross;
 					}
 				}
 				ss << "\n";
@@ -289,8 +273,7 @@ public:
 				ss << vdiv;
 				ss << margin;
 				ss << std::setw(static_cast<int>(this->getTotalWidth() +
-												 (marginSize * 2 + 1) *
-													 (columns.size() - 1)));
+												 (marginSize * 2 + 1) * (columns.size() - 1)));
 				ss << std::right << align::centtered(row[0]);
 				ss << margin;
 				ss << vdiv;

@@ -118,8 +118,7 @@ public:
      @tparam U   The other object type.
      */
 	template <typename U>
-	RefCountedPtr(RefCountedPtr<U> const &rhs) :
-		m_p(static_cast<T *>(rhs.get()))
+	RefCountedPtr(RefCountedPtr<U> const &rhs) : m_p(static_cast<T *>(rhs.get()))
 	{
 		++getRefCounts()[m_p];
 	}
@@ -156,8 +155,7 @@ public:
      @param  rhs The other RefCountedPtr to assign from.
      @return     A reference to the RefCountedPtr.
      */
-	template <typename U>
-	RefCountedPtr<T> &operator=(RefCountedPtr<U> const &rhs)
+	template <typename U> RefCountedPtr<T> &operator=(RefCountedPtr<U> const &rhs)
 	{
 		reset();
 		m_p = static_cast<T *>(rhs.get());

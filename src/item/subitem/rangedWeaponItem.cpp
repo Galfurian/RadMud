@@ -53,9 +53,7 @@ std::string RangedWeaponItem::lookContent()
 	if (content.empty() || (containedMagazine == nullptr)) {
 		return Formatter::italic("It does not contain any magazine.\n");
 	}
-	return Formatter::italic("It is loaded with " +
-							 containedMagazine->getName(true)) +
-		   "\n";
+	return Formatter::italic("It is loaded with " + containedMagazine->getName(true)) + "\n";
 }
 
 bool RangedWeaponItem::isAContainer() const
@@ -82,8 +80,7 @@ unsigned int RangedWeaponItem::getMinDamage() const
 	std::string error;
 	auto projectile = this->retrieveProjectile(error);
 	if (projectile != nullptr) {
-		valBase = SafeSum(
-			valBase, projectile->model->to<ProjectileModel>()->damageBonus);
+		valBase = SafeSum(valBase, projectile->model->to<ProjectileModel>()->damageBonus);
 	}
 	return valBase;
 }
@@ -102,8 +99,7 @@ unsigned int RangedWeaponItem::getMaxDamage() const
 	std::string error;
 	auto projectile = this->retrieveProjectile(error);
 	if (projectile != nullptr) {
-		valBase = SafeSum(
-			valBase, projectile->model->to<ProjectileModel>()->damageBonus);
+		valBase = SafeSum(valBase, projectile->model->to<ProjectileModel>()->damageBonus);
 	}
 	return valBase;
 }

@@ -60,8 +60,8 @@ void LuaStopScript();
 /// @param vnumMaterial The vnum of the material.
 /// @param qualityValue The initial quality of the item.
 /// @return The newly created item.
-Item *LuaLoadItem(Character *character, unsigned int vnumModel,
-				  unsigned int vnumMaterial, unsigned int qualityValue);
+Item *LuaLoadItem(Character *character, unsigned int vnumModel, unsigned int vnumMaterial,
+				  unsigned int qualityValue);
 
 /// @brief Provides the path from the character to the destination.
 /// @param character    The character which has to move.

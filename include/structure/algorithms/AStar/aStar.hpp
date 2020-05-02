@@ -42,8 +42,7 @@ public:
 		  const std::function<int(T e1, T e2)> &_getDistance,
 		  const std::function<bool(T e1, T e2)> &_areEqual,
 		  const std::function<std::vector<T>(T e)> &_getNeighbours) :
-		PathFinder<T>(_checkConnection, _getDistance, _areEqual,
-					  _getNeighbours),
+		PathFinder<T>(_checkConnection, _getDistance, _areEqual, _getNeighbours),
 		nodes(),
 		startNode(),
 		endNode()
@@ -98,8 +97,7 @@ private:
 			}
 			// Evaluate the G-value for the neighbour.
 			int gTemp = currentNode->getG() +
-						this->getDistance(currentNode->getElement(),
-										  neighbour->getElement());
+						this->getDistance(currentNode->getElement(), neighbour->getElement());
 			// Already-open nodes are only added to the list if their G-value
 			// is lower going via this route.
 			if (neighbour->getNodeState() == AStarNodeState::Open) {
@@ -109,8 +107,7 @@ private:
 					// Set the new G-Value.
 					neighbour->setG(gTemp);
 					// Check whether the end node has been reached.
-					if (this->areEqual(endNode->getElement(),
-									   neighbour->getElement())) {
+					if (this->areEqual(endNode->getElement(), neighbour->getElement())) {
 						return true;
 					}
 					// If not, check the next set of nodes.
@@ -126,8 +123,7 @@ private:
 				// Set the new G-Value.
 				neighbour->setG(gTemp);
 				// Check whether the end node has been reached.
-				if (this->areEqual(endNode->getElement(),
-								   neighbour->getElement())) {
+				if (this->areEqual(endNode->getElement(), neighbour->getElement())) {
 					return true;
 				}
 				// If not, check the next set of nodes.
@@ -163,10 +159,8 @@ private:
 				if (!found) {
 					auto newNode = std::make_shared<AStarNode<T> >(neighbour);
 					newNode->setG(currentNode->getG() +
-								  this->getDistance(currentNode->getElement(),
-													neighbour));
-					newNode->setH(
-						this->getDistance(neighbour, endNode->getElement()));
+								  this->getDistance(currentNode->getElement(), neighbour));
+					newNode->setH(this->getDistance(neighbour, endNode->getElement()));
 					nodes.emplace_back(newNode);
 					neighbours.emplace_back(newNode);
 				}

@@ -121,23 +121,19 @@ void ArgumentHandler::erase(const size_t &position)
 void ArgumentHandler::dump() const
 {
 	for (size_t it = 0; it < arguments.size(); ++it) {
-		MudLog(LogLevel::Debug,
-			   "[%-2d][IDX:%-2d][MUL[Q:%1d;A:%1d]:%-2d][ALL:%1d] %s {%s}", it,
-			   0, arguments.at(it).hasQuantity(),
-			   arguments.at(it).hasPrefixAll(), arguments.at(it).getQuantity(),
-			   arguments.at(it).meansAll(),
-			   arguments.at(it).getContent().c_str(),
-			   arguments.at(it).getOriginal().c_str());
+		MudLog(LogLevel::Debug, "[%-2d][IDX:%-2d][MUL[Q:%1d;A:%1d]:%-2d][ALL:%1d] %s {%s}", it, 0,
+			   arguments.at(it).hasQuantity(), arguments.at(it).hasPrefixAll(),
+			   arguments.at(it).getQuantity(), arguments.at(it).meansAll(),
+			   arguments.at(it).getContent().c_str(), arguments.at(it).getOriginal().c_str());
 	}
 }
 
 /// @brief Checks if the given argument is a fill word.
 bool ArgumentHandler::isFillWord(const std::string &argument)
 {
-	static std::string fill_words[] = { "in", "from", "with", "and", "the",
-										"on", "at",	  "to",	  "da",	 "su",
-										"a",  "e",	  "il",	  "la",	 "lo",
-										"un", "uno",  "una",  "con", "\n" };
+	static std::string fill_words[] = { "in", "from", "with", "and", "the", "on", "at",
+										"to", "da",	  "su",	  "a",	 "e",	"il", "la",
+										"lo", "un",	  "uno",  "una", "con", "\n" };
 	std::string argument_lower = ToLower(argument);
 	for (int i = 0; fill_words[i] != "\n"; i++) {
 		if (argument_lower == fill_words[i]) {
@@ -151,8 +147,7 @@ bool ArgumentHandler::isFillWord(const std::string &argument)
 void ArgumentHandler::evaluateArguments(bool skip_fill_words)
 {
 	std::vector<std::string> words = SplitString(original, " ");
-	for (std::vector<std::string>::const_iterator it = words.begin();
-		 it != words.end(); ++it) {
+	for (std::vector<std::string>::const_iterator it = words.begin(); it != words.end(); ++it) {
 		if (skip_fill_words && this->isFillWord(*it)) {
 			continue;
 		}

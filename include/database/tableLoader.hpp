@@ -36,8 +36,7 @@ public:
 	std::string loadQuery;
 
 	/// @brief Constructor.
-	TableLoader(std::string _table,
-				std::function<bool(ResultSet *result)> _loadFunction,
+	TableLoader(std::string _table, std::function<bool(ResultSet *result)> _loadFunction,
 				std::string _loadQuery = "");
 
 	/// Provide the query required to load the table.

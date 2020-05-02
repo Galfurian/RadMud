@@ -50,8 +50,8 @@ bool DoMobileSpawn(Character *character, ArgumentHandler &args)
 		character->sendMsg("You are not in valid room.\n");
 		return false;
 	}
-	auto mobileModel = Mud::instance().findMobileModel(
-		ToNumber<unsigned int>(args[0].getContent()));
+	auto mobileModel =
+		Mud::instance().findMobileModel(ToNumber<unsigned int>(args[0].getContent()));
 	if (mobileModel == nullptr) {
 		character->sendMsg("Mobile model not found.\n");
 		return false;
@@ -65,8 +65,7 @@ bool DoMobileSpawn(Character *character, ArgumentHandler &args)
 
 bool DoMobileSave(Character *character, ArgumentHandler &args)
 {
-	auto mobile =
-		character->room->findMobile(args[0].getContent(), args[0].getIndex());
+	auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex());
 	if (mobile == nullptr) {
 		character->sendMsg("Mobile not found.\n");
 		return false;
@@ -84,8 +83,7 @@ bool DoMobileKill(Character *character, ArgumentHandler &args)
 		character->sendMsg("You must provide a target mobile.\n");
 		return false;
 	}
-	auto mobile =
-		character->room->findMobile(args[0].getContent(), args[0].getIndex());
+	auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex());
 	if (mobile == nullptr) {
 		character->sendMsg("Mobile not found.\n");
 		return false;
@@ -94,8 +92,7 @@ bool DoMobileKill(Character *character, ArgumentHandler &args)
 	mobile->kill();
 	// Notify the death.
 	character->sendMsg("You snap your fingers.\n");
-	character->room->sendToAll("%s fall to the ground dead.", {},
-							   mobile->getNameCapital());
+	character->room->sendToAll("%s fall to the ground dead.", {}, mobile->getNameCapital());
 	return true;
 }
 
@@ -130,8 +127,7 @@ bool DoMobileReload(Character *character, ArgumentHandler &args)
 		character->sendMsg("You must provide a target mobile.\n");
 		return false;
 	}
-	auto mobile =
-		character->room->findMobile(args[0].getContent(), args[0].getIndex());
+	auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex());
 	if (mobile == nullptr) {
 		character->sendMsg("Mobile not found.\n");
 		return false;
@@ -139,8 +135,7 @@ bool DoMobileReload(Character *character, ArgumentHandler &args)
 	// Reload the mob.
 	mobile->reloadLua();
 	// Notify.
-	character->sendMsg("Target(%s) Script(%s)\n", mobile->getName(),
-					   mobile->lua_script);
+	character->sendMsg("Target(%s) Script(%s)\n", mobile->getName(), mobile->lua_script);
 	return true;
 }
 
@@ -149,14 +144,12 @@ bool DoMobileTrigger(Character *character, ArgumentHandler &args)
 	if (args.size() != 1) {
 		character->sendMsg("You must provide a target mobile.\n");
 	} else {
-		auto mobile = character->room->findMobile(args[0].getContent(),
-												  args[0].getIndex());
+		auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex());
 		if (mobile == nullptr) {
 			character->sendMsg("Mobile not found.\n");
 		} else {
 			mobile->triggerEventMain();
-			character->sendMsg("%s::triggerEventMain()\n",
-							   mobile->getNameCapital());
+			character->sendMsg("%s::triggerEventMain()\n", mobile->getNameCapital());
 			return true;
 		}
 	}
@@ -169,8 +162,7 @@ bool DoMobileLog(Character *character, ArgumentHandler &args)
 		character->sendMsg("You must provide a mobile id.\n");
 		return false;
 	}
-	auto mobile = Mud::instance().findMobile(
-		ToNumber<unsigned int>(args[0].getContent()));
+	auto mobile = Mud::instance().findMobile(ToNumber<unsigned int>(args[0].getContent()));
 	if (mobile == nullptr) {
 		character->sendMsg("Mobile not found.\n");
 		return false;

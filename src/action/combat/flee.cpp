@@ -94,13 +94,11 @@ ActionStatus Flee::perform()
 		return ActionStatus::Error;
 	}
 	// Get the character chance of fleeing (D20).
-	size_t fleeChance =
-		TRand<size_t>(0, 20) + actor->getAbilityModifier(Ability::Agility);
+	size_t fleeChance = TRand<size_t>(0, 20) + actor->getAbilityModifier(Ability::Agility);
 	// Get the required stamina.
 	auto consumedStamina = this->getConsumedStamina(actor);
 	// Base the escape level on how many enemies are surrounding the character.
-	if (fleeChance <
-		static_cast<unsigned int>(actor->combatHandler.getSize())) {
+	if (fleeChance < static_cast<unsigned int>(actor->combatHandler.getSize())) {
 		actor->sendMsg("You were not able to escape from your attackers.\n");
 		// Consume half the stamina.
 		actor->remStamina(consumedStamina / 2, true);
@@ -121,8 +119,7 @@ ActionStatus Flee::perform()
 			return ActionStatus::Error;
 		}
 		// Pick a random direction, from the poll of the available ones.
-		auto destination =
-			destinations.at(TRand<size_t>(0, destinations.size() - 1));
+		auto destination = destinations.at(TRand<size_t>(0, destinations.size() - 1));
 		// Check that the picked destination is not a null pointer.
 		if (destination == nullptr) {
 			MudLog(LogLevel::Error, "Flee selected null destination.");
@@ -135,8 +132,7 @@ ActionStatus Flee::perform()
 			actor->sendMsg(this->stop() + "\n\n");
 			// Move the actor to the random direction.
 			MoveCharacterTo(actor, destination,
-							actor->getName() +
-								" flees from the battlefield.\n\n",
+							actor->getName() + " flees from the battlefield.\n\n",
 							actor->getName() + " arives fleeing.\n\n",
 							"You flee from the battlefield.\n");
 			return ActionStatus::Finished;
@@ -178,7 +174,6 @@ unsigned int Flee::getConsumedStamina(Character *character)
 	unsigned int consumedStamina = 1;
 	consumedStamina -= character->getAbilityLog(Ability::Strength);
 	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-	consumedStamina =
-		SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
 	return consumedStamina;
 }

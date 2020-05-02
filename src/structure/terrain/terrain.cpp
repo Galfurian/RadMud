@@ -24,20 +24,12 @@
 #include "utilities/utils.hpp"
 
 Terrain::Terrain() :
-	vnum(),
-	name(),
-	flags(),
-	generationFlags(),
-	space(),
-	symbol(),
-	liquidContent(),
-	liquidSources()
+	vnum(), name(), flags(), generationFlags(), space(), symbol(), liquidContent(), liquidSources()
 {
 	// Nothing to do.
 }
 
-void Terrain::addLiquidSource(Liquid *_liquid,
-							  const unsigned int &_assignedProbability)
+void Terrain::addLiquidSource(Liquid *_liquid, const unsigned int &_assignedProbability)
 {
 	LiquidSource ls;
 	ls.liquid = _liquid;
@@ -52,8 +44,7 @@ void Terrain::addLiquidSource(Liquid *_liquid,
 Liquid *Terrain::getRandomLiquidSource() const
 {
 	if (!liquidSources.empty()) {
-		auto pickedValue = TRand<unsigned int>(
-			0, liquidSources.back().cumulativeProbability - 1);
+		auto pickedValue = TRand<unsigned int>(0, liquidSources.back().cumulativeProbability - 1);
 		for (auto liquidSource : liquidSources) {
 			if (pickedValue <= liquidSource.cumulativeProbability) {
 				return liquidSource.liquid;

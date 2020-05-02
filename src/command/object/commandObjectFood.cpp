@@ -41,12 +41,10 @@ bool DoEat(Character *character, ArgumentHandler &args)
 	Item *source = nullptr;
 	// If the room is lit.
 	if (character->room->isLit()) {
-		source =
-			character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+		source = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
 	} else if (character->inventoryIsLit()) {
 		// If the room is not lit but the inventory is.
-		source = character->findInventoryItem(args[0].getContent(),
-											  args[0].getIndex());
+		source = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 	} else {
 		// If the inventory is NOT empty, pick a random item.
 		if (!character->inventory.empty()) {
@@ -77,10 +75,8 @@ bool DoEat(Character *character, ArgumentHandler &args)
 	// Apply effects due to food.
 	if (HasFlag(foodModel->foodFlags, FoodFlag::Raw)) {
 		character->effectManager.addEffect(EffectFactory::poisonDamage(
-			character, "Food Poisoning", 1, TRand<unsigned int>(1, 5),
-			"Your stomach complains...",
-			"The pain in your guts is excruciating!",
-			"Your stomach is calm now.",
+			character, "Food Poisoning", 1, TRand<unsigned int>(1, 5), "Your stomach complains...",
+			"The pain in your guts is excruciating!", "Your stomach is calm now.",
 			"The pain in your guts is excruciating, your body collapses "
 			"and our merciful friend, Death, finds you very quickly.",
 			foodModel->nurishment));

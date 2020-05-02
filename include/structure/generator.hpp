@@ -86,7 +86,6 @@ public:
 	/// @param status   Status of the zone.
 	/// @param roomName The name of the room.
 	/// @return The description of the room.
-	std::string generateDescription(const AreaType &type,
-									const AreaStatus &status,
+	std::string generateDescription(const AreaType &type, const AreaStatus &status,
 									const std::string &roomName);
 };

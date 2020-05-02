@@ -24,11 +24,7 @@
 
 #include "utilities/logger.hpp"
 
-RangedWeaponModel::RangedWeaponModel() :
-	rangedWeaponType(),
-	minDamage(),
-	maxDamage(),
-	range()
+RangedWeaponModel::RangedWeaponModel() : rangedWeaponType(), minDamage(), maxDamage(), range()
 {
 	// Nothing to do.
 }
@@ -56,13 +52,10 @@ bool RangedWeaponModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 4) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Ranged Weapon Model (%s).",
-			   name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Ranged Weapon Model (%s).", name);
 		return false;
 	}
-	this->rangedWeaponType =
-		static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
+	this->rangedWeaponType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
 	this->minDamage = ToNumber<unsigned int>(functionList[1]);
 	this->maxDamage = ToNumber<unsigned int>(functionList[2]);
 	this->range = ToNumber<int>(functionList[3]);
@@ -76,8 +69,7 @@ void RangedWeaponModel::getSheet(Table &sheet) const
 	// Add a divider.
 	sheet.addDivider();
 	// Set the values.
-	sheet.addRow({ "Ranged Weapon Type",
-				   GetRangedWeaponTypeName(this->rangedWeaponType) });
+	sheet.addRow({ "Ranged Weapon Type", GetRangedWeaponTypeName(this->rangedWeaponType) });
 	sheet.addRow({ "Minimum Damage", ToString(this->minDamage) });
 	sheet.addRow({ "Maximum Damage", ToString(this->maxDamage) });
 	sheet.addRow({ "Range", ToString(this->range) });

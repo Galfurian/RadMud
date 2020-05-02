@@ -43,30 +43,21 @@ public:
 
 	/// @brief Constructor.
 	Map2D(const int &_width, const int &_height) :
-		width(_width),
-		height(_height),
-		nullValue(),
-		data()
+		width(_width), height(_height), nullValue(), data()
 	{
 		// Nothing to do.
 	}
 
 	/// @brief Constructor.
 	Map2D(int _width, int _height, T _nullValue) :
-		width(_width),
-		height(_height),
-		nullValue(_nullValue),
-		data()
+		width(_width), height(_height), nullValue(_nullValue), data()
 	{
 		// Nothing to do.
 	}
 
 	/// @brief Constructor.
 	Map2D(int _width, int _height, T _nullValue, T value) :
-		width(_width),
-		height(_height),
-		nullValue(_nullValue),
-		data()
+		width(_width), height(_height), nullValue(_nullValue), data()
 	{
 		for (int y = 0; y < width; y++) {
 			for (int x = 0; x < height; x++) {

@@ -25,8 +25,7 @@
 class ProcessPlayerPassword : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessPlayerPassword(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessPlayerPassword(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

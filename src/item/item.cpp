@@ -46,8 +46,7 @@ Item::Item() :
 
 Item::~Item()
 {
-	MudLog(LogLevel::Debug, "Deleted item\t\t[%d]\t\t(%s)", vnum,
-		   this->getNameCapital());
+	MudLog(LogLevel::Debug, "Deleted item\t\t[%d]\t\t(%s)", vnum, this->getNameCapital());
 }
 
 bool Item::check()
@@ -68,11 +67,9 @@ bool Item::removeFromMud()
 	// Remove the item from the game, this means: Room, Player, Container.
 	if (room != nullptr) {
 		if (!room->characters.empty()) {
-			room->sendToAll("%s crumbles into pieces.", {},
-							this->getNameCapital());
+			room->sendToAll("%s crumbles into pieces.", {}, this->getNameCapital());
 			if (!content.empty())
-				room->sendToAll("All its contents are scattered to the ground.",
-								{});
+				room->sendToAll("All its contents are scattered to the ground.", {});
 		}
 		auto itemRoom = room;
 		// Move the content to the room.
@@ -80,12 +77,11 @@ bool Item::removeFromMud()
 			room->addItem(it, true);
 		// Remove the item.
 		if (room->removeItem(this)) {
-			MudLog(LogLevel::Debug, "Removing item '%s' from room '%s'.",
-				   this->getName(), itemRoom->name);
+			MudLog(LogLevel::Debug, "Removing item '%s' from room '%s'.", this->getName(),
+				   itemRoom->name);
 		} else {
-			MudLog(LogLevel::Error,
-				   "Failed to remove item '%s' from room '%s'.",
-				   this->getName(), itemRoom->name);
+			MudLog(LogLevel::Error, "Failed to remove item '%s' from room '%s'.", this->getName(),
+				   itemRoom->name);
 			return false;
 		}
 	}
@@ -99,14 +95,14 @@ bool Item::removeFromMud()
 			owner->addInventoryItem(it);
 		// Remove the item from the owner.
 		if (owner->equipment.removeItem(this)) {
-			MudLog(LogLevel::Debug, "Removing item '%s' from '%s' equipment.",
-				   this->getName(), itemOwner->getName());
+			MudLog(LogLevel::Debug, "Removing item '%s' from '%s' equipment.", this->getName(),
+				   itemOwner->getName());
 		} else if (owner->inventory.removeItem(this)) {
-			MudLog(LogLevel::Debug, "Removing item '%s' from '%s' inventory.",
-				   this->getName(), itemOwner->getName());
+			MudLog(LogLevel::Debug, "Removing item '%s' from '%s' inventory.", this->getName(),
+				   itemOwner->getName());
 		} else {
-			MudLog(LogLevel::Debug, "Failed to remove item '%s' from '%s'.",
-				   this->getName(), itemOwner->getName());
+			MudLog(LogLevel::Debug, "Failed to remove item '%s' from '%s'.", this->getName(),
+				   itemOwner->getName());
 			return false;
 		}
 	}
@@ -117,23 +113,19 @@ bool Item::removeFromMud()
 			container->putInside(it, true);
 		// Remove the item from the container.
 		if (container->content.removeItem(this)) {
-			MudLog(LogLevel::Debug, "Removing item '%s' from container '%s'.",
-				   this->getName(), itemContainer->getName());
+			MudLog(LogLevel::Debug, "Removing item '%s' from container '%s'.", this->getName(),
+				   itemContainer->getName());
 		} else {
-			MudLog(LogLevel::Error,
-				   "Failed to remove item '%s' from container '%s'.",
+			MudLog(LogLevel::Error, "Failed to remove item '%s' from container '%s'.",
 				   this->getName(), itemContainer->getName());
 			return false;
 		}
 	}
 	if (this->getType() != ModelType::Corpse) {
 		if (Mud::instance().remItem(this)) {
-			MudLog(LogLevel::Debug, "Removing item '%s' from MUD items.",
-				   this->getName());
+			MudLog(LogLevel::Debug, "Removing item '%s' from MUD items.", this->getName());
 		} else {
-			MudLog(LogLevel::Error,
-				   "Failed to remove item '%s' from MUD items.",
-				   this->getName());
+			MudLog(LogLevel::Error, "Failed to remove item '%s' from MUD items.", this->getName());
 			return false;
 		}
 	}
@@ -197,8 +189,7 @@ bool Item::removeOnDB()
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
-	if (!SQLiteDbms::instance().deleteFrom("ItemLiquidContent",
-										   { container_pair })) {
+	if (!SQLiteDbms::instance().deleteFrom("ItemLiquidContent", { container_pair })) {
 		MudLog(LogLevel::Error, "Remove from table 'ItemLiquidContent'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
@@ -217,8 +208,7 @@ void Item::getSheet(Table &sheet) const
 	sheet.addRow({ "model", model->name });
 	sheet.addRow({ "quantity", ToString(quantity) });
 	sheet.addRow({ "maker", maker });
-	sheet.addRow({ "condition", ToString(condition) + "/" +
-									ToString(this->getMaxCondition()) });
+	sheet.addRow({ "condition", ToString(condition) + "/" + ToString(this->getMaxCondition()) });
 	sheet.addRow({ "Material", composition->name });
 	sheet.addRow({ "Quality", quality.toString() });
 	sheet.addRow({ "Weight", ToString(this->getWeight(true)) });
@@ -230,8 +220,7 @@ void Item::getSheet(Table &sheet) const
 	} else if (owner != nullptr) {
 		locationRow.emplace_back(owner->getNameCapital());
 	} else if (container != nullptr) {
-		locationRow.emplace_back(container->getNameCapital() + " " +
-								 ToString(container->vnum));
+		locationRow.emplace_back(container->getNameCapital() + " " + ToString(container->vnum));
 	} else {
 		locationRow.emplace_back("Nowhere");
 	}
@@ -243,13 +232,11 @@ void Item::getSheet(Table &sheet) const
 		sheet.addDivider();
 		sheet.addRow({ "Content", "Vnum" });
 		for (auto iterator : content) {
-			sheet.addRow(
-				{ iterator->getNameCapital(), ToString(iterator->vnum) });
+			sheet.addRow({ iterator->getNameCapital(), ToString(iterator->vnum) });
 		}
 		sheet.addDivider();
 	}
-	if (this->isAContainer() ||
-		(model->getType() == ModelType::LiquidContainer)) {
+	if (this->isAContainer() || (model->getType() == ModelType::LiquidContainer)) {
 		sheet.addRow({ "Free  Space", ToString(this->getFreeSpace()) });
 		sheet.addRow({ "Used  Space", ToString(this->getUsedSpace()) });
 		sheet.addRow({ "Total Space", ToString(this->getTotalSpace()) });
@@ -290,16 +277,14 @@ bool Item::canStackWith(Item *item) const
 	if (item->composition == nullptr)
 		return false;
 	return HasFlag(model->modelFlags, ModelFlag::CanBeStacked) &&
-		   (model->vnum == item->model->vnum) &&
-		   (composition->vnum == item->composition->vnum);
+		   (model->vnum == item->model->vnum) && (composition->vnum == item->composition->vnum);
 }
 
 Item *Item::removeFromStack(Character *actor, unsigned int &_quantity)
 {
 	if (this->quantity > _quantity) {
 		// Generate a copty of this item with the given quantity.
-		auto newStack = model->createItem(actor->getName(), composition, false,
-										  quality, _quantity);
+		auto newStack = model->createItem(actor->getName(), composition, false, quality, _quantity);
 		if (newStack != nullptr) {
 			// Actually reduce the quantity.
 			this->quantity -= _quantity;
@@ -379,10 +364,10 @@ std::string Item::getConditionDescription()
 
 unsigned int Item::getPrice(bool entireStack) const
 {
-	auto result = ((model->basePrice * quality.getModifier()) +
-				   (model->basePrice * composition->worth) +
-				   (model->basePrice * this->getConditionModifier())) /
-				  3;
+	auto result =
+		((model->basePrice * quality.getModifier()) + (model->basePrice * composition->worth) +
+		 (model->basePrice * this->getConditionModifier())) /
+		3;
 	// Evaluate for the entire stack.
 	if (entireStack)
 		result *= this->quantity;
@@ -440,12 +425,8 @@ std::string Item::getDescription()
 
 std::string Item::getLook()
 {
-	auto Gray = [](const std::string &s) {
-		return Formatter::gray() + s + Formatter::reset();
-	};
-	auto Yellow = [](const std::string &s) {
-		return Formatter::yellow() + s + Formatter::reset();
-	};
+	auto Gray = [](const std::string &s) { return Formatter::gray() + s + Formatter::reset(); };
+	auto Yellow = [](const std::string &s) { return Formatter::yellow() + s + Formatter::reset(); };
 	std::string output;
 	// Prepare : Name, Condition.
 	//           Description.
@@ -525,12 +506,10 @@ void Item::putInside(Item *&item, bool updateDB)
 	// Update the database.
 	if (updateDB && (this->getType() != ModelType::Corpse)) {
 		SQLiteDbms::instance().insertInto(
-			"ItemContent", { ToString(this->vnum), ToString(item->vnum) },
-			false, true);
+			"ItemContent", { ToString(this->vnum), ToString(item->vnum) }, false, true);
 	}
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(),
-		   this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' added to '%s';", item->getName(), this->getName());
 }
 
 bool Item::takeOut(Item *item, bool updateDB)
@@ -542,25 +521,22 @@ bool Item::takeOut(Item *item, bool updateDB)
 	item->container = nullptr;
 	// Update the database.
 	if (updateDB && (this->getType() != ModelType::Corpse)) {
-		SQLiteDbms::instance().deleteFrom(
-			"ItemContent", { std::make_pair("item", ToString(item->vnum)) });
+		SQLiteDbms::instance().deleteFrom("ItemContent",
+										  { std::make_pair("item", ToString(item->vnum)) });
 	}
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' taken out from '%s';", item->getName(),
-		   this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' taken out from '%s';", item->getName(), this->getName());
 	return true;
 }
 
-Item *Item::findContent(std::string search_parameter, unsigned int number,
-						unsigned int *number_ptr)
+Item *Item::findContent(std::string search_parameter, unsigned int number, unsigned int *number_ptr)
 {
 	if (!this->isAContainer())
 		return nullptr;
 	return ItemUtils::FindItemIn(content, search_parameter, number, number_ptr);
 }
 
-void Item::setOccupiedBodyParts(
-	std::vector<std::shared_ptr<BodyPart> > _occupiedBodyParts)
+void Item::setOccupiedBodyParts(std::vector<std::shared_ptr<BodyPart> > _occupiedBodyParts)
 {
 	// Set the new list of occupied body parts.
 	occupiedBodyParts = _occupiedBodyParts;

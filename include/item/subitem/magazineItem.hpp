@@ -51,8 +51,7 @@ public:
 	///                    be loaded.
 	/// @return <b>True</b> if the projectile can be loaded,<br>
 	///         <b>False</b> otherwise.
-	bool getAmountToLoad(Item *_projectile, unsigned int &amount,
-						 std::string &error) const;
+	bool getAmountToLoad(Item *_projectile, unsigned int &amount, std::string &error) const;
 
 	/// @brief Provides the list of already loaded projectiles.
 	/// @return The contained projectiles.

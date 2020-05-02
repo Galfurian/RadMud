@@ -127,45 +127,31 @@ void Character::getSheet(Table &sheet) const
 	sheet.addRow({ "Stamina", ToString(stamina) });
 	sheet.addRow({ "Hunger", ToString(hunger) });
 	sheet.addRow({ "Thirst", ToString(thirst) });
+	sheet.addRow({ "Strength", ToString(this->getAbility(Ability::Strength, false)) + " [" +
+								   ToString(effectManager.getAbilityMod(Ability::Strength)) + "][" +
+								   ToString(effectManager.getAbilityMod(Ability::Strength)) +
+								   "]" });
+	sheet.addRow({ "Agility", ToString(this->getAbility(Ability::Agility, false)) + " [" +
+								  ToString(effectManager.getAbilityMod(Ability::Agility)) + "][" +
+								  ToString(effectManager.getAbilityMod(Ability::Agility)) + "]" });
 	sheet.addRow(
-		{ "Strength",
-		  ToString(this->getAbility(Ability::Strength, false)) + " [" +
-			  ToString(effectManager.getAbilityMod(Ability::Strength)) + "][" +
-			  ToString(effectManager.getAbilityMod(Ability::Strength)) + "]" });
+		{ "Perception", ToString(this->getAbility(Ability::Perception, false)) + " [" +
+							ToString(effectManager.getAbilityMod(Ability::Perception)) + "][" +
+							ToString(effectManager.getAbilityMod(Ability::Perception)) + "]" });
 	sheet.addRow(
-		{ "Agility",
-		  ToString(this->getAbility(Ability::Agility, false)) + " [" +
-			  ToString(effectManager.getAbilityMod(Ability::Agility)) + "][" +
-			  ToString(effectManager.getAbilityMod(Ability::Agility)) + "]" });
+		{ "Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " [" +
+							  ToString(effectManager.getAbilityMod(Ability::Constitution)) + "][" +
+							  ToString(effectManager.getAbilityMod(Ability::Constitution)) + "]" });
 	sheet.addRow(
-		{ "Perception",
-		  ToString(this->getAbility(Ability::Perception, false)) + " [" +
-			  ToString(effectManager.getAbilityMod(Ability::Perception)) +
-			  "][" +
-			  ToString(effectManager.getAbilityMod(Ability::Perception)) +
-			  "]" });
-	sheet.addRow(
-		{ "Constitution",
-		  ToString(this->getAbility(Ability::Constitution, false)) + " [" +
-			  ToString(effectManager.getAbilityMod(Ability::Constitution)) +
-			  "][" +
-			  ToString(effectManager.getAbilityMod(Ability::Constitution)) +
-			  "]" });
-	sheet.addRow(
-		{ "Intelligence",
-		  ToString(this->getAbility(Ability::Intelligence, false)) + " [" +
-			  ToString(effectManager.getAbilityMod(Ability::Intelligence)) +
-			  "][" +
-			  ToString(effectManager.getAbilityMod(Ability::Intelligence)) +
-			  "]" });
+		{ "Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " [" +
+							  ToString(effectManager.getAbilityMod(Ability::Intelligence)) + "][" +
+							  ToString(effectManager.getAbilityMod(Ability::Intelligence)) + "]" });
 	sheet.addRow({ "## Skill", "## Points" });
 	for (const auto &skillData : skillManager.skills) {
-		sheet.addRow(
-			{ skillData->skill->name, ToString(skillData->skillLevel) });
+		sheet.addRow({ skillData->skill->name, ToString(skillData->skillLevel) });
 	}
 	if (CorrectAssert(this->room != nullptr)) {
-		sheet.addRow(
-			{ "Room", room->name + " [" + ToString(room->vnum) + "]" });
+		sheet.addRow({ "Room", room->name + " [" + ToString(room->vnum) + "]" });
 	} else {
 		sheet.addRow({ "Room", "NONE" });
 	}
@@ -173,8 +159,7 @@ void Character::getSheet(Table &sheet) const
 	sheet.addRow({ "Action", this->getAction()->getDescription() });
 	sheet.addDivider();
 	sheet.addRow({ "## Equipment", "## Inventory" });
-	for (size_t it = 0; it < std::max(inventory.size(), equipment.size());
-		 ++it) {
+	for (size_t it = 0; it < std::max(inventory.size(), equipment.size()); ++it) {
 		std::string equipmentItem, inventoryItem;
 		if (it < equipment.size()) {
 			equipmentItem = equipment.at(it)->getName();
@@ -272,8 +257,7 @@ bool Character::setAbility(const Ability &ability, const unsigned int &value)
 	return false;
 }
 
-unsigned int Character::getAbility(const Ability &ability,
-								   bool withEffects) const
+unsigned int Character::getAbility(const Ability &ability, bool withEffects) const
 {
 	auto overall = 0;
 	// Try to find the ability value.
@@ -295,16 +279,13 @@ unsigned int Character::getAbility(const Ability &ability,
 	return static_cast<unsigned int>(overall);
 }
 
-unsigned int Character::getAbilityModifier(const Ability &ability,
-										   bool withEffects) const
+unsigned int Character::getAbilityModifier(const Ability &ability, bool withEffects) const
 {
 	return Ability::getModifier(this->getAbility(ability, withEffects));
 }
 
-unsigned int Character::getAbilityLog(const Ability &ability,
-									  const double &base,
-									  const double &multiplier,
-									  const bool &withEffects) const
+unsigned int Character::getAbilityLog(const Ability &ability, const double &base,
+									  const double &multiplier, const bool &withEffects) const
 {
 	auto mod = this->getAbilityModifier(ability, withEffects);
 	auto logMod = SafeLog10(mod);
@@ -532,8 +513,7 @@ void Character::performAction()
 	}
 	if (action->checkElapsed()) {
 		auto status = action->perform();
-		if ((status == ActionStatus::Finished) ||
-			(status == ActionStatus::Error)) {
+		if ((status == ActionStatus::Finished) || (status == ActionStatus::Error)) {
 			// Remove the from action.
 			this->popAction();
 		}
@@ -584,8 +564,7 @@ Item *Character::findNearbyItem(std::string const &key, unsigned int number,
 	return nullptr;
 }
 
-Item *
-Character::findItemAtBodyPart(const std::shared_ptr<BodyPart> &bodyPart) const
+Item *Character::findItemAtBodyPart(const std::shared_ptr<BodyPart> &bodyPart) const
 {
 	for (auto item : equipment) {
 		for (auto occupiedBodyPart : item->occupiedBodyParts) {
@@ -604,8 +583,7 @@ void Character::addInventoryItem(Item *&item)
 	// Set the owner of the item.
 	item->owner = this;
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' added to '%s' inventory;",
-		   item->getName(), this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' added to '%s' inventory;", item->getName(), this->getName());
 }
 
 void Character::addEquipmentItem(Item *&item)
@@ -615,8 +593,7 @@ void Character::addEquipmentItem(Item *&item)
 	// Set the owner of the item.
 	item->owner = this;
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' added to '%s' equipment;",
-		   item->getName(), this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' added to '%s' equipment;", item->getName(), this->getName());
 }
 
 bool Character::remInventoryItem(Item *item)
@@ -628,8 +605,7 @@ bool Character::remInventoryItem(Item *item)
 	// Clear the owner of the item.
 	item->owner = nullptr;
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(),
-		   this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
 	return true;
 }
 
@@ -644,8 +620,7 @@ bool Character::remEquipmentItem(Item *item)
 	// Empty the occupied body parts.
 	item->occupiedBodyParts.clear();
 	// Log it.
-	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(),
-		   this->getName());
+	MudLog(LogLevel::Debug, "Item '%s' removed from '%s';", item->getName(), this->getName());
 	return true;
 }
 
@@ -675,8 +650,7 @@ double Character::getMaxCarryingWeight() const
 	return 100 + (this->getAbilityModifier(Ability::Strength) * 10);
 }
 
-std::vector<std::shared_ptr<BodyPart> >
-Character::canWield(Item *item, std::string &error) const
+std::vector<std::shared_ptr<BodyPart> > Character::canWield(Item *item, std::string &error) const
 {
 	// Prepare the list of occupied body parts.
 	std::vector<std::shared_ptr<BodyPart> > occupiedBodyParts;
@@ -697,8 +671,7 @@ Character::canWield(Item *item, std::string &error) const
 		if (occupiedBodyParts.size() == 2)
 			break;
 	}
-	if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand) &&
-		(occupiedBodyParts.size() != 2)) {
+	if (HasFlag(item->model->modelFlags, ModelFlag::TwoHand) && (occupiedBodyParts.size() != 2)) {
 		occupiedBodyParts.clear();
 	}
 	if (occupiedBodyParts.empty())
@@ -706,8 +679,7 @@ Character::canWield(Item *item, std::string &error) const
 	return occupiedBodyParts;
 }
 
-std::vector<std::shared_ptr<BodyPart> >
-Character::canWear(Item *item, std::string &error) const
+std::vector<std::shared_ptr<BodyPart> > Character::canWear(Item *item, std::string &error) const
 {
 	// Prepare the list of occupied body parts.
 	std::vector<std::shared_ptr<BodyPart> > occupiedBodyParts;
@@ -789,8 +761,8 @@ void Character::updateHealth()
 {
 	auto constMod(this->getAbilityModifier(Ability::Constitution));
 	auto regainMod(posture.getRegainModifier());
-	auto effectMod(static_cast<unsigned int>(
-		effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
+	auto effectMod(
+		static_cast<unsigned int>(effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
 	this->addHealth((constMod * regainMod) + effectMod, true);
 }
 
@@ -798,8 +770,8 @@ void Character::updateStamina()
 {
 	auto constMod(this->getAbilityModifier(Ability::Constitution));
 	auto regainMod(posture.getRegainModifier());
-	auto effectMod(static_cast<unsigned int>(
-		effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
+	auto effectMod(
+		static_cast<unsigned int>(effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
 	this->addHealth(((2 * constMod) * regainMod) + effectMod, true);
 }
 
@@ -957,8 +929,7 @@ bool Character::isAtRange(Character *target, const int &range)
 		if (WrongAssert(!target->toMobile()->isAlive()))
 			return false;
 	}
-	return StructUtils::los(room->coord, target->room->coord, room->area, range,
-							race->height);
+	return StructUtils::los(room->coord, target->room->coord, room->area, range, race->height);
 }
 
 void Character::kill()
@@ -1022,8 +993,7 @@ void Character::luaAddEquipment(Item *item)
 	std::string error;
 	auto occupiedBodyParts = this->canWear(item, error);
 	if (occupiedBodyParts.empty()) {
-		MudLog(LogLevel::Error, "The mobile %s cannot equip %s.",
-			   this->getName(), item->getName());
+		MudLog(LogLevel::Error, "The mobile %s cannot equip %s.", this->getName(), item->getName());
 		MudLog(LogLevel::Error, "Error: %s", error);
 		return;
 	} else {

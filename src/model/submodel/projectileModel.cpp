@@ -24,10 +24,7 @@
 
 #include "utilities/logger.hpp"
 
-ProjectileModel::ProjectileModel() :
-	projectileType(),
-	damageBonus(),
-	rangeBonus()
+ProjectileModel::ProjectileModel() : projectileType(), damageBonus(), rangeBonus()
 {
 	// Nothing to do.
 }
@@ -55,12 +52,10 @@ bool ProjectileModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 3) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Projectile Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Projectile Model (%s).", name);
 		return false;
 	}
-	this->projectileType =
-		static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
+	this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
 	this->damageBonus = ToNumber<unsigned int>(functionList[1]);
 	this->rangeBonus = ToNumber<int>(functionList[2]);
 	return true;
@@ -73,8 +68,7 @@ void ProjectileModel::getSheet(Table &sheet) const
 	// Add a divider.
 	sheet.addDivider();
 	// Set the values.
-	sheet.addRow(
-		{ "Projectile Type", GetRangedWeaponTypeName(this->projectileType) });
+	sheet.addRow({ "Projectile Type", GetRangedWeaponTypeName(this->projectileType) });
 	sheet.addRow({ "Damage Bonus", ToString(this->damageBonus) });
 	sheet.addRow({ "Range  Bonus", ToString(this->rangeBonus) });
 }

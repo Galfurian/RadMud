@@ -37,8 +37,7 @@ double SafeLog10(const double &source)
 	return 0;
 }
 
-bool BeginWith(const std::string &source, const std::string &prefix,
-			   bool sensitive, int n)
+bool BeginWith(const std::string &source, const std::string &prefix, bool sensitive, int n)
 {
 	if (&prefix == &source)
 		return true;
@@ -63,8 +62,7 @@ bool BeginWith(const std::string &source, const std::string &prefix,
 	return it1 == prefix.end();
 }
 
-bool EndWith(const std::string &source, const std::string &suffix,
-			 bool sensitive, int n)
+bool EndWith(const std::string &source, const std::string &suffix, bool sensitive, int n)
 {
 	if (&suffix == &source)
 		return true;
@@ -72,8 +70,7 @@ bool EndWith(const std::string &source, const std::string &suffix,
 		return false;
 	if (source.empty() || suffix.empty())
 		return false;
-	std::string::const_reverse_iterator it0 = source.rbegin(),
-										it1 = suffix.rbegin();
+	std::string::const_reverse_iterator it0 = source.rbegin(), it1 = suffix.rbegin();
 	if (sensitive) {
 		while ((it1 != suffix.rend()) && ((*it1) == (*it0))) {
 			if ((n > 0) && (--n <= 0))
@@ -90,8 +87,7 @@ bool EndWith(const std::string &source, const std::string &suffix,
 	return it1 == suffix.rend();
 }
 
-void FindAndReplace(std::string *source, const std::string &target,
-					const std::string &replacement)
+void FindAndReplace(std::string *source, const std::string &target, const std::string &replacement)
 {
 	size_t start_pos = 0;
 	while ((start_pos = source->find(target, start_pos)) != std::string::npos) {
@@ -146,8 +142,7 @@ std::string ToCapitals(const std::string &source)
 	return working;
 }
 
-std::vector<std::string> SplitString(const std::string &src,
-									 const std::string &del)
+std::vector<std::string> SplitString(const std::string &src, const std::string &del)
 {
 	std::vector<std::string> result;
 	std::string::size_type curr = 0, next = 0;
@@ -172,8 +167,7 @@ std::vector<std::string> GetWords(const std::string &source)
 	return working;
 }
 
-std::vector<std::string> TextWrap(std::string const &text,
-								  std::string::size_type const &width)
+std::vector<std::string> TextWrap(std::string const &text, std::string::size_type const &width)
 {
 	auto words = SplitString(text, " ");
 	std::vector<std::string> out;
@@ -261,10 +255,10 @@ bool GetFileContents(const char *filename, std::string &contents)
 }
 
 /// Check if the return code from Zlib is an error.
-#define ZCHECK_ERROR(err, msg)                                                 \
-	if ((err) != Z_OK) {                                                       \
-		std::cerr << #msg " error: " #err "\n";                                \
-		exit(1);                                                               \
+#define ZCHECK_ERROR(err, msg)                                                                     \
+	if ((err) != Z_OK) {                                                                           \
+		std::cerr << #msg " error: " #err "\n";                                                    \
+		exit(1);                                                                                   \
 	}
 
 std::vector<uint8_t> DeflateStream(std::vector<uint8_t> &uncompressed)

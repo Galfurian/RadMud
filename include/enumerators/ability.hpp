@@ -28,14 +28,7 @@
 class Ability : public BaseEnumerator {
 public:
 	/// The possible abilities.
-	enum Enum {
-		None,
-		Strength,
-		Agility,
-		Perception,
-		Constitution,
-		Intelligence
-	};
+	enum Enum { None, Strength, Agility, Perception, Constitution, Intelligence };
 
 	/// @brief Constructor.
 	Ability() : BaseEnumerator()

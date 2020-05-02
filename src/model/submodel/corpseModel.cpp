@@ -53,8 +53,7 @@ bool CorpseModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (!functionList.empty()) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Corpse Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Corpse Model (%s).", name);
 		return false;
 	}
 	return true;
@@ -71,8 +70,8 @@ void CorpseModel::getSheet(Table &sheet) const
 	}
 }
 
-Item *CorpseModel::createItem(std::string, Material *, bool,
-							  const ItemQuality &, const unsigned int &)
+Item *CorpseModel::createItem(std::string, Material *, bool, const ItemQuality &,
+							  const unsigned int &)
 {
 	MudLog(LogLevel::Error, "Use the proper createCorpse function.");
 	return nullptr;

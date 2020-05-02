@@ -48,8 +48,7 @@ bool DoItemCreate(Character *character, ArgumentHandler &args)
 		character->sendMsg("You can make %s out of:\n", itemModel->getName());
 		for (auto const &it : Mud::instance().mudMaterials) {
 			if (it.second->type == itemModel->material) {
-				character->sendMsg("    [%s] %s\n",
-								   Align(it.first, align::right, 4),
+				character->sendMsg("    [%s] %s\n", Align(it.first, align::right, 4),
 								   it.second->name);
 			}
 		}
@@ -59,8 +58,7 @@ bool DoItemCreate(Character *character, ArgumentHandler &args)
 	auto materialVnum = ToNumber<unsigned int>(args[1].getContent());
 	auto material = Mud::instance().findMaterial(materialVnum);
 	if (material == nullptr) {
-		character->sendMsg("Cannot find material '%s'.\n",
-						   args[1].getContent());
+		character->sendMsg("Cannot find material '%s'.\n", args[1].getContent());
 		return false;
 	}
 	// Get the quality.
@@ -73,16 +71,14 @@ bool DoItemCreate(Character *character, ArgumentHandler &args)
 		}
 	}
 	// Create the item.
-	auto item = itemModel->createItem(character->getName(), material, false,
-									  quality, quantity);
+	auto item = itemModel->createItem(character->getName(), material, false, quality, quantity);
 	if (item == nullptr) {
 		character->sendMsg("Creation failed.\n");
 		return false;
 	}
 	character->addInventoryItem(item);
-	character->sendMsg(
-		"You produce '%s' out of your apparently empty top hat.\n",
-		item->getName(true));
+	character->sendMsg("You produce '%s' out of your apparently empty top hat.\n",
+					   item->getName(true));
 	return true;
 }
 
@@ -125,12 +121,11 @@ bool DoItemGet(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	if (item->room != nullptr) {
-		character->sendMsg("The item was inside the room '%s' (%s)\n",
-						   item->room->name, ToString(item->room->vnum));
+		character->sendMsg("The item was inside the room '%s' (%s)\n", item->room->name,
+						   ToString(item->room->vnum));
 		item->room->removeItem(item);
 	} else if (item->owner != nullptr) {
-		character->sendMsg("The item was possessed by '%s'\n",
-						   item->owner->getName());
+		character->sendMsg("The item was possessed by '%s'\n", item->owner->getName());
 		if (!character->remEquipmentItem(item)) {
 			if (!character->remInventoryItem(item)) {
 				character->sendMsg("Cannot take the item from the owner!");
@@ -159,8 +154,7 @@ bool DoItemInfo(Character *character, ArgumentHandler &args)
 	auto itemVnum = ToNumber<unsigned int>(args[0].getContent());
 	auto item = Mud::instance().findItem(itemVnum);
 	if (item == nullptr) {
-		item =
-			character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+		item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
 		if (item == nullptr) {
 			character->sendMsg("Cannot find the target item.\n");
 			return false;
@@ -203,8 +197,7 @@ bool DoItemList(Character *character, ArgumentHandler &args)
 				typeName = args[argIt + 1].getContent();
 			}
 			if (args[argIt].getContent() == "-m") {
-				modelVnum =
-					ToNumber<unsigned int>(args[argIt + 1].getContent());
+				modelVnum = ToNumber<unsigned int>(args[argIt + 1].getContent());
 			}
 		}
 	}
@@ -299,8 +292,7 @@ bool DoModelList(Character *character, ArgumentHandler &args)
 				modelType = args[argIt + 1].getContent();
 			}
 			if (args[argIt].getContent() == "-m") {
-				modelVnum =
-					ToNumber<unsigned int>(args[argIt + 1].getContent());
+				modelVnum = ToNumber<unsigned int>(args[argIt + 1].getContent());
 			}
 		}
 	}
@@ -317,8 +309,7 @@ bool DoModelList(Character *character, ArgumentHandler &args)
 			}
 		}
 		if (!modelType.empty()) {
-			if (!BeginWith(ToLower(itemModel->getTypeName()),
-						   ToLower(modelType))) {
+			if (!BeginWith(ToLower(itemModel->getTypeName()), ToLower(modelType))) {
 				continue;
 			}
 		}

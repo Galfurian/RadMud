@@ -29,8 +29,7 @@ private:
 
 	/// Define the type of internal 3D data structure.
 	using three_dim_map_t =
-		typename std::map<const int,
-						  std::map<const int, std::map<const int, T> > >;
+		typename std::map<const int, std::map<const int, std::map<const int, T> > >;
 
 	/// Width of th map.
 	int width;
@@ -53,10 +52,7 @@ public:
 	/// @param _height    The height of the 3D map.
 	/// @param _elevation The elevation of the 3D map.
 	Map3D(int _width, int _height, int _elevation) :
-		width(_width),
-		height(_height),
-		elevation(_elevation),
-		data()
+		width(_width), height(_height), elevation(_elevation), data()
 	{
 		// Nothing to do.
 	}
@@ -67,10 +63,7 @@ public:
 	/// @param _elevation The elevation of the 3D map.
 	/// @param value     The initial value of the cells.
 	Map3D(int _width, int _height, int _elevation, T value) :
-		width(_width),
-		height(_height),
-		elevation(_elevation),
-		data()
+		width(_width), height(_height), elevation(_elevation), data()
 	{
 		for (int z = 0; z < width; ++z) {
 			for (int y = 0; y < height; ++y) {

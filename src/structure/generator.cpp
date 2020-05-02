@@ -79,8 +79,7 @@ Generator::Generator()
 	mapStatus[AreaStatus::Normal].namesStatus.push_back(".");
 	mapStatus[AreaStatus::Normal].namesStatus.push_back(", realy dark.");
 	mapStatus[AreaStatus::Normal].namesStatus.push_back(", digged by water.");
-	mapStatus[AreaStatus::Normal].namesStatus.push_back(
-		", made of marble stone.");
+	mapStatus[AreaStatus::Normal].namesStatus.push_back(", made of marble stone.");
 	mapStatus[AreaStatus::Normal].descriptionStatus.push_back(
 		"You do not see anything special here.");
 	mapStatus[AreaStatus::Normal].descriptionStatus.push_back(
@@ -112,8 +111,7 @@ Generator::Generator()
 	mapStatus[AreaStatus::Magmatic].name = "magmatic";
 	mapStatus[AreaStatus::Magmatic].namesStatus.push_back(", crossed by lava.");
 	mapStatus[AreaStatus::Magmatic].namesStatus.push_back(", hot as sun.");
-	mapStatus[AreaStatus::Magmatic].namesStatus.push_back(
-		", containing a lava pond.");
+	mapStatus[AreaStatus::Magmatic].namesStatus.push_back(", containing a lava pond.");
 	mapStatus[AreaStatus::Magmatic].descriptionStatus.push_back(
 		"A cascade of lava lights up the room slightly, this does not"
 		" help you a lot to see, but the heat here makes it tiring"
@@ -124,8 +122,7 @@ Generator::Generator()
 
 	// VEGETAL
 	mapStatus[AreaStatus::Vegetal].name = "vegetal";
-	mapStatus[AreaStatus::Vegetal].namesStatus.push_back(
-		", infested by vegetation.");
+	mapStatus[AreaStatus::Vegetal].namesStatus.push_back(", infested by vegetation.");
 	mapStatus[AreaStatus::Vegetal].descriptionStatus.push_back(
 		"The floor is completely covered with tendrils that"
 		" intertwine with each other, making you difficult to continue.");
@@ -149,26 +146,20 @@ Generator &Generator::instance()
 	return instance;
 }
 
-std::string Generator::generateName(const AreaType &type,
-									const AreaStatus &status)
+std::string Generator::generateName(const AreaType &type, const AreaStatus &status)
 {
 	size_t nameSelector = TRand<size_t>(0, mapBase[type].names.size() - 1);
-	size_t nameStatus =
-		TRand<size_t>(0, mapStatus[status].namesStatus.size() - 1);
-	return mapBase[type].names[nameSelector] +
-		   mapStatus[status].namesStatus[nameStatus];
+	size_t nameStatus = TRand<size_t>(0, mapStatus[status].namesStatus.size() - 1);
+	return mapBase[type].names[nameSelector] + mapStatus[status].namesStatus[nameStatus];
 }
 
-std::string Generator::generateDescription(const AreaType &type,
-										   const AreaStatus &status,
+std::string Generator::generateDescription(const AreaType &type, const AreaStatus &status,
 										   const std::string &roomName)
 {
-	size_t nameSelector =
-		TRand<size_t>(0, mapBase[type].descriptions.size() - 1);
-	size_t nameStatus =
-		TRand<size_t>(0, mapStatus[status].descriptionStatus.size() - 1);
-	std::string result = mapBase[type].descriptions[nameSelector] +
-						 mapStatus[status].descriptionStatus[nameStatus];
+	size_t nameSelector = TRand<size_t>(0, mapBase[type].descriptions.size() - 1);
+	size_t nameStatus = TRand<size_t>(0, mapStatus[status].descriptionStatus.size() - 1);
+	std::string result =
+		mapBase[type].descriptions[nameSelector] + mapStatus[status].descriptionStatus[nameStatus];
 	FindAndReplace(&result, "@ROOM_NAME", ToLower(roomName));
 	return result;
 }

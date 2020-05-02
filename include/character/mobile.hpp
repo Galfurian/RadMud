@@ -185,8 +185,7 @@ protected:
 	/// @param message   The received message.
 	/// @return <b>True</b> if the operations succeeded,<br>
 	///         <b>False</b> Otherwise.
-	bool mobileThread(std::string event, Character *character,
-					  std::string message);
+	bool mobileThread(std::string event, Character *character, std::string message);
 
 	void updateTicImpl() override;
 

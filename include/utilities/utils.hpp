@@ -33,17 +33,15 @@
 #include <iomanip>
 
 /// Allows to define a non-aborting assertion for correct guards.
-#define CorrectAssert(e)                                                       \
-	((e) ? true :                                                              \
-		   (std::cerr << "Assertion :" #e << "\n",                             \
-			std::cerr << "File      :" << __FILE__ << "\n",                    \
+#define CorrectAssert(e)                                                                           \
+	((e) ? true :                                                                                  \
+		   (std::cerr << "Assertion :" #e << "\n", std::cerr << "File      :" << __FILE__ << "\n", \
 			std::cerr << "Line      :" << __LINE__ << "\n", false))
 
 /// Allows to define a non-aborting assertion for wrong guards.
-#define WrongAssert(e)                                                         \
-	((e) ? (std::cerr << "Assertion :" #e << "\n",                             \
-			std::cerr << "File      :" << __FILE__ << "\n",                    \
-			std::cerr << "Line      :" << __LINE__ << "\n", true) :            \
+#define WrongAssert(e)                                                                             \
+	((e) ? (std::cerr << "Assertion :" #e << "\n", std::cerr << "File      :" << __FILE__ << "\n", \
+			std::cerr << "Line      :" << __LINE__ << "\n", true) :                                \
 		   false)
 
 #define Abs(x) ((x) < 0 ? -(x) : (x))
@@ -93,8 +91,7 @@ UnsignedType SafeSum(const UnsignedType &first, const SignedType &second,
 ///         <b>False</b> otherwise.
 template <typename Enum> bool HasFlag(const unsigned int &flags, Enum flag)
 {
-	static_assert(std::is_enum<Enum>::value,
-				  "template parameter is not an enum type");
+	static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
 	return (flags & static_cast<unsigned int>(flag)) != 0;
 }
 
@@ -103,8 +100,7 @@ template <typename Enum> bool HasFlag(const unsigned int &flags, Enum flag)
 /// @param flag  The flag to set.
 template <typename Enum> void SetFlag(unsigned int &flags, Enum flag)
 {
-	static_assert(std::is_enum<Enum>::value,
-				  "template parameter is not an enum type");
+	static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
 	flags |= static_cast<unsigned int>(flag);
 }
 
@@ -113,8 +109,7 @@ template <typename Enum> void SetFlag(unsigned int &flags, Enum flag)
 /// @param flag  The flag to clear.
 template <typename Enum> void ClearFlag(unsigned int &flags, Enum flag)
 {
-	static_assert(std::is_enum<Enum>::value,
-				  "template parameter is not an enum type");
+	static_assert(std::is_enum<Enum>::value, "template parameter is not an enum type");
 	flags &= ~static_cast<unsigned int>(flag);
 }
 
@@ -123,30 +118,28 @@ template <typename Enum> void ClearFlag(unsigned int &flags, Enum flag)
 /// @param prefix Prefix string.
 /// @return <b>True</b> if the source begin with the given prefix,<br>
 ///         <b>False</b> otherwise.
-bool BeginWith(const std::string &source, const std::string &prefix,
-			   bool sensitive = false, int n = -1);
+bool BeginWith(const std::string &source, const std::string &prefix, bool sensitive = false,
+			   int n = -1);
 
 /// @brief Check if the source string end with a given string.
 /// @param source Source string.
 /// @param suffix Final string.
 /// @return <b>True</b> if the source end with the given postfix,<br>
 ///         <b>False</b> otherwise.
-bool EndWith(const std::string &source, const std::string &suffix,
-			 bool sensitive = false, int n = -1);
+bool EndWith(const std::string &source, const std::string &suffix, bool sensitive = false,
+			 int n = -1);
 
 /// @brief Find and replace in a string.
 /// @param source      Source string.
 /// @param target      Target sub-string.
 /// @param replacement Replacement for the sub-string.
-void FindAndReplace(std::string *source, const std::string &target,
-					const std::string &replacement);
+void FindAndReplace(std::string *source, const std::string &target, const std::string &replacement);
 
 /// @brief Get rid of leading and trailing spaces from a string
 /// @param source Source string.
 /// @param trim   Trim condition.
 /// @return String modified.
-std::string Trim(const std::string &source,
-				 const std::string &trim = std::string(" \t\r\n"));
+std::string Trim(const std::string &source, const std::string &trim = std::string(" \t\r\n"));
 
 /// @brief Convert all the stirng to lowercase.
 /// @param source Source string.
@@ -163,8 +156,7 @@ std::string ToCapitals(const std::string &source);
 /// @param source    The source string.
 /// @param delimiter The delimiter which has to be used.
 /// @return The splitted string.
-std::vector<std::string> SplitString(const std::string &source,
-									 const std::string &delimiter);
+std::vector<std::string> SplitString(const std::string &source, const std::string &delimiter);
 
 /// @brief Get all the words in the source string.
 /// @param source The source string.
@@ -175,8 +167,7 @@ std::vector<std::string> GetWords(const std::string &source);
 /// @param text  The text to wrap.
 /// @param width The desired width.
 /// @return The wrapped lines.
-std::vector<std::string> TextWrap(std::string const &text,
-								  std::string::size_type const &width);
+std::vector<std::string> TextWrap(std::string const &text, std::string::size_type const &width);
 
 /// @brief Return the current timestamp as "Hours:Minute".
 /// @return The current timestamp.
@@ -202,8 +193,7 @@ inline double RoundTo(double value, int digits)
 /// @brief Transform a string into a numeric value.
 /// @param source The string to turn into a number.
 /// @return The number.
-template <typename T,
-		  typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 T ToNumber(const std::string &source)
 {
 	char *pEnd;
@@ -213,8 +203,7 @@ T ToNumber(const std::string &source)
 /// @brief Transform a numeric value into a string.
 /// @param value The value to turn into a string.
 /// @return The resulting string.
-template <typename T,
-		  typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
+template <typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value>::type>
 std::string ToString(const T &value)
 {
 	std::stringstream ss;
@@ -226,8 +215,7 @@ std::string ToString(const T &value)
 /// @param lowerBound The lower bound for the random value.
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
-template <typename T,
-		  typename = typename std::enable_if<std::is_integral<T>::value>::type>
+template <typename T, typename = typename std::enable_if<std::is_integral<T>::value>::type>
 T TRand(const T &lowerBound, const T &upperBound)
 {
 	std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
@@ -240,8 +228,7 @@ T TRand(const T &lowerBound, const T &upperBound)
 /// @param lowerBound The lower bound for the random value.
 /// @param upperBound The upper bound for the random value.
 /// @return The generated random value.
-template <typename T, typename = typename std::enable_if<
-						  std::is_floating_point<T>::value>::type>
+template <typename T, typename = typename std::enable_if<std::is_floating_point<T>::value>::type>
 T TRandReal(const T &lowerBound, const T &upperBound)
 {
 	std::uniform_real_distribution<T> distribution(lowerBound, upperBound);
@@ -264,9 +251,8 @@ template <typename T> T Normalize(T v, T from_lb, T from_ub, T to_lb, T to_ub)
 
 /// @brief Provides the distance between the source and the target.
 template <typename T>
-inline T GetDistance(T const &source_x, T const &target_x,
-					 T const &source_y = 0, T const &target_y = 0,
-					 T const &source_z = 0, T const &target_z = 0)
+inline T GetDistance(T const &source_x, T const &target_x, T const &source_y = 0,
+					 T const &target_y = 0, T const &source_z = 0, T const &target_z = 0)
 {
 	auto diff_x = source_x - target_x;
 	diff_x *= diff_x;
@@ -277,8 +263,7 @@ inline T GetDistance(T const &source_x, T const &target_x,
 	return static_cast<T>(std::sqrt(diff_x + diff_y + diff_z));
 }
 
-template <typename T, typename TPercentage>
-inline T Percent(T total, TPercentage percentage)
+template <typename T, typename TPercentage> inline T Percent(T total, TPercentage percentage)
 {
 	return static_cast<T>((total / 100) * percentage);
 }
@@ -329,8 +314,7 @@ template <typename T> bool FindErase(std::vector<T> &v, const T &item)
 ///         <b>False</b> otherwise.
 /// Complexity: <b>Linear</b>.<br>
 /// Proportional to distance(target)s.
-template <typename T>
-typename std::list<T>::iterator FindErase(std::list<T> &l, const T &item)
+template <typename T> typename std::list<T>::iterator FindErase(std::list<T> &l, const T &item)
 {
 	auto iterator = std::find(l.begin(), l.end(), item);
 	if (iterator != l.end()) {
@@ -345,8 +329,7 @@ typename std::list<T>::iterator FindErase(std::list<T> &l, const T &item)
 /// @return <b>True</b> if the remove is successful,<br><b>False</b> otherwise.
 /// Complexity: <b>Linear</b>.<br>
 /// Proportional to distance(target)s.
-template <typename T>
-typename std::set<T>::iterator FindErase(std::set<T> &set, const T &item)
+template <typename T> typename std::set<T>::iterator FindErase(std::set<T> &set, const T &item)
 {
 	auto it = set.find(item);
 	if (it != set.end()) {
@@ -362,8 +345,7 @@ typename std::set<T>::iterator FindErase(std::set<T> &set, const T &item)
 /// Complexity: <b>Log(n)</b>.<br>
 /// Where n is the number of members in the map.
 template <typename K, typename T>
-inline typename std::map<K, T>::iterator FindErase(std::map<K, T> &map,
-												   const K &key)
+inline typename std::map<K, T>::iterator FindErase(std::map<K, T> &map, const K &key)
 {
 	auto it = map.find(key);
 	if (it != map.end()) {

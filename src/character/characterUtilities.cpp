@@ -26,8 +26,7 @@
 #include "structure/room.hpp"
 #include "item/itemUtils.hpp"
 
-std::vector<std::shared_ptr<BodyPart::BodyWeapon> >
-GetActiveNaturalWeapons(Character *character)
+std::vector<std::shared_ptr<BodyPart::BodyWeapon> > GetActiveNaturalWeapons(Character *character)
 {
 	std::vector<std::shared_ptr<BodyPart::BodyWeapon> > naturalWeapons;
 	for (auto const &bodyPart : character->race->bodyParts) {
@@ -43,8 +42,7 @@ GetActiveNaturalWeapons(Character *character)
 	return naturalWeapons;
 }
 
-void FindCoinsInContainer(ItemVector const &container, ItemVector &foundCoins,
-						  const bool iterative)
+void FindCoinsInContainer(ItemVector const &container, ItemVector &foundCoins, const bool iterative)
 {
 	// Analyze the content.
 	for (auto item : container) {
@@ -55,8 +53,7 @@ void FindCoinsInContainer(ItemVector const &container, ItemVector &foundCoins,
 				// Cast the item to container.
 				auto containerItem = dynamic_cast<ContainerItem *>(item);
 				// Iterate inside the container's content.
-				FindCoinsInContainer(containerItem->content, foundCoins,
-									 iterative);
+				FindCoinsInContainer(containerItem->content, foundCoins, iterative);
 			}
 		}
 	}
@@ -71,9 +68,8 @@ ItemVector FindPosessedCoins(Character *character)
 	return foundCoins;
 }
 
-Item *FindNearbyItem(Character *character, std::string const &key,
-					 unsigned int number, unsigned int *number_ptr,
-					 const SearchOptionsCharacter &searchOptions)
+Item *FindNearbyItem(Character *character, std::string const &key, unsigned int number,
+					 unsigned int *number_ptr, const SearchOptionsCharacter &searchOptions)
 {
 	// Check the lights.
 	bool roomLit = true;
@@ -89,20 +85,16 @@ Item *FindNearbyItem(Character *character, std::string const &key,
 	}
 	if (searchOptions.searchInEquipment && (item == nullptr)) {
 		if (roomLit || inventoryLit) {
-			item = ItemUtils::FindItemIn(character->equipment, key, number,
-										 number_ptr);
-		} else if (searchOptions.randomIfNoLight &&
-				   (!character->equipment.empty())) {
+			item = ItemUtils::FindItemIn(character->equipment, key, number, number_ptr);
+		} else if (searchOptions.randomIfNoLight && (!character->equipment.empty())) {
 			auto it = TRand<size_t>(0, character->equipment.size() - 1);
 			item = character->equipment[it];
 		}
 	}
 	if (searchOptions.searchInInventory && (item == nullptr)) {
 		if (roomLit || inventoryLit) {
-			item = ItemUtils::FindItemIn(character->inventory, key, number,
-										 number_ptr);
-		} else if (searchOptions.randomIfNoLight &&
-				   (!character->inventory.empty())) {
+			item = ItemUtils::FindItemIn(character->inventory, key, number, number_ptr);
+		} else if (searchOptions.randomIfNoLight && (!character->inventory.empty())) {
 			auto it = TRand<size_t>(0, character->inventory.size() - 1);
 			item = character->inventory[it];
 		}
@@ -110,11 +102,10 @@ Item *FindNearbyItem(Character *character, std::string const &key,
 	return item;
 }
 
-bool FindNearbyResouces(
-	Character *character,
-	std::map<ResourceType, unsigned int> const &requiredResources,
-	std::vector<std::pair<Item *, unsigned int> > &foundResources,
-	const SearchOptionsCharacter &searchOptions, ResourceType &missing)
+bool FindNearbyResouces(Character *character,
+						std::map<ResourceType, unsigned int> const &requiredResources,
+						std::vector<std::pair<Item *, unsigned int> > &foundResources,
+						const SearchOptionsCharacter &searchOptions, ResourceType &missing)
 {
 	// Create a function which reduces the required quantity and checks if
 	// the zero has been reached.
@@ -166,8 +157,7 @@ bool FindNearbyResouces(
 					break;
 			}
 		}
-		MudLog(LogLevel::Debug, "[%s] %s/%s", resource.first.toString(),
-			   required, resource.second);
+		MudLog(LogLevel::Debug, "[%s] %s/%s", resource.first.toString(), required, resource.second);
 		// If the ingredients are still not enough, return false.
 		if (required > 0) {
 			missing = resource.first;
@@ -177,8 +167,7 @@ bool FindNearbyResouces(
 	return true;
 }
 
-Item *FindNearbyTool(Character *character, const ToolType &toolType,
-					 const ItemVector &exceptions,
+Item *FindNearbyTool(Character *character, const ToolType &toolType, const ItemVector &exceptions,
 					 const SearchOptionsCharacter &searchOptions)
 {
 	if (searchOptions.searchInRoom) {
@@ -203,12 +192,10 @@ Item *FindNearbyTool(Character *character, const ToolType &toolType,
 }
 
 bool FindNearbyTools(Character *character, std::vector<ToolType> requiredTools,
-					 ItemVector &foundTools,
-					 const SearchOptionsCharacter &searchOptions)
+					 ItemVector &foundTools, const SearchOptionsCharacter &searchOptions)
 {
 	for (auto const &requiredTool : requiredTools) {
-		auto tool =
-			FindNearbyTool(character, requiredTool, foundTools, searchOptions);
+		auto tool = FindNearbyTool(character, requiredTool, foundTools, searchOptions);
 		if (tool == nullptr)
 			return false;
 		foundTools.emplace_back(tool);
@@ -216,8 +203,7 @@ bool FindNearbyTools(Character *character, std::vector<ToolType> requiredTools,
 	return true;
 }
 
-Item *FindNearbyBuilding(Character *character,
-						 std::shared_ptr<ItemModel> buildingModel,
+Item *FindNearbyBuilding(Character *character, std::shared_ptr<ItemModel> buildingModel,
 						 const SearchOptionsCharacter &searchOptions)
 {
 	// Create a function which checks if the given item is of the required type.
@@ -251,9 +237,8 @@ Item *FindNearbyBuilding(Character *character,
 	return nullptr;
 }
 
-bool MoveCharacterTo(Character *character, Room *destination,
-					 const std::string &msgDepart, const std::string &msgArrive,
-					 const std::string &msgChar)
+bool MoveCharacterTo(Character *character, Room *destination, const std::string &msgDepart,
+					 const std::string &msgArrive, const std::string &msgChar)
 {
 	// Check if the function has received a valid character.
 	if (WrongAssert(character == nullptr))
@@ -292,25 +277,21 @@ bool MoveCharacterTo(Character *character, Room *destination,
 	return true;
 }
 
-bool HasRequiredKnowledge(Character *character,
-						  std::vector<Knowledge> const &required)
+bool HasRequiredKnowledge(Character *character, std::vector<Knowledge> const &required)
 {
 	if (WrongAssert(character == nullptr))
 		return false;
-	return std::find_if(
-			   required.begin(), required.end(),
-			   [&character](Knowledge const &k) {
-				   if (!((character->skillManager.getKnowledge(k) > 0) ||
-						 (character->effectManager.getKnowledge(k) > 0))) {
-					   MudLog(LogLevel::Debug, "Missing: %s", k.toString());
-					   return false;
-				   }
-				   return true;
-			   }) != required.end();
+	return std::find_if(required.begin(), required.end(), [&character](Knowledge const &k) {
+			   if (!((character->skillManager.getKnowledge(k) > 0) ||
+					 (character->effectManager.getKnowledge(k) > 0))) {
+				   MudLog(LogLevel::Debug, "Missing: %s", k.toString());
+				   return false;
+			   }
+			   return true;
+		   }) != required.end();
 }
 
-bool ParseAbilities(std::map<Ability, unsigned int> &abilities,
-					std::string const &source)
+bool ParseAbilities(std::map<Ability, unsigned int> &abilities, std::string const &source)
 {
 	if (source.empty())
 		return false;

@@ -35,8 +35,7 @@ void LoadCraftingCommands();
 /// @{
 
 /// Execute a profession.
-bool DoProfession(Character *character, Profession *profession,
-				  ArgumentHandler &args);
+bool DoProfession(Character *character, Profession *profession, ArgumentHandler &args);
 
 /// Build something.
 bool DoBuild(Character *character, ArgumentHandler &args);

@@ -49,8 +49,7 @@ unsigned int ArmorItem::getArmorClass() const
 	// Evaluate the modifier due to item's quality.
 	auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
 	// Evaluate the modifier due to item's condition.
-	auto acCondition =
-		static_cast<unsigned int>(acBase * this->getConditionModifier());
+	auto acCondition = static_cast<unsigned int>(acBase * this->getConditionModifier());
 	// Evaluate the modifier due to item's material.
 	unsigned int acMaterial = 0;
 	if (composition != nullptr) {

@@ -32,8 +32,7 @@ bool DoMaterialInfo(Character *character, ArgumentHandler &args)
 	auto materialVnum = ToNumber<unsigned int>(args[0].getContent());
 	auto material = Mud::instance().findMaterial(materialVnum);
 	if (material == nullptr) {
-		character->sendMsg("Can't find the desire material %s.\n",
-						   materialVnum);
+		character->sendMsg("Can't find the desire material %s.\n", materialVnum);
 		return false;
 	}
 	std::string msg;
@@ -81,8 +80,7 @@ bool DoBuildingInfo(Character *character, ArgumentHandler &args)
 	auto buildingVnum = ToNumber<unsigned int>(args[0].getContent());
 	auto building = Mud::instance().findBuilding(buildingVnum);
 	if (building == nullptr) {
-		character->sendMsg("Can't find the desire building %s.\n",
-						   buildingVnum);
+		character->sendMsg("Can't find the desire building %s.\n", buildingVnum);
 		return false;
 	}
 	std::string msg;
@@ -177,8 +175,7 @@ bool DoProductionInfo(Character *character, ArgumentHandler &args)
 	auto productionVnum = ToNumber<unsigned int>(args[0].getContent());
 	auto production = Mud::instance().findProduction(productionVnum);
 	if (production == nullptr) {
-		character->sendMsg("Can't find the desire production %s.\n",
-						   productionVnum);
+		character->sendMsg("Can't find the desire production %s.\n", productionVnum);
 		return false;
 	}
 	std::string msg;

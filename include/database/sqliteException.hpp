@@ -38,7 +38,7 @@ public:
 	/// @brief Constructor.
 	/// @param _errorCode    The SQLITE error code.
 	/// @param _errorMessage The error message.
-	SQLiteException(int _code, std::string const & _message);
+	SQLiteException(int _code, std::string const &_message);
 
 	/// @brief Return what is the subject of the exception.
 	char const *what() const noexcept override;

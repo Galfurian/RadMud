@@ -66,22 +66,16 @@ bool ProcessNewRace::process(ArgumentHandler &args)
 		for (auto const &it : TextWrap(race->description, 60)) {
 			error += it + "\n";
 		}
-		error += "  Strength     " +
-				 ToString(race->getAbility(Ability::Strength)) + "\n";
-		error += "  Agility      " +
-				 ToString(race->getAbility(Ability::Agility)) + "\n";
-		error += "  Perception   " +
-				 ToString(race->getAbility(Ability::Perception)) + "\n";
-		error += "  Constitution " +
-				 ToString(race->getAbility(Ability::Constitution)) + "\n";
-		error += "  Intelligence " +
-				 ToString(race->getAbility(Ability::Intelligence)) + "\n";
+		error += "  Strength     " + ToString(race->getAbility(Ability::Strength)) + "\n";
+		error += "  Agility      " + ToString(race->getAbility(Ability::Agility)) + "\n";
+		error += "  Perception   " + ToString(race->getAbility(Ability::Perception)) + "\n";
+		error += "  Constitution " + ToString(race->getAbility(Ability::Constitution)) + "\n";
+		error += "  Intelligence " + ToString(race->getAbility(Ability::Intelligence)) + "\n";
 		this->advance();
 		return true;
 	}
 	// Get the race.
-	auto race =
-		Mud::instance().findRace(ToNumber<unsigned int>(args[0].getContent()));
+	auto race = Mud::instance().findRace(ToNumber<unsigned int>(args[0].getContent()));
 	if (race == nullptr) {
 		error = "Not a valid race.";
 		this->advance();
@@ -97,12 +91,9 @@ bool ProcessNewRace::process(ArgumentHandler &args)
 	// Set the attributes.
 	player->setAbility(Ability::Strength, race->getAbility(Ability::Strength));
 	player->setAbility(Ability::Agility, race->getAbility(Ability::Agility));
-	player->setAbility(Ability::Perception,
-					   race->getAbility(Ability::Perception));
-	player->setAbility(Ability::Constitution,
-					   race->getAbility(Ability::Constitution));
-	player->setAbility(Ability::Intelligence,
-					   race->getAbility(Ability::Intelligence));
+	player->setAbility(Ability::Perception, race->getAbility(Ability::Perception));
+	player->setAbility(Ability::Constitution, race->getAbility(Ability::Constitution));
+	player->setAbility(Ability::Intelligence, race->getAbility(Ability::Intelligence));
 	// Set the health & stamina.
 	player->setHealth(player->getMaxHealth(), true);
 	player->setStamina(player->getMaxStamina(), true);
@@ -132,8 +123,7 @@ void ProcessNewRace::advance()
 	ss << "#\n";
 	ss << "# Type [" << Formatter::magenta("help [Number]");
 	ss << "] to read a brief description of the race.\n";
-	ss << "# Type [" << Formatter::magenta("back")
-	   << "] to return to the previous step.\n";
+	ss << "# Type [" << Formatter::magenta("back") << "] to return to the previous step.\n";
 	character->sendMsg(ss.str());
 
 	this->printError();

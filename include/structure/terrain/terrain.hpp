@@ -80,8 +80,7 @@ public:
 	Terrain();
 
 	/// @brief Adds a liquid source to the terrain.
-	void addLiquidSource(Liquid *_liquid,
-						 const unsigned int &_assignedProbability);
+	void addLiquidSource(Liquid *_liquid, const unsigned int &_assignedProbability);
 
 	/// @brief Provides a random liquid source based on their probabilities.
 	Liquid *getRandomLiquidSource() const;

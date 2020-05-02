@@ -52,12 +52,10 @@ bool ShieldModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 2) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Shield Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Shield Model (%s).", name);
 		return false;
 	}
-	this->size =
-		static_cast<ShieldSize>(ToNumber<unsigned int>(functionList[0]));
+	this->size = static_cast<ShieldSize>(ToNumber<unsigned int>(functionList[0]));
 	this->parryChance = ToNumber<unsigned int>(functionList[1]);
 	return true;
 }

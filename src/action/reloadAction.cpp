@@ -27,11 +27,8 @@
 
 #include <cassert>
 
-ReloadAction::ReloadAction(Character *_actor, RangedWeaponItem *_weapon,
-						   Item *_magazine) :
-	GeneralAction(_actor),
-	weapon(_weapon),
-	magazine(_magazine)
+ReloadAction::ReloadAction(Character *_actor, RangedWeaponItem *_weapon, Item *_magazine) :
+	GeneralAction(_actor), weapon(_weapon), magazine(_magazine)
 {
 	// Debugging message.
 	MudLog(LogLevel::Debug, "Created ReloadAction.");
@@ -88,16 +85,15 @@ bool ReloadAction::start()
 	actor->sendMsg("You start reloading %s with %s.\n", weapon->getName(true),
 				   magazine->getName(true));
 	actor->room->sendToAll("%s starts reloading %s with %s...\n", { actor },
-						   actor->getNameCapital(), weapon->getName(true),
-						   magazine->getName(true));
+						   actor->getNameCapital(), weapon->getName(true), magazine->getName(true));
 	return true;
 }
 
 std::string ReloadAction::stop()
 {
 	if ((weapon != nullptr) && (magazine != nullptr)) {
-		return "You stop reloading " + weapon->getName(true) + " with " +
-			   magazine->getName(true) + ".";
+		return "You stop reloading " + weapon->getName(true) + " with " + magazine->getName(true) +
+			   ".";
 	}
 	return "You stop reloading.";
 }
@@ -110,19 +106,16 @@ ActionStatus ReloadAction::perform()
 		return ActionStatus::Error;
 	}
 	SQLiteDbms::instance().beginTransaction();
-	if (!actor->remEquipmentItem(magazine) &&
-		!actor->remInventoryItem(magazine)) {
+	if (!actor->remEquipmentItem(magazine) && !actor->remInventoryItem(magazine)) {
 		// Rollback the transaction.
 		SQLiteDbms::instance().rollbackTransection();
-		actor->sendMsg(
-			"Something is gone wrong while you were reloading %s...\n\n",
-			weapon->getName(true));
+		actor->sendMsg("Something is gone wrong while you were reloading %s...\n\n",
+					   weapon->getName(true));
 		return ActionStatus::Error;
 	}
 	weapon->putInside(magazine);
 	SQLiteDbms::instance().endTransaction();
-	actor->sendMsg("You have finished reloading %s...\n\n",
-				   this->weapon->getName(true));
+	actor->sendMsg("You have finished reloading %s...\n\n", this->weapon->getName(true));
 	return ActionStatus::Finished;
 }
 

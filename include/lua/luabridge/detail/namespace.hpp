@@ -245,8 +245,7 @@ private:
 				rawgetfield(L, -1, "__parent");
 				if (lua_isnil(L, -1)) {
 					// Either the property or __parent must exist.
-					result = luaL_error(L, "no member named '%s'",
-										lua_tostring(L, 2));
+					result = luaL_error(L, "no member named '%s'", lua_tostring(L, 2));
 				}
 				lua_remove(L, -2);
 			}
@@ -361,8 +360,7 @@ private:
 		/**
          lua_CFunction to construct a class object wrapped in a container.
          */
-		template <class Params, class C>
-		static int ctorContainerProxy(lua_State *L)
+		template <class Params, class C> static int ctorContainerProxy(lua_State *L)
 		{
 			using T = typename ContainerTraits<C>::Type;
 			ArgList<Params, 2> args(L);
@@ -375,16 +373,14 @@ private:
 		/**
          lua_CFunction to construct a class object in-place in the userdata.
          */
-		template <class Params, class T>
-		static int ctorPlacementProxy(lua_State *L)
+		template <class Params, class T> static int ctorPlacementProxy(lua_State *L)
 		{
 			ArgList<Params, 2> args(L);
 			Constructor<T, Params>::call(UserdataValue<T>::place(L), args);
 			return 1;
 		}
 
-		template <class Params, class T, class C>
-		static int ctorPtrPlacementProxy(lua_State *L)
+		template <class Params, class T, class C> static int ctorPtrPlacementProxy(lua_State *L)
 		{
 			ArgList<Params, 2> args(L);
 			T newobject(Constructor<C, Params>::call(args));
@@ -492,8 +488,7 @@ private:
 		/**
          Derive a new class.
          */
-		Class(char const *name, Namespace const *parent,
-			  void const *const staticKey) :
+		Class(char const *name, Namespace const *parent, void const *const staticKey) :
 			ClassBase(parent->L)
 		{
 			m_stackSize = parent->m_stackSize + 3;
@@ -543,9 +538,7 @@ private:
 		/**
          Add or replace a static data member.
          */
-		template <class U>
-		Class<T> &addStaticData(char const *name, U *pu,
-								bool isWritable = false)
+		template <class U> Class<T> &addStaticData(char const *name, U *pu, bool isWritable = false)
 		{
 			assert(lua_istable(L, -1));
 
@@ -578,8 +571,7 @@ private:
          If the set function is null, the property is read-only.
          */
 		template <class U>
-		Class<T> &addStaticProperty(char const *name, U (*get)(),
-									void (*set)(U) = 0)
+		Class<T> &addStaticProperty(char const *name, U (*get)(), void (*set)(U) = 0)
 		{
 			typedef U (*get_t)();
 			typedef void (*set_t)(U);
@@ -612,8 +604,7 @@ private:
 		/**
          Add or replace a static member function.
          */
-		template <class FP>
-		Class<T> &addStaticFunction(char const *name, FP const fp)
+		template <class FP> Class<T> &addStaticFunction(char const *name, FP const fp)
 		{
 			new (lua_newuserdata(L, sizeof(fp))) FP(fp);
 			lua_pushcclosure(L, &CFunc::Call<FP>::f, 1);
@@ -626,8 +617,7 @@ private:
 		/**
          Add or replace a lua_CFunction.
          */
-		Class<T> &addStaticCFunction(char const *name,
-									 int (*const fp)(lua_State *))
+		Class<T> &addStaticCFunction(char const *name, int (*const fp)(lua_State *))
 		{
 			lua_pushcfunction(L, fp);
 			rawsetfield(L, -2, name);
@@ -639,8 +629,7 @@ private:
          Add or replace a data member.
          */
 		template <class U>
-		Class<T> &addData(char const *name, const U T::*mp,
-						  bool isWritable = false)
+		Class<T> &addData(char const *name, const U T::*mp, bool isWritable = false)
 		{
 			typedef const U T::*mp_t;
 
@@ -674,8 +663,7 @@ private:
          Add or replace a property member.
          */
 		template <class TG, class TS>
-		Class<T> &addProperty(char const *name, TG (T::*get)() const,
-							  bool (T::*set)(TS))
+		Class<T> &addProperty(char const *name, TG (T::*get)() const, bool (T::*set)(TS))
 		{
 			// Add to __propget in class and const tables.
 			{
@@ -705,8 +693,7 @@ private:
 		}
 
 		// read-only
-		template <class TG>
-		Class<T> &addProperty(char const *name, TG (T::*get)() const)
+		template <class TG> Class<T> &addProperty(char const *name, TG (T::*get)() const)
 		{
 			// Add to __propget in class and const tables.
 			rawgetfield(L, -2, "__propget");
@@ -734,8 +721,7 @@ private:
          argument respectively.
          */
 		template <class TG, class TS>
-		Class<T> &addProperty(char const *name, TG (*get)(T const *),
-							  bool (*set)(T *, TS))
+		Class<T> &addProperty(char const *name, TG (*get)(T const *), bool (*set)(T *, TS))
 		{
 			// Add to __propget in class and const tables.
 			{
@@ -765,8 +751,7 @@ private:
 		}
 
 		// read-only
-		template <class TG, class TS>
-		Class<T> &addProperty(char const *name, TG (*get)(T const *))
+		template <class TG, class TS> Class<T> &addProperty(char const *name, TG (*get)(T const *))
 		{
 			// Add to __propget in class and const tables.
 			rawgetfield(L, -2, "__propget");
@@ -820,32 +805,27 @@ private:
         */
 		template <class MemFn> Class<T> &addFunction(char const *name, MemFn mf)
 		{
-			CFunc::CallMemberFunctionHelper<
-				MemFn, FuncTraits<MemFn>::isConstMemberFunction>::add(L, name,
-																	  mf);
+			CFunc::CallMemberFunctionHelper<MemFn, FuncTraits<MemFn>::isConstMemberFunction>::add(
+				L, name, mf);
 			return *this;
 		}
 
-		template <class MemFn>
-		Class<T> &addPtrFunction(char const *name, MemFn mf)
+		template <class MemFn> Class<T> &addPtrFunction(char const *name, MemFn mf)
 		{
 			CFunc::CallMemberPtrFunctionHelper<MemFn>::add(L, name, mf);
 			return *this;
 		}
 
-		template <class MemFn>
-		Class<T> &addWPtrFunction(char const *name, MemFn mf)
+		template <class MemFn> Class<T> &addWPtrFunction(char const *name, MemFn mf)
 		{
 			CFunc::CallMemberWPtrFunctionHelper<MemFn>::add(L, name, mf);
 			return *this;
 		}
 
-		template <class MemFn>
-		Class<T> &addRefFunction(char const *name, MemFn mf)
+		template <class MemFn> Class<T> &addRefFunction(char const *name, MemFn mf)
 		{
-			CFunc::CallMemberRefFunctionHelper<
-				MemFn, FuncTraits<MemFn>::isConstMemberFunction>::add(L, name,
-																	  mf);
+			CFunc::CallMemberRefFunctionHelper<MemFn, FuncTraits<MemFn>::isConstMemberFunction>::add(
+				L, name, mf);
 			return *this;
 		}
 
@@ -882,8 +862,7 @@ private:
 		/**
          Add or replace a const member lua_CFunction.
          */
-		Class<T> &addCFunction(char const *name,
-							   int (T::*mfp)(lua_State *) const
+		Class<T> &addCFunction(char const *name, int (T::*mfp)(lua_State *) const
 
 		)
 		{
@@ -932,9 +911,7 @@ private:
          */
 		template <class MemFn, class C> Class<T> &addConstructor()
 		{
-			lua_pushcclosure(
-				L, &ctorContainerProxy<typename FuncTraits<MemFn>::Params, C>,
-				0);
+			lua_pushcclosure(L, &ctorContainerProxy<typename FuncTraits<MemFn>::Params, C>, 0);
 			rawsetfield(L, -2, "__call");
 
 			return *this;
@@ -942,9 +919,7 @@ private:
 
 		template <class MemFn> Class<T> &addConstructor()
 		{
-			lua_pushcclosure(
-				L, &ctorPlacementProxy<typename FuncTraits<MemFn>::Params, T>,
-				0);
+			lua_pushcclosure(L, &ctorPlacementProxy<typename FuncTraits<MemFn>::Params, T>, 0);
 			rawsetfield(L, -2, "__call");
 
 			return *this;
@@ -952,11 +927,8 @@ private:
 
 		template <class MemFn, class PT> Class<T> &addPtrConstructor()
 		{
-			lua_pushcclosure(
-				L,
-				&ctorPtrPlacementProxy<typename FuncTraits<MemFn>::Params, T,
-									   PT>,
-				0);
+			lua_pushcclosure(L, &ctorPtrPlacementProxy<typename FuncTraits<MemFn>::Params, T, PT>,
+							 0);
 			rawsetfield(L, -2, "__call");
 
 			return *this;
@@ -1064,28 +1036,23 @@ private:
 	template <class T> class WSPtrClass : virtual public ClassBase {
 	public:
 		WSPtrClass(char const *name, Namespace const *parent) :
-			ClassBase(parent->L),
-			weak(name, parent),
-			shared(name, parent)
+			ClassBase(parent->L), weak(name, parent), shared(name, parent)
 		{
 			m_stackSize = weak.m_stackSize;
 			parent->m_stackSize = weak.m_stackSize = shared.m_stackSize = 0;
 			lua_pop(L, 3);
 		}
 
-		WSPtrClass(char const *name, Namespace const *parent,
-				   void const *const sharedkey, void const *const weakkey) :
-			ClassBase(parent->L),
-			weak(name, parent, weakkey),
-			shared(name, parent, sharedkey)
+		WSPtrClass(char const *name, Namespace const *parent, void const *const sharedkey,
+				   void const *const weakkey) :
+			ClassBase(parent->L), weak(name, parent, weakkey), shared(name, parent, sharedkey)
 		{
 			m_stackSize = weak.m_stackSize;
 			parent->m_stackSize = weak.m_stackSize = shared.m_stackSize = 0;
 			lua_pop(L, 3);
 		}
 
-		template <class MemFn>
-		WSPtrClass<T> &addFunction(char const *name, MemFn mf)
+		template <class MemFn> WSPtrClass<T> &addFunction(char const *name, MemFn mf)
 		{
 			set_weak_class();
 			CFunc::CallMemberWPtrFunctionHelper<MemFn>::add(L, name, mf);
@@ -1095,8 +1062,7 @@ private:
 			return *this;
 		}
 
-		template <class MemFn>
-		WSPtrClass<T> &addRefFunction(char const *name, MemFn mf)
+		template <class MemFn> WSPtrClass<T> &addRefFunction(char const *name, MemFn mf)
 		{
 			set_weak_class();
 			CFunc::CallMemberRefWPtrFunctionHelper<MemFn>::add(L, name, mf);
@@ -1111,18 +1077,17 @@ private:
 			set_weak_class();
 			// NOTE: this constructs an empty weak-ptr,
 			// ideally we'd construct a weak-ptr from a referenced shared-ptr
-			lua_pushcclosure(
-				L,
-				&weak.template ctorPlacementProxy<
-					typename FuncTraits<MemFn>::Params, std::weak_ptr<T> >,
-				0);
+			lua_pushcclosure(L,
+							 &weak.template ctorPlacementProxy<typename FuncTraits<MemFn>::Params,
+															   std::weak_ptr<T> >,
+							 0);
 			rawsetfield(L, -2, "__call");
 
 			set_shared_class();
 			lua_pushcclosure(
 				L,
-				&shared.template ctorPtrPlacementProxy<
-					typename FuncTraits<MemFn>::Params, std::shared_ptr<T>, T>,
+				&shared.template ctorPtrPlacementProxy<typename FuncTraits<MemFn>::Params,
+													   std::shared_ptr<T>, T>,
 				0);
 			rawsetfield(L, -2, "__call");
 			return *this;
@@ -1133,8 +1098,7 @@ private:
 			return addConstructor<void (*)()>();
 		}
 
-		WSPtrClass<T> &addExtCFunction(char const *name,
-									   int (*const fp)(lua_State *)
+		WSPtrClass<T> &addExtCFunction(char const *name, int (*const fp)(lua_State *)
 
 		)
 		{
@@ -1192,8 +1156,7 @@ private:
 		}
 
 		template <class U>
-		WSPtrClass<T> &addData(char const *name, const U T::*mp,
-							   bool isWritable = true)
+		WSPtrClass<T> &addData(char const *name, const U T::*mp, bool isWritable = true)
 		{
 			typedef const U T::*mp_t;
 
@@ -1257,8 +1220,7 @@ private:
 		void set_weak_class()
 		{
 			lua_pop(L, 3);
-			lua_rawgetp(L, LUA_REGISTRYINDEX,
-						ClassInfo<std::weak_ptr<T> >::getStaticKey());
+			lua_rawgetp(L, LUA_REGISTRYINDEX, ClassInfo<std::weak_ptr<T> >::getStaticKey());
 			rawgetfield(L, -1, "__class");
 			rawgetfield(L, -1, "__const");
 			lua_insert(L, -3);
@@ -1268,8 +1230,7 @@ private:
 		void set_shared_class()
 		{
 			lua_pop(L, 3);
-			lua_rawgetp(L, LUA_REGISTRYINDEX,
-						ClassInfo<std::shared_ptr<T> >::getStaticKey());
+			lua_rawgetp(L, LUA_REGISTRYINDEX, ClassInfo<std::shared_ptr<T> >::getStaticKey());
 			rawgetfield(L, -1, "__class");
 			rawgetfield(L, -1, "__const");
 			lua_insert(L, -3);
@@ -1296,8 +1257,7 @@ private:
 		}
 
 		/// @brief Add an enumerator.
-		template <class EnumValue>
-		EnumToLua<T> &addEnum(char const *name, EnumValue value)
+		template <class EnumValue> EnumToLua<T> &addEnum(char const *name, EnumValue value)
 		{
 			// Push the name of the enum.
 			lua_pushstring(L, name);
@@ -1332,9 +1292,7 @@ private:
      The namespace is created if it doesn't already exist.
      The parent namespace is at the top of the Lua stack.
      */
-	Namespace(char const *name, Namespace const *parent) :
-		L(parent->L),
-		m_stackSize(0)
+	Namespace(char const *name, Namespace const *parent) : L(parent->L), m_stackSize(0)
 	{
 		m_stackSize = parent->m_stackSize + 1;
 		parent->m_stackSize = 0;
@@ -1448,8 +1406,7 @@ public:
 	/**
      Add or replace a variable.
      */
-	template <class T>
-	Namespace &addVariable(char const *name, T *pt, bool isWritable = false)
+	template <class T> Namespace &addVariable(char const *name, T *pt, bool isWritable = false)
 	{
 		assert(lua_istable(L, -1));
 
@@ -1595,8 +1552,7 @@ public:
 
 	//----------------------------------------------------------------------------
 
-	template <class K, class V>
-	Class<std::map<K, V> > beginStdMap(char const *name)
+	template <class K, class V> Class<std::map<K, V> > beginStdMap(char const *name)
 	{
 		using LT = std::map<K, V>;
 		//        using T = std::pair<const K, V>;
@@ -1680,8 +1636,7 @@ public:
 			.addPtrFunction("size", &LT::size)
 			.addPtrFunction("reverse", &LT::reverse)
 			.addPtrFunction("unique", (void (LT::*)()) & LT::unique)
-			.addPtrFunction("push_back",
-							(void (LT::*)(const T &)) & LT::push_back)
+			.addPtrFunction("push_back", (void (LT::*)(const T &)) & LT::push_back)
 			.addExtCFunction("add", &CFunc::ptrTableToList<T, LT>)
 			.addExtCFunction("iter", &CFunc::ptrListIter<T, LT>)
 			.addExtCFunction("table", &CFunc::ptrListToTable<T, LT>);
@@ -1701,8 +1656,7 @@ public:
 			.addPtrFunction("empty", &LT::empty)
 			.addPtrFunction("empty", &LT::empty)
 			.addPtrFunction("size", &LT::size)
-			.addPtrFunction("push_back",
-							(void (LT::*)(const T &)) & LT::push_back)
+			.addPtrFunction("push_back", (void (LT::*)(const T &)) & LT::push_back)
 			.addPtrFunction("at", (T_REF(LT::*)(T_SIZE)) & LT::at)
 			.addExtCFunction("add", &CFunc::ptrTableToList<T, LT>)
 			.addExtCFunction("iter", &CFunc::ptrListIter<T, LT>)
@@ -1730,8 +1684,7 @@ public:
 
 	template <class T, class U> WSPtrClass<T> deriveWSPtrClass(char const *name)
 	{
-		return WSPtrClass<T>(name, this,
-							 ClassInfo<std::shared_ptr<U> >::getStaticKey(),
+		return WSPtrClass<T>(name, this, ClassInfo<std::shared_ptr<U> >::getStaticKey(),
 							 ClassInfo<std::weak_ptr<U> >::getStaticKey())
 			.addNullCheck()
 			.addEqualCheck();

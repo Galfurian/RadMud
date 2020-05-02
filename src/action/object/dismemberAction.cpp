@@ -29,9 +29,7 @@
 
 DismemberAction::DismemberAction(Character *_actor, CorpseItem *_corpse,
 								 const std::shared_ptr<BodyPart> &_bodyPart) :
-	GeneralAction(_actor),
-	corpse(_corpse),
-	bodyPart(_bodyPart)
+	GeneralAction(_actor), corpse(_corpse), bodyPart(_bodyPart)
 {
 	// Debugging message.
 	MudLog(LogLevel::Debug, "Created DismemberAction.");
@@ -78,8 +76,8 @@ bool DismemberAction::start()
 		return false;
 	}
 	actor->sendMsg("You start dismembering %s...\n", corpse->getName(true));
-	actor->room->sendToAll("%s starts dismembering %s...\n", { actor },
-						   actor->getNameCapital(), corpse->getName(true));
+	actor->room->sendToAll("%s starts dismembering %s...\n", { actor }, actor->getNameCapital(),
+						   corpse->getName(true));
 	return true;
 }
 
@@ -113,21 +111,20 @@ ActionStatus DismemberAction::perform()
 			actor->sendMsg("You stop to dismember %s.", corpse->getName(true));
 			return ActionStatus::Error;
 		}
-		auto item = resources.resource->createItem(
-			actor->getName(), resources.material, false, ItemQuality::Normal,
-			static_cast<unsigned int>(resources.quantity));
+		auto item = resources.resource->createItem(actor->getName(), resources.material, false,
+												   ItemQuality::Normal,
+												   static_cast<unsigned int>(resources.quantity));
 		if (item == nullptr) {
 			actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
 			return ActionStatus::Error;
 		}
 		actor->skillManager.improveKnowledge(Knowledge::Butchery);
-		actor->sendMsg("You successfully butcher %s and produce %s.\n\n",
-					   corpse->getName(true), item->getName(true));
+		actor->sendMsg("You successfully butcher %s and produce %s.\n\n", corpse->getName(true),
+					   item->getName(true));
 		if (actor->canCarry(item, item->quantity)) {
 			actor->addInventoryItem(item);
 		} else if (actor->room != nullptr) {
-			actor->sendMsg("%s has been placed on the ground.",
-						   corpse->getNameCapital(true));
+			actor->sendMsg("%s has been placed on the ground.", corpse->getNameCapital(true));
 			actor->room->addItem(item);
 		} else {
 			actor->sendMsg("You fail to dismember %s.", corpse->getName(true));
@@ -149,9 +146,7 @@ unsigned int DismemberAction::getCooldown()
 	assert(bodyPart && "BodyPart is nullptr");
 	double required = 6;
 	MudLog(LogLevel::Debug, "Base time  : %f", required);
-	required -=
-		(required * actor->effectManager.getKnowledge(Knowledge::Butchery)) /
-		100;
+	required -= (required * actor->effectManager.getKnowledge(Knowledge::Butchery)) / 100;
 	MudLog(LogLevel::Debug, "With skill : %f", required);
 	return static_cast<unsigned int>(required);
 }

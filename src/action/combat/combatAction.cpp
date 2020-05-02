@@ -76,7 +76,7 @@ unsigned int CombatAction::getCooldown()
 	cooldown = SafeSum(cooldown, -actor->getAbilityLog(Ability::Agility));
 	cooldown = SafeSum(cooldown, SafeLog10(actor->weight));
 	cooldown = SafeSum(cooldown, SafeLog10(actor->getCarryingWeight()));
-	for (auto bodyPart : actor->race->bodyParts) {
+	for (const auto &bodyPart : actor->race->bodyParts) {
 		if (!HasFlag(bodyPart->flags, BodyPartFlag::CanWield)) {
 			continue;
 		}

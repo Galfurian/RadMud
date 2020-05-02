@@ -108,8 +108,7 @@ std::vector<Room *> getNeighbours(Room *room)
 	return result;
 }
 
-bool checkConnection(const MovementOptions &options, Room *r1, Room *r2,
-					 std::string &error)
+bool checkConnection(const MovementOptions &options, Room *r1, Room *r2, std::string &error)
 {
 	if ((r1 == nullptr) || (r2 == nullptr))
 		return false;
@@ -160,8 +159,7 @@ bool checkConnection(const MovementOptions &options, Room *r1, Room *r2,
 		auto currentAction = character->getAction();
 		// Check if the character is in combat and the option states that the
 		// movement cannot be performed while in close combat.
-		if ((currentAction->getType() == ActionType::Combat) &&
-			(!options.allowedInCloseCombat)) {
+		if ((currentAction->getType() == ActionType::Combat) && (!options.allowedInCloseCombat)) {
 			// Check if the character is locked into close combat.
 			bool lockedInCombat = false;
 			// Check if he is in the same room of one of its aggressors.
@@ -175,8 +173,7 @@ bool checkConnection(const MovementOptions &options, Room *r1, Room *r2,
 			}
 			// Check even the aimed character.
 			if (character->combatHandler.getAimedTarget() != nullptr) {
-				if (character->combatHandler.getAimedTarget()->room ==
-					character->room) {
+				if (character->combatHandler.getAimedTarget()->room == character->room) {
 					lockedInCombat = true;
 				}
 			}
@@ -201,8 +198,7 @@ bool checkConnection(const MovementOptions &options, Room *r1, Room *r2,
 			return false;
 		}
 		// Check if the destination is forbidden for mobiles.
-		if (character->isMobile() &&
-			HasFlag(connection->flags, ExitFlag::NoMob)) {
+		if (character->isMobile() && HasFlag(connection->flags, ExitFlag::NoMob)) {
 			error = "Mobiles cannot move through this exit.\n";
 			return false;
 		}
@@ -210,8 +206,8 @@ bool checkConnection(const MovementOptions &options, Room *r1, Room *r2,
 	return true;
 }
 
-bool checkConnection(const MovementOptions &options, Room *r1,
-					 const Direction &direction, std::string &error)
+bool checkConnection(const MovementOptions &options, Room *r1, const Direction &direction,
+					 std::string &error)
 {
 	// Check the room and the direction.
 	if ((r1 == nullptr) || (direction == Direction::None))
@@ -228,8 +224,7 @@ bool checkConnection(const MovementOptions &options, Room *r1,
 		error = "You cannot go that way.";
 		return false;
 	}
-	return StructUtils::checkConnection(options, r1, foundExit->destination,
-										error);
+	return StructUtils::checkConnection(options, r1, foundExit->destination, error);
 }
 
 Item *findDoor(Room *room)
@@ -254,8 +249,7 @@ Item *findDoor(Room *room)
 	return nullptr;
 }
 
-std::vector<Room *> selectRooms(Area *area, Room *startingRoom,
-								RoomSelectionOptions options)
+std::vector<Room *> selectRooms(Area *area, Room *startingRoom, RoomSelectionOptions options)
 {
 	std::vector<Room *> selectedRooms;
 	std::function<void(Room *)> RecursiveSelectRooms;
@@ -296,29 +290,21 @@ std::vector<Coordinates> fov(Coordinates &origin, const int &radius, Area *area)
 	while (point.x <= radius) {
 		while ((point.y <= point.x) && (point.square() <= pow(radius, 2))) {
 			// ---------------------------------------------------------
-			CheckCoord(origin.x + point.x, origin.y + point.y,
-					   origin.z + point.z);
+			CheckCoord(origin.x + point.x, origin.y + point.y, origin.z + point.z);
 			// ---------------------------------------------------------
-			CheckCoord(origin.x - point.x, origin.y + point.y,
-					   origin.z + point.z);
+			CheckCoord(origin.x - point.x, origin.y + point.y, origin.z + point.z);
 			// ---------------------------------------------------------
-			CheckCoord(origin.x + point.x, origin.y - point.y,
-					   origin.z + point.z);
+			CheckCoord(origin.x + point.x, origin.y - point.y, origin.z + point.z);
 			// ---------------------------------------------------------
-			CheckCoord(origin.x - point.x, origin.y - point.y,
-					   origin.z + point.z);
+			CheckCoord(origin.x - point.x, origin.y - point.y, origin.z + point.z);
 			// ---------------------------------------------------------
-			CheckCoord(origin.x + point.y, origin.y + point.x,
-					   origin.z + point.z);
+			CheckCoord(origin.x + point.y, origin.y + point.x, origin.z + point.z);
 			// ---------------------------------------------------------
-			CheckCoord(origin.x - point.y, origin.y + point.x,
-					   origin.z + point.z);
+			CheckCoord(origin.x - point.y, origin.y + point.x, origin.z + point.z);
 			// ---------------------------------------------------------
-			CheckCoord(origin.x + point.y, origin.y - point.x,
-					   origin.z + point.z);
+			CheckCoord(origin.x + point.y, origin.y - point.x, origin.z + point.z);
 			// ---------------------------------------------------------
-			CheckCoord(origin.x - point.y, origin.y - point.x,
-					   origin.z + point.z);
+			CheckCoord(origin.x - point.y, origin.y - point.x, origin.z + point.z);
 			// ---------------------------------------------------------
 			++point.y;
 		}
@@ -328,8 +314,8 @@ std::vector<Coordinates> fov(Coordinates &origin, const int &radius, Area *area)
 	return cfov;
 }
 
-std::vector<Coordinates> fov3d(Coordinates &origin, Area *area,
-							   const int &radius, double const &height)
+std::vector<Coordinates> fov3d(Coordinates &origin, Area *area, const int &radius,
+							   double const &height)
 {
 	int x0 = origin.x, y0 = origin.y, z0 = origin.z;
 	std::vector<Coordinates> fov_coords;
@@ -377,8 +363,8 @@ std::vector<Coordinates> fov3d(Coordinates &origin, Area *area,
 	return fov_coords;
 }
 
-bool los(Coordinates const &source, Coordinates const &target, Area *area,
-		 int const &radius, double const &height)
+bool los(Coordinates const &source, Coordinates const &target, Area *area, int const &radius,
+		 double const &height)
 {
 	// Deal with the easiest case.
 	if (source == target)

@@ -29,18 +29,13 @@ Coordinates::Coordinates() : x(), y(), z()
 	// Nothing to do.
 }
 
-Coordinates::Coordinates(const int &_x, const int &_y, const int &_z) :
-	x(_x),
-	y(_y),
-	z(_z)
+Coordinates::Coordinates(const int &_x, const int &_y, const int &_z) : x(_x), y(_y), z(_z)
 {
 	// Nothing to do.
 }
 
 Coordinates::Coordinates(const double &_x, const double &_y, const double &_z) :
-	x(static_cast<int>(_x)),
-	y(static_cast<int>(_y)),
-	z(static_cast<int>(_z))
+	x(static_cast<int>(_x)), y(static_cast<int>(_y)), z(static_cast<int>(_z))
 {
 	// Nothing to do.
 }
@@ -97,6 +92,5 @@ int Coordinates::square() const
 
 std::string Coordinates::toString() const
 {
-	return "[X:" + ToString(x) + ";" + " Y:" + ToString(y) + ";" +
-		   " Z:" + ToString(z) + "]";
+	return "[X:" + ToString(x) + ";" + " Y:" + ToString(y) + ";" + " Z:" + ToString(z) + "]";
 }

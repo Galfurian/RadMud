@@ -141,15 +141,13 @@ public:
 	/// @param key    The item to search.
 	/// @param number Position of the item we want to look for.
 	/// @return The item, if it's in the room.
-	Item *findItem(std::string const &key, unsigned int number,
-				   unsigned int *number_ptr = nullptr);
+	Item *findItem(std::string const &key, unsigned int number, unsigned int *number_ptr = nullptr);
 
 	/// @brief Search for the building in the room.
 	/// @param target The building to search.
 	/// @param number Position of the building we want to look for.
 	/// @return The building, if it's in the room.
-	Item *findBuilding(std::string target, unsigned int number,
-					   unsigned int *number_ptr = nullptr);
+	Item *findBuilding(std::string target, unsigned int number, unsigned int *number_ptr = nullptr);
 
 	/// @brief Search for the building in the room.
 	/// @param buildingVnum The vnum of the building to search.
@@ -166,11 +164,10 @@ public:
 	/// @param number    Number of the player we are looking for.
 	/// @param exceptions The list of exceptions.
 	/// @return The character, if it's in the room.
-	inline Character *findCharacter(std::string const &target,
-									unsigned int number,
-									unsigned int *number_ptr = nullptr,
-									std::vector<Character *> const &exceptions =
-										std::vector<Character *>()) const
+	inline Character *
+	findCharacter(std::string const &target, unsigned int number,
+				  unsigned int *number_ptr = nullptr,
+				  std::vector<Character *> const &exceptions = std::vector<Character *>()) const
 	{
 		return characters.findCharacter(target, number, number_ptr, exceptions);
 	}
@@ -180,20 +177,18 @@ public:
 	/// @param number    Number of the player we are looking for.
 	/// @param exceptions The list of exceptions.
 	/// @return The player, if it's in the room.
-	Player *findPlayer(std::string target, unsigned int number,
-					   unsigned int *number_ptr = nullptr,
-					   const std::vector<Character *> &exceptions =
-						   std::vector<Character *>()) const;
+	Player *
+	findPlayer(std::string target, unsigned int number, unsigned int *number_ptr = nullptr,
+			   const std::vector<Character *> &exceptions = std::vector<Character *>()) const;
 
 	/// @brief Search for the mobile in the room.
 	/// @param target    The mobile to search.
 	/// @param number    Number of the mobile we are looking for.
 	/// @param exceptions The list of exceptions.
 	/// @return The mobile, if it's in the room.
-	Mobile *findMobile(std::string target, unsigned int number,
-					   unsigned int *number_ptr = nullptr,
-					   const std::vector<Character *> &exceptions =
-						   std::vector<Character *>()) const;
+	Mobile *
+	findMobile(std::string target, unsigned int number, unsigned int *number_ptr = nullptr,
+			   const std::vector<Character *> &exceptions = std::vector<Character *>()) const;
 
 	/// @brief Add the provided exit to the room list of exits.
 	/// @param exit The exit to add to the list.
@@ -226,16 +221,14 @@ public:
 	///         can specify exceptions.
 	/// @param message    The message to send.
 	/// @param exceptions The list of exceptions.
-	void sendToAll(const std::string &message,
-				   const std::vector<Character *> &exceptions);
+	void sendToAll(const std::string &message, const std::vector<Character *> &exceptions);
 
 	/// @brief Sends a message to all the characters inside the room.
 	/// @param message    The message to send.
 	/// @param exceptions The list of exceptions.
 	/// @param args  Packed arguments.
 	template <typename... Args>
-	void sendToAll(std::string const &fmt,
-				   const std::vector<Character *> &exceptions,
+	void sendToAll(std::string const &fmt, const std::vector<Character *> &exceptions,
 				   const Args &... args)
 	{
 		std::stringstream ss;
@@ -247,9 +240,8 @@ public:
 	///         pass the checking function.
 	/// @param message        The message to send.
 	/// @param checkException The checking function.
-	void
-	funcSendToAll(const std::string &message,
-				  std::function<bool(Character *character)> checkException);
+	void funcSendToAll(const std::string &message,
+					   std::function<bool(Character *character)> checkException);
 
 	/// @brief Send a message to all the characters inside the room
 	///         which pass the checking function.

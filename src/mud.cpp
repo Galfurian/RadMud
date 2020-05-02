@@ -294,16 +294,13 @@ bool Mud::addArea(Area *area)
 
 bool Mud::addRace(Race *race)
 {
-	return (race == nullptr) ?
-			   false :
-			   mudRaces.insert(std::make_pair(race->vnum, race)).second;
+	return (race == nullptr) ? false : mudRaces.insert(std::make_pair(race->vnum, race)).second;
 }
 
 bool Mud::addFaction(Faction *faction)
 {
-	return (faction == nullptr) ?
-			   false :
-			   mudFactions.insert(std::make_pair(faction->vnum, faction)).second;
+	return (faction == nullptr) ? false :
+								  mudFactions.insert(std::make_pair(faction->vnum, faction)).second;
 }
 
 bool Mud::addSkill(std::shared_ptr<Skill> skill)
@@ -323,26 +320,21 @@ bool Mud::addMaterial(Material *material)
 {
 	return (material == nullptr) ?
 			   false :
-			   mudMaterials.insert(std::make_pair(material->vnum, material))
-				   .second;
+			   mudMaterials.insert(std::make_pair(material->vnum, material)).second;
 }
 
 bool Mud::addProfession(Profession *profession)
 {
 	return (profession == nullptr) ?
 			   false :
-			   mudProfessions
-				   .insert(std::make_pair(profession->vnum, profession))
-				   .second;
+			   mudProfessions.insert(std::make_pair(profession->vnum, profession)).second;
 }
 
 bool Mud::addProduction(Production *production)
 {
 	return (production == nullptr) ?
 			   false :
-			   mudProductions
-				   .insert(std::make_pair(production->vnum, production))
-				   .second;
+			   mudProductions.insert(std::make_pair(production->vnum, production)).second;
 }
 
 bool Mud::addLiquid(Liquid *liquid)
@@ -600,16 +592,14 @@ bool Mud::runMud()
 			this->setupDescriptor(iterator);
 		}
 		// Check for activity, timeout after 'timeout' seconds.
-		int activity =
-			select((_maxDesc + 1), &in_set, &out_set, &exc_set, &timeoutVal);
+		int activity = select((_maxDesc + 1), &in_set, &out_set, &exc_set, &timeoutVal);
 		if ((activity < 0) && (errno != EINTR)) {
 			perror("Select");
 		}
 		// Check if there are new connections on control port.
 		if (CMacroWrapper::FdIsSet(_servSocket, &in_set)) {
 			if (!this->processNewConnection()) {
-				MudLog(LogLevel::Error,
-					   "Error during processing a new connection.");
+				MudLog(LogLevel::Error, "Error during processing a new connection.");
 			}
 		}
 		// Handle all player input/output.
@@ -635,8 +625,7 @@ bool Mud::checkSocket(const int &socket) const
 {
 	int error_code;
 	socklen_t error_code_size = sizeof(error_code);
-	return getsockopt(socket, SOL_SOCKET, SO_ERROR, &error_code,
-					  &error_code_size) == 0;
+	return getsockopt(socket, SOL_SOCKET, SO_ERROR, &error_code, &error_code_size) == 0;
 }
 
 bool Mud::closeSocket(const int &socket) const
@@ -733,13 +722,11 @@ void Mud::removeInactivePlayers()
 			toRemove.insert(iterator);
 		}
 	}
-	for (auto iterator = toRemove.begin(); iterator != toRemove.end();
-		 ++iterator) {
+	for (auto iterator = toRemove.begin(); iterator != toRemove.end(); ++iterator) {
 		// Get the player at the given position.
 		auto player = *iterator;
 		// Log the action of removing.
-		MudLog(LogLevel::Global, "Removing inactive player : %s",
-			   player->getName());
+		MudLog(LogLevel::Global, "Removing inactive player : %s", player->getName());
 		// Only if the player has successfully logged in, save its state on DB.
 		if (player->logged_in) {
 			SQLiteDbms::instance().beginTransaction();
@@ -763,10 +750,8 @@ bool Mud::processNewConnection()
 	socklen_t socketAddressSize = sizeof(socketAddress);
 	// Loop until all outstanding connections are accepted.
 	while (true) {
-		socketFileDescriptor =
-			accept(_servSocket,
-				   reinterpret_cast<struct sockaddr *>(&socketAddress),
-				   &socketAddressSize);
+		socketFileDescriptor = accept(
+			_servSocket, reinterpret_cast<struct sockaddr *>(&socketAddress), &socketAddressSize);
 		// A bad socket probably means no more connections are outstanding.
 		if (socketFileDescriptor == NO_SOCKET_COMMUNICATION) {
 			// blocking is OK - we have accepted all outstanding connections.
@@ -937,8 +922,8 @@ bool Mud::initComunications()
 	struct linger ld = linger();
 
 	// Don't allow closed sockets to linger.
-	if (setsockopt(_servSocket, SOL_SOCKET, SO_LINGER,
-				   reinterpret_cast<char *>(&ld), sizeof ld) < 0) {
+	if (setsockopt(_servSocket, SOL_SOCKET, SO_LINGER, reinterpret_cast<char *>(&ld), sizeof ld) <
+		0) {
 		perror("Setsockopt (SO_LINGER)");
 		return false;
 	}
@@ -946,8 +931,8 @@ bool Mud::initComunications()
 	int x = 1;
 
 	// Allow address reuse.
-	if (setsockopt(_servSocket, SOL_SOCKET, SO_REUSEADDR,
-				   reinterpret_cast<char *>(&x), sizeof x) == -1) {
+	if (setsockopt(_servSocket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char *>(&x), sizeof x) ==
+		-1) {
 		perror("Setsockopt (SO_REUSEADDR)");
 		return false;
 	}
@@ -981,9 +966,7 @@ bool Mud::initComunications()
 
 bool Mud::closeComunications()
 {
-	return (_servSocket == NO_SOCKET_COMMUNICATION) ?
-			   false :
-			   this->closeSocket(_servSocket);
+	return (_servSocket == NO_SOCKET_COMMUNICATION) ? false : this->closeSocket(_servSocket);
 }
 
 bool Mud::startMud()
@@ -1019,15 +1002,13 @@ bool Mud::startMud()
 	LoadCommands();
 	MudLog(LogLevel::Global, "Initializing Database...");
 	if (!this->initDatabase()) {
-		MudLog(LogLevel::Error,
-			   "Something gone wrong during database initialization.");
+		MudLog(LogLevel::Error, "Something gone wrong during database initialization.");
 		return false;
 	}
 
 	MudLog(LogLevel::Global, "Initializing Communications...");
 	if (!this->initComunications()) {
-		MudLog(LogLevel::Error,
-			   "Something gone wrong during initialization of comunication.");
+		MudLog(LogLevel::Error, "Something gone wrong during initialization of comunication.");
 		return false;
 	}
 	MudLog(LogLevel::Global, "Booting Done (%f).", stopwatch.elapsed());
@@ -1045,8 +1026,7 @@ bool Mud::stopMud()
 	MudLog(LogLevel::Global, "Shutting down RadMud...");
 	MudLog(LogLevel::Global, "Closing Communications...");
 	if (!this->closeComunications()) {
-		MudLog(LogLevel::Error,
-			   "The communication has not been closed correctly.");
+		MudLog(LogLevel::Error, "The communication has not been closed correctly.");
 	}
 
 	MudLog(LogLevel::Global, "Saving Mud Information...");

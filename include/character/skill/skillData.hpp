@@ -37,18 +37,14 @@ public:
 	/// @brief Constructor.
 	SkillData(const unsigned int &_skillVnum, const unsigned int &_skillLevel,
 			  std::shared_ptr<Skill> _skill) :
-		skillVnum(_skillVnum),
-		skillLevel(_skillLevel),
-		skill(std::move(_skill))
+		skillVnum(_skillVnum), skillLevel(_skillLevel), skill(std::move(_skill))
 	{
 		// Nothing to do.
 	}
 
 	/// @brief Constructor.
 	SkillData(std::shared_ptr<Skill> _skill, const unsigned int &_skillLevel) :
-		skillVnum(_skill->vnum),
-		skillLevel(_skillLevel),
-		skill(std::move(_skill))
+		skillVnum(_skill->vnum), skillLevel(_skillLevel), skill(std::move(_skill))
 	{
 		// Nothing to do.
 	}
@@ -77,11 +73,8 @@ public:
 	std::shared_ptr<SkillData> skillData;
 
 	/// @brief Constructor.
-	SkillEffect(Character *_affected, std::string _name,
-				std::shared_ptr<SkillData> _skillData) :
-		affected(_affected),
-		name(std::move(_name)),
-		skillData(std::move(_skillData))
+	SkillEffect(Character *_affected, std::string _name, std::shared_ptr<SkillData> _skillData) :
+		affected(_affected), name(std::move(_name)), skillData(std::move(_skillData))
 	{
 		// Nothing to do.
 	}

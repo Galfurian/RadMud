@@ -40,14 +40,10 @@ SQLiteDbms::SQLiteDbms() : dbConnection(), loaders()
 	loaders.emplace_back(TableLoader("AreaList", LoadAreaList));
 	loaders.emplace_back(TableLoader("TravelPoint", LoadTravelPoint));
 	loaders.emplace_back(TableLoader("Skill", LoadSkill));
-	loaders.emplace_back(
-		TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
-	loaders.emplace_back(
-		TableLoader("SkillAbilityModifier", LoadSkillAbilityModifier));
-	loaders.emplace_back(
-		TableLoader("SkillStatusModifier", LoadSkillStatusModifier));
-	loaders.emplace_back(
-		TableLoader("SkillCombatModifier", LoadSkillCombatModifier));
+	loaders.emplace_back(TableLoader("SkillPrerequisite", LoadSkillPrerequisite));
+	loaders.emplace_back(TableLoader("SkillAbilityModifier", LoadSkillAbilityModifier));
+	loaders.emplace_back(TableLoader("SkillStatusModifier", LoadSkillStatusModifier));
+	loaders.emplace_back(TableLoader("SkillCombatModifier", LoadSkillCombatModifier));
 	loaders.emplace_back(TableLoader("SkillKnowledge", LoadSkillKnowledge));
 	loaders.emplace_back(TableLoader("BodyPart", LoadBodyPart));
 	loaders.emplace_back(TableLoader("Model", LoadModel));
@@ -58,35 +54,27 @@ SQLiteDbms::SQLiteDbms() : dbConnection(), loaders()
 	loaders.emplace_back(TableLoader("Liquid", LoadLiquid));
 	loaders.emplace_back(TableLoader("Item", LoadItem));
 	loaders.emplace_back(TableLoader("ItemContent", LoadItemContent));
-	loaders.emplace_back(
-		TableLoader("ItemLiquidContent", LoadItemLiquidContent));
+	loaders.emplace_back(TableLoader("ItemLiquidContent", LoadItemLiquidContent));
 	loaders.emplace_back(TableLoader("ItemRoom", LoadItemRoom));
 	loaders.emplace_back(TableLoader("Writings", LoadWriting));
 	loaders.emplace_back(TableLoader("Profession", LoadProfession));
 	loaders.emplace_back(TableLoader("Production", LoadProduction));
 	loaders.emplace_back(TableLoader("ProductionTool", LoadProductionTool));
-	loaders.emplace_back(
-		TableLoader("ProductionOutcome", LoadProductionOutcome));
-	loaders.emplace_back(
-		TableLoader("ProductionIngredient", LoadProductionIngredient));
-	loaders.emplace_back(
-		TableLoader("ProductionKnowledge", LoadProductionKnowledge));
+	loaders.emplace_back(TableLoader("ProductionOutcome", LoadProductionOutcome));
+	loaders.emplace_back(TableLoader("ProductionIngredient", LoadProductionIngredient));
+	loaders.emplace_back(TableLoader("ProductionKnowledge", LoadProductionKnowledge));
 	loaders.emplace_back(TableLoader("Currency", LoadCurrency));
 	loaders.emplace_back(TableLoader("ModelBodyPart", LoadModelBodyPart));
 	loaders.emplace_back(TableLoader("MobileModel", LoadMobileModel));
 	loaders.emplace_back(TableLoader("MobileSpawn", LoadMobileSpawn));
-	loaders.emplace_back(
-		TableLoader("BodyPartResources", LoadBodyPartResources));
+	loaders.emplace_back(TableLoader("BodyPartResources", LoadBodyPartResources));
 	loaders.emplace_back(TableLoader("BodyPartWeapon", LoadBodyPartWeapon));
 	loaders.emplace_back(TableLoader("TerrainLiquid", LoadTerrainLiquid));
-	loaders.emplace_back(
-		TableLoader("TerrainLiquidSources", LoadTerrainLiquidSources));
+	loaders.emplace_back(TableLoader("TerrainLiquidSources", LoadTerrainLiquidSources));
 	loaders.emplace_back(TableLoader("RoomLiquid", LoadRoomLiquid));
 	loaders.emplace_back(TableLoader("Building", LoadBuilding));
-	loaders.emplace_back(
-		TableLoader("BuildingIngredient", LoadBuildingIngredient));
-	loaders.emplace_back(
-		TableLoader("BuildingKnowledge", LoadBuildingKnowledge));
+	loaders.emplace_back(TableLoader("BuildingIngredient", LoadBuildingIngredient));
+	loaders.emplace_back(TableLoader("BuildingKnowledge", LoadBuildingKnowledge));
 	loaders.emplace_back(TableLoader("BuildingTool", LoadBuildingTool));
 	loaders.emplace_back(TableLoader("Shop", LoadShop));
 	loaders.emplace_back(TableLoader("ShopDefaultStock", LoadShopDefaultStock));
@@ -109,8 +97,7 @@ SQLiteDbms &SQLiteDbms::instance()
 bool SQLiteDbms::openDatabase()
 {
 	if (!dbConnection.openConnection(Mud::instance().getMudDatabaseName(),
-									 Mud::instance().getMudSystemDirectory(),
-									 true)) {
+									 Mud::instance().getMudSystemDirectory(), true)) {
 		this->showLastError();
 		return false;
 	}
@@ -157,9 +144,8 @@ bool SQLiteDbms::loadTables()
 	return status;
 }
 
-bool SQLiteDbms::insertInto(std::string const &table,
-							std::vector<std::string> const &args, bool orIgnore,
-							bool orReplace)
+bool SQLiteDbms::insertInto(std::string const &table, std::vector<std::string> const &args,
+							bool orIgnore, bool orReplace)
 {
 	std::stringstream stream;
 	stream << "INSERT";
@@ -189,11 +175,9 @@ bool SQLiteDbms::deleteFrom(std::string const &table, QueryList const &where)
 	for (auto it = where.begin(); it != where.end(); ++it) {
 		auto clause = (*it);
 		if ((it + 1) == where.end()) {
-			stream << "    " << clause.first << " = \"" << clause.second
-				   << "\";" << std::endl;
+			stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
 		} else {
-			stream << "    " << clause.first << " = \"" << clause.second
-				   << "\" AND" << std::endl;
+			stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
 		}
 	}
 	return (dbConnection.executeQuery(stream.str().c_str()) != 0);
@@ -208,22 +192,18 @@ bool SQLiteDbms::updateInto(std::string const &table, QueryList const &value,
 	for (auto it = value.begin(); it != value.end(); ++it) {
 		auto clause = (*it);
 		if ((it + 1) == value.end()) {
-			stream << "    " << clause.first << " = \"" << clause.second << "\""
-				   << std::endl;
+			stream << "    " << clause.first << " = \"" << clause.second << "\"" << std::endl;
 		} else {
-			stream << "    " << clause.first << " = \"" << clause.second
-				   << "\"," << std::endl;
+			stream << "    " << clause.first << " = \"" << clause.second << "\"," << std::endl;
 		}
 	}
 	stream << "WHERE" << std::endl;
 	for (auto it = where.begin(); it != where.end(); ++it) {
 		auto clause = (*it);
 		if ((it + 1) == where.end()) {
-			stream << "    " << clause.first << " = \"" << clause.second
-				   << "\";" << std::endl;
+			stream << "    " << clause.first << " = \"" << clause.second << "\";" << std::endl;
 		} else {
-			stream << "    " << clause.first << " = \"" << clause.second
-				   << "\" AND" << std::endl;
+			stream << "    " << clause.first << " = \"" << clause.second << "\" AND" << std::endl;
 		}
 	}
 	return (dbConnection.executeQuery(stream.str().c_str()) != 0);
@@ -236,8 +216,7 @@ bool SQLiteDbms::updatePlayers()
 	for (auto player : Mud::instance().mudPlayers) {
 		if (player->isPlaying()) {
 			if (!player->updateOnDB()) {
-				MudLog(LogLevel::Error, "Can't save the player '%s'.",
-					   player->getName());
+				MudLog(LogLevel::Error, "Can't save the player '%s'.", player->getName());
 				this->showLastError();
 			}
 		}
@@ -253,8 +232,7 @@ bool SQLiteDbms::updateItems()
 	//    dbConnection.beginTransaction();
 	for (auto it : Mud::instance().mudItems) {
 		if (!it.second->updateOnDB()) {
-			MudLog(LogLevel::Error, "Can't save the item '%s'.",
-				   it.second->getName());
+			MudLog(LogLevel::Error, "Can't save the item '%s'.", it.second->getName());
 			this->showLastError();
 		}
 	}
@@ -269,8 +247,7 @@ bool SQLiteDbms::updateRooms()
 	//    dbConnection.beginTransaction();
 	for (auto it : Mud::instance().mudRooms) {
 		if (!it.second->updateOnDB()) {
-			MudLog(LogLevel::Error, "Can't save the room '%s'.",
-				   it.second->name);
+			MudLog(LogLevel::Error, "Can't save the room '%s'.", it.second->name);
 			this->showLastError();
 		}
 	}

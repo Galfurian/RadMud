@@ -37,17 +37,15 @@ using FindPredicate = std::function<bool(Item *)>;
 /// @param key       The key of the item to search.
 /// @param number    Position of the item we want to look for.
 /// @return The item, if it's in the character's inventory.
-Item *FindItemIn(std::vector<Item *> const &container, std::string const &key,
-				 unsigned int number, unsigned int *number_ptr = nullptr,
-				 const FindPredicate &predicate = nullptr);
+Item *FindItemIn(std::vector<Item *> const &container, std::string const &key, unsigned int number,
+				 unsigned int *number_ptr = nullptr, const FindPredicate &predicate = nullptr);
 
 /// @brief Properly check if the given item can be used as tool.
 /// @param item         The item to check.
 /// @param exceptions   The exceptions.
 /// @param toolType     The type of tool.
 /// @return If the item can be used as tool.
-bool IsValidTool(Item *item, ItemVector const &exceptions,
-				 ToolType const &toolType);
+bool IsValidTool(Item *item, ItemVector const &exceptions, ToolType const &toolType);
 
 // Create a function which checks if the given item is of the required type.
 bool IsValidResource(Item *item, const ResourceType &type);

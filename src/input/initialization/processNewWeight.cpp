@@ -72,8 +72,7 @@ void ProcessNewWeight::advance()
 	std::stringstream ss;
 	ss << "# " << Formatter::bold("Character's Weight.") << "\n";
 	ss << "# Choose the weight of your character.\n";
-	ss << "# Type [" << Formatter::magenta("back")
-	   << "] to return to the previous step.\n";
+	ss << "# Type [" << Formatter::magenta("back") << "] to return to the previous step.\n";
 	character->sendMsg(ss.str());
 
 	this->printError();

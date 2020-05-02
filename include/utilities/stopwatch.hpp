@@ -38,9 +38,7 @@ public:
 	/// @brief Constructor.
 	/// @param _header The header of the stopwatch.
 	Stopwatch(std::string _header) :
-		header(_header),
-		timeStart(ClockT::now()),
-		timeEnd(ClockT::now())
+		header(_header), timeStart(ClockT::now()), timeEnd(ClockT::now())
 	{
 		// Nothing to do.
 	}

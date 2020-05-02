@@ -100,13 +100,11 @@ void ItemModel::getSheet(Table &sheet) const
 	sheet.addRow({ "Material", this->material.toString() });
 	sheet.addRow({ "TileSet", ToString(tileSet) });
 	sheet.addRow({ "TileId", ToString(tileId) });
-	sheet.addRow({ "Condition",
-				   ToString(this->tileSet) + ":" + ToString(this->tileId) });
+	sheet.addRow({ "Condition", ToString(this->tileSet) + ":" + ToString(this->tileId) });
 }
 
-Item *ItemModel::createItem(std::string maker, Material *composition,
-							bool isForMobile, const ItemQuality &itemQuality,
-							const unsigned int &quantity)
+Item *ItemModel::createItem(std::string maker, Material *composition, bool isForMobile,
+							const ItemQuality &itemQuality, const unsigned int &quantity)
 {
 	if (composition == nullptr) {
 		MudLog(LogLevel::Error, "Received nullptr material.");
@@ -201,9 +199,7 @@ bool ItemModel::replaceSymbols(std::string &source, Material *itemMaterial,
 	if (itemMaterial) {
 		modified = true;
 		FindAndReplace(&source, "&m", ToLower(itemMaterial->name));
-		FindAndReplace(
-			&source, "&M",
-			ToLower(itemMaterial->article + ' ' + itemMaterial->name));
+		FindAndReplace(&source, "&M", ToLower(itemMaterial->article + ' ' + itemMaterial->name));
 	} else {
 		FindAndReplace(&source, "&m", "");
 		FindAndReplace(&source, "&M", "");
@@ -217,8 +213,7 @@ bool ItemModel::replaceSymbols(std::string &source, Material *itemMaterial,
 	return modified;
 }
 
-std::string ItemModel::getName(Material *itemMaterial,
-							   const ItemQuality &itemQuality) const
+std::string ItemModel::getName(Material *itemMaterial, const ItemQuality &itemQuality) const
 {
 	// Make a copy of the short description.
 	std::string output = shortdesc;
@@ -229,8 +224,7 @@ std::string ItemModel::getName(Material *itemMaterial,
 	return output;
 }
 
-std::string ItemModel::getDescription(Material *itemMaterial,
-									  const ItemQuality &itemQuality)
+std::string ItemModel::getDescription(Material *itemMaterial, const ItemQuality &itemQuality)
 {
 	// Make a copy of the description.
 	std::string output = description;
@@ -238,8 +232,7 @@ std::string ItemModel::getDescription(Material *itemMaterial,
 	return output;
 }
 
-std::vector<std::shared_ptr<BodyPart> >
-ItemModel::getCompatibleBodyParts(Race *race)
+std::vector<std::shared_ptr<BodyPart> > ItemModel::getCompatibleBodyParts(Race *race)
 {
 	std::vector<std::shared_ptr<BodyPart> > filteredBodyParts;
 	for (auto const &raceBodyPart : race->bodyParts)

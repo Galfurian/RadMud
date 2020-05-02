@@ -28,9 +28,7 @@
 
 #include <cassert>
 
-UnloadAction::UnloadAction(Character *_actor, Item *_item) :
-	GeneralAction(_actor),
-	item(_item)
+UnloadAction::UnloadAction(Character *_actor, Item *_item) : GeneralAction(_actor), item(_item)
 {
 	// Debugging message.
 	MudLog(LogLevel::Debug, "Created UnloadAction.");
@@ -92,8 +90,7 @@ bool UnloadAction::start()
 	}
 	// Send the starting message.
 	actor->sendMsg("You start unloading %s.\n", item->getName(true));
-	actor->room->sendToAll("%s starts unloading %s...\n", { actor },
-						   actor->getNameCapital(),
+	actor->room->sendToAll("%s starts unloading %s...\n", { actor }, actor->getNameCapital(),
 						   item->getName(true));
 	return true;
 }
@@ -150,9 +147,8 @@ unsigned int UnloadAction::getCooldown()
 		// Get the loaded projectile.
 		auto loadedProjectile = magazine->getAlreadyLoadedProjectile();
 		if (loadedProjectile != nullptr) {
-			return static_cast<unsigned int>(
-				loadedProjectile->getWeight(false) *
-				loadedProjectile->quantity);
+			return static_cast<unsigned int>(loadedProjectile->getWeight(false) *
+											 loadedProjectile->quantity);
 		}
 	}
 	return 1;

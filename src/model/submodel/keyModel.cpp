@@ -52,8 +52,7 @@ bool KeyModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 0) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Key Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Key Model (%s).", name);
 		return false;
 	}
 	return true;

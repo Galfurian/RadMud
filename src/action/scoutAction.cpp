@@ -79,8 +79,7 @@ bool ScoutAction::start()
 	}
 	// Send the starting message.
 	actor->sendMsg("You start scouting the area...\n");
-	actor->room->sendToAll("%s starts scouting the area...\n", { actor },
-						   actor->getNameCapital());
+	actor->room->sendToAll("%s starts scouting the area...\n", { actor }, actor->getNameCapital());
 	return true;
 }
 
@@ -112,8 +111,7 @@ ActionStatus ScoutAction::perform()
 	actor->sendMsg("\n");
 	// Add the effect.
 	unsigned int modifier = actor->getAbilityModifier(Ability::Perception);
-	actor->effectManager.addEffect(
-		EffectFactory::clearTargets(actor, 2 + modifier), true);
+	actor->effectManager.addEffect(EffectFactory::clearTargets(actor, 2 + modifier), true);
 	return ActionStatus::Finished;
 }
 
@@ -123,8 +121,7 @@ unsigned int ScoutAction::getCooldown()
 	// BASE       [+3.0]
 	// PERCEPTION [-0.0 to -2.80]
 	unsigned int requiredTime = 3;
-	requiredTime =
-		SafeSum(requiredTime, -actor->getAbilityLog(Ability::Perception));
+	requiredTime = SafeSum(requiredTime, -actor->getAbilityLog(Ability::Perception));
 	return requiredTime;
 }
 
@@ -135,10 +132,8 @@ unsigned int ScoutAction::getConsumedStamina(Character *character)
 	// WEIGHT   [+1.6 to +2.51]
 	// CARRIED  [+0.0 to +2.48]
 	unsigned int consumedStamina = 1;
-	consumedStamina =
-		SafeSum(consumedStamina, -character->getAbilityLog(Ability::Strength));
+	consumedStamina = SafeSum(consumedStamina, -character->getAbilityLog(Ability::Strength));
 	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-	consumedStamina =
-		SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
 	return consumedStamina;
 }

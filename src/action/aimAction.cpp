@@ -29,9 +29,7 @@
 #include <cassert>
 #include "structure/structureUtils.hpp"
 
-AimAction::AimAction(Character *_actor, Character *_target) :
-	GeneralAction(_actor),
-	target(_target)
+AimAction::AimAction(Character *_actor, Character *_target) : GeneralAction(_actor), target(_target)
 {
 	// Debugging message.
 	MudLog(LogLevel::Debug, "Created aim action.");
@@ -82,8 +80,7 @@ bool AimAction::start()
 	}
 	// Send the starting message.
 	actor->sendMsg("You start aiming at %s...\n", target->getName());
-	actor->room->sendToAll("%s starts aiming...\n", { actor },
-						   actor->getNameCapital());
+	actor->room->sendToAll("%s starts aiming...\n", { actor }, actor->getNameCapital());
 	return true;
 }
 
@@ -119,9 +116,8 @@ unsigned int AimAction::getCooldown()
 	unsigned int requiredTime = 2;
 	if ((actor != nullptr) && (target != nullptr)) {
 		if ((actor->room != nullptr) && (target->room != nullptr)) {
-			requiredTime = SafeSum(requiredTime,
-								   StructUtils::getRoomDistance(actor->room,
-																target->room));
+			requiredTime =
+				SafeSum(requiredTime, StructUtils::getRoomDistance(actor->room, target->room));
 		}
 	}
 	return requiredTime;

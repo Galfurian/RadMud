@@ -30,10 +30,7 @@
 #include <cassert>
 
 Chase::Chase(Character *_actor, Character *_target) :
-	CombatAction(_actor),
-	target(_target),
-	lastRoom(_target->room),
-	RoomCheckFunction()
+	CombatAction(_actor), target(_target), lastRoom(_target->room), RoomCheckFunction()
 {
 	// Debugging message.
 	MudLog(LogLevel::Debug, "Created Chase.");
@@ -165,8 +162,7 @@ unsigned int Chase::getConsumedStamina(Character *character)
 	unsigned int consumedStamina = 1;
 	consumedStamina -= character->getAbilityLog(Ability::Strength);
 	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-	consumedStamina =
-		SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
 	return static_cast<unsigned int>(consumedStamina * multiplier);
 }
 
@@ -184,8 +180,8 @@ bool Chase::updatePath()
 		};
 	}
 	// Find the path from the actor to the target.
-	AStar<Room *> aStar(RoomCheckFunction, StructUtils::getRoomDistance,
-						StructUtils::roomsAreEqual, StructUtils::getNeighbours);
+	AStar<Room *> aStar(RoomCheckFunction, StructUtils::getRoomDistance, StructUtils::roomsAreEqual,
+						StructUtils::getNeighbours);
 	return aStar.findPath(actor->room, target->room, path);
 }
 
@@ -201,20 +197,17 @@ bool Chase::moveTowardsTarget()
 		return false;
 	}
 	// Get the direction of the next room.
-	auto direction =
-		StructUtils::getDirection(actor->room->coord, nextRoom->coord);
+	auto direction = StructUtils::getDirection(actor->room->coord, nextRoom->coord);
 	// Move character.
 	if (!MoveCharacterTo(actor, nextRoom,
-						 actor->getNameCapital() + " goes " +
-							 direction.toString() + ".\n",
+						 actor->getNameCapital() + " goes " + direction.toString() + ".\n",
 						 actor->getNameCapital() + " arrives from " +
 							 direction.getOpposite().toString() + ".\n")) {
 		MudLog(LogLevel::Debug, "Cannot move to the next room.");
 		return false;
 	}
 	// Apply the disturbed aim effect.
-	actor->effectManager.addEffect(EffectFactory::disturbedAim(actor, 1, -3),
-								   true);
+	actor->effectManager.addEffect(EffectFactory::disturbedAim(actor, 1, -3), true);
 	// Pop the room.
 	path.erase(path.begin());
 	return true;

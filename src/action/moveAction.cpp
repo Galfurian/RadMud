@@ -26,11 +26,8 @@
 #include "character/characterUtilities.hpp"
 #include <cassert>
 
-MoveAction::MoveAction(Character *_actor, Room *_destination,
-					   Direction _direction) :
-	GeneralAction(_actor),
-	destination(_destination),
-	direction(_direction)
+MoveAction::MoveAction(Character *_actor, Room *_destination, Direction _direction) :
+	GeneralAction(_actor), destination(_destination), direction(_direction)
 {
 	// Debugging message.
 	//MudLog(LogLevel::Debug, "Created MoveAction.");
@@ -87,16 +84,14 @@ bool MoveAction::start()
 	}
 	if (actor->posture == CharacterPosture::Stand) {
 		actor->sendMsg("You start going %s...\n", direction.toString());
-		actor->room->sendToAll("%s starts going %s...\n", { actor },
-							   actor->getNameCapital(), direction.toString());
+		actor->room->sendToAll("%s starts going %s...\n", { actor }, actor->getNameCapital(),
+							   direction.toString());
 	} else if (actor->posture == CharacterPosture::Crouch) {
-		actor->sendMsg("You move crouching towards %s...\n",
-					   direction.toString());
+		actor->sendMsg("You move crouching towards %s...\n", direction.toString());
 		actor->room->sendToAll("%s move crouching towards %s...\n", { actor },
 							   actor->getNameCapital(), direction.toString());
 	} else if (actor->posture == CharacterPosture::Prone) {
-		actor->sendMsg("You begin crawling towards %s...\n",
-					   direction.toString());
+		actor->sendMsg("You begin crawling towards %s...\n", direction.toString());
 		actor->room->sendToAll("%s begin crawling towards %s...\n", { actor },
 							   actor->getNameCapital(), direction.toString());
 	}
@@ -122,8 +117,7 @@ ActionStatus MoveAction::perform()
 	options.character = actor;
 	options.requiredStamina = consumedStamina;
 	// Check if the character can move to the given room.
-	if (!StructUtils::checkConnection(options, actor->room, destination,
-									  error)) {
+	if (!StructUtils::checkConnection(options, actor->room, destination, error)) {
 		// Notify that the actor can't move because too tired.
 		actor->sendMsg(error + "\n");
 		return ActionStatus::Error;
@@ -132,15 +126,12 @@ ActionStatus MoveAction::perform()
 	actor->remStamina(consumedStamina, true);
 	// Check if the actor was aiming.
 	if (actor->combatHandler.getAimedTarget() != nullptr) {
-		actor->effectManager.addEffect(
-			EffectFactory::disturbedAim(actor, 1, -3), true);
+		actor->effectManager.addEffect(EffectFactory::disturbedAim(actor, 1, -3), true);
 	}
 	// Move character.
-	MoveCharacterTo(actor, destination,
-					actor->getNameCapital() + " goes " + direction.toString() +
-						".\n",
-					actor->getNameCapital() + " arrives from " +
-						direction.getOpposite().toString() + ".\n");
+	MoveCharacterTo(
+		actor, destination, actor->getNameCapital() + " goes " + direction.toString() + ".\n",
+		actor->getNameCapital() + " arrives from " + direction.getOpposite().toString() + ".\n");
 	return ActionStatus::Finished;
 }
 
@@ -165,13 +156,12 @@ unsigned int MoveAction::getConsumedStamina(Character *character)
 	unsigned int consumedStamina = 1;
 	consumedStamina -= character->getAbilityLog(Ability::Strength);
 	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-	consumedStamina =
-		SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
 	return static_cast<unsigned int>(consumedStamina * multiplier);
 }
 
-bool MoveAction::canMoveTo(Character *character, const Direction &direction,
-						   std::string &error, bool allowInCombat)
+bool MoveAction::canMoveTo(Character *character, const Direction &direction, std::string &error,
+						   bool allowInCombat)
 {
 	if (character->room == nullptr) {
 		return false;
@@ -190,8 +180,7 @@ bool MoveAction::canMoveTo(Character *character, const Direction &direction,
 		}
 		// Check even the aimed character.
 		if (character->combatHandler.getAimedTarget() != nullptr) {
-			if (character->combatHandler.getAimedTarget()->room ==
-				character->room) {
+			if (character->combatHandler.getAimedTarget()->room == character->room) {
 				lockedInCombat = true;
 			}
 		}
@@ -250,6 +239,5 @@ bool MoveAction::canMoveTo(Character *character, const Direction &direction,
 		}
 	}
 	// Check if the destination is forbidden for mobiles.
-	return !(character->isMobile() &&
-			 HasFlag(destExit->flags, ExitFlag::NoMob));
+	return !(character->isMobile() && HasFlag(destExit->flags, ExitFlag::NoMob));
 }

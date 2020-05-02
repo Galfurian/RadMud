@@ -44,12 +44,10 @@ bool DoDrink(Character *character, ArgumentHandler &args)
 	Item *source = nullptr;
 	// If the room is lit.
 	if (character->room->isLit()) {
-		source =
-			character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+		source = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
 	} else if (character->inventoryIsLit()) {
 		// If the room is not lit but the inventory is.
-		source = character->findInventoryItem(args[0].getContent(),
-											  args[0].getIndex());
+		source = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 	} else {
 		// If the inventory is NOT empty, pick a random item.
 		if (!character->inventory.empty()) {
@@ -63,18 +61,15 @@ bool DoDrink(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	if (HasFlag(source->flags, ItemFlag::Locked)) {
-		character->sendMsg("You have first to unlock %s.\n",
-						   source->getName(true));
+		character->sendMsg("You have first to unlock %s.\n", source->getName(true));
 		return false;
 	}
 	if (HasFlag(source->flags, ItemFlag::Closed)) {
-		character->sendMsg("You have first to open %s.\n",
-						   source->getName(true));
+		character->sendMsg("You have first to open %s.\n", source->getName(true));
 		return false;
 	}
 	if (source->getType() != ModelType::LiquidContainer) {
-		character->sendMsg("%s is not a source for liquids.\n",
-						   source->getNameCapital(true));
+		character->sendMsg("%s is not a source for liquids.\n", source->getNameCapital(true));
 		return false;
 	}
 	if (character->thirst == 100) {
@@ -115,8 +110,8 @@ bool DoDrink(Character *character, ArgumentHandler &args)
 					   source->getName(true));
 	// Send the message inside the room.
 	character->room->sendToAll("%s drinks some %s from %s.\n", { character },
-							   character->getNameCapital(),
-							   liquidContent->getName(), source->getName(true));
+							   character->getNameCapital(), liquidContent->getName(),
+							   source->getName(true));
 	return true;
 }
 
@@ -138,16 +133,12 @@ bool DoFill(Character *character, ArgumentHandler &args)
 	Item *source = nullptr, *destination = nullptr;
 	// If the room is lit.
 	if (character->room->isLit()) {
-		destination =
-			character->findNearbyItem(args[0].getContent(), args[0].getIndex());
-		source =
-			character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+		destination = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+		source = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
 	} else if (character->inventoryIsLit()) {
 		// If the room is not lit but the inventory is.
-		destination = character->findInventoryItem(args[0].getContent(),
-												   args[0].getIndex());
-		source = character->findInventoryItem(args[1].getContent(),
-											  args[1].getIndex());
+		destination = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+		source = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
 	} else {
 		character->sendMsg("You can't do that without seeing,"
 						   "you could waste most of the liquid.\n");
@@ -159,39 +150,32 @@ bool DoFill(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	if (HasFlag(source->flags, ItemFlag::Locked)) {
-		character->sendMsg("You have first to unlock %s.\n",
-						   source->getName(true));
+		character->sendMsg("You have first to unlock %s.\n", source->getName(true));
 		return false;
 	}
 	if (HasFlag(source->flags, ItemFlag::Closed)) {
-		character->sendMsg("You have first to open %s.\n",
-						   source->getName(true));
+		character->sendMsg("You have first to open %s.\n", source->getName(true));
 		return false;
 	}
 	if (source->getType() != ModelType::LiquidContainer) {
-		character->sendMsg("%s is not a suitable source of liquids.\n",
-						   source->getNameCapital());
+		character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
 		return false;
 	}
 	// Check the destination item.
 	if (destination == nullptr) {
-		character->sendMsg("You don't have any '%s' with you.\n",
-						   args[0].getContent());
+		character->sendMsg("You don't have any '%s' with you.\n", args[0].getContent());
 		return false;
 	}
 	if (HasFlag(destination->flags, ItemFlag::Locked)) {
-		character->sendMsg("You have first to unlock %s.\n",
-						   destination->getName(true));
+		character->sendMsg("You have first to unlock %s.\n", destination->getName(true));
 		return false;
 	}
 	if (HasFlag(destination->flags, ItemFlag::Closed)) {
-		character->sendMsg("You have first to open %s.\n",
-						   destination->getName(true));
+		character->sendMsg("You have first to open %s.\n", destination->getName(true));
 		return false;
 	}
 	if (destination->getType() != ModelType::LiquidContainer) {
-		character->sendMsg("%s is not a suitable destination.\n",
-						   destination->getNameCapital());
+		character->sendMsg("%s is not a suitable destination.\n", destination->getNameCapital());
 		return false;
 	}
 	// Cast the source item to liquid container.
@@ -230,17 +214,14 @@ bool DoFill(Character *character, ArgumentHandler &args)
 	}
 	// And now pour in the liquid.
 	if (!liqConDst->pourIn(pouredLiquid, quantity)) {
-		character->sendMsg(
-			"You failed to fill the destination with the liquid.\n");
+		character->sendMsg("You failed to fill the destination with the liquid.\n");
 		return false;
 	}
 	// Send the messages.
-	character->sendMsg("You fill %s with %s from %s.\n",
-					   destination->getName(true), pouredLiquid->getName(),
-					   source->getName(true));
+	character->sendMsg("You fill %s with %s from %s.\n", destination->getName(true),
+					   pouredLiquid->getName(), source->getName(true));
 	character->room->sendToAll("%s fills %s with %s from %s.\n", { character },
-							   character->getNameCapital(),
-							   destination->getName(true),
+							   character->getNameCapital(), destination->getName(true),
 							   pouredLiquid->getName(), source->getName(true));
 	return true;
 }
@@ -265,19 +246,15 @@ bool DoPour(Character *character, ArgumentHandler &args)
 	if (character->room->isLit()) {
 		// Liquids can be poured inside another container only if from
 		// a container inside the inventory.
-		source = character->findInventoryItem(args[0].getContent(),
-											  args[0].getIndex());
+		source = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 		if (args.size() == 2) {
-			destination = character->findNearbyItem(args[1].getContent(),
-													args[1].getIndex());
+			destination = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
 		}
 	} else if (character->inventoryIsLit()) {
 		// If the room is not lit but the inventory is.
-		source = character->findInventoryItem(args[0].getContent(),
-											  args[0].getIndex());
+		source = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 		if (args.size() == 2) {
-			destination = character->findInventoryItem(args[1].getContent(),
-													   args[1].getIndex());
+			destination = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
 		}
 	} else {
 		character->sendMsg("You can't do that without seeing,"
@@ -290,18 +267,15 @@ bool DoPour(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	if (HasFlag(source->flags, ItemFlag::Locked)) {
-		character->sendMsg("You have first to unlock %s.\n",
-						   source->getName(true));
+		character->sendMsg("You have first to unlock %s.\n", source->getName(true));
 		return false;
 	}
 	if (HasFlag(source->flags, ItemFlag::Closed)) {
-		character->sendMsg("You have first to open %s.\n",
-						   source->getName(true));
+		character->sendMsg("You have first to open %s.\n", source->getName(true));
 		return false;
 	}
 	if (source->getType() != ModelType::LiquidContainer) {
-		character->sendMsg("%s is not a suitable source of liquids.\n",
-						   source->getNameCapital());
+		character->sendMsg("%s is not a suitable source of liquids.\n", source->getNameCapital());
 		return false;
 	}
 	// Cast the source item to liquid container.
@@ -323,18 +297,16 @@ bool DoPour(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		// Send the messages.
-		character->sendMsg("You pour %s from %s on the ground.\n",
-						   pouredLiquid->getName(), liqConSrc->getName());
-		character->room->sendToAll("%s pours %s from %s on the ground.\n",
-								   { character }, character->getNameCapital(),
-								   pouredLiquid->getName(),
+		character->sendMsg("You pour %s from %s on the ground.\n", pouredLiquid->getName(),
+						   liqConSrc->getName());
+		character->room->sendToAll("%s pours %s from %s on the ground.\n", { character },
+								   character->getNameCapital(), pouredLiquid->getName(),
 								   liqConSrc->getName(true));
 		return true;
 	}
 	// Check the destination item.
 	if (destination == nullptr) {
-		character->sendMsg("You don't see '%s' anywhere.\n",
-						   args[0].getContent());
+		character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
 		return false;
 	}
 	// Check if the destination is a kindled light source.
@@ -343,18 +315,16 @@ bool DoPour(Character *character, ArgumentHandler &args)
 		auto lightItem = static_cast<LightItem *>(destination);
 		// Cast the model of the destination to light source.
 		auto lightModel = destination->model->to<LightModel>();
-		if (!lightItem->isActive() || !HasFlag(lightModel->lightSourceFlags,
-											   LightModelFlags::NeedToKindle)) {
-			character->sendMsg("You cannot use %s on %s.\n",
-							   source->getName(true),
+		if (!lightItem->isActive() ||
+			!HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle)) {
+			character->sendMsg("You cannot use %s on %s.\n", source->getName(true),
 							   destination->getName(true));
 			return false;
 		}
 		// Now pour out the liquid.
 		if (!liqConSrc->pourOut(liqConSrc->liquidQuantity)) {
 			character->sendMsg("You failed to pour the liquid from %s on %s.\n",
-							   source->getName(true),
-							   destination->getName(true));
+							   source->getName(true), destination->getName(true));
 			return false;
 		}
 		// Send the messages.
@@ -362,18 +332,15 @@ bool DoPour(Character *character, ArgumentHandler &args)
 		if (HasFlag(pouredLiquid->flags, LiquidFlags::Inflammable)) {
 			character->sendMsg("As soon as you pour %s from %s on %s, a blaze "
 							   "of fire arises from %s and hits you.\n",
-							   pouredLiquid->getName(),
-							   liqConSrc->getName(true),
-							   destination->getName(true),
-							   destination->getName(true));
-			character->room->sendToAll(
-				"As soon as %s pours %s from %s on %s,"
-				" a blaze of fire arises from %s "
-				"and hits %s.\n",
-				{ character }, character->getNameCapital(),
-				pouredLiquid->getName(), liqConSrc->getName(true),
-				destination->getName(true), destination->getName(true),
-				character->getName());
+							   pouredLiquid->getName(), liqConSrc->getName(true),
+							   destination->getName(true), destination->getName(true));
+			character->room->sendToAll("As soon as %s pours %s from %s on %s,"
+									   " a blaze of fire arises from %s "
+									   "and hits %s.\n",
+									   { character }, character->getNameCapital(),
+									   pouredLiquid->getName(), liqConSrc->getName(true),
+									   destination->getName(true), destination->getName(true),
+									   character->getName());
 			// Evaluate the damage as the 15% of the maximum health.
 			auto maxHealth = static_cast<double>(character->getMaxHealth());
 			auto damage = (maxHealth / 100) * 15;
@@ -382,40 +349,33 @@ bool DoPour(Character *character, ArgumentHandler &args)
 				// Notify the others.
 				character->room->funcSendToAll(
 					"%s%s screams in pain and then die!%s\n",
-					[&](Character *other) { return character != other; },
-					Formatter::red(), character->getNameCapital(),
-					Formatter::reset());
+					[&](Character *other) { return character != other; }, Formatter::red(),
+					character->getNameCapital(), Formatter::reset());
 				// The target has received the damage and now it is dead.
 				character->kill();
 				return false;
 			}
 		} else {
-			character->sendMsg("You pour %s from %s on %s.\n",
-							   pouredLiquid->getName(),
-							   liqConSrc->getName(true),
-							   destination->getName(true));
-			character->room->sendToAll(
-				"%s pours %s from %s on %s.\n", { character },
-				character->getNameCapital(), pouredLiquid->getName(),
-				liqConSrc->getName(true), destination->getName(true));
+			character->sendMsg("You pour %s from %s on %s.\n", pouredLiquid->getName(),
+							   liqConSrc->getName(true), destination->getName(true));
+			character->room->sendToAll("%s pours %s from %s on %s.\n", { character },
+									   character->getNameCapital(), pouredLiquid->getName(),
+									   liqConSrc->getName(true), destination->getName(true));
 			// Turn off the light source.
 			lightItem->active = false;
 		}
 		return true;
 	}
 	if (HasFlag(destination->flags, ItemFlag::Locked)) {
-		character->sendMsg("You have first to unlock %s.\n",
-						   destination->getName(true));
+		character->sendMsg("You have first to unlock %s.\n", destination->getName(true));
 		return false;
 	}
 	if (HasFlag(destination->flags, ItemFlag::Closed)) {
-		character->sendMsg("You have first to open %s.\n",
-						   destination->getName(true));
+		character->sendMsg("You have first to open %s.\n", destination->getName(true));
 		return false;
 	}
 	if (destination->getType() != ModelType::LiquidContainer) {
-		character->sendMsg("%s is not a suitable destination.\n",
-						   destination->getNameCapital());
+		character->sendMsg("%s is not a suitable destination.\n", destination->getNameCapital());
 		return false;
 	}
 	// Cast the destination item to liquid container.
@@ -438,22 +398,19 @@ bool DoPour(Character *character, ArgumentHandler &args)
 	}
 	// Now pour out the liquid.
 	if (!liqConSrc->pourOut(quantity)) {
-		character->sendMsg("You failed to pour out the liquid from %s.\n",
-						   source->getName(true));
+		character->sendMsg("You failed to pour out the liquid from %s.\n", source->getName(true));
 		return false;
 	}
 	// And now pour in the liquid.
 	if (!liqConDst->pourIn(pouredLiquid, quantity)) {
-		character->sendMsg("You failed to pour the liquid into %s.\n",
-						   source->getName(true));
+		character->sendMsg("You failed to pour the liquid into %s.\n", source->getName(true));
 		return false;
 	}
 	// Send the messages.
 	character->sendMsg("You pour %s of %s into %s.\n", pouredLiquid->getName(),
 					   source->getName(true), destination->getName(true));
 	character->room->sendToAll("%s pour %s of %s into %s.\n", { character },
-							   character->getNameCapital(),
-							   pouredLiquid->getName(), source->getName(true),
-							   destination->getName(true));
+							   character->getNameCapital(), pouredLiquid->getName(),
+							   source->getName(true), destination->getName(true));
 	return true;
 }

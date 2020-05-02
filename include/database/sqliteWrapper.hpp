@@ -72,8 +72,7 @@ public:
 	/// @param openInMemory The db is loaded from the file to the memory.
 	/// @return <b>True</b> if the operations succeeded,<br>
 	///         <b>False</b> Otherwise.
-	bool openConnection(const std::string &dbName,
-						const std::string &dbDirectory,
+	bool openConnection(const std::string &dbName, const std::string &dbDirectory,
 						const bool &openInMemory);
 
 	bool updateInMemoryDatabase();

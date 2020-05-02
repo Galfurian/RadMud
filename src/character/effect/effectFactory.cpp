@@ -37,20 +37,16 @@ Effect clearTargets(Character *actor, const unsigned int &duration)
 	return effect;
 }
 
-Effect disturbedAim(Character *actor, const unsigned int &duration,
-					const int &negativeMagnitude)
+Effect disturbedAim(Character *actor, const unsigned int &duration, const int &negativeMagnitude)
 {
-	auto effect =
-		Effect(actor, "DisturbedAim", 0, duration, Effect::Functionality());
+	auto effect = Effect(actor, "DisturbedAim", 0, duration, Effect::Functionality());
 	effect.setCombatMod(CombatModifier::RangedWeaponHitRoll, negativeMagnitude);
 	return effect;
 }
 
-Effect poisonDamage(Character *actor, std::string const &name,
-					const unsigned int &delay, const unsigned int &duration,
-					std::string const &messageActivate,
-					std::string const &messagePeriodic,
-					std::string const &messageExpire,
+Effect poisonDamage(Character *actor, std::string const &name, const unsigned int &delay,
+					const unsigned int &duration, std::string const &messageActivate,
+					std::string const &messagePeriodic, std::string const &messageExpire,
 					std::string const &messageDeath, const unsigned int &damage)
 {
 	Effect::Functionality functionality;
@@ -59,8 +55,7 @@ Effect poisonDamage(Character *actor, std::string const &name,
 			character->sendMsg(messageActivate + "\n\n");
 		}
 	};
-	functionality.periodic = [damage, messageDeath,
-							  messagePeriodic](Character *character) {
+	functionality.periodic = [damage, messageDeath, messagePeriodic](Character *character) {
 		if (character != nullptr) {
 			if (!character->remHealth(damage)) {
 				character->sendMsg(messageDeath + "\n\n");
@@ -79,4 +74,4 @@ Effect poisonDamage(Character *actor, std::string const &name,
 	return effect;
 }
 
-}
+} // namespace EffectFactory

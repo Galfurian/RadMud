@@ -133,8 +133,7 @@ struct CFunc {
 			} else {
 				assert(lua_isnil(L, -1));
 				lua_pop(L, 2);
-				result = luaL_error(L, "no writable variable '%s'",
-									lua_tostring(L, 2));
+				result = luaL_error(L, "no writable variable '%s'", lua_tostring(L, 2));
 			}
 		}
 
@@ -158,8 +157,7 @@ struct CFunc {
 	template <class T> static int getVariable(lua_State *L)
 	{
 		assert(lua_islightuserdata(L, lua_upvalueindex(1)));
-		T const *ptr =
-			static_cast<T const *>(lua_touserdata(L, lua_upvalueindex(1)));
+		T const *ptr = static_cast<T const *>(lua_touserdata(L, lua_upvalueindex(1)));
 		assert(ptr != 0);
 		Stack<T>::push(L, *ptr);
 		return 1;
@@ -182,17 +180,15 @@ struct CFunc {
 	/// @details
 	/// This is used for global functions, global properties, class static methods,
 	/// and class static properties. The function pointer is in the first upvalue.
-	template <class FnPtr,
-			  class ReturnType = typename FuncTraits<FnPtr>::ReturnType>
-	struct Call {
+	template <class FnPtr, class ReturnType = typename FuncTraits<FnPtr>::ReturnType> struct Call {
 		using Params = typename FuncTraits<FnPtr>::Params;
 
 		static int f(lua_State *L)
 		{
 			try {
 				assert(isfulluserdata(L, lua_upvalueindex(1)));
-				FnPtr const &fnptr = *static_cast<FnPtr const *>(
-					lua_touserdata(L, lua_upvalueindex(1)));
+				FnPtr const &fnptr =
+					*static_cast<FnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 				assert(fnptr != 0);
 				ArgList<Params> args(L);
 				Stack<typename FuncTraits<FnPtr>::ReturnType>::push(
@@ -217,8 +213,8 @@ struct CFunc {
 		{
 			try {
 				assert(isfulluserdata(L, lua_upvalueindex(1)));
-				FnPtr const &fnptr = *static_cast<FnPtr const *>(
-					lua_touserdata(L, lua_upvalueindex(1)));
+				FnPtr const &fnptr =
+					*static_cast<FnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 				assert(fnptr != 0);
 				ArgList<Params> args(L);
 				FuncTraits<FnPtr>::call(fnptr, args);
@@ -233,20 +229,19 @@ struct CFunc {
 	};
 
 	/// @brief lua_CFunction to call a function with references as arguments.
-	template <class FnPtr,
-			  class ReturnType = typename FuncTraits<FnPtr>::ReturnType>
+	template <class FnPtr, class ReturnType = typename FuncTraits<FnPtr>::ReturnType>
 	struct CallRef {
 		using Params = typename FuncTraits<FnPtr>::Params;
 
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			FnPtr const &fnptr = *static_cast<FnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			FnPtr const &fnptr =
+				*static_cast<FnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 1> args(L);
-			Stack<typename FuncTraits<FnPtr>::ReturnType>::push(
-				L, FuncTraits<FnPtr>::call(fnptr, args));
+			Stack<typename FuncTraits<FnPtr>::ReturnType>::push(L, FuncTraits<FnPtr>::call(fnptr,
+																						   args));
 			LuaRef v(newTable(L));
 			FuncArgs<Params, 0>::refs(v, args);
 			v.push(L);
@@ -260,8 +255,8 @@ struct CFunc {
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			FnPtr const &fnptr = *static_cast<FnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			FnPtr const &fnptr =
+				*static_cast<FnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 1> args(L);
 			FuncTraits<FnPtr>::call(fnptr, args);
@@ -276,8 +271,7 @@ struct CFunc {
 	/// @details
 	/// The member function pointer is in the first upvalue.
 	/// The class userdata object is at the top of the Lua stack.
-	template <class MemFnPtr,
-			  class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
+	template <class MemFnPtr, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
 	struct CallMember {
 		using T = typename FuncTraits<MemFnPtr>::ClassType;
 		using Params = typename FuncTraits<MemFnPtr>::Params;
@@ -287,12 +281,11 @@ struct CFunc {
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
 			try {
 				T *const t = Userdata::get<T>(L, 1, false);
-				MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-					lua_touserdata(L, lua_upvalueindex(1)));
+				MemFnPtr const &fnptr =
+					*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 				assert(fnptr != 0);
 				ArgList<Params, 2> args(L);
-				Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(t, fnptr,
-																	  args));
+				Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(t, fnptr, args));
 			} catch (std::exception &e) {
 				lua_pushnil(L);
 				lua_insert(L, 1);
@@ -306,8 +299,7 @@ struct CFunc {
 	/// @details
 	/// The const member function pointer is in the first upvalue.
 	/// The class userdata object is at the top of the Lua stack.
-	template <class MemFnPtr,
-			  class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
+	template <class MemFnPtr, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
 	struct CallConstMember {
 		using T = typename FuncTraits<MemFnPtr>::ClassType;
 		using Params = typename FuncTraits<MemFnPtr>::Params;
@@ -317,12 +309,11 @@ struct CFunc {
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
 			try {
 				T const *const t = Userdata::get<T>(L, 1, true);
-				MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-					lua_touserdata(L, lua_upvalueindex(1)));
+				MemFnPtr const &fnptr =
+					*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 				assert(fnptr != 0);
 				ArgList<Params, 2> args(L);
-				Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(t, fnptr,
-																	  args));
+				Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(t, fnptr, args));
 			} catch (std::exception &e) {
 				lua_pushnil(L);
 				lua_insert(L, 1);
@@ -332,26 +323,23 @@ struct CFunc {
 		}
 	};
 
-	template <class MemFnPtr, class T,
-			  class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
+	template <class MemFnPtr, class T, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
 	struct CallMemberPtr {
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
 
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			std::shared_ptr<T> *const t =
-				Userdata::get<std::shared_ptr<T> >(L, 1, false);
+			std::shared_ptr<T> *const t = Userdata::get<std::shared_ptr<T> >(L, 1, false);
 			T *const tt = t->get();
 			if (!tt) {
 				return luaL_error(L, "shared_ptr is nil");
 			}
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
-			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(tt, fnptr,
-																  args));
+			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(tt, fnptr, args));
 			return 1;
 		}
 	};
@@ -360,8 +348,7 @@ struct CFunc {
 		static int f(lua_State *L)
 		{
 			std::shared_ptr<T> t = Stack<std::shared_ptr<T> >::get(L, 1);
-			Stack<std::shared_ptr<R> >::push(L,
-											 std::dynamic_pointer_cast<R>(t));
+			Stack<std::shared_ptr<R> >::push(L, std::dynamic_pointer_cast<R>(t));
 			return 1;
 		}
 	};
@@ -453,8 +440,7 @@ struct CFunc {
 		if (!c) {
 			return luaL_error(L, "shared_ptr is nil");
 		}
-		T C::**mp =
-			static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
+		T C::**mp = static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
 		Stack<T>::push(L, c->**mp);
 		return 1;
 	}
@@ -470,8 +456,7 @@ struct CFunc {
 		if (!c) {
 			return luaL_error(L, "weak_ptr is nil");
 		}
-		T C::**mp =
-			static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
+		T C::**mp = static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
 		Stack<T>::push(L, c->**mp);
 		return 1;
 	}
@@ -483,8 +468,7 @@ struct CFunc {
 		if (!c) {
 			return luaL_error(L, "shared_ptr is nil");
 		}
-		T C::**mp =
-			static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
+		T C::**mp = static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
 		c->**mp = Stack<T>::get(L, 2);
 		return 0;
 	}
@@ -500,22 +484,19 @@ struct CFunc {
 		if (!c) {
 			return luaL_error(L, "weak_ptr is nil");
 		}
-		T C::**mp =
-			static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
+		T C::**mp = static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
 		c->**mp = Stack<T>::get(L, 2);
 		return 0;
 	}
 
-	template <class MemFnPtr, class T,
-			  class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
+	template <class MemFnPtr, class T, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
 	struct CallMemberWPtr {
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
 
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			std::weak_ptr<T> *const tw =
-				Userdata::get<std::weak_ptr<T> >(L, 1, false);
+			std::weak_ptr<T> *const tw = Userdata::get<std::weak_ptr<T> >(L, 1, false);
 			std::shared_ptr<T> const t = tw->lock();
 			if (!t) {
 				return luaL_error(L, "cannot lock weak_ptr");
@@ -524,12 +505,11 @@ struct CFunc {
 			if (!tt) {
 				return luaL_error(L, "weak_ptr is nil");
 			}
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
-			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(tt, fnptr,
-																  args));
+			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(tt, fnptr, args));
 			return 1;
 		}
 	};
@@ -537,8 +517,7 @@ struct CFunc {
 	/**
         lua_CFunction to calls for function references.
     */
-	template <class MemFnPtr,
-			  class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
+	template <class MemFnPtr, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
 	struct CallMemberRef {
 		typedef typename FuncTraits<MemFnPtr>::ClassType T;
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
@@ -547,12 +526,11 @@ struct CFunc {
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
 			T *const t = Userdata::get<T>(L, 1, false);
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
-			Stack<ReturnType>::push(L,
-									FuncTraits<MemFnPtr>::call(t, fnptr, args));
+			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(t, fnptr, args));
 			LuaRef v(newTable(L));
 			FuncArgs<Params, 0>::refs(v, args);
 			v.push(L);
@@ -560,8 +538,7 @@ struct CFunc {
 		}
 	};
 
-	template <class MemFnPtr,
-			  class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
+	template <class MemFnPtr, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
 	struct CallConstMemberRef {
 		typedef typename FuncTraits<MemFnPtr>::ClassType T;
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
@@ -570,12 +547,11 @@ struct CFunc {
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
 			T const *const t = Userdata::get<T>(L, 1, true);
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
-			Stack<ReturnType>::push(L,
-									FuncTraits<MemFnPtr>::call(t, fnptr, args));
+			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(t, fnptr, args));
 			LuaRef v(newTable(L));
 			FuncArgs<Params, 0>::refs(v, args);
 			v.push(L);
@@ -583,26 +559,23 @@ struct CFunc {
 		}
 	};
 
-	template <class MemFnPtr, class T,
-			  class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
+	template <class MemFnPtr, class T, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
 	struct CallMemberRefPtr {
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
 
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			std::shared_ptr<T> *const t =
-				Userdata::get<std::shared_ptr<T> >(L, 1, false);
+			std::shared_ptr<T> *const t = Userdata::get<std::shared_ptr<T> >(L, 1, false);
 			T *const tt = t->get();
 			if (!tt) {
 				return luaL_error(L, "shared_ptr is nil");
 			}
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
-			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(tt, fnptr,
-																  args));
+			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(tt, fnptr, args));
 			LuaRef v(newTable(L));
 			FuncArgs<Params, 0>::refs(v, args);
 			v.push(L);
@@ -610,16 +583,14 @@ struct CFunc {
 		}
 	};
 
-	template <class MemFnPtr, class T,
-			  class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
+	template <class MemFnPtr, class T, class ReturnType = typename FuncTraits<MemFnPtr>::ReturnType>
 	struct CallMemberRefWPtr {
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
 
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			std::weak_ptr<T> *const tw =
-				Userdata::get<std::weak_ptr<T> >(L, 1, false);
+			std::weak_ptr<T> *const tw = Userdata::get<std::weak_ptr<T> >(L, 1, false);
 			std::shared_ptr<T> const t = tw->lock();
 			if (!t) {
 				return luaL_error(L, "cannot lock weak_ptr");
@@ -628,12 +599,11 @@ struct CFunc {
 			if (!tt) {
 				return luaL_error(L, "weak_ptr is nil");
 			}
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
-			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(tt, fnptr,
-																  args));
+			Stack<ReturnType>::push(L, FuncTraits<MemFnPtr>::call(tt, fnptr, args));
 			LuaRef v(newTable(L));
 			FuncArgs<Params, 0>::refs(v, args);
 			v.push(L);
@@ -654,8 +624,8 @@ struct CFunc {
 			try {
 				assert(isfulluserdata(L, lua_upvalueindex(1)));
 				T *const t = Userdata::get<T>(L, 1, false);
-				MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-					lua_touserdata(L, lua_upvalueindex(1)));
+				MemFnPtr const &fnptr =
+					*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 				assert(fnptr != 0);
 				ArgList<Params, 2> args(L);
 				FuncTraits<MemFnPtr>::call(t, fnptr, args);
@@ -681,8 +651,8 @@ struct CFunc {
 			try {
 				assert(isfulluserdata(L, lua_upvalueindex(1)));
 				T const *const t = Userdata::get<T>(L, 1, true);
-				MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-					lua_touserdata(L, lua_upvalueindex(1)));
+				MemFnPtr const &fnptr =
+					*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 				assert(fnptr != 0);
 				ArgList<Params, 2> args(L);
 				FuncTraits<MemFnPtr>::call(t, fnptr, args);
@@ -701,11 +671,10 @@ struct CFunc {
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			std::shared_ptr<T> *const t =
-				Userdata::get<std::shared_ptr<T> >(L, 1, false);
+			std::shared_ptr<T> *const t = Userdata::get<std::shared_ptr<T> >(L, 1, false);
 			T *const tt = t->get();
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
 			FuncTraits<MemFnPtr>::call(tt, fnptr, args);
@@ -713,15 +682,13 @@ struct CFunc {
 		}
 	};
 
-	template <class MemFnPtr, class T>
-	struct CallMemberWPtr<MemFnPtr, T, void> {
+	template <class MemFnPtr, class T> struct CallMemberWPtr<MemFnPtr, T, void> {
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
 
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			std::weak_ptr<T> *const tw =
-				Userdata::get<std::weak_ptr<T> >(L, 1, false);
+			std::weak_ptr<T> *const tw = Userdata::get<std::weak_ptr<T> >(L, 1, false);
 			std::shared_ptr<T> const t = tw->lock();
 			if (!t) {
 				return luaL_error(L, "cannot lock weak_ptr");
@@ -730,8 +697,8 @@ struct CFunc {
 			if (!tt) {
 				return luaL_error(L, "weak_ptr is nil");
 			}
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
 			FuncTraits<MemFnPtr>::call(tt, fnptr, args);
@@ -747,8 +714,8 @@ struct CFunc {
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
 			T *const t = Userdata::get<T>(L, 1, false);
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
 			FuncTraits<MemFnPtr>::call(t, fnptr, args);
@@ -767,8 +734,8 @@ struct CFunc {
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
 			T const *const t = Userdata::get<T>(L, 1, true);
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
 			FuncTraits<MemFnPtr>::call(t, fnptr, args);
@@ -779,21 +746,19 @@ struct CFunc {
 		}
 	};
 
-	template <class MemFnPtr, class T>
-	struct CallMemberRefPtr<MemFnPtr, T, void> {
+	template <class MemFnPtr, class T> struct CallMemberRefPtr<MemFnPtr, T, void> {
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
 
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			std::shared_ptr<T> *const t =
-				Userdata::get<std::shared_ptr<T> >(L, 1, false);
+			std::shared_ptr<T> *const t = Userdata::get<std::shared_ptr<T> >(L, 1, false);
 			T *const tt = t->get();
 			if (!tt) {
 				return luaL_error(L, "shared_ptr is nil");
 			}
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
 			FuncTraits<MemFnPtr>::call(tt, fnptr, args);
@@ -804,15 +769,13 @@ struct CFunc {
 		}
 	};
 
-	template <class MemFnPtr, class T>
-	struct CallMemberRefWPtr<MemFnPtr, T, void> {
+	template <class MemFnPtr, class T> struct CallMemberRefWPtr<MemFnPtr, T, void> {
 		typedef typename FuncTraits<MemFnPtr>::Params Params;
 
 		static int f(lua_State *L)
 		{
 			assert(isfulluserdata(L, lua_upvalueindex(1)));
-			std::weak_ptr<T> *const tw =
-				Userdata::get<std::weak_ptr<T> >(L, 1, false);
+			std::weak_ptr<T> *const tw = Userdata::get<std::weak_ptr<T> >(L, 1, false);
 			std::shared_ptr<T> const t = tw->lock();
 			if (!t) {
 				return luaL_error(L, "cannot lock weak_ptr");
@@ -821,8 +784,8 @@ struct CFunc {
 			if (!tt) {
 				return luaL_error(L, "weak_ptr is nil");
 			}
-			MemFnPtr const &fnptr = *static_cast<MemFnPtr const *>(
-				lua_touserdata(L, lua_upvalueindex(1)));
+			MemFnPtr const &fnptr =
+				*static_cast<MemFnPtr const *>(lua_touserdata(L, lua_upvalueindex(1)));
 			assert(fnptr != 0);
 			ArgList<Params, 2> args(L);
 			FuncTraits<MemFnPtr>::call(tt, fnptr, args);
@@ -844,8 +807,8 @@ struct CFunc {
 				assert(isfulluserdata(L, lua_upvalueindex(1)));
 				typedef int (T::*MFP)(lua_State * L);
 				T *const t = Userdata::get<T>(L, 1, false);
-				MFP const &fnptr = *static_cast<MFP const *>(
-					lua_touserdata(L, lua_upvalueindex(1)));
+				MFP const &fnptr =
+					*static_cast<MFP const *>(lua_touserdata(L, lua_upvalueindex(1)));
 				assert(fnptr != 0);
 				return (t->*fnptr)(L);
 			} catch (std::exception &e) {
@@ -868,8 +831,8 @@ struct CFunc {
 				assert(isfulluserdata(L, lua_upvalueindex(1)));
 				typedef int (T::*MFP)(lua_State * L);
 				T const *const t = Userdata::get<T>(L, 1, true);
-				MFP const &fnptr = *static_cast<MFP const *>(
-					lua_touserdata(L, lua_upvalueindex(1)));
+				MFP const &fnptr =
+					*static_cast<MFP const *>(lua_touserdata(L, lua_upvalueindex(1)));
 				assert(fnptr != 0);
 				return (t->*fnptr)(L);
 			} catch (std::exception &e) {
@@ -958,8 +921,7 @@ struct CFunc {
 		}
 	};
 
-	template <class MemFnPtr>
-	struct CallMemberRefFunctionHelper<MemFnPtr, false> {
+	template <class MemFnPtr> struct CallMemberRefFunctionHelper<MemFnPtr, false> {
 		static void add(lua_State *L, char const *name, MemFnPtr mf)
 		{
 			new (lua_newuserdata(L, sizeof(MemFnPtr))) MemFnPtr(mf);
@@ -983,8 +945,7 @@ struct CFunc {
 	template <class C, typename T> static int getProperty(lua_State *L)
 	{
 		C const *const c = Userdata::get<C>(L, 1, true);
-		T C::**mp =
-			static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
+		T C::**mp = static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
 		Stack<T>::push(L, c->**mp);
 		return 1;
 	}
@@ -1005,8 +966,7 @@ struct CFunc {
 	template <class C, typename T> static int setProperty(lua_State *L)
 	{
 		C *const c = Userdata::get<C>(L, 1, false);
-		T C::**mp =
-			static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
+		T C::**mp = static_cast<T C::**>(lua_touserdata(L, lua_upvalueindex(1)));
 		c->**mp = Stack<T>::get(L, 2);
 		return 0;
 	}
@@ -1083,8 +1043,7 @@ struct CFunc {
      */
 
 	// read lua table into C++ std::list
-	template <class T, class C>
-	static int tableToListHelper(lua_State *L, C *const t)
+	template <class T, class C> static int tableToListHelper(lua_State *L, C *const t)
 	{
 		if (!t) {
 			return luaL_error(L, "invalid pointer to std::list<>/std::vector");
@@ -1114,8 +1073,7 @@ struct CFunc {
 
 	template <class T, class C> static int ptrTableToList(lua_State *L)
 	{
-		std::shared_ptr<C> const *const t =
-			Userdata::get<std::shared_ptr<C> >(L, 1, true);
+		std::shared_ptr<C> const *const t = Userdata::get<std::shared_ptr<C> >(L, 1, true);
 		if (!t) {
 			return luaL_error(L, "cannot derefencee shared_ptr");
 		}
@@ -1126,10 +1084,8 @@ struct CFunc {
 	template <class T, class C> static int listIterIter(lua_State *L)
 	{
 		typedef typename C::const_iterator IterType;
-		IterType *const end = static_cast<IterType *const>(
-			lua_touserdata(L, lua_upvalueindex(2)));
-		IterType *const iter = static_cast<IterType *const>(
-			lua_touserdata(L, lua_upvalueindex(1)));
+		IterType *const end = static_cast<IterType *const>(lua_touserdata(L, lua_upvalueindex(2)));
+		IterType *const iter = static_cast<IterType *const>(lua_touserdata(L, lua_upvalueindex(1)));
 		assert(end);
 		assert(iter);
 		if ((*iter) == (*end)) {
@@ -1141,8 +1097,7 @@ struct CFunc {
 	}
 
 	// generate an iterator
-	template <class T, class C>
-	static int listIterHelper(lua_State *L, C *const t)
+	template <class T, class C> static int listIterHelper(lua_State *L, C *const t)
 	{
 		if (!t) {
 			return luaL_error(L, "invalid pointer to std::list<>/std::vector");
@@ -1162,8 +1117,7 @@ struct CFunc {
 
 	template <class T, class C> static int ptrListIter(lua_State *L)
 	{
-		std::shared_ptr<C> const *const t =
-			Userdata::get<std::shared_ptr<C> >(L, 1, true);
+		std::shared_ptr<C> const *const t = Userdata::get<std::shared_ptr<C> >(L, 1, true);
 		if (!t) {
 			return luaL_error(L, "cannot derefencee shared_ptr");
 		}
@@ -1172,8 +1126,7 @@ struct CFunc {
 
 	//--------------------------------------------------------------------------
 	// generate table from std::list
-	template <class T, class C>
-	static int listToTableHelper(lua_State *L, C const *const t)
+	template <class T, class C> static int listToTableHelper(lua_State *L, C const *const t)
 	{
 		if (!t) {
 			return luaL_error(L, "invalid pointer to std::list<>/std::vector");
@@ -1190,8 +1143,7 @@ struct CFunc {
 		LuaRef v(L);
 		v = newTable(L);
 		int index = 1;
-		for (typename C::const_iterator iter = t->begin(); iter != t->end();
-			 ++iter, ++index) {
+		for (typename C::const_iterator iter = t->begin(); iter != t->end(); ++iter, ++index) {
 			v[index] = (*iter);
 		}
 		v.push(L);
@@ -1207,8 +1159,7 @@ struct CFunc {
 
 	template <class T, class C> static int ptrListToTable(lua_State *L)
 	{
-		std::shared_ptr<C> const *const t =
-			Userdata::get<std::shared_ptr<C> >(L, 1, true);
+		std::shared_ptr<C> const *const t = Userdata::get<std::shared_ptr<C> >(L, 1, true);
 		if (!t) {
 			return luaL_error(L, "cannot derefencee shared_ptr");
 		}
@@ -1250,10 +1201,8 @@ struct CFunc {
 	{
 		typedef std::map<K, V> C;
 		typedef typename C::const_iterator IterType;
-		IterType *const end = static_cast<IterType *const>(
-			lua_touserdata(L, lua_upvalueindex(2)));
-		IterType *const iter = static_cast<IterType *const>(
-			lua_touserdata(L, lua_upvalueindex(1)));
+		IterType *const end = static_cast<IterType *const>(lua_touserdata(L, lua_upvalueindex(2)));
+		IterType *const iter = static_cast<IterType *const>(lua_touserdata(L, lua_upvalueindex(1)));
 		assert(end);
 		assert(iter);
 		if ((*iter) == (*end)) {
@@ -1291,8 +1240,7 @@ struct CFunc {
 
 		LuaRef v(L);
 		v = newTable(L);
-		for (typename C::const_iterator iter = t->begin(); iter != t->end();
-			 ++iter) {
+		for (typename C::const_iterator iter = t->begin(); iter != t->end(); ++iter) {
 			v[(*iter).first] = (*iter).second;
 		}
 		v.push(L);
@@ -1354,10 +1302,8 @@ struct CFunc {
 	{
 		typedef std::set<T> C;
 		typedef typename C::const_iterator IterType;
-		IterType *const end = static_cast<IterType *const>(
-			lua_touserdata(L, lua_upvalueindex(2)));
-		IterType *const iter = static_cast<IterType *const>(
-			lua_touserdata(L, lua_upvalueindex(1)));
+		IterType *const end = static_cast<IterType *const>(lua_touserdata(L, lua_upvalueindex(2)));
+		IterType *const iter = static_cast<IterType *const>(lua_touserdata(L, lua_upvalueindex(1)));
 		assert(end);
 		assert(iter);
 		if ((*iter) == (*end)) {
@@ -1395,8 +1341,7 @@ struct CFunc {
 
 		LuaRef v(L);
 		v = newTable(L);
-		for (typename C::const_iterator iter = t->begin(); iter != t->end();
-			 ++iter) {
+		for (typename C::const_iterator iter = t->begin(); iter != t->end(); ++iter) {
 			v[(*iter)] = true;
 		}
 		v.push(L);

@@ -25,8 +25,7 @@
 class ProcessNewAttributes : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessNewAttributes(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessNewAttributes(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

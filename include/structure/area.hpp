@@ -107,8 +107,7 @@ public:
 	/// @param exceptions  The exceptions.
 	/// @param coordinates The desired coordinates.
 	/// @return The list of items at the given coordinates.
-	ItemVector getItemsAt(const ItemVector &exceptions,
-						  const Coordinates &coordinates);
+	ItemVector getItemsAt(const ItemVector &exceptions, const Coordinates &coordinates);
 
 	/// @brief Add the passed room to its coordinates inside the area.
 	/// @param room The room that has to be added.
@@ -146,8 +145,7 @@ public:
 	/// @param radius     The radius of visibility of the character.
 	/// @return The map containing all the Information about the
 	///          Field of View of a character.
-	std::string drawASCIIFov(Room *centerRoom, const int &radius,
-							 double const &origin_height);
+	std::string drawASCIIFov(Room *centerRoom, const int &radius, double const &origin_height);
 
 	/// @brief Draw the Filed of View for a character (ASCII).
 	/// @param centerRoom The room from where the algorithm has to
@@ -162,8 +160,7 @@ public:
 	/// @param origin The coordinate of the central room.
 	/// @param radius     The radius of visibility.
 	/// @return The list containing the targets.
-	CharacterVector getCharactersInSight(CharacterVector &exceptions,
-										 Coordinates &origin,
+	CharacterVector getCharactersInSight(CharacterVector &exceptions, Coordinates &origin,
 										 const int &radius);
 
 	/// @brief Provides a list of items which are in sight.
@@ -171,6 +168,5 @@ public:
 	/// @param origin The coordinate of the central room.
 	/// @param radius     The radius of visibility.
 	/// @return The list containing the items.
-	ItemVector getItemsInSight(ItemVector &exceptions, Coordinates &origin,
-							   const int &radius);
+	ItemVector getItemsInSight(ItemVector &exceptions, Coordinates &origin, const int &radius);
 };

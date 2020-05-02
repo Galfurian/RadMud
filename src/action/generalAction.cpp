@@ -27,9 +27,7 @@
 #include "character/mobile.hpp"
 
 GeneralAction::GeneralAction(Character *_actor, const bool &_lastAction) :
-	actor(_actor),
-	lastAction(_lastAction),
-	actionCooldown()
+	actor(_actor), lastAction(_lastAction), actionCooldown()
 {
 	// Debugging message.
 	//MudLog(LogLevel::Debug, "Created GeneralAction.");
@@ -42,15 +40,15 @@ GeneralAction::~GeneralAction()
 
 bool GeneralAction::checkElapsed() const
 {
-	return (std::chrono::duration_cast<std::chrono::seconds>(
-				actionCooldown - std::chrono::system_clock::now())
+	return (std::chrono::duration_cast<std::chrono::seconds>(actionCooldown -
+															 std::chrono::system_clock::now())
 				.count() <= 0);
 }
 
 long int GeneralAction::getElapsed() const
 {
-	return std::chrono::duration_cast<std::chrono::seconds>(
-			   actionCooldown - std::chrono::system_clock::now())
+	return std::chrono::duration_cast<std::chrono::seconds>(actionCooldown -
+															std::chrono::system_clock::now())
 		.count();
 }
 
@@ -94,10 +92,9 @@ ActionStatus GeneralAction::perform()
 
 unsigned int GeneralAction::getCooldown()
 {
-	return static_cast<unsigned int>(
-		std::chrono::duration_cast<std::chrono::seconds>(
-			actionCooldown - std::chrono::system_clock::now())
-			.count());
+	return static_cast<unsigned int>(std::chrono::duration_cast<std::chrono::seconds>(
+										 actionCooldown - std::chrono::system_clock::now())
+										 .count());
 }
 
 void GeneralAction::resetCooldown(const unsigned int &_actionCooldown)
@@ -115,14 +112,12 @@ std::shared_ptr<CombatAction> GeneralAction::toCombatAction()
 	return std::static_pointer_cast<CombatAction>(this->shared_from_this());
 }
 
-bool operator==(const std::shared_ptr<GeneralAction> &_generalAction,
-				const ActionType &_actionType)
+bool operator==(const std::shared_ptr<GeneralAction> &_generalAction, const ActionType &_actionType)
 {
 	return (_generalAction->getType() == _actionType);
 }
 
-bool operator!=(const std::shared_ptr<GeneralAction> &_generalAction,
-				const ActionType &_actionType)
+bool operator!=(const std::shared_ptr<GeneralAction> &_generalAction, const ActionType &_actionType)
 {
 	return (_generalAction->getType() != _actionType);
 }

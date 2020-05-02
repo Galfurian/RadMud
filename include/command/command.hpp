@@ -56,11 +56,9 @@ public:
 	/// @param _gods            The level necessary to execute the command.
 	/// @param _canUseInCombat  The can_use_in_combat flag.
 	/// @param _typedCompletely If the command must be typed completely.
-	Command(const std::function<bool(Character *character,
-									 ArgumentHandler &args)> &_handler,
-			const std::string &_name, const std::string &_arguments,
-			const std::string &_help, const bool &_gods,
-			const bool &_canUseInCombat, const bool &_typedCompletely);
+	Command(const std::function<bool(Character *character, ArgumentHandler &args)> &_handler,
+			const std::string &_name, const std::string &_arguments, const std::string &_help,
+			const bool &_gods, const bool &_canUseInCombat, const bool &_typedCompletely);
 
 	/// @brief Checks if the provided character can use the command.
 	/// @param character The character to check.

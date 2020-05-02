@@ -158,8 +158,7 @@ template <> struct Stack<unsigned int &> {
 	static inline unsigned int &get(lua_State *L, int index)
 	{
 		unsigned int l = static_cast<unsigned int>(luaL_checknumber(L, index));
-		unsigned int *x =
-			new (lua_newuserdata(L, sizeof(unsigned int))) unsigned int(l);
+		unsigned int *x = new (lua_newuserdata(L, sizeof(unsigned int))) unsigned int(l);
 		return *x;
 	}
 };
@@ -200,10 +199,8 @@ template <> struct Stack<unsigned char &> {
 
 	static inline unsigned char &get(lua_State *L, int index)
 	{
-		unsigned char l =
-			static_cast<unsigned char>(luaL_checknumber(L, index));
-		unsigned char *x =
-			new (lua_newuserdata(L, sizeof(unsigned char))) unsigned char(l);
+		unsigned char l = static_cast<unsigned char>(luaL_checknumber(L, index));
+		unsigned char *x = new (lua_newuserdata(L, sizeof(unsigned char))) unsigned char(l);
 		return *x;
 	}
 };
@@ -286,10 +283,8 @@ template <> struct Stack<unsigned short &> {
 
 	static inline unsigned short &get(lua_State *L, int index)
 	{
-		unsigned short l =
-			static_cast<unsigned short>(luaL_checknumber(L, index));
-		unsigned short *x =
-			new (lua_newuserdata(L, sizeof(unsigned short))) unsigned short(l);
+		unsigned short l = static_cast<unsigned short>(luaL_checknumber(L, index));
+		unsigned short *x = new (lua_newuserdata(L, sizeof(unsigned short))) unsigned short(l);
 		return *x;
 	}
 };
@@ -372,10 +367,8 @@ template <> struct Stack<unsigned long &> {
 
 	static inline unsigned long &get(lua_State *L, int index)
 	{
-		unsigned long l =
-			static_cast<unsigned long>(luaL_checknumber(L, index));
-		unsigned long *x =
-			new (lua_newuserdata(L, sizeof(unsigned long))) unsigned long(l);
+		unsigned long l = static_cast<unsigned long>(luaL_checknumber(L, index));
+		unsigned long *x = new (lua_newuserdata(L, sizeof(unsigned long))) unsigned long(l);
 		return *x;
 	}
 };
@@ -682,10 +675,9 @@ template <> struct Stack<std::string &> {
 	{
 		size_t len;
 		const char *str = luaL_checklstring(L, index, &len);
-		std::string *x =
-			new (lua_newuserdata(L, sizeof(std::string))) std::string(str, len);
+		std::string *x = new (lua_newuserdata(L, sizeof(std::string))) std::string(str, len);
 		return *x;
 	}
 };
 
-}
+} // namespace luabridge

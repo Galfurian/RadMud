@@ -22,15 +22,13 @@ public:
 	}
 
 	// connects a member function to this Signal
-	template <typename T>
-	size_t connect_member(T *inst, void (T::*func)(Args...))
+	template <typename T> size_t connect_member(T *inst, void (T::*func)(Args...))
 	{
 		return connect([=](Args... args) { (inst->*func)(args...); });
 	}
 
 	// connects a const member function to this Signal
-	template <typename T>
-	size_t connect_member(T *inst, void (T::*func)(Args...) const)
+	template <typename T> size_t connect_member(T *inst, void (T::*func)(Args...) const)
 	{
 		return connect([=](Args... args) { (inst->*func)(args...); });
 	}

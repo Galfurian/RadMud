@@ -45,8 +45,8 @@ bool DoFindPath(Character *character, ArgumentHandler &args)
 		std::string error;
 		return StructUtils::checkConnection(options, from, to, error);
 	};
-	AStar<Room *> aStar(RoomCheckFunction, StructUtils::getRoomDistance,
-						StructUtils::roomsAreEqual, StructUtils::getNeighbours);
+	AStar<Room *> aStar(RoomCheckFunction, StructUtils::getRoomDistance, StructUtils::roomsAreEqual,
+						StructUtils::getNeighbours);
 	std::vector<Room *> path;
 	if (!aStar.findPath(character->room, room, path)) {
 		character->sendMsg("There is no path to that room.\n\n");
@@ -168,8 +168,7 @@ bool DoRoomEdit(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		QueryList value = { std::make_pair("description", input) };
-		QueryList where = { std::make_pair("vnum",
-										   ToString(character->room->vnum)) };
+		QueryList where = { std::make_pair("vnum", ToString(character->room->vnum)) };
 		if (!SQLiteDbms::instance().updateInto("Room", value, where)) {
 			character->sendMsg("Command gone wrong.\n");
 			return false;
@@ -184,8 +183,7 @@ bool DoRoomEdit(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		QueryList value = { std::make_pair("name", input) };
-		QueryList where = { std::make_pair("vnum",
-										   ToString(character->room->vnum)) };
+		QueryList where = { std::make_pair("vnum", ToString(character->room->vnum)) };
 		if (!SQLiteDbms::instance().updateInto("Room", value, where)) {
 			character->sendMsg("Command gone wrong.\n");
 			return false;
@@ -307,8 +305,7 @@ bool DoRoomList(Character *character, ArgumentHandler &args)
 		} else {
 			row.emplace_back("None");
 		}
-		row.emplace_back(ToString(room->coord.x) + ' ' +
-						 ToString(room->coord.y) + ' ' +
+		row.emplace_back(ToString(room->coord.x) + ' ' + ToString(room->coord.y) + ' ' +
 						 ToString(room->coord.z));
 		row.emplace_back(room->terrain->name);
 		row.emplace_back(room->name);

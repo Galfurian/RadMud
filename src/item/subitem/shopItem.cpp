@@ -57,8 +57,7 @@ bool ShopItem::updateOnDB()
 	arguments.emplace_back(ToString(shopBuyTax));
 	arguments.emplace_back(ToString(shopSellTax));
 	arguments.emplace_back(ToString(balance));
-	arguments.emplace_back(
-		(shopKeeper != nullptr) ? ToString(shopKeeper->vnum) : "0");
+	arguments.emplace_back((shopKeeper != nullptr) ? ToString(shopKeeper->vnum) : "0");
 	arguments.emplace_back(ToString(openingHour));
 	arguments.emplace_back(ToString(closingHour));
 	if (SQLiteDbms::instance().insertInto("Shop", arguments, false, true))
@@ -83,8 +82,7 @@ bool ShopItem::removeOnDB()
 		SQLiteDbms::instance().showLastError();
 		status = false;
 	}
-	if (!SQLiteDbms::instance().deleteFrom("ShopDefaultStock",
-										   { stock_pair })) {
+	if (!SQLiteDbms::instance().deleteFrom("ShopDefaultStock", { stock_pair })) {
 		MudLog(LogLevel::Error, "Remove from table 'ShopDefaultStock'.");
 		SQLiteDbms::instance().showLastError();
 		status = false;
@@ -103,8 +101,7 @@ void ShopItem::getSheet(Table &sheet) const
 	sheet.addRow({ "Buy Tax", ToString(shopBuyTax) });
 	sheet.addRow({ "Sell Tax", ToString(shopSellTax) });
 	sheet.addRow({ "Balance", ToString(this->getBalance()) });
-	sheet.addRow(
-		{ "ShopKeeper", (shopKeeper) ? shopKeeper->getNameCapital() : "None" });
+	sheet.addRow({ "ShopKeeper", (shopKeeper) ? shopKeeper->getNameCapital() : "None" });
 	sheet.addRow({ "Opening Hour", ToString(openingHour) });
 	sheet.addRow({ "Closing Hour", ToString(closingHour) });
 }
@@ -173,8 +170,7 @@ std::string ShopItem::lookContent()
 			row.emplace_back(ToString(this->evaluateBuyPrice(iterator)));
 			row.emplace_back(ToString(this->evaluateSellPrice(iterator)));
 			if (iterator->quantity > 1) {
-				row.emplace_back(ToString(this->evaluateSellPrice(iterator) *
-										  iterator->quantity));
+				row.emplace_back(ToString(this->evaluateSellPrice(iterator) * iterator->quantity));
 			} else {
 				row.emplace_back("");
 			}
@@ -234,10 +230,8 @@ bool ShopItem::canUse(std::string &error)
 		return false;
 	}
 	auto hour = MudUpdater::instance().getMudHour();
-	if (((openingHour < closingHour) &&
-		 ((hour < openingHour) || (hour > closingHour))) ||
-		((closingHour < openingHour) &&
-		 ((hour < closingHour) || (hour > openingHour)))) {
+	if (((openingHour < closingHour) && ((hour < openingHour) || (hour > closingHour))) ||
+		((closingHour < openingHour) && ((hour < closingHour) || (hour > openingHour)))) {
 		error = "The shopkeeper's probably taking a nap.";
 		return false;
 	}

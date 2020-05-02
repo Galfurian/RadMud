@@ -47,16 +47,13 @@ unsigned int CurrencyItem::getPrice(bool entireStack) const
 {
 	auto customPrice = Item::getPrice(entireStack);
 	if (composition != nullptr) {
-		if (model->to<CurrencyModel>()->findPrice(composition->vnum,
-												  customPrice)) {
+		if (model->to<CurrencyModel>()->findPrice(composition->vnum, customPrice)) {
 			return customPrice * quantity;
 		}
-		MudLog(LogLevel::Error,
-					"The item (%s) has a wrong composition w.r.t its currency.",
-					this->getName());
+		MudLog(LogLevel::Error, "The item (%s) has a wrong composition w.r.t its currency.",
+			   this->getName());
 	}
-	MudLog(LogLevel::Error, "The item %s has no composition.",
-				this->getName());
+	MudLog(LogLevel::Error, "The item %s has no composition.", this->getName());
 	return customPrice;
 }
 

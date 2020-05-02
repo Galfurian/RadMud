@@ -116,7 +116,7 @@ public:
 	/// The model description.
 	std::string description;
 	/// Store here the position where the model can be equipped.
-	std::vector<std::shared_ptr<BodyPart>> bodyParts;
+	std::vector<std::shared_ptr<BodyPart> > bodyParts;
 	/// The model flags.
 	unsigned int modelFlags;
 	/// The model base weight.
@@ -174,11 +174,9 @@ public:
 	/// @param itemQuality The quality of the item.
 	/// @param quantity    The quantity.
 	/// @return The newly created item.
-	virtual Item *
-	createItem(std::string maker, Material *composition,
-			   bool isForMobile = false,
-			   const ItemQuality &itemQuality = ItemQuality::Normal,
-			   const unsigned int &quantity = 1);
+	virtual Item *createItem(std::string maker, Material *composition, bool isForMobile = false,
+							 const ItemQuality &itemQuality = ItemQuality::Normal,
+							 const unsigned int &quantity = 1);
 
 	/// @brief Check the correctness of the model.
 	/// @return <b>True</b> if the model has correct values,<br>
@@ -192,31 +190,28 @@ public:
 	/// @param itemQuality  The quality of the model.
 	/// @return <b>True</b> if something changed inside the string,<br>
 	///         <b>False</b> otherwise.
-	bool
-	replaceSymbols(std::string &source, Material *itemMaterial = nullptr,
-				   const ItemQuality &itemQuality = ItemQuality::Normal) const;
+	bool replaceSymbols(std::string &source, Material *itemMaterial = nullptr,
+						const ItemQuality &itemQuality = ItemQuality::Normal) const;
 
 	/// @brief Returns the name of the model depending on the passed arguments.
 	/// @param itemMaterial The material of which the model is made.
 	/// @param itemQuality  The quality of the model.
 	/// @return The specific name of the model.
-	std::string
-	getName(Material *itemMaterial = nullptr,
-			const ItemQuality &itemQuality = ItemQuality::Normal) const;
+	std::string getName(Material *itemMaterial = nullptr,
+						const ItemQuality &itemQuality = ItemQuality::Normal) const;
 
 	/// @brief Returns the description of the model depending
 	///         on the passed arguments.
 	/// @param itemMaterial The material of which the model is made.
 	/// @param itemQuality  The quality of the model.
 	/// @return The specific description of the model.
-	std::string
-	getDescription(Material *itemMaterial = nullptr,
-				   const ItemQuality &itemQuality = ItemQuality::Normal);
+	std::string getDescription(Material *itemMaterial = nullptr,
+							   const ItemQuality &itemQuality = ItemQuality::Normal);
 
 	/// @brief Gets the body parts in common between the model and the race.
 	/// @param race The race with which the check must be performed.
 	/// @return The body parts in common between the model and the race.
-	std::vector<std::shared_ptr<BodyPart>> getCompatibleBodyParts(Race * race);
+	std::vector<std::shared_ptr<BodyPart> > getCompatibleBodyParts(Race *race);
 
 	/// @brief Returns the tile of the model.
 	/// @param offset The ofset of the tile.

@@ -62,8 +62,7 @@ Mobile::~Mobile()
 	if (this->isAlive()) {
 		room->removeCharacter(this);
 	}
-	MudLog(LogLevel::Debug, "Deleted mobile\t\t\t\t(%s)",
-		   this->getNameCapital());
+	MudLog(LogLevel::Debug, "Deleted mobile\t\t\t\t(%s)", this->getNameCapital());
 }
 
 bool Mobile::setAbilities(const std::string &source)
@@ -73,24 +72,19 @@ bool Mobile::setAbilities(const std::string &source)
 	std::vector<std::string> charList = SplitString(source, ";");
 	if (charList.size() != 5)
 		return false;
-	if (!this->setAbility(Ability::Strength,
-						  ToNumber<unsigned int>(charList[0]))) {
+	if (!this->setAbility(Ability::Strength, ToNumber<unsigned int>(charList[0]))) {
 		return false;
 	}
-	if (!this->setAbility(Ability::Agility,
-						  ToNumber<unsigned int>(charList[1]))) {
+	if (!this->setAbility(Ability::Agility, ToNumber<unsigned int>(charList[1]))) {
 		return false;
 	}
-	if (!this->setAbility(Ability::Perception,
-						  ToNumber<unsigned int>(charList[2]))) {
+	if (!this->setAbility(Ability::Perception, ToNumber<unsigned int>(charList[2]))) {
 		return false;
 	}
-	if (!this->setAbility(Ability::Constitution,
-						  ToNumber<unsigned int>(charList[3]))) {
+	if (!this->setAbility(Ability::Constitution, ToNumber<unsigned int>(charList[3]))) {
 		return false;
 	}
-	if (!this->setAbility(Ability::Intelligence,
-						  ToNumber<unsigned int>(charList[4]))) {
+	if (!this->setAbility(Ability::Intelligence, ToNumber<unsigned int>(charList[4]))) {
 		return false;
 	}
 	return true;
@@ -127,11 +121,9 @@ void Mobile::respawn()
 	std::vector<Character *> exceptions;
 	exceptions.emplace_back(this);
 	// Send the message inside the room.
-	this->room->sendToAll("%s apear from somewhere.\n", exceptions,
-						  this->getNameCapital());
+	this->room->sendToAll("%s apear from somewhere.\n", exceptions, this->getNameCapital());
 	// Set the next action time.
-	behaviourTimer =
-		std::chrono::system_clock::now() + std::chrono::seconds(level);
+	behaviourTimer = std::chrono::system_clock::now() + std::chrono::seconds(level);
 	// Log to the mud.
 	//MudLog(LogLevel::Debug, "Respawning " + this->id);
 }
@@ -231,10 +223,9 @@ void Mobile::kill()
 		// Set a random condition for the new item.
 		item->condition = TRandReal<double>(min, max);
 		// For debugging purposes print the condintion of the items.
-		MudLog(LogLevel::Debug,
-			   "Item [%d]'%s' condition : %d (max cond:%d, roll [%2d-%2d]).",
-			   item->vnum, item->getName().c_str(), item->condition,
-			   item->getMaxCondition(), min, max);
+		MudLog(LogLevel::Debug, "Item [%d]'%s' condition : %d (max cond:%d, roll [%2d-%2d]).",
+			   item->vnum, item->getName().c_str(), item->condition, item->getMaxCondition(), min,
+			   max);
 	};
 	// Before calling the character kill function, set the vnum for the new
 	//  items, and set the item condition to a random value from 10% to 50%.
@@ -245,8 +236,7 @@ void Mobile::kill()
 	// Call the method of the father class.
 	Character::kill();
 	// Set to 0 the cycle that this mobile has passed dead.
-	nextRespawn = std::chrono::system_clock::now() +
-				  std::chrono::seconds(10 * this->level);
+	nextRespawn = std::chrono::system_clock::now() + std::chrono::seconds(10 * this->level);
 	// Call the LUA function: Event_Death.
 	this->triggerEventDeath();
 }
@@ -254,8 +244,8 @@ void Mobile::kill()
 int64_t Mobile::getRespawnTime() const
 {
 	// Return the check if the mobile can be respawned.
-	return std::chrono::duration_cast<std::chrono::seconds>(
-			   std::chrono::system_clock::now() - nextRespawn)
+	return std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() -
+															nextRespawn)
 		.count();
 }
 
@@ -307,8 +297,7 @@ bool Mobile::saveOnDB()
 		return false;
 	}
 	if (room == nullptr) {
-		MudLog(LogLevel::Error,
-			   "Trying to save mobile while it is in no room.");
+		MudLog(LogLevel::Error, "Trying to save mobile while it is in no room.");
 		return false;
 	}
 	std::vector<std::string> args;
@@ -325,8 +314,7 @@ void Mobile::performBehaviour()
 	}
 	if (this->checkBehaviourTimer()) {
 		auto status = behaviourQueue.front()->perform();
-		if ((status == BehaviourStatus::Finished) ||
-			(status == BehaviourStatus::Error)) {
+		if ((status == BehaviourStatus::Finished) || (status == BehaviourStatus::Error)) {
 			behaviourQueue.pop_front();
 		}
 	}
@@ -335,9 +323,8 @@ void Mobile::performBehaviour()
 bool Mobile::checkBehaviourTimer()
 {
 	// Check if the tic is passed.
-	if (std::chrono::duration_cast<std::chrono::seconds>(
-			std::chrono::system_clock::now() - behaviourTimer) >=
-		behaviourDelay) {
+	if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() -
+														 behaviourTimer) >= behaviourDelay) {
 		behaviourTimer = std::chrono::system_clock::now();
 		return true;
 	}
@@ -407,8 +394,7 @@ void Mobile::triggerEventMain()
 	this->mobileThread("EventMain", nullptr, "");
 }
 
-bool Mobile::mobileThread(std::string event, Character *character,
-						  std::string message)
+bool Mobile::mobileThread(std::string event, Character *character, std::string message)
 {
 	if (!event.empty()) {
 		try {
@@ -417,19 +403,16 @@ bool Mobile::mobileThread(std::string event, Character *character,
 				if (character != nullptr) {
 					if (!message.empty()) {
 						behaviourQueue.emplace_back(
-							std::make_shared<BehaviourP3<
-								Character *, Character *, std::string> >(
+							std::make_shared<BehaviourP3<Character *, Character *, std::string> >(
 								event, func, this, character, message));
 					} else {
 						behaviourQueue.emplace_back(
-							std::make_shared<
-								BehaviourP2<Character *, Character *> >(
+							std::make_shared<BehaviourP2<Character *, Character *> >(
 								event, func, this, character));
 					}
 				} else {
 					behaviourQueue.emplace_back(
-						std::make_shared<BehaviourP1<Character *> >(event, func,
-																	this));
+						std::make_shared<BehaviourP1<Character *> >(event, func, this));
 				}
 			}
 		} catch (luabridge::LuaException const &e) {

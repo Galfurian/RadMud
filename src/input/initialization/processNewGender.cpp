@@ -74,8 +74,7 @@ void ProcessNewGender::advance()
 	ss << "#\n";
 	ss << "# Choose one of the above gender by typing the correspondent number.\n";
 	ss << "#\n";
-	ss << "# Type [" + Formatter::magenta("back")
-	   << "] to return to the previous step.\n";
+	ss << "# Type [" + Formatter::magenta("back") << "] to return to the previous step.\n";
 	character->sendMsg(ss.str());
 	this->printError();
 }

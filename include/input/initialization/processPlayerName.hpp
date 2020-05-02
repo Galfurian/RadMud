@@ -25,8 +25,7 @@
 class ProcessPlayerName : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessPlayerName(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessPlayerName(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

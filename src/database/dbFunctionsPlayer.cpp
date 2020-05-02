@@ -54,18 +54,15 @@ bool SQLiteDbms::loadPlayer(Player *player)
 		}
 	}
 	if (!this->loadPlayerItems(player)) {
-		MudLog(LogLevel::Error,
-			   "Encountered an error during loading Player Items.");
+		MudLog(LogLevel::Error, "Encountered an error during loading Player Items.");
 		return false;
 	}
 	if (!this->loadPlayerSkill(player)) {
-		MudLog(LogLevel::Error,
-			   "Encountered an error during loading Player Skills.");
+		MudLog(LogLevel::Error, "Encountered an error during loading Player Skills.");
 		return false;
 	}
 	if (!this->loadPlayerLuaVariables(player)) {
-		MudLog(LogLevel::Error,
-			   "Encountered an error during loading Player Lua Variables.");
+		MudLog(LogLevel::Error, "Encountered an error during loading Player Lua Variables.");
 		return false;
 	}
 	// Check the loaded player.
@@ -251,8 +248,7 @@ bool SQLiteDbms::loadPlayerItems(Player *player)
 {
 	// Prepare the query.
 	std::string query =
-		"SELECT item, position FROM ItemPlayer WHERE owner = \"" +
-		player->name + "\";";
+		"SELECT item, position FROM ItemPlayer WHERE owner = \"" + player->name + "\";";
 	// Execute the query.
 	auto result = dbConnection.executeSelect(query.c_str());
 	// Check the result.
@@ -266,8 +262,7 @@ bool SQLiteDbms::loadPlayerItems(Player *player)
 	while (result->next()) {
 		// The pointer to the object.
 		auto item = Mud::instance().findItem(result->getNextUnsignedInteger());
-		auto bodyPart =
-			Mud::instance().findBodyPart(result->getNextUnsignedInteger());
+		auto bodyPart = Mud::instance().findBodyPart(result->getNextUnsignedInteger());
 		if (item == nullptr) {
 			MudLog(LogLevel::Error, "Item not found!");
 			status = false;
@@ -330,8 +325,7 @@ bool SQLiteDbms::loadPlayerSkill(Player *player)
 	// Loading status.
 	bool status = true;
 	while (result->next()) {
-		auto skill =
-			Mud::instance().findSkill(result->getNextUnsignedInteger());
+		auto skill = Mud::instance().findSkill(result->getNextUnsignedInteger());
 		auto value = result->getNextUnsignedInteger();
 		if (skill == nullptr) {
 			MudLog(LogLevel::Error, "Wrong skill id.");

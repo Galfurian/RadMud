@@ -54,10 +54,7 @@ private:
 
 public:
 	explicit Iterator(LuaRef table) :
-		m_L(table.state()),
-		m_table(table),
-		m_key(table.state()),
-		m_value(table.state())
+		m_L(table.state()), m_table(table), m_key(table.state()), m_value(table.state())
 	{
 		next(); // get the first (key, value) pair from table
 	}

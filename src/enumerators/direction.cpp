@@ -24,26 +24,19 @@
 #include "structure/coordinates.hpp"
 #include "utilities/utils.hpp"
 
-Direction::Direction(const std::string &_direction, const bool &exact) :
-	BaseEnumerator()
+Direction::Direction(const std::string &_direction, const bool &exact) : BaseEnumerator()
 {
-	if ((exact && (_direction == "north")) ||
-		(!exact && BeginWith("north", _direction))) {
+	if ((exact && (_direction == "north")) || (!exact && BeginWith("north", _direction))) {
 		value = North;
-	} else if ((exact && (_direction == "south")) ||
-			   (!exact && BeginWith("south", _direction))) {
+	} else if ((exact && (_direction == "south")) || (!exact && BeginWith("south", _direction))) {
 		value = South;
-	} else if ((exact && (_direction == "west")) ||
-			   (!exact && BeginWith("west", _direction))) {
+	} else if ((exact && (_direction == "west")) || (!exact && BeginWith("west", _direction))) {
 		value = West;
-	} else if ((exact && (_direction == "east")) ||
-			   (!exact && BeginWith("east", _direction))) {
+	} else if ((exact && (_direction == "east")) || (!exact && BeginWith("east", _direction))) {
 		value = East;
-	} else if ((exact && (_direction == "up")) ||
-			   (!exact && BeginWith("up", _direction))) {
+	} else if ((exact && (_direction == "up")) || (!exact && BeginWith("up", _direction))) {
 		value = Up;
-	} else if ((exact && (_direction == "down")) ||
-			   (!exact && BeginWith("down", _direction))) {
+	} else if ((exact && (_direction == "down")) || (!exact && BeginWith("down", _direction))) {
 		value = Down;
 	} else
 		value = None;

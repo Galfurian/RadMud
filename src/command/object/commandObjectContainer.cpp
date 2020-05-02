@@ -60,19 +60,16 @@ bool DoOrganize(Character *character, ArgumentHandler &args)
 		character->sendMsg("Too much arguments.\n");
 		return false;
 	}
-	auto item =
-		character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+	auto item = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
 	if (item != nullptr) {
 		if (!item->isAContainer()) {
-			character->sendMsg(
-				"You can't organize %s, it is not a container.\n",
-				item->getName(true));
+			character->sendMsg("You can't organize %s, it is not a container.\n",
+							   item->getName(true));
 			return false;
 		}
 		// Check if the item is a magazine.
 		if (item->getType() == ModelType::Magazine) {
-			character->sendMsg("You can't organize projectiles inside %s.\n",
-							   item->getName(true));
+			character->sendMsg("You can't organize projectiles inside %s.\n", item->getName(true));
 			return false;
 		}
 		// Check if the item is a range weapon.
@@ -82,9 +79,8 @@ bool DoOrganize(Character *character, ArgumentHandler &args)
 		}
 		// Check if the item is a liquid container.
 		if (item->getType() == ModelType::LiquidContainer) {
-			character->sendMsg(
-				"You can't organize liquid molecules inside %s.\n",
-				item->getName(true));
+			character->sendMsg("You can't organize liquid molecules inside %s.\n",
+							   item->getName(true));
 			return false;
 		}
 		// Cast the item to container.
@@ -93,8 +89,7 @@ bool DoOrganize(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		item->content.orderBy(order);
-		character->sendMsg("You have organized %s, by %s.\n",
-						   item->getName(true), name);
+		character->sendMsg("You have organized %s, by %s.\n", item->getName(true), name);
 		return true;
 	}
 	if (BeginWith("inventory", args[1].getContent())) {
@@ -165,8 +160,7 @@ bool DoOpen(Character *character, ArgumentHandler &args)
 		if (HasFlag(roomExit->flags, ExitFlag::Hidden)) {
 			character->sendMsg("You have opened a hidden door!\n");
 			// Send the message inside the room.
-			character->room->sendToAll("%s opens a hidden door!\n",
-									   { character },
+			character->room->sendToAll("%s opens a hidden door!\n", { character },
 									   character->getNameCapital());
 		} else {
 			character->sendMsg("You have opened the door.\n");
@@ -181,12 +175,10 @@ bool DoOpen(Character *character, ArgumentHandler &args)
 				continue;
 			if (HasFlag(it->flags, ExitFlag::Hidden)) {
 				// Show the action in the next room.
-				it->destination->sendToAll(
-					"Someone opens a secret passage from the other side.\n",
-					{});
+				it->destination->sendToAll("Someone opens a secret passage from the other side.\n",
+										   {});
 			} else {
-				it->destination->sendToAll(
-					"Someone opens a door from the other side.\n", {});
+				it->destination->sendToAll("Someone opens a door from the other side.\n", {});
 			}
 		}
 	} else {
@@ -197,13 +189,11 @@ bool DoOpen(Character *character, ArgumentHandler &args)
 		auto inventoryIsLit = character->inventoryIsLit();
 		// If the room is lit.
 		if (roomIsLit) {
-			container = character->findNearbyItem(args[0].getContent(),
-												  args[0].getIndex());
+			container = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
 		} else {
 			// If the room is not lit but the inventory is.
 			if (inventoryIsLit) {
-				container = character->findInventoryItem(args[0].getContent(),
-														 args[0].getIndex());
+				container = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 			} else {
 				character->sendMsg("You can't see.\n");
 				return false;
@@ -225,8 +215,7 @@ bool DoOpen(Character *character, ArgumentHandler &args)
 		// Send the message to the character.
 		character->sendMsg("You open %s.\n", container->getName(true));
 		// Send the message inside the room.
-		character->room->sendToAll("%s opens %s.\n", { character },
-								   character->getNameCapital(),
+		character->room->sendToAll("%s opens %s.\n", { character }, character->getNameCapital(),
 								   container->getName(true));
 	}
 	return true;
@@ -276,13 +265,11 @@ bool DoClose(Character *character, ArgumentHandler &args)
 			return false;
 		}
 		if (destination->items.size() > 1) {
-			character->sendMsg(
-				"There are items on the way, you can't close the door.\n");
+			character->sendMsg("There are items on the way, you can't close the door.\n");
 			return false;
 		}
 		if (destination->characters.size() >= 1) {
-			character->sendMsg(
-				"There are someone on the way, you can't close the door.\n");
+			character->sendMsg("There are someone on the way, you can't close the door.\n");
 			return false;
 		}
 		SetFlag(door->flags, ItemFlag::Closed);
@@ -290,8 +277,7 @@ bool DoClose(Character *character, ArgumentHandler &args)
 		if (HasFlag(roomExit->flags, ExitFlag::Hidden)) {
 			character->sendMsg("You have closed a hidden door!\n");
 			// Send the message inside the room.
-			character->room->sendToAll("%s closes a hidden door!\n",
-									   { character },
+			character->room->sendToAll("%s closes a hidden door!\n", { character },
 									   character->getNameCapital());
 		} else {
 			character->sendMsg("You have closed the door.\n");
@@ -306,13 +292,11 @@ bool DoClose(Character *character, ArgumentHandler &args)
 				continue;
 			if (HasFlag(it->flags, ExitFlag::Hidden)) {
 				// Send the message inside the room.
-				it->destination->sendToAll(
-					"Someone closes a secret passage from the other side.\n",
-					{});
+				it->destination->sendToAll("Someone closes a secret passage from the other side.\n",
+										   {});
 			} else {
 				// Send the message inside the room.
-				it->destination->sendToAll(
-					"Someone closes a door from the other side.\n", {});
+				it->destination->sendToAll("Someone closes a door from the other side.\n", {});
 			}
 		}
 	} else {
@@ -323,13 +307,11 @@ bool DoClose(Character *character, ArgumentHandler &args)
 		auto inventoryIsLit = character->inventoryIsLit();
 		// If the room is lit.
 		if (roomIsLit) {
-			container = character->findNearbyItem(args[0].getContent(),
-												  args[0].getIndex());
+			container = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
 		} else {
 			// If the room is not lit but the inventory is.
 			if (inventoryIsLit) {
-				container = character->findInventoryItem(args[0].getContent(),
-														 args[0].getIndex());
+				container = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 			} else {
 				character->sendMsg("You can't see.\n");
 				return false;
@@ -351,8 +333,7 @@ bool DoClose(Character *character, ArgumentHandler &args)
 		// Send the message to the character.
 		character->sendMsg("You close %s.\n", container->getName(true));
 		// Send the message inside the room.
-		character->room->sendToAll("%s closes %s.\n", { character },
-								   character->getNameCapital(),
+		character->room->sendToAll("%s closes %s.\n", { character }, character->getNameCapital(),
 								   container->getName(true));
 	}
 	return true;

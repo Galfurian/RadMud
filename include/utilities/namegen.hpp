@@ -112,8 +112,7 @@ protected:
 	std::vector<std::unique_ptr<NameGenerator> > generators;
 
 	/// The type of the map of symbols.
-	using SymbolMap =
-		std::unordered_map<std::string, const std::vector<std::string> >;
+	using SymbolMap = std::unordered_map<std::string, const std::vector<std::string> >;
 
 	/// @brief Returns the symbol map.
 	static const SymbolMap &getSymbolMap();

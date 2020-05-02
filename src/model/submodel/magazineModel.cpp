@@ -52,12 +52,10 @@ bool MagazineModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 2) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Magazine Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Magazine Model (%s).", name);
 		return false;
 	}
-	this->projectileType =
-		static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
+	this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
 	this->maxAmount = ToNumber<unsigned int>(functionList[1]);
 	return true;
 }
@@ -69,7 +67,6 @@ void MagazineModel::getSheet(Table &sheet) const
 	// Add a divider.
 	sheet.addDivider();
 	// Set the values.
-	sheet.addRow(
-		{ "Contained Type", GetRangedWeaponTypeName(this->projectileType) });
+	sheet.addRow({ "Contained Type", GetRangedWeaponTypeName(this->projectileType) });
 	sheet.addRow({ "Maximum Amount", ToString(this->maxAmount) });
 }

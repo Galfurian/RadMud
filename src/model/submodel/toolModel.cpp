@@ -52,12 +52,10 @@ bool ToolModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 1) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Tool Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Tool Model (%s).", name);
 		return false;
 	}
-	this->toolType =
-		static_cast<ToolType>(ToNumber<unsigned int>(functionList[0]));
+	this->toolType = static_cast<ToolType>(ToNumber<unsigned int>(functionList[0]));
 	return true;
 }
 

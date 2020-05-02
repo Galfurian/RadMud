@@ -25,8 +25,7 @@
 class ProcessNewConfirm : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessNewConfirm(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessNewConfirm(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

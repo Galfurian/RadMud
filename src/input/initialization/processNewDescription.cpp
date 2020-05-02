@@ -52,8 +52,7 @@ bool ProcessNewDescription::process(ArgumentHandler &args)
 		// Advance to the next step.
 		newStep->advance();
 		return true;
-	} else if (input.find_first_not_of(VALID_CHARACTERS_DESC) !=
-			   std::string::npos) {
+	} else if (input.find_first_not_of(VALID_CHARACTERS_DESC) != std::string::npos) {
 		error = "Description cannot contain disallowed characters.";
 		this->advance();
 	} else {
@@ -76,10 +75,8 @@ void ProcessNewDescription::advance()
 	std::stringstream ss;
 	ss << "# " << Formatter::bold("Character's Description.") << "\n";
 	ss << "# Insert a brief description of your character, its optional.\n";
-	ss << "# Type [" << Formatter::magenta("back")
-	   << "] to return to the previous step.\n";
-	ss << "# Type [" << Formatter::magenta("skip")
-	   << "] to just pass to the next step.\n";
+	ss << "# Type [" << Formatter::magenta("back") << "] to return to the previous step.\n";
+	ss << "# Type [" << Formatter::magenta("skip") << "] to just pass to the next step.\n";
 	character->sendMsg(ss.str());
 	this->printError();
 }

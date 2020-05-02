@@ -28,12 +28,8 @@ Exit::Exit() : source(), destination(), direction(Direction::None), flags()
 	// Nothing to do.
 }
 
-Exit::Exit(Room *_source, Room *_destination, Direction _direction,
-		   unsigned int _flags) :
-	source(_source),
-	destination(_destination),
-	direction(_direction),
-	flags(_flags)
+Exit::Exit(Room *_source, Room *_destination, Direction _direction, unsigned int _flags) :
+	source(_source), destination(_destination), direction(_direction), flags(_flags)
 {
 	// Nothing to do.
 }

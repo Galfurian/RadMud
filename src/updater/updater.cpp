@@ -79,8 +79,7 @@ void MudUpdater::updateBandUncompressed(const size_t &size)
 void MudUpdater::addItemToDestroy(Item *item)
 {
 	if (!itemToDestroy.insert(item).second) {
-		MudLog(LogLevel::Debug,
-			   "Failed to insert item %d to the list of items to destroy.");
+		MudLog(LogLevel::Debug, "Failed to insert item %d to the list of items to destroy.");
 	}
 }
 
@@ -170,7 +169,7 @@ void MudUpdater::advanceTime()
 	// [DELTA] Perform characters pending actions.
 	this->performActions();
 	// [DELTA] Destroy all the registered items.
-	for (const auto & item : itemToDestroy) {
+	for (const auto &item : itemToDestroy) {
 		// If the item is not temporary, remove it from DB.
 		if (!HasFlag(item->flags, ItemFlag::Temporary)) {
 			if (!item->removeOnDB()) {
@@ -191,8 +190,7 @@ void MudUpdater::advanceTime()
 bool MudUpdater::hasTicPassed()
 {
 	// Check if the tic is passed.
-	if (std::chrono::duration_cast<std::chrono::seconds>(
-			std::chrono::system_clock::now() - ticTime)
+	if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - ticTime)
 			.count() >= ticSize) {
 		// Reset Tic Time.
 		ticTime = std::chrono::system_clock::now();
@@ -206,30 +204,25 @@ void MudUpdater::updateDayPhase()
 	// Increment the current mud hour.
 	mudHour++;
 	if (mudHour == static_cast<unsigned int>(DayPhase::Morning)) {
-		Mud::instance().broadcastMsg(0, Formatter::yellow() +
-											"The sun rises from the east.\n" +
+		Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun rises from the east.\n" +
 											Formatter::reset());
 		mudDayPhase = DayPhase::Morning;
 	} else if (mudHour == static_cast<unsigned int>(DayPhase::Day)) {
-		Mud::instance().broadcastMsg(0, Formatter::yellow() +
-											"The sun is just above you.\n" +
+		Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun is just above you.\n" +
 											Formatter::reset());
 		mudDayPhase = DayPhase::Day;
 	} else if (mudHour == static_cast<unsigned int>(DayPhase::Dusk)) {
-		Mud::instance().broadcastMsg(0, Formatter::yellow() +
-											"The sun begins to set.\n" +
+		Mud::instance().broadcastMsg(0, Formatter::yellow() + "The sun begins to set.\n" +
 											Formatter::reset());
 		mudDayPhase = DayPhase::Dusk;
 	} else if (mudHour == static_cast<unsigned int>(DayPhase::Night)) {
-		Mud::instance().broadcastMsg(0, Formatter::yellow() +
-											"Darkness engulfs you.\n" +
+		Mud::instance().broadcastMsg(0, Formatter::yellow() + "Darkness engulfs you.\n" +
 											Formatter::reset());
 		mudDayPhase = DayPhase::Night;
 		// Reset the mud hour.
 		mudHour = 0;
 	} else {
-		Mud::instance().broadcastMsg(0, Formatter::yellow() +
-											"Another hour has passed." +
+		Mud::instance().broadcastMsg(0, Formatter::yellow() + "Another hour has passed." +
 											Formatter::reset());
 	}
 }

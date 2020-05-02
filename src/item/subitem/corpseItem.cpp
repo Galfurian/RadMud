@@ -44,8 +44,7 @@ bool CorpseItem::removeFromMud()
 			   this->getName());
 	}
 	if (Mud::instance().remCorpse(this)) {
-		MudLog(LogLevel::Debug, "Removing item '%s' from MUD corpses.",
-			   this->getName());
+		MudLog(LogLevel::Debug, "Removing item '%s' from MUD corpses.", this->getName());
 		return true;
 	}
 	return false;
@@ -108,8 +107,7 @@ bool CorpseItem::removeBodyPart(const std::shared_ptr<BodyPart> &bodyPart)
 	// Lock the access to the item.
 	std::lock_guard<std::mutex> lock(itemMutex);
 	// Proceed with the function.
-	for (auto it = remainingBodyParts.begin(); it != remainingBodyParts.end();
-		 ++it) {
+	for (auto it = remainingBodyParts.begin(); it != remainingBodyParts.end(); ++it) {
 		if ((*it)->vnum == bodyPart->vnum) {
 			remainingBodyParts.erase(it);
 			remainingBodyParts.shrink_to_fit();

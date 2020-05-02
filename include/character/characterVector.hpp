@@ -41,11 +41,11 @@ public:
 	/// @param skipPlayer   <b>True</b> skips players,<br>
 	///                     <b>False</b> count also the players.
 	/// @return The character if it has been found.
-	Character *findCharacter(
-		const std::string &target, unsigned int number,
-		unsigned int *number_ptr = nullptr,
-		const std::vector<Character *> &exceptions = std::vector<Character *>(),
-		bool skipMobile = false, bool skipPlayer = false) const;
+	Character *
+	findCharacter(const std::string &target, unsigned int number,
+				  unsigned int *number_ptr = nullptr,
+				  const std::vector<Character *> &exceptions = std::vector<Character *>(),
+				  bool skipMobile = false, bool skipPlayer = false) const;
 
 	/// @brief Checks if the container actually contains the given character.
 	/// @param character The character to search.

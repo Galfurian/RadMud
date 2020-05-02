@@ -23,13 +23,7 @@
 #include "creation/material.hpp"
 
 Material::Material() :
-	vnum(),
-	type(MaterialType::None),
-	name(),
-	article(),
-	worth(),
-	hardness(),
-	lightness()
+	vnum(), type(MaterialType::None), name(), article(), worth(), hardness(), lightness()
 {
 	// Nothing to do.
 }

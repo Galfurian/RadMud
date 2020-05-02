@@ -75,8 +75,7 @@ public:
 	/// @param data   The unsigned integer retrieved from the cell.
 	/// @return <b>True</b> if the data has been retrieved,<br>
 	///         <b>False</b> otherwise.
-	virtual bool getDataUnsignedInteger(const int &column,
-										unsigned int &data) = 0;
+	virtual bool getDataUnsignedInteger(const int &column, unsigned int &data) = 0;
 
 	/// @brief Get the given column data as a double.
 	/// @param column The number of the column.

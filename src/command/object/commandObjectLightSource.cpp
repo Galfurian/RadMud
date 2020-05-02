@@ -43,16 +43,14 @@ bool DoTurn(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	auto searchOptions = SearchOptionsCharacter::allOptions();
-	auto item = FindNearbyItem(character, args[0].getContent(),
-							   args[0].getIndex(), nullptr, searchOptions);
+	auto item =
+		FindNearbyItem(character, args[0].getContent(), args[0].getIndex(), nullptr, searchOptions);
 	if (item == nullptr) {
-		character->sendMsg("You don't see '%s' anywhere.\n",
-						   args[0].getContent());
+		character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
 		return false;
 	}
 	if (item->getType() != ModelType::Light) {
-		character->sendMsg("%s is not a light source.\n",
-						   item->getNameCapital(true));
+		character->sendMsg("%s is not a light source.\n", item->getNameCapital(true));
 		return false;
 	}
 	// Cast the item to light.
@@ -70,8 +68,7 @@ bool DoTurn(Character *character, ArgumentHandler &args)
 	}
 	// Check if the item can be simply turned on and off.
 	if (HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle)) {
-		character->sendMsg("You cannot simply turn on %s.\n",
-						   item->getName(true));
+		character->sendMsg("You cannot simply turn on %s.\n", item->getName(true));
 		return false;
 	}
 	if (lightItem->getAutonomy() > 0) {
@@ -108,36 +105,28 @@ bool DoKindle(Character *character, ArgumentHandler &args)
 	auto inventoryIsLit = character->inventoryIsLit();
 	// If the room is lit.
 	if (roomIsLit) {
-		lightSource =
-			character->findNearbyItem(args[0].getContent(), args[0].getIndex());
-		ignitionSource =
-			character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+		lightSource = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+		ignitionSource = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
 	} else if (inventoryIsLit) {
 		// If the room is not lit but the inventory is.
-		lightSource = character->findInventoryItem(args[0].getContent(),
-												   args[0].getIndex());
-		ignitionSource = character->findInventoryItem(args[1].getContent(),
-													  args[1].getIndex());
+		lightSource = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+		ignitionSource = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
 	} else if (!character->inventory.empty()) {
 		// If its pitch black, get random items from the inventory.
 		auto inventorySize(character->inventory.size() - 1);
 		lightSource = character->inventory.at(TRand<size_t>(0, inventorySize));
-		ignitionSource =
-			character->inventory.at(TRand<size_t>(0, inventorySize));
+		ignitionSource = character->inventory.at(TRand<size_t>(0, inventorySize));
 	}
 	if (lightSource == nullptr) {
-		character->sendMsg("You don't see '%s' anywhere.\n",
-						   args[0].getContent());
+		character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
 		return false;
 	}
 	if (lightSource->getType() != ModelType::Light) {
-		character->sendMsg("%s is not a light source.\n",
-						   lightSource->getNameCapital(true));
+		character->sendMsg("%s is not a light source.\n", lightSource->getNameCapital(true));
 		return false;
 	}
 	if (ignitionSource == nullptr) {
-		character->sendMsg("You don't see '%s' anywhere.\n",
-						   args[1].getContent());
+		character->sendMsg("You don't see '%s' anywhere.\n", args[1].getContent());
 		return false;
 	}
 	bool canUseToIgnite = false;
@@ -154,8 +143,8 @@ bool DoKindle(Character *character, ArgumentHandler &args)
 		auto lightModel = lightItem->model->to<LightModel>();
 		// Check if the ignition source is active AND is a light source which
 		// is activated through manual kindling.
-		if (lightItem->isActive() && HasFlag(lightModel->lightSourceFlags,
-											 LightModelFlags::NeedToKindle)) {
+		if (lightItem->isActive() &&
+			HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle)) {
 			canUseToIgnite = true;
 		}
 	}
@@ -172,23 +161,19 @@ bool DoKindle(Character *character, ArgumentHandler &args)
 	// Check if the item can be simply turned on and off.
 	if (!HasFlag(lightModel->lightSourceFlags, LightModelFlags::NeedToKindle) ||
 		HasFlag(lightModel->lightSourceFlags, LightModelFlags::AlwaysActive)) {
-		character->sendMsg("%s cannot be kindled.\n",
-						   lightItem->getNameCapital(true));
+		character->sendMsg("%s cannot be kindled.\n", lightItem->getNameCapital(true));
 		return false;
 	}
 	if (lightItem->active) {
-		character->sendMsg("%s is already kindled.\n",
-						   lightItem->getNameCapital(true));
+		character->sendMsg("%s is already kindled.\n", lightItem->getNameCapital(true));
 		return false;
 	} else {
 		if (lightItem->getAutonomy() > 0) {
-			character->sendMsg("You kindled %s using %s.\n",
-							   lightItem->getName(true),
+			character->sendMsg("You kindled %s using %s.\n", lightItem->getName(true),
 							   ignitionSource->getName(true));
 			lightItem->active = true;
 		} else {
-			character->sendMsg("%s cannot be kindled.\n",
-							   lightItem->getNameCapital(true));
+			character->sendMsg("%s cannot be kindled.\n", lightItem->getNameCapital(true));
 			return false;
 		}
 	}
@@ -217,16 +202,12 @@ bool DoRefill(Character *character, ArgumentHandler &args)
 	auto inventoryIsLit = character->inventoryIsLit();
 	// If the room is lit.
 	if (roomIsLit) {
-		item =
-			character->findNearbyItem(args[0].getContent(), args[0].getIndex());
-		fuel =
-			character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+		item = character->findNearbyItem(args[0].getContent(), args[0].getIndex());
+		fuel = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
 	} else if (inventoryIsLit) {
 		// If the room is not lit but the inventory is.
-		item = character->findInventoryItem(args[0].getContent(),
-											args[0].getIndex());
-		fuel = character->findInventoryItem(args[1].getContent(),
-											args[1].getIndex());
+		item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+		fuel = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
 	} else {
 		character->sendMsg("You can't do that without seeing,"
 						   "you could waste most of the fuel.\n");
@@ -262,11 +243,10 @@ bool DoRefill(Character *character, ArgumentHandler &args)
 		// Put the item inside the container.
 		lightSource->putInside(fuel);
 		// Send the messages.
-		character->sendMsg("You refill %s with %s.\n",
-						   lightSource->getName(true), fuel->getName(true));
+		character->sendMsg("You refill %s with %s.\n", lightSource->getName(true),
+						   fuel->getName(true));
 		character->room->sendToAll("%s refills %s with %s.\n", { character },
-								   character->getNameCapital(),
-								   lightSource->getName(true),
+								   character->getNameCapital(), lightSource->getName(true),
 								   fuel->getName(true));
 	} else {
 		// Remove from the stack.
@@ -281,11 +261,10 @@ bool DoRefill(Character *character, ArgumentHandler &args)
 		// Put the stack inside the container.
 		lightSource->putInside(newStack);
 		// Send the messages.
-		character->sendMsg("You put refill %s with part of %s.\n",
-						   lightSource->getName(true), fuel->getName(true));
-		character->room->sendToAll("%s refills %s with part of %s.\n",
-								   { character }, character->getNameCapital(),
-								   lightSource->getName(true),
+		character->sendMsg("You put refill %s with part of %s.\n", lightSource->getName(true),
+						   fuel->getName(true));
+		character->room->sendToAll("%s refills %s with part of %s.\n", { character },
+								   character->getNameCapital(), lightSource->getName(true),
 								   fuel->getName(true));
 	}
 	// Conclude the transaction.

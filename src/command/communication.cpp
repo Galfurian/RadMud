@@ -28,24 +28,23 @@
 
 void LoadCommunicationCommands()
 {
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoSay, "say", "[someone] (something)",
-		"Talk to people in the current room.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoWhisper, "whisper", "(someone) (something)",
-		"Whisper secretly to a single character.", false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(DoSay, "say", "[someone] (something)",
+														 "Talk to people in the current room.",
+														 false, true, false));
 	Mud::instance().addCommand(
-		std::make_shared<Command>(DoEmote, "emote", "(emotion)",
-								  "Express an emotion.", false, true, false));
+		std::make_shared<Command>(DoWhisper, "whisper", "(someone) (something)",
+								  "Whisper secretly to a single character.", false, true, false));
+	Mud::instance().addCommand(std::make_shared<Command>(
+		DoEmote, "emote", "(emotion)", "Express an emotion.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
 		DoBug, "bug", "(message)",
-		"Report a bug, your character's name, location and date will be saved.",
-		false, true, false));
+		"Report a bug, your character's name, location and date will be saved.", false, true,
+		false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoIdea, "idea", "(message)",
-		"Send an idea, try to be as clear as possible.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoTypo, "typo", "(message)", "Report a typo.", false, true, false));
+		DoIdea, "idea", "(message)", "Send an idea, try to be as clear as possible.", false, true,
+		false));
+	Mud::instance().addCommand(std::make_shared<Command>(DoTypo, "typo", "(message)",
+														 "Report a typo.", false, true, false));
 }
 
 bool DoSay(Character *character, ArgumentHandler &args)
@@ -60,48 +59,39 @@ bool DoSay(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Check if the character are talking to another character.
-	auto receiver = character->room->findCharacter(args.get(0).getContent(),
-												   args.get(0).getIndex(),
+	auto receiver = character->room->findCharacter(args.get(0).getContent(), args.get(0).getIndex(),
 												   nullptr, { character });
 	if (receiver != nullptr) {
 		// Get the rest of the message, minus the first word.
 		auto message = args.substr(1);
 		if (message.empty()) {
-			character->sendMsg("My dear friend, say what to %s?\n",
-							   receiver->getName());
+			character->sendMsg("My dear friend, say what to %s?\n", receiver->getName());
 			return false;
 		}
 		// Eat the space between the name and the message.
 		message = Trim(message, " ");
 		// Player send.
 		character->sendMsg("You say to %s, \"%s\"\n", receiver->getName(),
-						   Formatter::cyan() + Formatter::italic() + message +
-							   Formatter::reset());
+						   Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 		// Target receive.
-		receiver->sendMsg("%s say to you, \"%s\"\n\n",
-						  character->getNameCapital(),
-						  Formatter::cyan() + Formatter::italic() + message +
-							  Formatter::reset());
+		receiver->sendMsg("%s say to you, \"%s\"\n\n", character->getNameCapital(),
+						  Formatter::cyan() + Formatter::italic() + message + Formatter::reset());
 		// Send the message inside the room.
-		character->room->sendToAll("%s says to %s, \"%s\".\n",
-								   { character, receiver },
-								   character->getNameCapital(),
-								   receiver->getName(),
-								   Formatter::cyan() + Formatter::italic() +
-									   message + Formatter::reset());
+		character->room->sendToAll("%s says to %s, \"%s\".\n", { character, receiver },
+								   character->getNameCapital(), receiver->getName(),
+								   Formatter::cyan() + Formatter::italic() + message +
+									   Formatter::reset());
 		// If it's a mobile, activate the trigger.
 		if (receiver->isMobile()) {
 			receiver->toMobile()->triggerEventMessage(character, message);
 		}
 	} else {
-		character->sendMsg("You say \"%s\".\n",
-						   Formatter::cyan() + Formatter::italic() +
-							   args.getOriginal() + Formatter::reset());
+		character->sendMsg("You say \"%s\".\n", Formatter::cyan() + Formatter::italic() +
+													args.getOriginal() + Formatter::reset());
 		// Send the message inside the room.
-		character->room->sendToAll("%s says \"%s\".\n", { character },
-								   character->getNameCapital(),
-								   Formatter::cyan() + Formatter::italic() +
-									   args.getOriginal() + Formatter::reset());
+		character->room->sendToAll("%s says \"%s\".\n", { character }, character->getNameCapital(),
+								   Formatter::cyan() + Formatter::italic() + args.getOriginal() +
+									   Formatter::reset());
 	}
 	return true;
 }
@@ -118,8 +108,8 @@ bool DoWhisper(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Check the existence of the target character.
-	auto receiver = character->room->findCharacter(
-		args[0].getContent(), args[0].getIndex(), nullptr, { character });
+	auto receiver = character->room->findCharacter(args[0].getContent(), args[0].getIndex(),
+												   nullptr, { character });
 	if (receiver == nullptr) {
 		character->sendMsg("You don't see %s here.\n", args[0].getContent());
 		return false;
@@ -127,19 +117,16 @@ bool DoWhisper(Character *character, ArgumentHandler &args)
 	// Retrieve the message.
 	auto message = args.substr(1);
 	if (message.empty()) {
-		character->sendMsg("What do you want to whisper to %s?\n",
-						   receiver->getName());
+		character->sendMsg("What do you want to whisper to %s?\n", receiver->getName());
 		return false;
 	}
 	// Check if the sender is invisible.
-	auto sender =
-		(receiver->canSee(character)) ? "Someone" : character->getNameCapital();
+	auto sender = (receiver->canSee(character)) ? "Someone" : character->getNameCapital();
 	// Send the message.
 	character->sendMsg("%sYou whisper to %s, %s\"%s\".\n", Formatter::magenta(),
 					   receiver->getName(), Formatter::reset(), message);
-	receiver->sendMsg("%s whisper to you, %s\"%s\"\n\n",
-					  Formatter::magenta() + sender, Formatter::reset(),
-					  message);
+	receiver->sendMsg("%s whisper to you, %s\"%s\"\n\n", Formatter::magenta() + sender,
+					  Formatter::reset(), message);
 	return true;
 }
 
@@ -155,10 +142,8 @@ bool DoEmote(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Send the messages.
-	character->sendMsg("%sYou %s\n", Formatter::yellow(),
-					   args.getOriginal() + Formatter::reset());
-	character->room->sendToAll("%s %s\n", { character },
-							   Formatter::yellow() + character->getName(),
+	character->sendMsg("%sYou %s\n", Formatter::yellow(), args.getOriginal() + Formatter::reset());
+	character->room->sendToAll("%s %s\n", { character }, Formatter::yellow() + character->getName(),
 							   args.getOriginal() + Formatter::reset());
 	return true;
 }

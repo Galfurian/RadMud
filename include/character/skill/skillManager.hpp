@@ -47,8 +47,7 @@ public:
 	/// @param skill        A pointer to the skill.
 	/// @param skillLevel   The initial level of the skill.
 	/// @return The outcome.
-	bool addSkill(const std::shared_ptr<Skill> &skill,
-				  const unsigned int &skillLevel = 1);
+	bool addSkill(const std::shared_ptr<Skill> &skill, const unsigned int &skillLevel = 1);
 
 	/// @brief Finds the given skill data.
 	/// @param vnum The vnum of the skill.
@@ -80,8 +79,7 @@ public:
 	void improveKnowledge(const Knowledge &knowledge);
 
 private:
-	inline std::shared_ptr<SkillEffect>
-	getSkillEffect(const std::shared_ptr<SkillData> &skillData)
+	inline std::shared_ptr<SkillEffect> getSkillEffect(const std::shared_ptr<SkillData> &skillData)
 	{
 		for (const auto &it : skillEffects)
 			if (it->skillData == skillData)
@@ -94,8 +92,7 @@ private:
 	{
 		auto skillEffect = this->getSkillEffect(skillData);
 		if (skillEffect == nullptr) {
-			skillEffect = std::make_shared<SkillEffect>(
-				owner, skillData->skill->name, skillData);
+			skillEffect = std::make_shared<SkillEffect>(owner, skillData->skill->name, skillData);
 			skillEffects.emplace_back(skillEffect);
 		}
 		return skillEffect;

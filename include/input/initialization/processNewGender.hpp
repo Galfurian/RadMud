@@ -25,8 +25,7 @@
 class ProcessNewGender : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessNewGender(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessNewGender(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

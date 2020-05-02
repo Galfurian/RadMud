@@ -55,12 +55,7 @@ private:
 public:
 	/// @brief Constructor.
 	AStarNode(T _element) :
-		PathFinderNode<T>(_element),
-		nodeState(),
-		g(),
-		h(),
-		parentNode(),
-		endNodeFlag()
+		PathFinderNode<T>(_element), nodeState(), g(), h(), parentNode(), endNodeFlag()
 	{
 		// Nothing to do.
 	}

@@ -53,12 +53,10 @@ bool ArmorModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 3) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Armor Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Armor Model (%s).", name);
 		return false;
 	}
-	this->size =
-		static_cast<ArmorSize>(ToNumber<unsigned int>(functionList[0]));
+	this->size = static_cast<ArmorSize>(ToNumber<unsigned int>(functionList[0]));
 	this->armorClass = ToNumber<unsigned int>(functionList[1]);
 	this->allowedAnatomy = ToNumber<unsigned int>(functionList[2]);
 	return true;

@@ -51,20 +51,16 @@ Effect clearTargets(Character *actor, const unsigned int &duration);
 /// @param duration          The duration in TIC of the effect.
 /// @param negativeMagnitude The magnitude of the disturbance.
 /// @return The created effect.
-Effect disturbedAim(Character *actor, const unsigned int &duration,
-					const int &negativeMagnitude);
+Effect disturbedAim(Character *actor, const unsigned int &duration, const int &negativeMagnitude);
 
 /// @brief Reduce health over time due to poisoning.
 /// @param actor    The character affected by the effect.
 /// @param duration The duration in TIC of the effect.
 /// @param damage   The magnitude of the damage.
 /// @return The created effect.
-Effect poisonDamage(Character *actor, std::string const &name,
-					const unsigned int &delay, const unsigned int &duration,
-					std::string const &messageActivate,
-					std::string const &messagePeriodic,
-					std::string const &messageExpire,
-					std::string const &messageDeath,
-					const unsigned int &damage);
+Effect poisonDamage(Character *actor, std::string const &name, const unsigned int &delay,
+					const unsigned int &duration, std::string const &messageActivate,
+					std::string const &messagePeriodic, std::string const &messageExpire,
+					std::string const &messageDeath, const unsigned int &damage);
 
 } // namespace EffectFactory

@@ -27,16 +27,7 @@
 #include "structure/structureDefines.hpp"
 
 Area::Area() :
-	vnum(),
-	name(),
-	builder(),
-	map(),
-	width(),
-	height(),
-	elevation(),
-	tileSet(),
-	type(),
-	status()
+	vnum(), name(), builder(), map(), width(), height(), elevation(), tileSet(), type(), status()
 {
 }
 
@@ -107,8 +98,7 @@ CharacterVector Area::getCharactersAt(const CharacterVector &exceptions,
 	return characterContainer;
 }
 
-ItemVector Area::getItemsAt(const ItemVector &exceptions,
-							const Coordinates &coordinates)
+ItemVector Area::getItemsAt(const ItemVector &exceptions, const Coordinates &coordinates)
 {
 	ItemVector itemContainer;
 	if (this->isValid(coordinates)) {
@@ -129,14 +119,12 @@ bool Area::addRoom(Room *room)
 			room->area = this;
 			return true;
 		} else {
-			MudLog(LogLevel::Error,
-						"Room's insertion could not be completed %s.",
-						room->coord.toString());
+			MudLog(LogLevel::Error, "Room's insertion could not be completed %s.",
+				   room->coord.toString());
 		}
 	} else {
-		MudLog(LogLevel::Error,
-					"Room's coordinates are not inside the boundaries %s.",
-					room->coord.toString());
+		MudLog(LogLevel::Error, "Room's coordinates are not inside the boundaries %s.",
+			   room->coord.toString());
 	}
 	return false;
 }
@@ -182,12 +170,9 @@ std::vector<std::string> Area::drawFov(Room *centerRoom, const int &radius)
 	int origin_z = centerRoom->coord.z;
 	// Evaluate the minimum and maximum value for x and y.
 	int min_x = (origin_x < radius) ? 0 : (origin_x - radius);
-	int max_x =
-		((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
+	int max_x = ((origin_x + radius) > this->width) ? this->width : (origin_x + radius);
 	int min_y = (origin_y < radius) ? 0 : (origin_y - radius);
-	int max_y = ((origin_y + radius - 1) > this->height) ?
-					this->height :
-					(origin_y + radius - 1);
+	int max_y = ((origin_y + radius - 1) > this->height) ? this->height : (origin_y + radius - 1);
 	// Evaluate the field of view.
 	auto coordinatesInFov = StructUtils::fov(centerRoom->coord, radius, this);
 	// Prepare Environment layer.
@@ -213,21 +198,17 @@ std::vector<std::string> Area::drawFov(Room *centerRoom, const int &radius)
 				if ((up != nullptr) && (down != nullptr)) {
 					if (HasFlag(up->flags, ExitFlag::Stairs) &&
 						HasFlag(down->flags, ExitFlag::Stairs)) {
-						tileCode =
-							ToString(18) + ":" + ToString(this->tileSet + 1);
+						tileCode = ToString(18) + ":" + ToString(this->tileSet + 1);
 					}
 				} else if (up != nullptr) {
 					if (HasFlag(up->flags, ExitFlag::Stairs)) {
-						tileCode =
-							ToString(18) + ":" + ToString(this->tileSet + 1);
+						tileCode = ToString(18) + ":" + ToString(this->tileSet + 1);
 					}
 				} else if (down != nullptr) {
 					if (HasFlag(down->flags, ExitFlag::Stairs)) {
-						tileCode =
-							ToString(18) + ":" + ToString(this->tileSet + 0);
+						tileCode = ToString(18) + ":" + ToString(this->tileSet + 0);
 					} else {
-						tileCode =
-							ToString(18) + ":" + ToString(this->tileSet + 4);
+						tileCode = ToString(18) + ":" + ToString(this->tileSet + 4);
 					}
 				}
 			}
@@ -293,8 +274,7 @@ std::vector<std::string> Area::drawFov(Room *centerRoom, const int &radius)
 				// Check if there are creatures in the tile.
 				if (!room->characters.empty()) {
 					for (auto iterator : room->characters) {
-						if (!HasFlag(iterator->flags,
-									 CharacterFlag::Invisible)) {
+						if (!HasFlag(iterator->flags, CharacterFlag::Invisible)) {
 							tileCode = iterator->race->getTile();
 							break;
 						}
@@ -311,8 +291,7 @@ std::vector<std::string> Area::drawFov(Room *centerRoom, const int &radius)
 	return layers;
 }
 
-std::string Area::drawASCIIFov(Room *centerRoom, const int &radius,
-							   double const &origin_height)
+std::string Area::drawASCIIFov(Room *centerRoom, const int &radius, double const &origin_height)
 {
 	if (!this->inBoundaries(centerRoom->coord)) {
 		return "";
@@ -327,8 +306,7 @@ std::string Area::drawASCIIFov(Room *centerRoom, const int &radius,
 	//int min_z = (centerRoom->coord.z - radius);
 	//int max_z = (centerRoom->coord.z + radius);
 	// Evaluate the field of view.
-	auto view =
-		StructUtils::fov3d(centerRoom->coord, this, radius, origin_height);
+	auto view = StructUtils::fov3d(centerRoom->coord, this, radius, origin_height);
 	// Draw the fov.
 	Coordinates point = centerRoom->coord;
 	for (point.y = max_y; point.y >= min_y; --point.y) {
@@ -397,8 +375,7 @@ std::string Area::getASCIICell(Room *room)
 	auto up = room->findExit(Direction::Up);
 	auto down = room->findExit(Direction::Down);
 	if ((up != nullptr) && (down != nullptr)) {
-		if (HasFlag(up->flags, ExitFlag::Stairs) &&
-			HasFlag(down->flags, ExitFlag::Stairs)) {
+		if (HasFlag(up->flags, ExitFlag::Stairs) && HasFlag(down->flags, ExitFlag::Stairs)) {
 			tile = 'X';
 		}
 	} else if (up != nullptr) {
@@ -427,21 +404,18 @@ std::string Area::getASCIICell(Room *room)
 	return tile;
 }
 
-CharacterVector Area::getCharactersInSight(CharacterVector &exceptions,
-										   Coordinates &origin,
+CharacterVector Area::getCharactersInSight(CharacterVector &exceptions, Coordinates &origin,
 										   const int &radius)
 {
 	CharacterVector characterContainer;
 	auto validCoordinates = StructUtils::fov(origin, radius, this);
 	for (auto coordinates : validCoordinates) {
-		characterContainer.addUnique(
-			this->getCharactersAt(exceptions, coordinates));
+		characterContainer.addUnique(this->getCharactersAt(exceptions, coordinates));
 	}
 	return characterContainer;
 }
 
-ItemVector Area::getItemsInSight(ItemVector &exceptions, Coordinates &origin,
-								 const int &radius)
+ItemVector Area::getItemsInSight(ItemVector &exceptions, Coordinates &origin, const int &radius)
 {
 	ItemVector foundItems;
 	auto validCoordinates = StructUtils::fov(origin, radius, this);

@@ -60,8 +60,7 @@ void Faction::getSheet(Table &sheet) const
 	sheet.addRow({ "Vnum", ToString(this->vnum) });
 	sheet.addRow({ "Name", this->name });
 	sheet.addRow({ "Description", this->description });
-	sheet.addRow({ "Currency", currency->getName() + " (" +
-								   ToString(currency->vnum) + ")" });
+	sheet.addRow({ "Currency", currency->getName() + " (" + ToString(currency->vnum) + ")" });
 }
 
 std::string Faction::getName()

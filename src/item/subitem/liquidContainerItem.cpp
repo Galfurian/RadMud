@@ -68,12 +68,10 @@ std::string LiquidContainerItem::lookContent()
 		return ss.str();
 	}
 	int percent = 0;
-	if (HasFlag(model->to<LiquidContainerModel>()->liquidFlags,
-				LiqContainerFlag::Endless)) {
+	if (HasFlag(model->to<LiquidContainerModel>()->liquidFlags, LiqContainerFlag::Endless)) {
 		percent = 100;
 	} else if (this->getUsedSpace() > 0) {
-		percent = static_cast<int>((100.0 * this->getUsedSpace()) /
-								   this->getTotalSpace());
+		percent = static_cast<int>((100.0 * this->getUsedSpace()) / this->getTotalSpace());
 	}
 	ss << ((percent >= 100) ?
 			   "It's full of " :
@@ -83,8 +81,7 @@ std::string LiquidContainerItem::lookContent()
 			   "Contains a discrete amount of " :
 			   (percent >= 25) ?
 			   "It contains a little bit of " :
-			   (percent >= 0) ? "It contains some drops of " :
-								"It's empty, but you can see some ")
+			   (percent >= 0) ? "It contains some drops of " : "It's empty, but you can see some ")
 	   << Formatter::cyan(liquidContent->getName()) << ".\n";
 	return ss.str();
 }
@@ -112,8 +109,8 @@ double LiquidContainerItem::getUsedSpace() const
 	return liquidQuantity;
 }
 
-bool LiquidContainerItem::canContainLiquid(
-	Liquid *newLiquidContent, const double &newLiquidQuantity) const
+bool LiquidContainerItem::canContainLiquid(Liquid *newLiquidContent,
+										   const double &newLiquidQuantity) const
 {
 	if (newLiquidQuantity > this->getFreeSpace()) {
 		return false;
@@ -124,8 +121,8 @@ bool LiquidContainerItem::canContainLiquid(
 	return true;
 }
 
-bool LiquidContainerItem::pourIn(Liquid *newLiquidContent,
-								 const double &quantityToPourIn, bool updateDB)
+bool LiquidContainerItem::pourIn(Liquid *newLiquidContent, const double &quantityToPourIn,
+								 bool updateDB)
 {
 	if (!this->canContainLiquid(newLiquidContent, quantityToPourIn)) {
 		return false;
@@ -141,23 +138,20 @@ bool LiquidContainerItem::pourIn(Liquid *newLiquidContent,
 	// Prepare the query arguments.
 	if (updateDB) {
 		SQLiteDbms::instance().insertInto("ItemLiquidContent",
-										  { ToString(vnum),
-											ToString(liquidContent->vnum),
+										  { ToString(vnum), ToString(liquidContent->vnum),
 											ToString(liquidQuantity) },
 										  false, true);
 	}
 	return true;
 }
 
-bool LiquidContainerItem::pourOut(const double &quantityToPourOut,
-								  bool updateDB)
+bool LiquidContainerItem::pourOut(const double &quantityToPourOut, bool updateDB)
 {
 	if (model->getType() != ModelType::LiquidContainer) {
 		return false;
 	}
 	// If the item has an Endless provision of liquid, don't do any check.
-	if (HasFlag(model->to<LiquidContainerModel>()->liquidFlags,
-				LiqContainerFlag::Endless)) {
+	if (HasFlag(model->to<LiquidContainerModel>()->liquidFlags, LiqContainerFlag::Endless)) {
 		return true;
 	}
 	// Check if the container has the necessary amount of liquid.
@@ -169,8 +163,7 @@ bool LiquidContainerItem::pourOut(const double &quantityToPourOut,
 			if (liquidQuantity < 0.1) {
 				QueryList where;
 				where.emplace_back(std::make_pair("container", ToString(vnum)));
-				where.emplace_back(
-					std::make_pair("content", ToString(liquidContent->vnum)));
+				where.emplace_back(std::make_pair("content", ToString(liquidContent->vnum)));
 				// If the container is empty, remove the entry from
 				//  the liquid contained table.
 				SQLiteDbms::instance().deleteFrom("ItemLiquidContent", where);
@@ -178,11 +171,10 @@ bool LiquidContainerItem::pourOut(const double &quantityToPourOut,
 				liquidContent = nullptr;
 				liquidQuantity = 0.0;
 			} else {
-				SQLiteDbms::instance().insertInto(
-					"ItemLiquidContent",
-					{ ToString(vnum), ToString(liquidContent->vnum),
-					  ToString(liquidQuantity) },
-					false, true);
+				SQLiteDbms::instance().insertInto("ItemLiquidContent",
+												  { ToString(vnum), ToString(liquidContent->vnum),
+													ToString(liquidQuantity) },
+												  false, true);
 			}
 		}
 		return true;

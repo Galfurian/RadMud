@@ -25,8 +25,7 @@
 class ProcessNewAge : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessNewAge(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessNewAge(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

@@ -63,27 +63,23 @@ void LightItem::getSheet(Table &sheet) const
 	// Add a divider.
 	sheet.addDivider();
 	// Set the values.
-	sheet.addRow(
-		{ "Remaining Autonomy", ToString(this->getAutonomy()) + " h" });
+	sheet.addRow({ "Remaining Autonomy", ToString(this->getAutonomy()) + " h" });
 }
 
 std::string LightItem::lookContent()
 {
 	std::string output;
-	auto autonomyInHour =
-		this->getAutonomy() / MudUpdater::instance().getHourTicSize();
+	auto autonomyInHour = this->getAutonomy() / MudUpdater::instance().getHourTicSize();
 	output += Formatter::italic();
 	if (model->to<LightModel>()->fuelType == ResourceType::None) {
 		if (!HasFlag(model->modelFlags, ModelFlag::Unbreakable)) {
-			output += "It should have an autonomy of " +
-					  ToString(autonomyInHour) + "h.\n";
+			output += "It should have an autonomy of " + ToString(autonomyInHour) + "h.\n";
 		}
 	} else {
 		if (content.empty()) {
 			output += "It does not contain any fuel.\n";
 		} else {
-			output += "It contains enough fuel for " +
-					  ToString(autonomyInHour) + "h.\n";
+			output += "It contains enough fuel for " + ToString(autonomyInHour) + "h.\n";
 		}
 	}
 	if (this->isActive()) {
@@ -105,8 +101,8 @@ double LightItem::getTotalSpace() const
 
 bool LightItem::isActive() const
 {
-	return active || HasFlag(model->to<LightModel>()->lightSourceFlags,
-							 LightModelFlags::AlwaysActive);
+	return active ||
+		   HasFlag(model->to<LightModel>()->lightSourceFlags, LightModelFlags::AlwaysActive);
 }
 
 bool LightItem::canRefillWith(Item *item, std::string &error) const
@@ -116,30 +112,25 @@ bool LightItem::canRefillWith(Item *item, std::string &error) const
 		return false;
 	}
 	if (item->getType() != ModelType::Resource) {
-		error = "You can't refill " + this->getName(true) + " with " +
-				item->getName(true);
+		error = "You can't refill " + this->getName(true) + " with " + item->getName(true);
 		return false;
 	}
 	if (model->getType() != ModelType::Light) {
-		error = "You can't refill " + this->getName(true) + " with " +
-				item->getName(true);
+		error = "You can't refill " + this->getName(true) + " with " + item->getName(true);
 		return false;
 	}
 	if (model->to<LightModel>()->fuelType == ResourceType::None) {
 		error = this->getNameCapital(true) + " is not meant to be refilled.";
 		return false;
 	}
-	if (model->to<LightModel>()->fuelType !=
-		item->model->to<ResourceModel>()->resourceType) {
-		error = "You can't refill " + this->getName(true) + " with " +
-				item->getName(true);
+	if (model->to<LightModel>()->fuelType != item->model->to<ResourceModel>()->resourceType) {
+		error = "You can't refill " + this->getName(true) + " with " + item->getName(true);
 		return false;
 	}
 	return true;
 }
 
-bool LightItem::getAmountToRefill(Item *item, unsigned int &amount,
-								  std::string &error) const
+bool LightItem::getAmountToRefill(Item *item, unsigned int &amount, std::string &error) const
 {
 	if (!this->canRefillWith(item, error)) {
 		return false;
@@ -155,8 +146,7 @@ bool LightItem::getAmountToRefill(Item *item, unsigned int &amount,
 	}
 	// Check if the weight of the fuel exceeds the available space.
 	if ((maxWeight - contentWeight) < fuelWeight) {
-		MudLog(LogLevel::Debug, "(%f - %f) < %f", maxWeight, contentWeight,
-			   fuelWeight);
+		MudLog(LogLevel::Debug, "(%f - %f) < %f", maxWeight, contentWeight, fuelWeight);
 		error = this->getNameCapital(true) + " is already at full capacity.";
 		return false;
 	}

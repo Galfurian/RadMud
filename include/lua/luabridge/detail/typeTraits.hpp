@@ -80,8 +80,7 @@ struct TypeTraits {
 		template <typename> static yes &test(...);
 
 	public:
-		static const bool value =
-			sizeof(test<ContainerTraits<T> >(0)) == sizeof(yes);
+		static const bool value = sizeof(test<ContainerTraits<T> >(0)) == sizeof(yes);
 	};
 
 	/** Determine if T is an enum */

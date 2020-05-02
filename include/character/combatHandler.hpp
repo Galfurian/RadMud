@@ -41,8 +41,7 @@ public:
 		/// @param _aggressor  The aggressor.
 		/// @param _aggression The aggro level.
 		Aggression(Character *_aggressor, unsigned int _aggression) :
-			aggressor(_aggressor),
-			aggression(_aggression)
+			aggressor(_aggressor), aggression(_aggression)
 		{
 			/// Nothing to do.
 		}

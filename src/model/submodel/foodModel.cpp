@@ -52,8 +52,7 @@ bool FoodModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 2) {
-		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Food Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Food Model (%s).", name);
 		return false;
 	}
 	nurishment = ToNumber<unsigned int>(functionList[0]);

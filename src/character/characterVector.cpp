@@ -24,8 +24,7 @@
 #include "character/player.hpp"
 #include "character/mobile.hpp"
 
-static inline bool IsAnException(Character *character,
-								 std::vector<Character *> const &ex)
+static inline bool IsAnException(Character *character, std::vector<Character *> const &ex)
 {
 	return std::find_if(ex.begin(), ex.end(), [&character](Character *other) {
 			   return other->getName() == character->getName();
@@ -37,16 +36,14 @@ CharacterVector::CharacterVector()
 	// Nothing to do.
 }
 
-Character *
-CharacterVector::findCharacter(const std::string &target, unsigned int number,
-							   unsigned int *number_ptr,
-							   const std::vector<Character *> &exceptions,
-							   bool skipMobile, bool skipPlayer) const
+Character *CharacterVector::findCharacter(const std::string &target, unsigned int number,
+										  unsigned int *number_ptr,
+										  const std::vector<Character *> &exceptions,
+										  bool skipMobile, bool skipPlayer) const
 {
 	Character *found_character = nullptr;
 	for (auto character : (*this)) {
-		if ((skipMobile && character->isMobile()) ||
-			(skipPlayer && character->isPlayer())) {
+		if ((skipMobile && character->isMobile()) || (skipPlayer && character->isPlayer())) {
 			continue;
 		}
 		if (IsAnException(character, exceptions))
@@ -62,8 +59,7 @@ CharacterVector::findCharacter(const std::string &target, unsigned int number,
 			}
 		} else {
 			if (character->toPlayer()->isPlaying()) {
-				if (BeginWith(character->toPlayer()->getName(),
-							  ToLower(target))) {
+				if (BeginWith(character->toPlayer()->getName(), ToLower(target))) {
 					if (number == 1) {
 						found_character = character;
 						break;

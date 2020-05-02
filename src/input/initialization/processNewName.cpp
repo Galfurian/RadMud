@@ -42,14 +42,12 @@ bool ProcessNewName::process(ArgumentHandler &args)
 		// Advance to the next step.
 		newStep->rollBack();
 		return true;
-	} else if (input.find_first_not_of(VALID_CHARACTERS_NAME) !=
-			   std::string::npos) {
+	} else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos) {
 		error = "That player name contains disallowed characters.";
 		this->advance();
 	}
 	// Check for bad names here.
-	else if (Mud::instance().badNames.find(input) !=
-			 Mud::instance().badNames.end()) {
+	else if (Mud::instance().badNames.find(input) != Mud::instance().badNames.end()) {
 		error = "That name is not permitted.";
 		this->advance();
 	}
@@ -82,8 +80,7 @@ void ProcessNewName::advance()
 	ss << "# Choose carefully, because this it's the only chance you have";
 	ss << " to pick a legendary name, maybe one day it will";
 	ss << " be whispered all over the lands.\n";
-	ss << "# Type [" + Formatter::magenta("back")
-	   << "] to return to the previous step.\n";
+	ss << "# Type [" + Formatter::magenta("back") << "] to return to the previous step.\n";
 	character->sendMsg(ss.str());
 	this->printError();
 }

@@ -25,8 +25,7 @@
 class ProcessNewPassword : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessNewPassword(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessNewPassword(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

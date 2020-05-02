@@ -36,16 +36,15 @@ bool OpenLog(const std::string &filename);
 /// @brief Print to console and to logging file the given string.
 /// @param level  The category of the message.
 /// @param msg    The message to log.
-void _mudlog(const char *file, int line, const LogLevel &level,
-			 const std::string &msg);
+void _mudlog(const char *file, int line, const LogLevel &level, const std::string &msg);
 
 /// @brief Print to consol and to logging file the given string.
 /// @param level The category of the message.
 /// @param msg   The message to log.
 /// @param args  Packed arguments.
 template <typename... Args>
-void _mudlog(const char *file, int line, const LogLevel &level,
-			 std::string const &fmt, const Args &... args)
+void _mudlog(const char *file, int line, const LogLevel &level, std::string const &fmt,
+			 const Args &... args)
 {
 	std::stringstream ss;
 	tfm::format(ss, fmt.c_str(), args...);

@@ -27,8 +27,7 @@
 bool DoShutdown(Character *character, ArgumentHandler &)
 {
 	// Send message to all the players.
-	Mud::instance().broadcastMsg(0, character->getNameCapital() +
-										" has shut down the game!");
+	Mud::instance().broadcastMsg(0, character->getNameCapital() + " has shut down the game!");
 	Mud::instance().shutDownSignal();
 	return true;
 }
@@ -40,8 +39,7 @@ bool DoMudSave(Character *character, ArgumentHandler &)
 		return false;
 	}
 	// Send message to all the players.
-	Mud::instance().broadcastMsg(0, character->getNameCapital() +
-										" is writing the history...");
+	Mud::instance().broadcastMsg(0, character->getNameCapital() + " is writing the history...");
 	character->sendMsg("Ok.\n");
 	return true;
 }
@@ -61,11 +59,10 @@ bool DoGoTo(Character *character, ArgumentHandler &args)
 	// Stop any action the character is executing.
 	StopAction(character);
 	// Move player.
-	MoveCharacterTo(
-		character, destination,
-		character->getNameCapital() + " disappears in a puff of smoke!\n",
-		character->getNameCapital() + " appears in a puff of smoke!\n",
-		"You go to room " + destination->name + ".\n");
+	MoveCharacterTo(character, destination,
+					character->getNameCapital() + " disappears in a puff of smoke!\n",
+					character->getNameCapital() + " appears in a puff of smoke!\n",
+					"You go to room " + destination->name + ".\n");
 	return true;
 }
 

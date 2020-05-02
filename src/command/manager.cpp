@@ -27,8 +27,8 @@
 void LoadManagerCommands()
 {
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoAssign, "assign", "(mobile) (building)",
-		"Allows to assign a mobile to a task/building.", false, false, false));
+		DoAssign, "assign", "(mobile) (building)", "Allows to assign a mobile to a task/building.",
+		false, false, false));
 }
 
 bool DoAssign(Character *character, ArgumentHandler &args)
@@ -41,18 +41,15 @@ bool DoAssign(Character *character, ArgumentHandler &args)
 	// Stop any action the character is executing.
 	StopAction(character);
 	if (args.size() != 2) {
-		character->sendMsg(
-			"You need to specify who you want assign to which building.\n");
+		character->sendMsg("You need to specify who you want assign to which building.\n");
 		return false;
 	}
-	auto mobile = character->room->findMobile(args[0].getContent(),
-											  args[0].getIndex(), {});
+	auto mobile = character->room->findMobile(args[0].getContent(), args[0].getIndex(), {});
 	if (mobile == nullptr) {
 		character->sendMsg("You don't see that person.\n");
 		return false;
 	}
-	auto building =
-		character->room->findBuilding(args[1].getContent(), args[1].getIndex());
+	auto building = character->room->findBuilding(args[1].getContent(), args[1].getIndex());
 	if (building == nullptr) {
 		character->sendMsg("You don't see the desired building here.\n");
 		return false;
@@ -61,8 +58,7 @@ bool DoAssign(Character *character, ArgumentHandler &args)
 		auto shop = static_cast<ShopItem *>(building);
 		if (mobile->managedItem != nullptr) {
 			if (mobile->managedItem == shop) {
-				character->sendMsg("%s is already assigned to %s.\n",
-								   mobile->getNameCapital(),
+				character->sendMsg("%s is already assigned to %s.\n", mobile->getNameCapital(),
 								   building->getName(true));
 			} else {
 				character->sendMsg("%s is already assigned to another shop.\n",

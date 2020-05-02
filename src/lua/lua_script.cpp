@@ -49,8 +49,8 @@ void LuaStopScript()
 	throw std::logic_error("Stopped Lua Script");
 }
 
-Item *LuaLoadItem(Character *character, unsigned int vnumModel,
-				  unsigned int vnumMaterial, unsigned int qualityValue)
+Item *LuaLoadItem(Character *character, unsigned int vnumModel, unsigned int vnumMaterial,
+				  unsigned int qualityValue)
 {
 	auto model = Mud::instance().findItemModel(vnumModel);
 	if (model == nullptr) {
@@ -63,8 +63,8 @@ Item *LuaLoadItem(Character *character, unsigned int vnumModel,
 		return nullptr;
 	}
 	// Create the item.
-	auto item = model->createItem(character->getName(), composition, true,
-								  ItemQuality(qualityValue));
+	auto item =
+		model->createItem(character->getName(), composition, true, ItemQuality(qualityValue));
 	return item;
 }
 
@@ -86,8 +86,8 @@ std::vector<Direction> LuaFindPath(Character *character, Room *destination)
 		return StructUtils::checkConnection(options, from, to, error);
 	};
 	// Find the path from the actor to the target.
-	AStar<Room *> aStar(RoomCheckFunction, StructUtils::getRoomDistance,
-						StructUtils::roomsAreEqual, StructUtils::getNeighbours);
+	AStar<Room *> aStar(RoomCheckFunction, StructUtils::getRoomDistance, StructUtils::roomsAreEqual,
+						StructUtils::getNeighbours);
 	std::vector<Room *> visitedRooms;
 	if (aStar.findPath(character->room, destination, visitedRooms)) {
 		Coordinates previous = character->room->coord;
@@ -108,9 +108,8 @@ std::vector<Room *> LuaGetRoomsInSight(Character *character)
 		return result;
 	if (character->room->area == nullptr)
 		return result;
-	auto validCoordinates =
-		StructUtils::fov(character->room->coord, character->getViewDistance(),
-						 character->room->area);
+	auto validCoordinates = StructUtils::fov(character->room->coord, character->getViewDistance(),
+											 character->room->area);
 	for (auto coordinates : validCoordinates) {
 		result.emplace_back(character->room->area->getRoom(coordinates));
 	}
@@ -142,8 +141,8 @@ std::vector<Item *> LuaGetItemsInSight(Character *character)
 	if (character->room == nullptr)
 		return result;
 	ItemVector exceptions;
-	auto itemsInSight = character->room->area->getItemsInSight(
-		exceptions, character->room->coord, character->getViewDistance());
+	auto itemsInSight = character->room->area->getItemsInSight(exceptions, character->room->coord,
+															   character->getViewDistance());
 	for (auto itemInSight : itemsInSight) {
 		result.emplace_back(itemInSight);
 	}
@@ -214,8 +213,7 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 	// -------------------------------------------------------------------------
 	// CHARACTER_VECTOR derived from 'std::vector<Character *>'
 	luabridge::getGlobalNamespace(L)
-		.deriveClass<CharacterVector, std::vector<Character *> >(
-			"CharacterVector")
+		.deriveClass<CharacterVector, std::vector<Character *> >("CharacterVector")
 		.endClass();
 	// -------------------------------------------------------------------------
 	// ITEM_VECTOR derived from 'std::vector<Item *>'
@@ -320,8 +318,7 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 		.endClass()
 		.deriveWSPtrClass<LightModel, ItemModel>("LightModel")
 		.endClass()
-		.deriveWSPtrClass<LiquidContainerModel, ItemModel>(
-			"LiquidContainerModel")
+		.deriveWSPtrClass<LiquidContainerModel, ItemModel>("LiquidContainerModel")
 		.endClass()
 		.deriveWSPtrClass<MagazineItem, ItemModel>("MagazineItem")
 		.endClass()

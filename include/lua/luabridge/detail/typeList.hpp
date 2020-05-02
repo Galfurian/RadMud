@@ -70,8 +70,7 @@ template <typename List> struct TypeListValues {
 /**
  TypeListValues recursive template definition.
  */
-template <typename Head, typename Tail>
-struct TypeListValues<TypeList<Head, Tail> > {
+template <typename Head, typename Tail> struct TypeListValues<TypeList<Head, Tail> > {
 	Head hd;
 	TypeListValues<Tail> tl;
 
@@ -96,14 +95,11 @@ struct TypeListValues<TypeList<Head, Tail> > {
 // const-references.  We need to handle these specially since we can't count
 // on the referenced object hanging around for the lifetime of the list.
 
-template <typename Head, typename Tail>
-struct TypeListValues<TypeList<Head &, Tail> > {
+template <typename Head, typename Tail> struct TypeListValues<TypeList<Head &, Tail> > {
 	Head hd;
 	TypeListValues<Tail> tl;
 
-	TypeListValues(Head &hd_, TypeListValues<Tail> const &tl_) :
-		hd(hd_),
-		tl(tl_)
+	TypeListValues(Head &hd_, TypeListValues<Tail> const &tl_) : hd(hd_), tl(tl_)
 	{
 	}
 
@@ -120,14 +116,11 @@ struct TypeListValues<TypeList<Head &, Tail> > {
 	}
 };
 
-template <typename Head, typename Tail>
-struct TypeListValues<TypeList<Head const &, Tail> > {
+template <typename Head, typename Tail> struct TypeListValues<TypeList<Head const &, Tail> > {
 	Head hd;
 	TypeListValues<Tail> tl;
 
-	TypeListValues(Head const &hd_, const TypeListValues<Tail> &tl_) :
-		hd(hd_),
-		tl(tl_)
+	TypeListValues(Head const &hd_, const TypeListValues<Tail> &tl_) : hd(hd_), tl(tl_)
 	{
 	}
 
@@ -159,8 +152,7 @@ template <int Start> struct ArgList<None, Start> : public TypeListValues<None> {
 };
 
 template <typename Head, typename Tail, int Start>
-struct ArgList<TypeList<Head, Tail>, Start> :
-	public TypeListValues<TypeList<Head, Tail> > {
+struct ArgList<TypeList<Head, Tail>, Start> : public TypeListValues<TypeList<Head, Tail> > {
 	ArgList(lua_State *L) :
 		TypeListValues<TypeList<Head, Tail> >(Stack<Head>::get(L, Start),
 											  ArgList<Tail, Start + 1>(L))

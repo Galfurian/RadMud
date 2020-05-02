@@ -41,8 +41,7 @@ bool ProcessNewPassword::process(ArgumentHandler &args)
 		// Advance to the next step.
 		newStep->rollBack();
 		return true;
-	} else if (input.find_first_not_of(VALID_CHARACTERS_NAME) !=
-			   std::string::npos) {
+	} else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos) {
 		error = "Password cannot contain disallowed characters.";
 		this->advance();
 	} else {
@@ -66,8 +65,7 @@ void ProcessNewPassword::advance()
 	ss << "# " << Formatter::bold("Character's Password.") << "\n";
 	ss << "# Choose a proper password, in order to protect the";
 	ss << "access to your character.\n";
-	ss << "# Type [" << Formatter::magenta("back")
-	   << "] to return to the previous step.\n";
+	ss << "# Type [" << Formatter::magenta("back") << "] to return to the previous step.\n";
 	character->sendMsg(ss.str());
 	this->printError();
 }

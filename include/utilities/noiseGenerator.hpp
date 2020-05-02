@@ -27,16 +27,14 @@ public:
 		// Nothing to do.
 	}
 
-	template <typename T>
-	T getNoise(T x, T y, double amplitude = 1, double persistence = 0.5)
+	template <typename T> T getNoise(T x, T y, double amplitude = 1, double persistence = 0.5)
 	{
 		double total = 0;
 		double frequency = std::pow(2, octaves);
 		for (size_t i = 0; i < octaves; ++i) {
 			frequency /= 2;
 			amplitude *= persistence;
-			total += interpolatedNoise(static_cast<size_t>((dis(gen) + i) %
-														   (primes.size() - 1)),
+			total += interpolatedNoise(static_cast<size_t>((dis(gen) + i) % (primes.size() - 1)),
 									   x / frequency, y / frequency) *
 					 amplitude;
 		}
@@ -63,11 +61,11 @@ private:
 
 	double smoothedNoise(size_t i, size_t x, size_t y)
 	{
-		double corners = (noise(i, x - 1, y - 1) + noise(i, x + 1, y - 1) +
-						  noise(i, x - 1, y + 1) + noise(i, x + 1, y + 1)) /
+		double corners = (noise(i, x - 1, y - 1) + noise(i, x + 1, y - 1) + noise(i, x - 1, y + 1) +
+						  noise(i, x + 1, y + 1)) /
 						 16,
-			   sides = (noise(i, x - 1, y) + noise(i, x + 1, y) +
-						noise(i, x, y - 1) + noise(i, x, y + 1)) /
+			   sides = (noise(i, x - 1, y) + noise(i, x + 1, y) + noise(i, x, y - 1) +
+						noise(i, x, y + 1)) /
 					   8,
 			   center = noise(i, x, y) / 4;
 		return corners + sides + center;
@@ -90,8 +88,7 @@ private:
 			   v2 = smoothedNoise(i, integer_X + 1, integer_Y),
 			   v3 = smoothedNoise(i, integer_X, integer_Y + 1),
 			   v4 = smoothedNoise(i, integer_X + 1, integer_Y + 1),
-			   i1 = interpolate(v1, v2, fractional_X),
-			   i2 = interpolate(v3, v4, fractional_X);
+			   i1 = interpolate(v1, v2, fractional_X), i2 = interpolate(v3, v4, fractional_X);
 		return interpolate(i1, i2, fractional_Y);
 	}
 };

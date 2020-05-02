@@ -49,9 +49,7 @@ bool CurrencyModel::setModel(const std::string &source)
 {
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 0) {
-		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Currency Model (%s).",
-					name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Currency Model (%s).", name);
 		return false;
 	}
 	return true;
@@ -65,23 +63,19 @@ void CurrencyModel::getSheet(Table &sheet) const
 	//sheet.addDivider();
 }
 
-Item *CurrencyModel::createItem(std::string maker, Material *composition,
-								bool isForMobile,
-								const ItemQuality &itemQuality,
-								const unsigned int &quantity)
+Item *CurrencyModel::createItem(std::string maker, Material *composition, bool isForMobile,
+								const ItemQuality &itemQuality, const unsigned int &quantity)
 {
 	auto it = std::find(prices.begin(), prices.end(), composition->vnum);
 	if (it != prices.end()) {
-		return ItemModel::createItem(maker, composition, isForMobile,
-									 itemQuality, quantity);
+		return ItemModel::createItem(maker, composition, isForMobile, itemQuality, quantity);
 	} else {
 		MudLog(LogLevel::Error, "Material is not allowed.");
 		return nullptr;
 	}
 }
 
-bool CurrencyModel::addPrice(const unsigned int &materialVnum,
-							 const unsigned int &price)
+bool CurrencyModel::addPrice(const unsigned int &materialVnum, const unsigned int &price)
 {
 	auto it = std::find(prices.begin(), prices.end(), materialVnum);
 	if (it == prices.end()) {
@@ -92,8 +86,7 @@ bool CurrencyModel::addPrice(const unsigned int &materialVnum,
 	return false;
 }
 
-bool CurrencyModel::findPrice(const unsigned int &materialVnum,
-							  unsigned int &price) const
+bool CurrencyModel::findPrice(const unsigned int &materialVnum, unsigned int &price) const
 {
 	auto it = std::find(prices.begin(), prices.end(), materialVnum);
 	if (it != prices.end()) {
@@ -103,8 +96,7 @@ bool CurrencyModel::findPrice(const unsigned int &materialVnum,
 	return false;
 }
 
-ItemVector CurrencyModel::generateCurrency(const std::string &maker,
-										   const unsigned int &value)
+ItemVector CurrencyModel::generateCurrency(const std::string &maker, const unsigned int &value)
 {
 	auto status = true;
 	auto currentValue = value;
@@ -116,8 +108,7 @@ ItemVector CurrencyModel::generateCurrency(const std::string &maker,
 		if (coinQuantity == 0) {
 			continue;
 		}
-		auto coin = this->createItem(maker, coinMaterial, false,
-									 ItemQuality::Normal, coinQuantity);
+		auto coin = this->createItem(maker, coinMaterial, false, ItemQuality::Normal, coinQuantity);
 		if (coin != nullptr) {
 			coins.emplace_back(coin);
 		} else {

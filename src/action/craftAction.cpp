@@ -31,9 +31,8 @@
 
 #include <cassert>
 
-CraftAction::CraftAction(
-	Character *_actor, Production *_production, ItemVector const &_tools,
-	std::vector<std::pair<Item *, unsigned int> > const &_ingredients) :
+CraftAction::CraftAction(Character *_actor, Production *_production, ItemVector const &_tools,
+						 std::vector<std::pair<Item *, unsigned int> > const &_ingredients) :
 	GeneralAction(_actor),
 	production(_production),
 	tools(_tools),
@@ -127,8 +126,7 @@ bool CraftAction::start()
 	// Send the messages.
 	actor->sendMsg("%s %s.\n", production->profession->startMessage,
 				   Formatter::yellow(production->outcome->getName()));
-	actor->room->sendToAll("%s has started %s something...\n", { actor },
-						   actor->getNameCapital(),
+	actor->room->sendToAll("%s has started %s something...\n", { actor }, actor->getNameCapital(),
 						   production->profession->action);
 	return true;
 }
@@ -164,9 +162,8 @@ ActionStatus CraftAction::perform()
 	if (HasFlag(outcomeModel->modelFlags, ModelFlag::CanBeStacked)) {
 		// Create the item.
 		// TODO: FIX WRONG TYPE OF MATERIAL!
-		auto newItem =
-			outcomeModel->createItem(actor->getName(), material, false,
-									 ItemQuality::Normal, production->quantity);
+		auto newItem = outcomeModel->createItem(actor->getName(), material, false,
+												ItemQuality::Normal, production->quantity);
 		if (newItem == nullptr) {
 			MudLog(LogLevel::Error, "Crafted item is a null pointer.");
 			actor->sendMsg("\nYou have failed your action.\n");
@@ -223,8 +220,7 @@ unsigned int CraftAction::getCooldown()
 	double requiredTime = production->time;
 	MudLog(LogLevel::Debug, "Base time  : %f", requiredTime);
 	for (auto const &knowledge : production->requiredKnowledge) {
-		requiredTime -=
-			(requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
+		requiredTime -= (requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
 	}
 	MudLog(LogLevel::Debug, "With skill : %f", requiredTime);
 	return static_cast<unsigned int>(requiredTime);
@@ -249,9 +245,7 @@ void CraftAction::determineMaterial()
 		}
 
 		/// @brief Constructor.
-		MaterialEntry(Material *_material, double _weight) :
-			material(_material),
-			weight(_weight)
+		MaterialEntry(Material *_material, double _weight) : material(_material), weight(_weight)
 		{
 			// Nothing to do.
 		}
@@ -263,8 +257,7 @@ void CraftAction::determineMaterial()
 			continue;
 		}
 		// Create a new material entry.
-		MaterialEntry entry(ingr.first->composition,
-							ingr.first->getWeight(false) * ingr.second);
+		MaterialEntry entry(ingr.first->composition, ingr.first->getWeight(false) * ingr.second);
 		bool found = false;
 		for (auto it : materials) {
 			if (it.material->vnum == entry.material->vnum) {
@@ -295,7 +288,6 @@ unsigned int CraftAction::getConsumedStamina(Character *character)
 	unsigned int consumedStamina = 1;
 	consumedStamina -= character->getAbilityLog(Ability::Strength);
 	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-	consumedStamina =
-		SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
 	return consumedStamina;
 }

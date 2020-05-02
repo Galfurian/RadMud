@@ -78,9 +78,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			if (pickedUpSomething) {
 				// Send the messages.
 				character->sendMsg("You've picked up everything you could.\n");
-				room->sendToAll("%s has picked up everything %s could.\n",
-								{ character }, character->getNameCapital(),
-								character->getSubjectPronoun());
+				room->sendToAll("%s has picked up everything %s could.\n", { character },
+								character->getNameCapital(), character->getSubjectPronoun());
 				return true;
 			}
 			character->sendMsg("You've picked up nothing.\n");
@@ -101,8 +100,7 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			//  items by providing the specific vnum.
 			if (character->isMobile() && IsNumber(args[0].getContent())) {
 				for (auto it : room->items) {
-					if (it->vnum ==
-						ToNumber<unsigned int>(args[0].getContent())) {
+					if (it->vnum == ToNumber<unsigned int>(args[0].getContent())) {
 						item = it;
 					}
 				}
@@ -140,14 +138,13 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			ClearFlag(item->flags, ItemFlag::Temporary);
 			// Send the messages.
 			character->sendMsg("You take %s.\n", item->getName(true));
-			room->sendToAll("%s has picked up %s.\n", { character },
-							character->getNameCapital(), item->getName(true));
+			room->sendToAll("%s has picked up %s.\n", { character }, character->getNameCapital(),
+							item->getName(true));
 		} else {
 			// Remove a stack from item.
 			auto newStack = item->removeFromStack(character, quantity);
 			if (newStack == nullptr) {
-				character->sendMsg("You failed to drop %s.\n",
-								   item->getName(true));
+				character->sendMsg("You failed to drop %s.\n", item->getName(true));
 				return false;
 			}
 			// Add the item to the player's inventory.
@@ -165,12 +162,10 @@ bool DoTake(Character *character, ArgumentHandler &args)
 		Item *container = nullptr;
 		// If the room is lit.
 		if (roomIsLit) {
-			container = character->findNearbyItem(args[1].getContent(),
-												  args[1].getIndex());
+			container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
 		} else if (character->inventoryIsLit()) {
 			// If the room is not lit but the inventory is.
-			container = character->findInventoryItem(args[1].getContent(),
-													 args[1].getIndex());
+			container = character->findInventoryItem(args[1].getContent(), args[1].getIndex());
 		} else {
 			character->sendMsg("You can't see.\n");
 			return false;
@@ -182,8 +177,7 @@ bool DoTake(Character *character, ArgumentHandler &args)
 		}
 		// Check if the item is a container.
 		if (!container->isAContainer()) {
-			character->sendMsg("%s is not a container.\n",
-							   container->getNameCapital(true));
+			character->sendMsg("%s is not a container.\n", container->getNameCapital(true));
 			return false;
 		}
 		// Check if the item is a magazine.
@@ -201,19 +195,16 @@ bool DoTake(Character *character, ArgumentHandler &args)
 		}
 		// Check if it is locked.
 		if (HasFlag(container->flags, ItemFlag::Locked)) {
-			character->sendMsg("You have first to unlock %s first.\n",
-							   container->getName(true));
+			character->sendMsg("You have first to unlock %s first.\n", container->getName(true));
 			return false;
 		}
 		if (HasFlag(container->flags, ItemFlag::Closed)) {
-			character->sendMsg("You have first to open %s first.\n",
-							   container->getName(true));
+			character->sendMsg("You have first to open %s first.\n", container->getName(true));
 			return false;
 		}
 		if (ToLower(args[0].getContent()) == "all") {
 			if (container->content.empty()) {
-				character->sendMsg("There is nothing inside %s.\n",
-								   container->getName(true));
+				character->sendMsg("There is nothing inside %s.\n", container->getName(true));
 				return false;
 			}
 			// Make a temporary copy of the character's inventory.
@@ -241,25 +232,20 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			// Handle output only if the player has really taken something.
 			if (takenSomething) {
 				// Send the messages.
-				character->sendMsg(
-					"You've taken everything you could from %s.\n",
-					container->getName(true));
-				room->sendToAll("%s has taken everything %s could from %s.\n",
-								{ character }, character->getNameCapital(),
-								character->getSubjectPronoun(),
+				character->sendMsg("You've taken everything you could from %s.\n",
+								   container->getName(true));
+				room->sendToAll("%s has taken everything %s could from %s.\n", { character },
+								character->getNameCapital(), character->getSubjectPronoun(),
 								container->getName(true));
 				return true;
 			}
-			character->sendMsg("You've taken nothing from %s.\n",
-							   container->getName(true));
+			character->sendMsg("You've taken nothing from %s.\n", container->getName(true));
 			return false;
 		}
 		// Search the item inside the container.
-		auto item =
-			container->findContent(args[0].getContent(), args[0].getIndex());
+		auto item = container->findContent(args[0].getContent(), args[0].getIndex());
 		if (item == nullptr) {
-			character->sendMsg(
-				"You don't see that item inside the container.\n");
+			character->sendMsg("You don't see that item inside the container.\n");
 			return false;
 		}
 		// Check if the item has the flag kNoPick.
@@ -273,8 +259,7 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			quantity = item->quantity;
 		// Check if the player can carry the item.
 		if (!character->canCarry(item, quantity)) {
-			character->sendMsg(
-				"You are not strong enough to carry that object.\n");
+			character->sendMsg("You are not strong enough to carry that object.\n");
 			return false;
 		}
 		if (item->quantity == quantity) {
@@ -285,8 +270,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			// If the item was a temporary item, make it permanent.
 			ClearFlag(item->flags, ItemFlag::Temporary);
 			// Send the messages.
-			character->sendMsg("You take out %s from %s.\n",
-							   item->getName(true), container->getName(true));
+			character->sendMsg("You take out %s from %s.\n", item->getName(true),
+							   container->getName(true));
 			room->sendToAll("%s takes out %s from %s.\n", { character },
 							character->getNameCapital(), item->getName(true),
 							container->getName(true));
@@ -294,8 +279,7 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			// Remove a stack from item.
 			auto newStack = item->removeFromStack(character, quantity);
 			if (newStack == nullptr) {
-				character->sendMsg("You failed to take part of %s.\n",
-								   item->getName(true));
+				character->sendMsg("You failed to take part of %s.\n", item->getName(true));
 				return false;
 			}
 			// Add the item to the player's inventory.
@@ -303,8 +287,8 @@ bool DoTake(Character *character, ArgumentHandler &args)
 			// If the item was a temporary item, make it permanent.
 			ClearFlag(newStack->flags, ItemFlag::Temporary);
 			// Send the messages.
-			character->sendMsg("You take out part of %s from %s.\n",
-							   item->getName(true), container->getName(true));
+			character->sendMsg("You take out part of %s from %s.\n", item->getName(true),
+							   container->getName(true));
 			room->sendToAll("%s takes out %s from %s.\n", { character },
 							character->getNameCapital(), item->getName(true),
 							container->getName(true));
@@ -346,14 +330,12 @@ bool DoDrop(Character *character, ArgumentHandler &args)
 		}
 		// Send the messages.
 		character->sendMsg("You dropped all.\n");
-		character->room->sendToAll("%s has dropped all %s items.\n",
-								   { character }, character->getNameCapital(),
-								   character->getPossessivePronoun());
+		character->room->sendToAll("%s has dropped all %s items.\n", { character },
+								   character->getNameCapital(), character->getPossessivePronoun());
 		return true;
 	}
 	// Get the item.
-	Item *item =
-		character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+	Item *item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 	// If the room is not lit, check if the inventory contains a light.
 	if (!character->room->isLit()) {
 		// If the inventory is NOT lit and NOT empty, pick a random item.
@@ -379,8 +361,7 @@ bool DoDrop(Character *character, ArgumentHandler &args)
 		// Send the messages.
 		character->sendMsg("You drop %s.\n", item->getName(true));
 		character->room->sendToAll("%s has dropped %s.\n", { character },
-								   character->getNameCapital(),
-								   item->getName(true));
+								   character->getNameCapital(), item->getName(true));
 	} else {
 		// Remove from the stack.
 		auto newStack = item->removeFromStack(character, quantity);
@@ -393,8 +374,7 @@ bool DoDrop(Character *character, ArgumentHandler &args)
 		// Send the messages.
 		character->sendMsg("You drop part of %s.\n", item->getName(true));
 		character->room->sendToAll("%s has dropped %s.\n", { character },
-								   character->getNameCapital(),
-								   item->getName(true));
+								   character->getNameCapital(), item->getName(true));
 	}
 	return true;
 }
@@ -412,16 +392,13 @@ bool DoPut(Character *character, ArgumentHandler &args)
 		character->sendMsg("Put what inside what?\n");
 		return false;
 	}
-	auto container =
-		character->findNearbyItem(args[1].getContent(), args[1].getIndex());
+	auto container = character->findNearbyItem(args[1].getContent(), args[1].getIndex());
 	if (container == nullptr) {
-		character->sendMsg("You don't see any container named '%s' here.\n",
-						   args[1].getContent());
+		character->sendMsg("You don't see any container named '%s' here.\n", args[1].getContent());
 		return false;
 	}
 	if (!container->isAContainer()) {
-		character->sendMsg("%s is not a valid container.\n",
-						   container->getNameCapital());
+		character->sendMsg("%s is not a valid container.\n", container->getNameCapital());
 		return false;
 	}
 	// Check if the item is a magazine.
@@ -443,18 +420,15 @@ bool DoPut(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	if (container->getType() == ModelType::Corpse) {
-		character->sendMsg(
-			"You don't really want to put something inside that body...\n");
+		character->sendMsg("You don't really want to put something inside that body...\n");
 		return false;
 	}
 	if (HasFlag(container->flags, ItemFlag::Locked)) {
-		character->sendMsg("You have first to unlock %s.\n",
-						   container->getName(true));
+		character->sendMsg("You have first to unlock %s.\n", container->getName(true));
 		return false;
 	}
 	if (HasFlag(container->flags, ItemFlag::Closed)) {
-		character->sendMsg("You have first to open %s.\n",
-						   container->getName(true));
+		character->sendMsg("You have first to open %s.\n", container->getName(true));
 		return false;
 	}
 	if (character->inventory.empty()) {
@@ -479,17 +453,14 @@ bool DoPut(Character *character, ArgumentHandler &args)
 			container->putInside(iterator);
 		}
 		// Send the messages.
-		character->sendMsg("You put everything you could in %s.\n",
-						   container->getName(true));
-		character->room->sendToAll("%s puts everything %s could inside %s.\n",
-								   { character }, character->getNameCapital(),
-								   character->getSubjectPronoun(),
+		character->sendMsg("You put everything you could in %s.\n", container->getName(true));
+		character->room->sendToAll("%s puts everything %s could inside %s.\n", { character },
+								   character->getNameCapital(), character->getSubjectPronoun(),
 								   container->getName(true));
 		return true;
 	}
 	// Find the specific item inside the inventory.
-	auto item =
-		character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+	auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 	// If the room is not lit, check if the inventory contains a light.
 	if (!character->room->isLit()) {
 		// If the inventory is NOT lit and NOT empty, pick a random item.
@@ -508,8 +479,7 @@ bool DoPut(Character *character, ArgumentHandler &args)
 		quantity = item->quantity;
 	// Check if the item can be contained inside the destination.
 	if (!container->canContain(item, quantity)) {
-		character->sendMsg("%s can't contain any more items.\n",
-						   container->getNameCapital());
+		character->sendMsg("%s can't contain any more items.\n", container->getNameCapital());
 		return false;
 	}
 	if (item->quantity == quantity) {
@@ -521,25 +491,23 @@ bool DoPut(Character *character, ArgumentHandler &args)
 		character->sendMsg("You put %s inside %s.\n", item->getName(true),
 						   container->getName(true));
 		character->room->sendToAll("%s puts %s inside %s.\n", { character },
-								   character->getNameCapital(),
-								   item->getName(true),
+								   character->getNameCapital(), item->getName(true),
 								   container->getName(true));
 	} else {
 		// Remove from the stack.
 		auto newStack = item->removeFromStack(character, quantity);
 		if (newStack == nullptr) {
-			character->sendMsg("You failed to put part of %s inside %s.\n",
-							   item->getName(true), container->getName(true));
+			character->sendMsg("You failed to put part of %s inside %s.\n", item->getName(true),
+							   container->getName(true));
 			return false;
 		}
 		// Put the stack inside the container.
 		container->putInside(newStack);
 		// Send the messages.
-		character->sendMsg("You put part of %s inside %s.\n",
-						   item->getName(true), container->getName(true));
+		character->sendMsg("You put part of %s inside %s.\n", item->getName(true),
+						   container->getName(true));
 		character->room->sendToAll("%s puts %s inside %s.\n", { character },
-								   character->getNameCapital(),
-								   item->getName(true),
+								   character->getNameCapital(), item->getName(true),
 								   container->getName(true));
 	}
 	return true;
@@ -560,8 +528,7 @@ bool DoGive(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Get the item.
-	auto item =
-		character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+	auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 	// If the room is not lit, check if the inventory contains a light.
 	if (!character->room->isLit()) {
 		// If the inventory is NOT lit and NOT empty, pick a random item.
@@ -574,16 +541,15 @@ bool DoGive(Character *character, ArgumentHandler &args)
 		character->sendMsg("You don't have that item.\n");
 		return false;
 	}
-	auto target = character->room->findCharacter(
-		args[1].getContent(), args[1].getIndex(), nullptr, { character });
+	auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(), nullptr,
+												 { character });
 	if (target == nullptr) {
 		character->sendMsg("You don't see that person.\n");
 		return false;
 	}
 	// Check if the target player can carry the item.
 	if (!target->canCarry(item, item->quantity)) {
-		character->sendMsg("%s can't carry anymore items.\n",
-						   target->getNameCapital());
+		character->sendMsg("%s can't carry anymore items.\n", target->getNameCapital());
 		return false;
 	}
 	// Set the quantity.
@@ -596,33 +562,27 @@ bool DoGive(Character *character, ArgumentHandler &args)
 		// Add the item to the target inventory.
 		target->addInventoryItem(item);
 		// Send all the messages.
-		character->sendMsg("You give %s to %s.\n", item->getName(true),
-						   target->getName());
-		target->sendMsg("%s gives you %s.\n\n", character->getNameCapital(),
-						item->getName(true));
-		character->room->sendToAll("%s gives %s to %s.\n",
-								   { character, target },
-								   character->getNameCapital(),
-								   item->getName(true), target->getName());
+		character->sendMsg("You give %s to %s.\n", item->getName(true), target->getName());
+		target->sendMsg("%s gives you %s.\n\n", character->getNameCapital(), item->getName(true));
+		character->room->sendToAll("%s gives %s to %s.\n", { character, target },
+								   character->getNameCapital(), item->getName(true),
+								   target->getName());
 	} else {
 		// Remove from the stack.
 		auto newStack = item->removeFromStack(character, quantity);
 		if (newStack == nullptr) {
-			character->sendMsg("You failed to give part of %s to %s.\n",
-							   item->getName(true), target->getName());
+			character->sendMsg("You failed to give part of %s to %s.\n", item->getName(true),
+							   target->getName());
 			return false;
 		}
 		// Add the stack to the target inventory.
 		target->addInventoryItem(newStack);
 		// Send all the messages.
-		character->sendMsg("You give part of %s to %s.\n", item->getName(true),
-						   target->getName());
-		target->sendMsg("%s gives you %s.\n\n", character->getNameCapital(),
-						item->getName(true));
-		character->room->sendToAll("%s gives %s to %s.\n",
-								   { character, target },
-								   character->getNameCapital(),
-								   item->getName(true), target->getName());
+		character->sendMsg("You give part of %s to %s.\n", item->getName(true), target->getName());
+		target->sendMsg("%s gives you %s.\n\n", character->getNameCapital(), item->getName(true));
+		character->room->sendToAll("%s gives %s to %s.\n", { character, target },
+								   character->getNameCapital(), item->getName(true),
+								   target->getName());
 	}
 	return true;
 }

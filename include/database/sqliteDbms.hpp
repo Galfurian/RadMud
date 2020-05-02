@@ -102,9 +102,8 @@ public:
 	/// @param orReplace Flag used to enable the OR REPLACE option.
 	/// @return <b>True</b> if the operations succeeded,<br>
 	///         <b>False</b> Otherwise.
-	bool insertInto(std::string const &table,
-					std::vector<std::string> const &args, bool orIgnore = true,
-					bool orReplace = false);
+	bool insertInto(std::string const &table, std::vector<std::string> const &args,
+					bool orIgnore = true, bool orReplace = false);
 
 	/// @brief Execute a Delete From query.
 	/// @param table The name of the table.
@@ -119,8 +118,7 @@ public:
 	/// @param where Vector of where clause.
 	/// @return <b>True</b> if the operations succeeded,<br>
 	///         <b>False</b> Otherwise.
-	bool updateInto(std::string const &table, QueryList const &value,
-					QueryList const &where);
+	bool updateInto(std::string const &table, QueryList const &value, QueryList const &where);
 
 	/// Updates all the connected players.
 	bool updatePlayers();

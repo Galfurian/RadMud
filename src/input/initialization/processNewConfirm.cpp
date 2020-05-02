@@ -47,8 +47,7 @@ bool ProcessNewConfirm::process(ArgumentHandler &args)
 		player->flags = 0;
 		player->rent_room = 1000;
 		for (const auto &skillData : player->race->skills) {
-			player->skillManager.addSkill(skillData->skill,
-										  skillData->skillLevel);
+			player->skillManager.addSkill(skillData->skill, skillData->skillLevel);
 		}
 		// Update the player on the database.
 		SQLiteDbms::instance().beginTransaction();
@@ -80,10 +79,8 @@ void ProcessNewConfirm::advance()
 	std::stringstream ss;
 	ss << "# Give a look to the information you have provided, now it's the right time";
 	ss << " to decide if you want to change something.\n";
-	ss << "# Type [" << Formatter::magenta("confirm")
-	   << "] to conclude the character creation.\n";
-	ss << "# Type [" << Formatter::magenta("back")
-	   << "]    to return to the previous step.\n";
+	ss << "# Type [" << Formatter::magenta("confirm") << "] to conclude the character creation.\n";
+	ss << "# Type [" << Formatter::magenta("back") << "]    to return to the previous step.\n";
 	ss << Formatter::green("Do you confirm?") << "\n";
 	character->sendMsg(ss.str());
 	this->printError();

@@ -57,9 +57,8 @@ namespace StructUtils
 {
 /// @brief Provides the distance between the source and the target.
 template <typename T>
-inline T getDistance(T const &source_x, T const &target_x,
-					 T const &source_y = 0, T const &target_y = 0,
-					 T const &source_z = 0, T const &target_z = 0)
+inline T getDistance(T const &source_x, T const &target_x, T const &source_y = 0,
+					 T const &target_y = 0, T const &source_z = 0, T const &target_z = 0)
 {
 	return static_cast<int>(std::sqrt(std::pow(source_x - target_x, 2) +
 									  std::pow(source_y - target_y, 2) +
@@ -72,8 +71,7 @@ inline T getDistance(T const &source_x, T const &target_x,
 /// @return The distance between the two coordinates.
 inline int getDistance(Coordinates const &source, Coordinates const &target)
 {
-	return getDistance(source.x, target.x, source.y, target.y, source.z,
-					   target.z);
+	return getDistance(source.x, target.x, source.y, target.y, source.z, target.z);
 }
 
 /// Functions used to get the distance between two rooms.
@@ -121,35 +119,32 @@ std::vector<Room *> getNeighbours(Room *r);
 ///                 message in case of failure.
 /// @return <b>True</b> if there is a valid connection between the rooms,<br>
 ///         <b>False</b> otherwise.
-bool checkConnection(const MovementOptions &options, Room *r1, Room *r2,
-					 std::string &error);
+bool checkConnection(const MovementOptions &options, Room *r1, Room *r2, std::string &error);
 
 /// @brief Checks if there is a valid connection on the given direction.
-bool checkConnection(const MovementOptions &options, Room *r1,
-					 const Direction &direction, std::string &error);
+bool checkConnection(const MovementOptions &options, Room *r1, const Direction &direction,
+					 std::string &error);
 
 /// @brief Search for a built door inside the room.
 /// @return The contained door if there is one.
 Item *findDoor(Room *room);
 
-std::vector<Room *> selectRooms(Area *area, Room *startingRoom,
-								RoomSelectionOptions options);
+std::vector<Room *> selectRooms(Area *area, Room *startingRoom, RoomSelectionOptions options);
 
 /// @brief A Field of View algorithm which provides all the rooms
 ///         which are inside the radius of the field of view.
 /// @param origin The coordinate of the central room.
 /// @param radius The radius of visibility of the character.
 /// @return A vector containing all the coordinates of valid rooms.
-std::vector<Coordinates> fov(Coordinates &origin, const int &radius,
-							 Area *area);
+std::vector<Coordinates> fov(Coordinates &origin, const int &radius, Area *area);
 
 /// @brief A Field of View algorithm which provides all the rooms
 ///         which are inside the radius of the field of view.
 /// @param origin The coordinate of the central room.
 /// @param radius The radius of visibility of the character.
 /// @return A vector containing all the coordinates of valid rooms.
-std::vector<Coordinates> fov3d(Coordinates &origin, Area *area,
-							   const int &radius, double const &height = 0.5);
+std::vector<Coordinates> fov3d(Coordinates &origin, Area *area, const int &radius,
+							   double const &height = 0.5);
 
 /// @brief Determine if a coordinate is in sight from a starting one.
 /// @param source The coordinates of the origin.
@@ -157,7 +152,7 @@ std::vector<Coordinates> fov3d(Coordinates &origin, Area *area,
 /// @param radius   The radius of visibility.
 /// @return <b>True</b> if the target room is in sight,<br>
 ///         <b>False</b> otherwise.
-bool los(Coordinates const &source, Coordinates const &target, Area *area,
-		 int const &radius, double const &height = 0.5);
+bool los(Coordinates const &source, Coordinates const &target, Area *area, int const &radius,
+		 double const &height = 0.5);
 
 } // namespace StructUtils

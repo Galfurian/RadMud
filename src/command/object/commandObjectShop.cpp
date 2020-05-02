@@ -48,10 +48,8 @@ bool DoDeposit(Character *character, ArgumentHandler &args)
 		character->sendMsg("You cannot do that without light.\n");
 		return false;
 	}
-	auto item =
-		character->findInventoryItem(args[0].getContent(), args[0].getIndex());
-	auto building =
-		character->room->findBuilding(args[1].getContent(), args[1].getIndex());
+	auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+	auto building = character->room->findBuilding(args[1].getContent(), args[1].getIndex());
 	// Check the item.
 	if (item == nullptr) {
 		character->sendMsg("You don't have that item.\n");
@@ -107,8 +105,7 @@ bool DoBuy(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Get the target.
-	auto target =
-		character->room->findItem(args[1].getContent(), args[1].getIndex());
+	auto target = character->room->findItem(args[1].getContent(), args[1].getIndex());
 	if (target == nullptr) {
 		character->sendMsg("You don't see '%s' here.\n", args[1].getContent());
 		return false;
@@ -140,8 +137,7 @@ bool DoBuy(Character *character, ArgumentHandler &args)
 	if (item->quantity < quantity)
 		quantity = item->quantity;
 	if (!character->canCarry(item, quantity)) {
-		auto phrase =
-			"It seems that you can't carry " + item->getName(true) + ".\n";
+		auto phrase = "It seems that you can't carry " + item->getName(true) + ".\n";
 		shopKeeper->doCommand("say " + character->getName() + " " + phrase);
 		return false;
 	}
@@ -154,8 +150,7 @@ bool DoBuy(Character *character, ArgumentHandler &args)
 	for (auto coin : availableCoins) {
 		unsigned int coinValue = coin->getPrice(false);
 		unsigned int coinQuantity = 0;
-		while ((coinQuantity < coin->quantity) &&
-			   (providedValue < requiredValue)) {
+		while ((coinQuantity < coin->quantity) && (providedValue < requiredValue)) {
 			providedValue += coinValue;
 			++coinQuantity;
 		}
@@ -172,11 +167,9 @@ bool DoBuy(Character *character, ArgumentHandler &args)
 	if (providedValue > requiredValue) {
 		auto change = providedValue - requiredValue;
 		auto currency = shopKeeper->faction->currency;
-		changedCoins =
-			currency->generateCurrency(shopKeeper->getName(), change);
+		changedCoins = currency->generateCurrency(shopKeeper->getName(), change);
 		if (changedCoins.empty()) {
-			auto phrase =
-				"Sorry but I cannot sell " + item->getName(true) + " to you.\n";
+			auto phrase = "Sorry but I cannot sell " + item->getName(true) + " to you.\n";
 			shopKeeper->doCommand("say " + character->getName() + " " + phrase);
 			return false;
 		}
@@ -187,8 +180,7 @@ bool DoBuy(Character *character, ArgumentHandler &args)
 
 		shop->takeOut(item);
 		character->addInventoryItem(item);
-		character->sendMsg("You buy %s from %s.\n", item->getName(true),
-						   shop->getName(true));
+		character->sendMsg("You buy %s from %s.\n", item->getName(true), shop->getName(true));
 	} else {
 		// Remove from the stack.
 		auto newStack = item->removeFromStack(character, quantity);
@@ -237,8 +229,7 @@ bool DoSell(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Get the item and the target.
-	auto item =
-		character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+	auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 	// Check the item.
 	if (item == nullptr) {
 		character->sendMsg("You don't have that item.\n");
@@ -250,8 +241,7 @@ bool DoSell(Character *character, ArgumentHandler &args)
 	}
 
 	// Get the target.
-	auto target =
-		character->room->findItem(args[1].getContent(), args[1].getIndex());
+	auto target = character->room->findItem(args[1].getContent(), args[1].getIndex());
 	if (target == nullptr) {
 		character->sendMsg("You don't see '%s' here.\n", args[1].getContent());
 		return false;
@@ -305,14 +295,13 @@ bool DoSell(Character *character, ArgumentHandler &args)
 		// Decrese the shop balance.
 		shop->balance -= price;
 		// Send a message.
-		character->sendMsg("You sell %s to %s.\n", item->getName(true),
-						   shop->getName(true));
+		character->sendMsg("You sell %s to %s.\n", item->getName(true), shop->getName(true));
 	} else {
 		// Remove from the stack.
 		auto newStack = item->removeFromStack(character, quantity);
 		if (newStack == nullptr) {
-			character->sendMsg("You failed sell part of %s to %s.\n",
-							   item->getName(true), shop->getName(true));
+			character->sendMsg("You failed sell part of %s to %s.\n", item->getName(true),
+							   shop->getName(true));
 			for (auto coin : coins) {
 				MudUpdater::instance().addItemToDestroy(coin);
 			}

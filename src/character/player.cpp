@@ -26,8 +26,7 @@
 #include "utilities/formatter.hpp"
 #include "mud.hpp"
 
-Player::Player(const int &_socket, const int &_port,
-			   const std::string &_address) :
+Player::Player(const int &_socket, const int &_port, const std::string &_address) :
 	psocket(_socket),
 	port(_port),
 	address(_address),
@@ -138,8 +137,8 @@ bool Player::remInventoryItem(Item *item)
 	if (Character::remInventoryItem(item)) {
 		// Update on database.
 		if (item->getType() != ModelType::Corpse) {
-			SQLiteDbms::instance().deleteFrom(
-				"ItemPlayer", { std::make_pair("item", ToString(item->vnum)) });
+			SQLiteDbms::instance().deleteFrom("ItemPlayer",
+											  { std::make_pair("item", ToString(item->vnum)) });
 		}
 		return true;
 	}
@@ -151,8 +150,8 @@ bool Player::remEquipmentItem(Item *item)
 	if (Character::remEquipmentItem(item)) {
 		// Update on database.
 		if (item->getType() != ModelType::Corpse) {
-			SQLiteDbms::instance().deleteFrom(
-				"ItemPlayer", { std::make_pair("item", ToString(item->vnum)) });
+			SQLiteDbms::instance().deleteFrom("ItemPlayer",
+											  { std::make_pair("item", ToString(item->vnum)) });
 		}
 		return true;
 	}
@@ -186,8 +185,8 @@ void Player::closeConnection()
 
 bool Player::isPlaying() const
 {
-	return checkConnection() && (connectionState == ConnectionState::Playing) &&
-		   (!closing) && logged_in;
+	return checkConnection() && (connectionState == ConnectionState::Playing) && (!closing) &&
+		   logged_in;
 }
 
 bool Player::hasPendingOutput() const
@@ -224,18 +223,14 @@ void Player::sendPrompt()
 			FindAndReplace(&out, "&H", ToString(this->getMaxHealth()));
 			FindAndReplace(&out, "&s", ToString(stamina));
 			FindAndReplace(&out, "&S", ToString(this->getMaxStamina()));
-			FindAndReplace(
-				&out, "&T",
-				(this->combatHandler.getPredefinedTarget() == nullptr) ?
-					"" :
-					"[" + this->combatHandler.getPredefinedTarget()->getName() +
-						"]");
-			FindAndReplace(
-				&out, "&A",
-				(this->combatHandler.getAimedTarget() == nullptr) ?
-					"" :
-					"[" + this->combatHandler.getAimedTarget()->getName() +
-						"]");
+			FindAndReplace(&out, "&T",
+						   (this->combatHandler.getPredefinedTarget() == nullptr) ?
+							   "" :
+							   "[" + this->combatHandler.getPredefinedTarget()->getName() + "]");
+			FindAndReplace(&out, "&A",
+						   (this->combatHandler.getAimedTarget() == nullptr) ?
+							   "" :
+							   "[" + this->combatHandler.getAimedTarget()->getName() + "]");
 			this->sendMsg(out);
 		} else {
 			this->sendMsg("\n");
@@ -256,8 +251,7 @@ void Player::kill()
 	this->setStamina(1, true);
 	Character::sendMsg("%sYou have%s died%s... "
 					   "but don't worry your fight is not over...%s\n\n\n",
-					   Formatter::gray(), Formatter::red(), Formatter::gray(),
-					   Formatter::reset());
+					   Formatter::gray(), Formatter::red(), Formatter::gray(), Formatter::reset());
 }
 
 void Player::enterGame()
@@ -266,13 +260,11 @@ void Player::enterGame()
 	// Phase 1: Clear the screen and show the welcome message.
 	this->sendMsg(Formatter::clearScreen());
 	// Greet them.
-	Character::sendMsg("%sWelcome, %s!%s\n", Formatter::bold(), name,
-					   Formatter::reset());
+	Character::sendMsg("%sWelcome, %s!%s\n", Formatter::bold(), name, Formatter::reset());
 	// -------------------------------------------------------------------------
 	// Phase 2: Show the news.
 	this->sendMsg("#---------------- Global News ----------------#\n");
-	for (auto it = Mud::instance().mudNews.rbegin();
-		 it != Mud::instance().mudNews.rend(); ++it) {
+	for (auto it = Mud::instance().mudNews.rbegin(); it != Mud::instance().mudNews.rend(); ++it) {
 		this->sendMsg("Date :" + it->first + "\n");
 		this->sendMsg(it->second + "\n");
 	}
@@ -313,8 +305,7 @@ void Player::processRead()
 		MudLog(LogLevel::Error, "Socket recv failed: %d", errno);
 		// Close the socket.
 		if (Mud::instance().closeSocket(psocket)) {
-			MudLog(LogLevel::Error,
-				   "Something has gone wrong during socket closure.");
+			MudLog(LogLevel::Error, "Something has gone wrong during socket closure.");
 		}
 		// Log the error.
 		MudLog(LogLevel::Error, "Connection %d closed.", psocket);
@@ -370,8 +361,7 @@ void Player::processWrite()
         Mud::instance().getUpdater().updateBandWidth(2, uncompressed.size());
 #else
 		// Send to player.
-		auto nWrite =
-			send(psocket, outbuffer.c_str(), outbuffer.size(), MSG_NOSIGNAL);
+		auto nWrite = send(psocket, outbuffer.c_str(), outbuffer.size(), MSG_NOSIGNAL);
 		auto uWritten = static_cast<std::size_t>(nWrite);
 #endif
 #if 0

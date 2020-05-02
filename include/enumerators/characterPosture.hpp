@@ -45,8 +45,7 @@ public:
 	}
 
 	/// @brief Constructor from unsigned int.
-	explicit CharacterPosture(const unsigned int &_value) :
-		BaseEnumerator(_value)
+	explicit CharacterPosture(const unsigned int &_value) : BaseEnumerator(_value)
 	{
 		if (_value > Sleep)
 			value = None;

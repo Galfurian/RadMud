@@ -75,8 +75,7 @@ std::vector<WeaponItemType *> GetActiveWeapons(Character *character)
 /// @brief Provides the list of active natural weapons.
 /// @param character The target character.
 /// @return Vector of natural weapons.
-std::vector<std::shared_ptr<BodyPart::BodyWeapon> >
-GetActiveNaturalWeapons(Character *character);
+std::vector<std::shared_ptr<BodyPart::BodyWeapon> > GetActiveNaturalWeapons(Character *character);
 
 /// @brief Search the coins inside the given container.
 /// @param character The target character.
@@ -105,10 +104,8 @@ public:
 	bool randomIfNoLight;
 
 	/// @brief Constructor.
-	explicit SearchOptionsCharacter(bool _searchInRoom = false,
-									bool _searchInInventory = false,
-									bool _searchInEquipment = false,
-									bool _checkLightLevels = false,
+	explicit SearchOptionsCharacter(bool _searchInRoom = false, bool _searchInInventory = false,
+									bool _searchInEquipment = false, bool _checkLightLevels = false,
 									bool _randomIfNoLight = false) :
 		searchInRoom(_searchInRoom),
 		searchInInventory(_searchInInventory),
@@ -135,9 +132,8 @@ public:
 };
 
 /// @brief Search the given item name nearby the character.
-Item *FindNearbyItem(Character *character, std::string const &key,
-					 unsigned int number, unsigned int *number_ptr,
-					 const SearchOptionsCharacter &searchOptions);
+Item *FindNearbyItem(Character *character, std::string const &key, unsigned int number,
+					 unsigned int *number_ptr, const SearchOptionsCharacter &searchOptions);
 
 /// @brief Search the list of ingredients nearby the character.
 /// @param character            The target character.
@@ -146,11 +142,10 @@ Item *FindNearbyItem(Character *character, std::string const &key,
 /// @param searchOptions        The search options.
 /// @return <b>True</b> if the operation goes well,<br>
 ///         <b>False</b> otherwise.
-bool FindNearbyResouces(
-	Character *character,
-	std::map<ResourceType, unsigned int> const &requiredResources,
-	std::vector<std::pair<Item *, unsigned int> > &foundResources,
-	const SearchOptionsCharacter &searchOptions, ResourceType &missing);
+bool FindNearbyResouces(Character *character,
+						std::map<ResourceType, unsigned int> const &requiredResources,
+						std::vector<std::pair<Item *, unsigned int> > &foundResources,
+						const SearchOptionsCharacter &searchOptions, ResourceType &missing);
 
 /// @brief Search the given type of tool in the proximity of the character.
 /// @param character        The target character.
@@ -158,8 +153,7 @@ bool FindNearbyResouces(
 /// @param exceptions       Items which cannot be selected.
 /// @param searchOptions    The search options.
 /// @return The searched tool.
-Item *FindNearbyTool(Character *character, const ToolType &toolType,
-					 const ItemVector &exceptions,
+Item *FindNearbyTool(Character *character, const ToolType &toolType, const ItemVector &exceptions,
 					 const SearchOptionsCharacter &searchOptions);
 
 /// @brief Search the list of tools nearby the character.
@@ -170,8 +164,7 @@ Item *FindNearbyTool(Character *character, const ToolType &toolType,
 /// @return <b>True</b> if the operation goes well,<br>
 ///         <b>False</b> otherwise.
 bool FindNearbyTools(Character *character, std::vector<ToolType> requiredTools,
-					 ItemVector &foundTools,
-					 const SearchOptionsCharacter &searchOptions);
+					 ItemVector &foundTools, const SearchOptionsCharacter &searchOptions);
 
 /// @brief Search the required building.
 /// @param character        The target character.
@@ -179,8 +172,7 @@ bool FindNearbyTools(Character *character, std::vector<ToolType> requiredTools,
 /// @param searchOptions    The search options.
 /// @return <b>True</b> if the operation goes well,<br>
 ///         <b>False</b> otherwise.
-Item *FindNearbyBuilding(Character *character,
-						 std::shared_ptr<ItemModel> buildingModel,
+Item *FindNearbyBuilding(Character *character, std::shared_ptr<ItemModel> buildingModel,
 						 const SearchOptionsCharacter &searchOptions);
 
 /// @brief Move the character to another room.
@@ -191,9 +183,8 @@ Item *FindNearbyBuilding(Character *character,
 /// @param msgChar     What to tell the character.
 /// @return <b>True</b> if the operation goes well,<br>
 ///         <b>False</b> otherwise.
-bool MoveCharacterTo(Character *character, Room *destination,
-					 const std::string &msgDepart, const std::string &msgArrive,
-					 const std::string &msgChar = "");
+bool MoveCharacterTo(Character *character, Room *destination, const std::string &msgDepart,
+					 const std::string &msgArrive, const std::string &msgChar = "");
 
 /// @brief Checks if the character has the required knowledge for the
 ///         given production.
@@ -201,13 +192,11 @@ bool MoveCharacterTo(Character *character, Room *destination,
 /// @param production   The production to check.
 /// @return <b>True</b> has the required knowledge,<br>
 ///         <b>False</b> otherwise.
-bool HasRequiredKnowledge(Character *character,
-						  std::vector<Knowledge> const &required);
+bool HasRequiredKnowledge(Character *character, std::vector<Knowledge> const &required);
 
 /// @brief Parse the abilities from the given string.
 /// @param abilities The map where the abilities should be stored.
 /// @param source    The string which containts the values
 /// @return <b>True</b> if the string is correct,<br>
 ///         <b>False</b> otherwise.
-bool ParseAbilities(std::map<Ability, unsigned int> &abilities,
-					std::string const &source);
+bool ParseAbilities(std::map<Ability, unsigned int> &abilities, std::string const &source);

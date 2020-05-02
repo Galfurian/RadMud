@@ -51,9 +51,7 @@ bool LoadBlockedIp(ResultSet *result)
 bool LoadNews(ResultSet *result)
 {
 	if (!Mud::instance()
-			 .mudNews
-			 .insert(std::make_pair(result->getNextString(),
-									result->getNextString()))
+			 .mudNews.insert(std::make_pair(result->getNextString(), result->getNextString()))
 			 .second) {
 		throw SQLiteException("Error during news loading.");
 	}
@@ -77,11 +75,9 @@ bool LoadItemContent(ResultSet *result)
 bool LoadItem(ResultSet *result)
 {
 	auto itemVnum = result->getNextUnsignedInteger();
-	auto itemModel =
-		Mud::instance().findItemModel(result->getNextUnsignedInteger());
+	auto itemModel = Mud::instance().findItemModel(result->getNextUnsignedInteger());
 	if (itemModel == nullptr) {
-		throw SQLiteException("Item has wrong model (" + ToString(itemVnum) +
-							  ")");
+		throw SQLiteException("Item has wrong model (" + ToString(itemVnum) + ")");
 	}
 	// Create the item.
 	auto item = ItemFactory::newItem(itemModel->getType());
@@ -90,8 +86,7 @@ bool LoadItem(ResultSet *result)
 	item->quantity = result->getNextUnsignedInteger();
 	item->maker = result->getNextString();
 	item->condition = result->getNextDouble();
-	item->composition =
-		Mud::instance().findMaterial(result->getNextUnsignedInteger());
+	item->composition = Mud::instance().findMaterial(result->getNextUnsignedInteger());
 	item->quality = ItemQuality(result->getNextUnsignedInteger());
 	item->flags = result->getNextUnsignedInteger();
 	// Check correctness of attributes.
@@ -121,8 +116,8 @@ bool LoadSkill(ResultSet *result)
 		throw SQLiteException("Error during error checking.");
 	if (!Mud::instance().addSkill(skill))
 		throw SQLiteException("Error during skill insertion.");
-	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", skill->name,
-		   skill->ability.toString(), skill->description);
+	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", skill->name, skill->ability.toString(),
+		   skill->description);
 	return true;
 }
 
@@ -136,14 +131,12 @@ bool LoadSkillPrerequisite(ResultSet *result)
 	auto requiredSkillVnum = result->getNextUnsignedInteger();
 	auto requiredSkill = Mud::instance().findSkill(requiredSkillVnum);
 	if (requiredSkill == nullptr) {
-		throw SQLiteException("Can't find the skill " +
-							  ToString(requiredSkillVnum) +
+		throw SQLiteException("Can't find the skill " + ToString(requiredSkillVnum) +
 							  " required by the skill " + ToString(skillVnum));
 	}
 	skill->requiredSkill.emplace_back(requiredSkillVnum);
 	requiredSkill->usedForSkill.emplace_back(skillVnum);
-	MudLog(LogLevel::Debug, "\t%-25s requires %-25s", skill->name,
-		   requiredSkill->name);
+	MudLog(LogLevel::Debug, "\t%-25s requires %-25s", skill->name, requiredSkill->name);
 	return true;
 }
 
@@ -157,14 +150,12 @@ bool LoadSkillAbilityModifier(ResultSet *result)
 	auto abilityNumber = result->getNextUnsignedInteger();
 	auto ability = Ability(abilityNumber);
 	if (ability == Ability::None) {
-		throw SQLiteException("Can't find the ability " +
-							  ToString(abilityNumber));
+		throw SQLiteException("Can't find the ability " + ToString(abilityNumber));
 	}
 	auto modifier = result->getNextInteger();
 	skill->modifierManager->setAbilityMod(ability, modifier);
 	// Log it.
-	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", skill->name,
-		   ability.toString(), modifier);
+	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", skill->name, ability.toString(), modifier);
 	return true;
 }
 
@@ -178,14 +169,12 @@ bool LoadSkillStatusModifier(ResultSet *result)
 	auto statusModifierNumber = result->getNextUnsignedInteger();
 	auto statusModifier = StatusModifier(statusModifierNumber);
 	if (statusModifier == StatusModifier::None) {
-		throw SQLiteException("Can't find the status modifier " +
-							  ToString(statusModifierNumber));
+		throw SQLiteException("Can't find the status modifier " + ToString(statusModifierNumber));
 	}
 	auto modifier = result->getNextInteger();
 	skill->modifierManager->setStatusMod(statusModifier, modifier);
 	// Log it.
-	MudLog(LogLevel::Debug, "\t%-25s%-35s%-35s", skill->name,
-		   statusModifier.toString(), modifier);
+	MudLog(LogLevel::Debug, "\t%-25s%-35s%-35s", skill->name, statusModifier.toString(), modifier);
 	return true;
 }
 
@@ -199,14 +188,12 @@ bool LoadSkillCombatModifier(ResultSet *result)
 	auto combatModifierNumber = result->getNextUnsignedInteger();
 	auto combatModifier = CombatModifier(combatModifierNumber);
 	if (combatModifier == CombatModifier::None) {
-		throw SQLiteException("Can't find the combat modifier " +
-							  ToString(combatModifierNumber));
+		throw SQLiteException("Can't find the combat modifier " + ToString(combatModifierNumber));
 	}
 	auto modifier = result->getNextInteger();
 	skill->modifierManager->setCombatMod(combatModifier, modifier);
 	// Log it.
-	MudLog(LogLevel::Debug, "\t%-25s%-35s%-35s", skill->name,
-		   combatModifier.toString(), modifier);
+	MudLog(LogLevel::Debug, "\t%-25s%-35s%-35s", skill->name, combatModifier.toString(), modifier);
 	return true;
 }
 
@@ -220,8 +207,7 @@ bool LoadSkillKnowledge(ResultSet *result)
 	auto knowledgeNumber = result->getNextUnsignedInteger();
 	auto knowledge = Knowledge(knowledgeNumber);
 	if (knowledge == Ability::None) {
-		throw SQLiteException("Can't find the knowledge " +
-							  ToString(knowledgeNumber));
+		throw SQLiteException("Can't find the knowledge " + ToString(knowledgeNumber));
 	}
 	skill->modifierManager->setKnowledge(knowledge, 1);
 	// Log it.
@@ -239,12 +225,10 @@ bool LoadFaction(ResultSet *result)
 	auto currencyVnum = result->getNextUnsignedInteger();
 	auto currencyModel = Mud::instance().findItemModel(currencyVnum);
 	if (currencyModel == nullptr) {
-		throw SQLiteException("Can't find the currency " +
-							  ToString(currencyVnum));
+		throw SQLiteException("Can't find the currency " + ToString(currencyVnum));
 	}
 	if (currencyModel->getType() != ModelType::Currency) {
-		throw SQLiteException("Model is not currency " +
-							  ToString(currencyVnum));
+		throw SQLiteException("Model is not currency " + ToString(currencyVnum));
 	}
 	faction->currency = currencyModel->to<CurrencyModel>();
 	// Translate new_line.
@@ -264,8 +248,7 @@ bool LoadModel(ResultSet *result)
 	// Retrieve the vnum and the type of model.
 	auto vnum = result->getNextUnsignedInteger();
 	// Create a pointer to the new item model.
-	auto itemModel =
-		ModelFactory::newModel(ModelType(result->getNextUnsignedInteger()));
+	auto itemModel = ModelFactory::newModel(ModelType(result->getNextUnsignedInteger()));
 	if (itemModel == nullptr) {
 		throw SQLiteException("Wrong type of model " + ToString(vnum));
 	}
@@ -329,11 +312,9 @@ bool LoadRace(ResultSet *result)
 	// Retrieve and set the values.
 	corpse->corpseRace = race;
 	auto corpseCompositionVnum = result->getNextUnsignedInteger();
-	auto corpseComposition =
-		Mud::instance().findMaterial(corpseCompositionVnum);
+	auto corpseComposition = Mud::instance().findMaterial(corpseCompositionVnum);
 	if (corpseComposition == nullptr) {
-		throw SQLiteException("Cannot find the material " +
-							  ToString(corpseCompositionVnum) +
+		throw SQLiteException("Cannot find the material " + ToString(corpseCompositionVnum) +
 							  " for a corpse.");
 	}
 	corpse->corpseComposition = corpseComposition;
@@ -362,8 +343,7 @@ bool LoadRaceBodyPart(ResultSet *result)
 	auto bodyPartVnum = result->getNextUnsignedInteger();
 	auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
 	if (bodyPart == nullptr) {
-		throw SQLiteException("Cannot find the body part " +
-							  ToString(bodyPartVnum));
+		throw SQLiteException("Cannot find the body part " + ToString(bodyPartVnum));
 	}
 	// Add the body part to the race.
 	race->bodyParts.emplace_back(bodyPart);
@@ -388,8 +368,7 @@ bool LoadRaceBaseSkill(ResultSet *result)
 	// Set the base skill of the race.
 	race->skills.emplace_back(std::make_shared<SkillData>(skill, skillLevel));
 	// Log the skill.
-	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", race->name, skill->name,
-		   skillLevel);
+	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", race->name, skill->name, skillLevel);
 	return true;
 }
 
@@ -427,9 +406,7 @@ bool LoadMobileModel(ResultSet *result)
 		mm->abilities = mm->race->abilities;
 	}
 	mm->lua_script = result->getNextString();
-	if (!Mud::instance()
-			 .mudMobileModels.insert(std::make_pair(mm->vnum, mm))
-			 .second) {
+	if (!Mud::instance().mudMobileModels.insert(std::make_pair(mm->vnum, mm)).second) {
 		throw SQLiteException("Failed to store mobile model.");
 	}
 	return true;
@@ -444,13 +421,11 @@ bool LoadMobileSpawn(ResultSet *result)
 	// Retrive the data.
 	auto mm = Mud::instance().findMobileModel(modelVnum);
 	if (mm == nullptr) {
-		throw SQLiteException("Cannot find mobile model " +
-							  ToString(modelVnum) + ".");
+		throw SQLiteException("Cannot find mobile model " + ToString(modelVnum) + ".");
 	}
 	auto room = Mud::instance().findRoom(roomVnum);
 	if (room == nullptr) {
-		throw SQLiteException("Cannot find the room " + ToString(roomVnum) +
-							  ".");
+		throw SQLiteException("Cannot find the room " + ToString(roomVnum) + ".");
 	}
 	if (mm->spawn(room, vnum) == nullptr) {
 		throw SQLiteException("Cannot spawn mobile " + ToString(vnum) + ".");
@@ -467,8 +442,7 @@ bool LoadRoom(ResultSet *result)
 	room->coord.x = result->getNextInteger();
 	room->coord.y = result->getNextInteger();
 	room->coord.z = result->getNextInteger();
-	room->terrain =
-		Mud::instance().findTerrain(result->getNextUnsignedInteger());
+	room->terrain = Mud::instance().findTerrain(result->getNextUnsignedInteger());
 	room->name = result->getNextString();
 	room->description = result->getNextString();
 	room->flags = result->getNextUnsignedInteger();
@@ -496,8 +470,7 @@ bool LoadRoomLiquid(ResultSet *result)
 	auto liquidVnum = result->getNextUnsignedInteger();
 	auto liquid = Mud::instance().findLiquid(liquidVnum);
 	if (liquid == nullptr) {
-		throw SQLiteException("Cannot find the liquid: " +
-							  ToString(liquidVnum));
+		throw SQLiteException("Cannot find the liquid: " + ToString(liquidVnum));
 	}
 	auto quantity = result->getNextInteger();
 	if (quantity > 0) {
@@ -522,13 +495,11 @@ bool LoadExit(ResultSet *result)
 	}
 	newExit->destination = Mud::instance().findRoom(destinationVnum);
 	if (newExit->destination == nullptr) {
-		throw SQLiteException("Can't find destination " +
-							  ToString(destinationVnum));
+		throw SQLiteException("Can't find destination " + ToString(destinationVnum));
 	}
 	Direction direction(directionValue);
 	if (direction == Direction::None) {
-		throw SQLiteException("Direction si not valid " +
-							  ToString(directionValue));
+		throw SQLiteException("Direction si not valid " + ToString(directionValue));
 	}
 	newExit->direction = direction;
 	newExit->flags = flagValue;
@@ -682,8 +653,7 @@ bool LoadProduction(ResultSet *result)
 	auto professionVnum = result->getNextUnsignedInteger();
 	auto profession = Mud::instance().findProfession(professionVnum);
 	if (profession == nullptr) {
-		throw SQLiteException("Can't find the profession " +
-							  ToString(professionVnum));
+		throw SQLiteException("Can't find the profession " + ToString(professionVnum));
 	}
 	production->profession = profession;
 	production->difficulty = result->getNextUnsignedInteger();
@@ -696,8 +666,7 @@ bool LoadProduction(ResultSet *result)
 	}
 	profession->productions.emplace_back(production);
 	// Log it.
-	MudLog(LogLevel::Debug, "\t%-25s%-25s", production->name,
-		   profession->command);
+	MudLog(LogLevel::Debug, "\t%-25s%-25s", production->name, profession->command);
 	return true;
 }
 
@@ -706,19 +675,16 @@ bool LoadProductionTool(ResultSet *result)
 	auto productionVnum = result->getNextUnsignedInteger();
 	auto production = Mud::instance().findProduction(productionVnum);
 	if (production == nullptr) {
-		throw SQLiteException("Can't find the production " +
-							  ToString(productionVnum));
+		throw SQLiteException("Can't find the production " + ToString(productionVnum));
 	}
 	auto toolTypeNumber = result->getNextUnsignedInteger();
 	auto toolType = ToolType(toolTypeNumber);
 	if (toolType == ToolType::None) {
-		throw SQLiteException("Can't find the tool type " +
-							  ToString(toolTypeNumber));
+		throw SQLiteException("Can't find the tool type " + ToString(toolTypeNumber));
 	}
 	production->tools.emplace_back(toolType);
 	// Log it.
-	MudLog(LogLevel::Debug, "\t%-25s%-25s", production->name,
-		   toolType.toString());
+	MudLog(LogLevel::Debug, "\t%-25s%-25s", production->name, toolType.toString());
 	return true;
 }
 
@@ -727,20 +693,18 @@ bool LoadProductionOutcome(ResultSet *result)
 	auto productionVnum = result->getNextUnsignedInteger();
 	auto production = Mud::instance().findProduction(productionVnum);
 	if (production == nullptr) {
-		throw SQLiteException("Can't find the production " +
-							  ToString(productionVnum));
+		throw SQLiteException("Can't find the production " + ToString(productionVnum));
 	}
 	auto outcomeVnum = result->getNextUnsignedInteger();
 	auto outcome = Mud::instance().findItemModel(outcomeVnum);
 	if (outcome == nullptr) {
-		throw SQLiteException("Can't find the outcome " +
-							  ToString(outcomeVnum));
+		throw SQLiteException("Can't find the outcome " + ToString(outcomeVnum));
 	}
 	production->outcome = outcome;
 	production->quantity = result->getNextUnsignedInteger();
 	// Log it.
-	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", production->name,
-		   outcome->name, production->quantity);
+	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", production->name, outcome->name,
+		   production->quantity);
 	return true;
 }
 
@@ -749,14 +713,12 @@ bool LoadProductionIngredient(ResultSet *result)
 	auto productionVnum = result->getNextUnsignedInteger();
 	auto production = Mud::instance().findProduction(productionVnum);
 	if (production == nullptr) {
-		throw SQLiteException("Can't find the production " +
-							  ToString(productionVnum));
+		throw SQLiteException("Can't find the production " + ToString(productionVnum));
 	}
 	auto ingredientNumber = result->getNextUnsignedInteger();
 	auto ingredient = ResourceType(ingredientNumber);
 	if (ingredient == ResourceType::None) {
-		throw SQLiteException("Can't find the ingredient " +
-							  ToString(ingredientNumber));
+		throw SQLiteException("Can't find the ingredient " + ToString(ingredientNumber));
 	}
 	auto quantity = result->getNextUnsignedInteger();
 	if (quantity == 0) {
@@ -764,8 +726,7 @@ bool LoadProductionIngredient(ResultSet *result)
 	}
 	production->ingredients.insert(std::make_pair(ingredient, quantity));
 	// Log it.
-	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", production->name,
-		   ingredient.toString(), quantity);
+	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", production->name, ingredient.toString(), quantity);
 	return true;
 }
 
@@ -774,19 +735,16 @@ bool LoadProductionKnowledge(ResultSet *result)
 	auto productionVnum = result->getNextUnsignedInteger();
 	auto production = Mud::instance().findProduction(productionVnum);
 	if (production == nullptr) {
-		throw SQLiteException("Can't find the production " +
-							  ToString(productionVnum));
+		throw SQLiteException("Can't find the production " + ToString(productionVnum));
 	}
 	auto knowledgeNumber = result->getNextUnsignedInteger();
 	auto knowledge = Knowledge(knowledgeNumber);
 	if (knowledge == ResourceType::None) {
-		throw SQLiteException("Can't find the ingredient " +
-							  ToString(knowledgeNumber));
+		throw SQLiteException("Can't find the ingredient " + ToString(knowledgeNumber));
 	}
 	production->requiredKnowledge.emplace_back(knowledge);
 	// Log it.
-	MudLog(LogLevel::Debug, "\t%-25s%-25s", production->name,
-		   knowledge.toString());
+	MudLog(LogLevel::Debug, "\t%-25s%-25s", production->name, knowledge.toString());
 	return true;
 }
 
@@ -817,8 +775,7 @@ bool LoadItemLiquidContent(ResultSet *result)
 	auto containerVnum = result->getNextUnsignedInteger();
 	auto container = Mud::instance().findItem(containerVnum);
 	if (container == nullptr) {
-		throw SQLiteException("Can't find the container " +
-							  ToString(containerVnum));
+		throw SQLiteException("Can't find the container " + ToString(containerVnum));
 	}
 	if (container->getType() != ModelType::LiquidContainer) {
 		throw SQLiteException("Wrong container for liquids.");
@@ -838,8 +795,7 @@ bool LoadItemLiquidContent(ResultSet *result)
 
 bool LoadTravelPoint(ResultSet *result)
 {
-	auto sourceArea =
-		Mud::instance().findArea(result->getNextUnsignedInteger());
+	auto sourceArea = Mud::instance().findArea(result->getNextUnsignedInteger());
 	if (sourceArea == nullptr) {
 		throw SQLiteException("Can't find the source area.");
 	}
@@ -847,8 +803,7 @@ bool LoadTravelPoint(ResultSet *result)
 	if (sourceRoom == nullptr) {
 		throw SQLiteException("Can't find the source room.");
 	}
-	auto targetArea =
-		Mud::instance().findArea(result->getNextUnsignedInteger());
+	auto targetArea = Mud::instance().findArea(result->getNextUnsignedInteger());
 	if (targetArea == nullptr) {
 		throw SQLiteException("Can't find the target area.");
 	}
@@ -880,8 +835,7 @@ bool LoadBuilding(ResultSet *result)
 	auto modelVnum = result->getNextUnsignedInteger();
 	building->buildingModel = Mud::instance().findItemModel(modelVnum);
 	if (building->buildingModel == nullptr) {
-		throw SQLiteException("Can't find the building model: " +
-							  ToString(modelVnum));
+		throw SQLiteException("Can't find the building model: " + ToString(modelVnum));
 	}
 	if (!Mud::instance().addBuilding(building)) {
 		throw SQLiteException("Error during building insertion.");
@@ -895,14 +849,12 @@ bool LoadBuildingTool(ResultSet *result)
 	auto buildingVnum = result->getNextUnsignedInteger();
 	auto building = Mud::instance().findBuilding(buildingVnum);
 	if (building == nullptr) {
-		throw SQLiteException("Can't find the building: " +
-							  ToString(buildingVnum));
+		throw SQLiteException("Can't find the building: " + ToString(buildingVnum));
 	}
 	auto toolId = result->getNextUnsignedInteger();
 	ToolType tool(toolId);
 	if (tool == ToolType::None) {
-		throw SQLiteException("Can't find the type of tool : " +
-							  ToString(toolId));
+		throw SQLiteException("Can't find the type of tool : " + ToString(toolId));
 	}
 	building->tools.emplace_back(tool);
 	MudLog(LogLevel::Debug, "\t%-25s%-25s", building->name, tool.toString());
@@ -914,19 +866,16 @@ bool LoadBuildingIngredient(ResultSet *result)
 	auto buildingVnum = result->getNextUnsignedInteger();
 	auto building = Mud::instance().findBuilding(buildingVnum);
 	if (building == nullptr) {
-		throw SQLiteException("Can't find the building: " +
-							  ToString(buildingVnum));
+		throw SQLiteException("Can't find the building: " + ToString(buildingVnum));
 	}
 	auto ingredientId = result->getNextUnsignedInteger();
 	ResourceType ingredient(ingredientId);
 	if (ingredient == ResourceType::None) {
-		throw SQLiteException("Can't find the type of resource: " +
-							  ToString(ingredientId));
+		throw SQLiteException("Can't find the type of resource: " + ToString(ingredientId));
 	}
 	auto quantity = result->getNextUnsignedInteger();
 	building->ingredients.insert(std::make_pair(ingredient, quantity));
-	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", building->name,
-		   ingredient.toString(), quantity);
+	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", building->name, ingredient.toString(), quantity);
 	return true;
 }
 
@@ -935,18 +884,16 @@ bool LoadBuildingKnowledge(ResultSet *result)
 	auto buildingVnum = result->getNextUnsignedInteger();
 	auto building = Mud::instance().findBuilding(buildingVnum);
 	if (building == nullptr) {
-		throw SQLiteException("Can't find the building: " +
-							  ToString(buildingVnum));
+		throw SQLiteException("Can't find the building: " + ToString(buildingVnum));
 	}
 	auto knowledgeId = result->getNextUnsignedInteger();
 	Knowledge knowledge(knowledgeId);
 	if (knowledge == Knowledge::None) {
-		throw SQLiteException("Can't find the knowledge: " +
-							  ToString(knowledgeId));
+		throw SQLiteException("Can't find the knowledge: " + ToString(knowledgeId));
 	}
 	building->requiredKnowledge.emplace_back(knowledge);
-	MudLog(LogLevel::Debug, "\t[%-4s] %-25s%-25s", building->vnum,
-		   building->name, knowledge.toString());
+	MudLog(LogLevel::Debug, "\t[%-4s] %-25s%-25s", building->vnum, building->name,
+		   knowledge.toString());
 	return true;
 }
 
@@ -965,8 +912,7 @@ bool LoadShop(ResultSet *result)
 	shop->shopBuyTax = result->getNextUnsignedInteger();
 	shop->shopSellTax = result->getNextUnsignedInteger();
 	shop->balance = result->getNextUnsignedInteger();
-	shop->shopKeeper =
-		Mud::instance().findMobile(result->getNextUnsignedInteger());
+	shop->shopKeeper = Mud::instance().findMobile(result->getNextUnsignedInteger());
 	shop->openingHour = result->getNextUnsignedInteger();
 	shop->closingHour = result->getNextUnsignedInteger();
 	if (shop->shopKeeper != nullptr)
@@ -982,8 +928,7 @@ bool LoadShopDefaultStock(ResultSet *result)
 		throw SQLiteException("Wrong shop (" + ToString(shopVnum) + ")");
 	}
 	if (shopItem->getType() != ModelType::Shop) {
-		throw SQLiteException("Wrong type (" + shopItem->getType().toString() +
-							  ")");
+		throw SQLiteException("Wrong type (" + shopItem->getType().toString() + ")");
 	}
 	auto shop = dynamic_cast<ShopItem *>(shopItem);
 	auto modelVnum = result->getNextUnsignedInteger();
@@ -994,8 +939,7 @@ bool LoadShopDefaultStock(ResultSet *result)
 	auto compositionVnum = result->getNextUnsignedInteger();
 	auto composition = Mud::instance().findMaterial(compositionVnum);
 	if (composition == nullptr) {
-		throw SQLiteException("Wrong composition (" +
-							  ToString(compositionVnum) + ")");
+		throw SQLiteException("Wrong composition (" + ToString(compositionVnum) + ")");
 	}
 	auto quality = ItemQuality(result->getNextUnsignedInteger());
 	auto quantity = result->getNextUnsignedInteger();
@@ -1018,8 +962,7 @@ bool LoadCurrency(ResultSet *result)
 	}
 	auto material = Mud::instance().findMaterial(materialVnum);
 	if (material == nullptr) {
-		throw SQLiteException("Can't find the material " +
-							  ToString(materialVnum));
+		throw SQLiteException("Can't find the material " + ToString(materialVnum));
 	}
 	auto currency = model->to<CurrencyModel>();
 	if (!currency->addPrice(materialVnum, worth)) {
@@ -1038,8 +981,8 @@ bool LoadTerrain(ResultSet *result)
 	terrain->space = result->getNextUnsignedInteger();
 	terrain->symbol = result->getNextString();
 	if (!Mud::instance().addTerrain(terrain)) {
-		throw SQLiteException("Can't add the terrain " +
-							  ToString(terrain->vnum) + " - " + terrain->name);
+		throw SQLiteException("Can't add the terrain " + ToString(terrain->vnum) + " - " +
+							  terrain->name);
 	}
 	MudLog(LogLevel::Debug, "\t%-25s%-25s", terrain->vnum, terrain->name);
 	return true;
@@ -1050,8 +993,7 @@ bool LoadTerrainLiquid(ResultSet *result)
 	auto terrainVnum = result->getNextUnsignedInteger();
 	auto terrain = Mud::instance().findTerrain(terrainVnum);
 	if (terrain == nullptr) {
-		throw SQLiteException("Can't find the terrain " +
-							  ToString(terrainVnum));
+		throw SQLiteException("Can't find the terrain " + ToString(terrainVnum));
 	}
 	auto liquidVnum = result->getNextUnsignedInteger();
 	auto liquid = Mud::instance().findLiquid(liquidVnum);
@@ -1069,8 +1011,7 @@ bool LoadTerrainLiquidSources(ResultSet *result)
 	auto terrainVnum = result->getNextUnsignedInteger();
 	auto terrain = Mud::instance().findTerrain(terrainVnum);
 	if (terrain == nullptr) {
-		throw SQLiteException("Can't find the terrain " +
-							  ToString(terrainVnum));
+		throw SQLiteException("Can't find the terrain " + ToString(terrainVnum));
 	}
 	auto liquidVnum = result->getNextUnsignedInteger();
 	auto liquid = Mud::instance().findLiquid(liquidVnum);
@@ -1080,8 +1021,7 @@ bool LoadTerrainLiquidSources(ResultSet *result)
 	auto probability = result->getNextUnsignedInteger();
 	// Add the liquid source.
 	terrain->addLiquidSource(liquid, probability);
-	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", terrain->name, liquid->name,
-		   probability);
+	MudLog(LogLevel::Debug, "\t%-25s%-25s%-25s", terrain->name, liquid->name, probability);
 	return true;
 }
 
@@ -1103,8 +1043,7 @@ bool LoadBodyPartResources(ResultSet *result)
 	auto bodyPartVnum = result->getNextUnsignedInteger();
 	auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
 	if (bodyPart == nullptr) {
-		throw SQLiteException("Can't find the body part " +
-							  ToString(bodyPartVnum));
+		throw SQLiteException("Can't find the body part " + ToString(bodyPartVnum));
 	}
 	auto modelVnum = result->getNextUnsignedInteger();
 	auto model = Mud::instance().findItemModel(modelVnum);
@@ -1112,14 +1051,12 @@ bool LoadBodyPartResources(ResultSet *result)
 		throw SQLiteException("Can't find the model " + ToString(modelVnum));
 	}
 	if (model->getType() != ModelType::Resource) {
-		throw SQLiteException("The model is not a resource " +
-							  ToString(modelVnum));
+		throw SQLiteException("The model is not a resource " + ToString(modelVnum));
 	}
 	auto materialVnum = result->getNextUnsignedInteger();
 	auto material = Mud::instance().findMaterial(materialVnum);
 	if (material == nullptr) {
-		throw SQLiteException("Can't find the material " +
-							  ToString(materialVnum));
+		throw SQLiteException("Can't find the material " + ToString(materialVnum));
 	}
 	auto quantity = result->getNextInteger();
 	auto difficulty = result->getNextInteger();
@@ -1137,8 +1074,7 @@ bool LoadBodyPartWeapon(ResultSet *result)
 	auto bodyPartVnum = result->getNextUnsignedInteger();
 	auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
 	if (bodyPart == nullptr) {
-		throw SQLiteException("Can't add the body part" +
-							  ToString(bodyPartVnum));
+		throw SQLiteException("Can't add the body part" + ToString(bodyPartVnum));
 	}
 	auto bodyWeapon = std::make_shared<BodyPart::BodyWeapon>();
 	bodyWeapon->name = result->getNextString();
@@ -1159,8 +1095,7 @@ bool LoadModelBodyPart(ResultSet *result)
 	auto bodyPartVnum = result->getNextUnsignedInteger();
 	auto bodyPart = Mud::instance().findBodyPart(bodyPartVnum);
 	if (bodyPart == nullptr)
-		throw SQLiteException("Can't find the body part " +
-							  ToString(bodyPartVnum));
+		throw SQLiteException("Can't find the body part " + ToString(bodyPartVnum));
 	model->bodyParts.emplace_back(bodyPart);
 	return true;
 }

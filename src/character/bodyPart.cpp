@@ -54,8 +54,7 @@ std::string BodyPart::getDescription(Race *race, bool capital) const
 {
 	std::string result = description;
 	FindAndReplace(&result, "&m", (race) ? ToLower(race->name) : "");
-	FindAndReplace(&result, "&M",
-				   (race) ? ToLower(race->article + ' ' + race->name) : "");
+	FindAndReplace(&result, "&M", (race) ? ToLower(race->article + ' ' + race->name) : "");
 	return (capital) ? ToCapitals(result) : result;
 }
 

@@ -65,10 +65,8 @@ void ProcessNewStory::advance()
 	ss << "#\n";
 	ss << "Year 374\n";
 	ss << "#\n";
-	ss << "# Type [" << Formatter::magenta("continue")
-	   << "] to continue to the next step.\n";
-	ss << "# Type [" << Formatter::magenta("back")
-	   << "] to return to the previous step.\n";
+	ss << "# Type [" << Formatter::magenta("continue") << "] to continue to the next step.\n";
+	ss << "# Type [" << Formatter::magenta("back") << "] to return to the previous step.\n";
 	character->sendMsg(ss.str());
 
 	this->printError();

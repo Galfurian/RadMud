@@ -47,8 +47,7 @@ private:
 		/// @param _material The material.
 		/// @param _price    The price associated to the material.
 		Price(const unsigned int &_material, const unsigned int &_price) :
-			material(_material),
-			price(_price)
+			material(_material), price(_price)
 		{
 			// Nothing to do.
 		}
@@ -88,8 +87,7 @@ public:
 
 	void getSheet(Table &sheet) const override;
 
-	Item *createItem(std::string maker, Material *composition,
-					 bool isForMobile = false,
+	Item *createItem(std::string maker, Material *composition, bool isForMobile = false,
 					 const ItemQuality &itemQuality = ItemQuality::Normal,
 					 const unsigned int &quantity = 1) override;
 
@@ -114,8 +112,7 @@ public:
 	/// @param maker Who has generated the currency.
 	/// @param value The total worth that has to be generate.
 	/// @return The list of generated currencies.
-	ItemVector generateCurrency(const std::string &maker,
-								const unsigned int &value);
+	ItemVector generateCurrency(const std::string &maker, const unsigned int &value);
 
 private:
 	/// @brief Sort the list of prices.

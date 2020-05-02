@@ -42,13 +42,7 @@ class Character;
 class Material;
 
 /// Used to determine the flag of the item.
-enum class ItemFlag {
-	None = 0,
-	Closed = 1,
-	Locked = 2,
-	Built = 4,
-	Temporary = 8
-};
+enum class ItemFlag { None = 0, Closed = 1, Locked = 2, Built = 4, Temporary = 8 };
 
 /// @brief Holds details about items.
 class Item : public UpdateInterface {
@@ -256,8 +250,7 @@ public:
 
 	/// @brief Set the body parts occupied by the item.
 	/// @param _occupiedBodyParts The occupied body parts.
-	void setOccupiedBodyParts(
-		std::vector<std::shared_ptr<BodyPart> > _occupiedBodyParts);
+	void setOccupiedBodyParts(std::vector<std::shared_ptr<BodyPart> > _occupiedBodyParts);
 
 	/// @brief Operator used to order the items based on their name.
 	bool operator<(Item &rhs) const;

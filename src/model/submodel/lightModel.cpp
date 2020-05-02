@@ -52,9 +52,8 @@ bool LightModel::setModel(const std::string &source)
 	}
 	auto functionList = SplitString(source, " ");
 	if (functionList.size() != 4) {
-		MudLog(LogLevel::Error,
-					"Wrong number of parameters for Light Model (%s)[%s].",
-					name, source);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Light Model (%s)[%s].", name,
+			   source);
 		return false;
 	}
 	fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));

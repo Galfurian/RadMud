@@ -25,12 +25,7 @@
 #include "utilities/logger.hpp"
 
 MechanismModel::MechanismModel() :
-	mechanismType(),
-	key(),
-	difficulty(),
-	efficency(),
-	command(),
-	target()
+	mechanismType(), key(), difficulty(), efficency(), command(), target()
 {
 	// Nothing to do.
 }
@@ -58,12 +53,10 @@ bool MechanismModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 6) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Mechanism Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Mechanism Model (%s).", name);
 		return false;
 	}
-	this->mechanismType =
-		static_cast<MechanismType>(ToNumber<unsigned int>(functionList[0]));
+	this->mechanismType = static_cast<MechanismType>(ToNumber<unsigned int>(functionList[0]));
 
 	if ((this->mechanismType == MechanismType::Door) ||
 		(this->mechanismType == MechanismType::Lock)) {
@@ -85,8 +78,7 @@ void MechanismModel::getSheet(Table &sheet) const
 	// Add a divider.
 	sheet.addDivider();
 	// Set the values.
-	sheet.addRow(
-		{ "Mechanism Type", GetMechanismTypeName(this->mechanismType) });
+	sheet.addRow({ "Mechanism Type", GetMechanismTypeName(this->mechanismType) });
 	sheet.addRow({ "Key", ToString(this->key) });
 	sheet.addRow({ "Picklock Difficulty", ToString(this->difficulty) });
 	sheet.addRow({ "Picklock Efficency", ToString(this->efficency) });

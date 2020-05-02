@@ -44,8 +44,7 @@ public:
 
 	void getSheet(Table &sheet) const override;
 
-	Item *createItem(std::string maker, Material *composition,
-					 bool isForMobile = false,
+	Item *createItem(std::string maker, Material *composition, bool isForMobile = false,
 					 const ItemQuality &itemQuality = ItemQuality::Normal,
 					 const unsigned int &quantity = 1) override;
 

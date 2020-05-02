@@ -52,8 +52,7 @@ bool ResourceModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 1) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Resource Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Resource Model (%s).", name);
 		return false;
 	}
 	this->resourceType = ResourceType(ToNumber<unsigned int>(functionList[0]));

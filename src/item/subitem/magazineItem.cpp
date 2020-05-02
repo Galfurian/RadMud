@@ -74,8 +74,7 @@ bool MagazineItem::isAContainer() const
 bool MagazineItem::canLoadWith(Item *_projectile, std::string &error) const
 {
 	if (_projectile->getType() != ModelType::Projectile) {
-		error = "You can't load " + this->getName(true) + " with " +
-				_projectile->getName(true);
+		error = "You can't load " + this->getName(true) + " with " + _projectile->getName(true);
 		return false;
 	}
 	// Retrieve any already loaded projectiles.
@@ -107,8 +106,7 @@ bool MagazineItem::getAmountToLoad(Item *_projectile, unsigned int &amount,
 		// Set the amount of already loaded projectiles.
 		amountAlreadyLoaded = loadedProjectile->quantity;
 		if (amount <= amountAlreadyLoaded) {
-			error =
-				this->getNameCapital(true) + " is already at full capacity.";
+			error = this->getNameCapital(true) + " is already at full capacity.";
 			return false;
 		}
 		amount -= amountAlreadyLoaded;

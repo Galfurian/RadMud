@@ -66,8 +66,7 @@ bool SavePlayerSkills(Player *player)
 		args.push_back(player->name);
 		args.push_back(ToString(skillData->skillVnum));
 		args.push_back(ToString(skillData->skillLevel));
-		if (!SQLiteDbms::instance().insertInto("PlayerSkill", args, false,
-											   true)) {
+		if (!SQLiteDbms::instance().insertInto("PlayerSkill", args, false, true)) {
 			return false;
 		}
 	}
@@ -82,16 +81,14 @@ bool SavePlayerLuaVariables(Player *player)
 		args.push_back(player->name);
 		args.push_back(iterator.first);
 		args.push_back(iterator.second);
-		if (!SQLiteDbms::instance().insertInto("PlayerVariable", args, false,
-											   true)) {
+		if (!SQLiteDbms::instance().insertInto("PlayerVariable", args, false, true)) {
 			return false;
 		}
 	}
 	return true;
 }
 
-bool SaveItemPlayer(Player *player, Item *item,
-					const unsigned int &bodyPartVnum)
+bool SaveItemPlayer(Player *player, Item *item, const unsigned int &bodyPartVnum)
 {
 	std::vector<std::string> args;
 	args.emplace_back(player->name);

@@ -29,47 +29,38 @@
 
 void LoadGeneralCommands()
 {
+	Mud::instance().addCommand(
+		std::make_shared<Command>(DoQuit, "quit", "", "Leave the game.", false, false, true));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoQuit, "quit", "", "Leave the game.", false, false, true));
+		DoWho, "who", "", "List all the character online.", false, false, false));
+	Mud::instance().addCommand(std::make_shared<Command>(DoSet, "set", "(setting) (value)",
+														 "Set some character texts(eg. descr).",
+														 false, false, false));
+	Mud::instance().addCommand(
+		std::make_shared<Command>(DoLook, "look", "[(something) or (someone)]",
+								  "Look at something or someone.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoWho, "who", "", "List all the character online.", false, false,
-		false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoSet, "set", "(setting) (value)",
-		"Set some character texts(eg. descr).", false, false, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoLook, "look", "[(something) or (someone)]",
-		"Look at something or someone.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoHelp, "help", "(command)",
-		"Show the list of commands or show help for a given command.", false,
-		true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoPrompt, "prompt", "(help)|(prompt definition)", "Modify your prompt.",
-		false, false, false));
+		DoHelp, "help", "(command)", "Show the list of commands or show help for a given command.",
+		false, true, false));
+	Mud::instance().addCommand(
+		std::make_shared<Command>(DoPrompt, "prompt", "(help)|(prompt definition)",
+								  "Modify your prompt.", false, false, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
 		DoTime, "time", "", "Give the current day phase.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoStatistics, "statistics", "", "Show player statistics.", false, true,
-		false));
+		DoStatistics, "statistics", "", "Show player statistics.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoEffects, "effects", "", "Show player active effects.", false, true,
-		false));
+		DoEffects, "effects", "", "Show player active effects.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoRent, "rent", "", "Allow player to rent and disconnect.", false,
-		false, false));
+		DoRent, "rent", "", "Allow player to rent and disconnect.", false, false, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoSkills, "skills", "", "Shows the playes skills and their level.",
-		false, true, false));
+		DoSkills, "skills", "", "Shows the playes skills and their level.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoActions, "actions", "", "Shows the list of actions.", false, true,
-		false));
+		DoActions, "actions", "", "Shows the list of actions.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoServer, "server", "", "Shows the server statistics.", false, true,
-		false));
+		DoServer, "server", "", "Shows the server statistics.", false, true, false));
 	Mud::instance().addCommand(std::make_shared<Command>(
-		DoGenerateName, "generate_name", "", "Generates a random name.", false,
-		true, false));
+		DoGenerateName, "generate_name", "", "Generates a random name.", false, true, false));
 }
 
 bool DoQuit(Character *character, ArgumentHandler & /*args*/)
@@ -88,11 +79,10 @@ bool DoQuit(Character *character, ArgumentHandler & /*args*/)
 		player->sendMsg("See you next time!\n");
 		if (player->room != nullptr) {
 			// Send the message inside the room.
-			player->room->sendToAll("Player %s disappear in a puff of smoke.\n",
-									{ character }, player->getName());
+			player->room->sendToAll("Player %s disappear in a puff of smoke.\n", { character },
+									player->getName());
 		}
-		MudLog(LogLevel::Global, "Player %s has left the game.",
-			   player->getName());
+		MudLog(LogLevel::Global, "Player %s has left the game.", player->getName());
 		// End of properly connected.
 		player->closeConnection();
 		return true;
@@ -111,9 +101,8 @@ bool DoWho(Character *character, ArgumentHandler & /*args*/)
 		// If the player is not playing, continue.
 		if (!iterator->isPlaying())
 			continue;
-		table.addRow({ iterator->getName(), (iterator->room != nullptr) ?
-												iterator->room->name :
-												"Nowhere" });
+		table.addRow({ iterator->getName(),
+					   (iterator->room != nullptr) ? iterator->room->name : "Nowhere" });
 		++total;
 	}
 	character->sendMsg(table.getTable());
@@ -169,10 +158,8 @@ bool DoLook(Character *character, ArgumentHandler &args)
 		// player is looking at someone.
 		if (character->room->isLit()) {
 			// Check if the character is looking at another character.
-			auto target =
-				character->room->findCharacter(args[0].getContent(),
-											   target_index, &target_index,
-											   { character });
+			auto target = character->room->findCharacter(args[0].getContent(), target_index,
+														 &target_index, { character });
 			if (target) {
 				if (character->canSee(target)) {
 					// Show the target.
@@ -181,8 +168,7 @@ bool DoLook(Character *character, ArgumentHandler &args)
 					if (target->canSee(character)) {
 						// Notify to other character, that this one are
 						// looking at him.
-						target->sendMsg("%s looks at you.\n\n",
-										character->getNameCapital());
+						target->sendMsg("%s looks at you.\n\n", character->getNameCapital());
 					}
 					return true;
 				}
@@ -191,37 +177,32 @@ bool DoLook(Character *character, ArgumentHandler &args)
 		// Otherwise, check if the character is looking at an item.
 		auto options = SearchOptionsCharacter::allOptions();
 		options.randomIfNoLight = false;
-		auto item = FindNearbyItem(character, args[0].getContent(),
-								   target_index, &target_index, options);
+		auto item =
+			FindNearbyItem(character, args[0].getContent(), target_index, &target_index, options);
 		if (item) {
 			character->sendMsg(item->getLook());
 			return true;
 		}
-		character->sendMsg("You don't see '%s' anywhere.\n",
-						   args[0].getContent());
+		character->sendMsg("You don't see '%s' anywhere.\n", args[0].getContent());
 	} else if (args.size() == 2) {
 		// Check if the room is lit by a light. In that case, maybe the
 		// player is looking at the equipment of someone.
 		if (character->room->isLit()) {
-			auto target =
-				character->room->findCharacter(args[1].getContent(),
-											   args[1].getIndex(), nullptr,
-											   { character });
+			auto target = character->room->findCharacter(args[1].getContent(), args[1].getIndex(),
+														 nullptr, { character });
 			if (target != nullptr) {
 				if (character->canSee(target)) {
-					auto item = target->findEquipmentItem(args[0].getContent(),
-														  args[0].getIndex());
+					auto item = target->findEquipmentItem(args[0].getContent(), args[0].getIndex());
 					if (item != nullptr) {
 						character->sendMsg(item->getLook());
 						return true;
 					}
-					character->sendMsg("You don't see %s on %s.\n",
-									   args[0].getContent(), target->getName());
+					character->sendMsg("You don't see %s on %s.\n", args[0].getContent(),
+									   target->getName());
 					return false;
 				}
-				character->sendMsg(
-					"You don't see the container '%s' anywhere.\n",
-					args[1].getContent());
+				character->sendMsg("You don't see the container '%s' anywhere.\n",
+								   args[1].getContent());
 				return false;
 			}
 		}
@@ -229,20 +210,18 @@ bool DoLook(Character *character, ArgumentHandler &args)
 		// container.
 		auto options = SearchOptionsCharacter::allOptions();
 		options.randomIfNoLight = false;
-		auto container = FindNearbyItem(character, args[1].getContent(),
-										args[1].getIndex(), nullptr, options);
+		auto container =
+			FindNearbyItem(character, args[1].getContent(), args[1].getIndex(), nullptr, options);
 		if (container == nullptr) {
 			character->sendMsg("You don't see the container '%s' anywhere.\n",
 							   args[1].getContent());
 			return false;
 		}
 		if (!container->isAContainer()) {
-			character->sendMsg("%s is not a container.\n",
-							   container->getNameCapital(true));
+			character->sendMsg("%s is not a container.\n", container->getNameCapital(true));
 			return false;
 		}
-		auto item =
-			container->findContent(args[0].getContent(), args[0].getIndex());
+		auto item = container->findContent(args[0].getContent(), args[0].getIndex());
 		if (item) {
 			character->sendMsg(item->getLook());
 			return true;
@@ -302,17 +281,13 @@ bool DoHelp(Character *character, ArgumentHandler &args)
 				if (BeginWith(ToLower(it->name), command)) {
 					std::string msg;
 					msg += "Showing help for command :" + it->name + "\n";
-					msg += Formatter::yellow() +
-						   " Command   : " + Formatter::reset() + it->name +
+					msg += Formatter::yellow() + " Command   : " + Formatter::reset() + it->name +
 						   "\n";
-					msg += Formatter::yellow() +
-						   " Level     : " + Formatter::reset() +
+					msg += Formatter::yellow() + " Level     : " + Formatter::reset() +
 						   ToString(it->gods) + "\n";
-					msg += Formatter::yellow() +
-						   " Arguments : " + Formatter::reset() +
+					msg += Formatter::yellow() + " Arguments : " + Formatter::reset() +
 						   it->arguments + "\n";
-					msg += Formatter::yellow() +
-						   " Help      : " + Formatter::reset() + it->help +
+					msg += Formatter::yellow() + " Help      : " + Formatter::reset() + it->help +
 						   "\n";
 					character->sendMsg(msg);
 					return true;
@@ -336,8 +311,8 @@ bool DoPrompt(Character *character, ArgumentHandler &args)
 	if (args.empty()) {
 		character->sendMsg("Current prompt:\n");
 		character->sendMsg("    %s\n", player->prompt);
-		character->sendMsg("Type %sprompt help %sto read the guide.\n",
-						   Formatter::yellow(), Formatter::reset());
+		character->sendMsg("Type %sprompt help %sto read the guide.\n", Formatter::yellow(),
+						   Formatter::reset());
 	} else {
 		if (args[0].getContent() == "help") {
 			auto yellow = [](std::string s) {
@@ -348,8 +323,7 @@ bool DoPrompt(Character *character, ArgumentHandler &args)
 			};
 			std::string msg;
 			msg += yellow("Prompt Help") + "\n";
-			msg +=
-				"You can set the prompt you prefer, respectfully to this constraints:\n";
+			msg += "You can set the prompt you prefer, respectfully to this constraints:\n";
 			msg += " - Not more than 15 characters.\n";
 			msg += "\n";
 			msg += "You can use the following shortcuts in you prompt:\n";
@@ -379,15 +353,14 @@ bool DoTime(Character *character, ArgumentHandler & /*args*/)
 		character->sendMsg("%sThe sun has just risen.%s\n", Formatter::yellow(),
 						   Formatter::reset());
 	} else if (MudUpdater::instance().getDayPhase() == DayPhase::Day) {
-		character->sendMsg("%sThe sun is high in the sky.%s\n",
-						   Formatter::yellow(), Formatter::reset());
+		character->sendMsg("%sThe sun is high in the sky.%s\n", Formatter::yellow(),
+						   Formatter::reset());
 	} else if (MudUpdater::instance().getDayPhase() == DayPhase::Dusk) {
-		character->sendMsg(
-			"%sThe sun is setting, the shadows begin to prevail.%s\n",
-			Formatter::cyan(), Formatter::reset());
+		character->sendMsg("%sThe sun is setting, the shadows begin to prevail.%s\n",
+						   Formatter::cyan(), Formatter::reset());
 	} else if (MudUpdater::instance().getDayPhase() == DayPhase::Night) {
-		character->sendMsg("%sThe darkness surrounds you.%s\n",
-						   Formatter::blue(), Formatter::reset());
+		character->sendMsg("%sThe darkness surrounds you.%s\n", Formatter::blue(),
+						   Formatter::reset());
 	}
 	return true;
 }
@@ -402,8 +375,7 @@ bool DoStatistics(Character *character, ArgumentHandler & /*args*/)
 	auto player = character->toPlayer();
 	std::stringstream ss;
 	ss << Formatter::magenta("Name        : ") << player->getName() << " ";
-	ss << Formatter::magenta("Gender : ") << GetGenderTypeName(player->gender)
-	   << " ";
+	ss << Formatter::magenta("Gender : ") << GetGenderTypeName(player->gender) << " ";
 	ss << Formatter::magenta("Race : ") << player->race->name << "\n";
 	ss << Formatter::magenta("Weight      : ") << player->weight << " ";
 	ss << Mud::instance().getWeightMeasure() << "\n";
@@ -412,11 +384,9 @@ bool DoStatistics(Character *character, ArgumentHandler & /*args*/)
 	// Add the abilities.
 	// STRENGTH
 	for (auto const &ability : player->abilities) {
-		ss << "    " << Formatter::magenta(ability.first.getAbbreviation())
-		   << "    " << std::right << std::setw(5)
-		   << player->getAbility(ability.first) << "(" << std::right
-		   << std::setw(3) << player->getAbilityModifier(ability.first)
-		   << ")\n";
+		ss << "    " << Formatter::magenta(ability.first.getAbbreviation()) << "    " << std::right
+		   << std::setw(5) << player->getAbility(ability.first) << "(" << std::right << std::setw(3)
+		   << player->getAbilityModifier(ability.first) << ")\n";
 	}
 	// HEALTH
 	ss << "    " << Formatter::magenta("Health  ");
@@ -424,10 +394,8 @@ bool DoStatistics(Character *character, ArgumentHandler & /*args*/)
 	ss << "    " << Formatter::magenta("Stamina ");
 	ss << player->stamina << "/" << player->getMaxStamina() << "\n";
 	// Add the Armor Class.
-	ss << "    " << Formatter::magenta("Armor Class ")
-	   << player->getArmorClass() << "\n";
-	ss << "    " << Formatter::magenta("Parry Chance ")
-	   << player->getParryChace() << "\n";
+	ss << "    " << Formatter::magenta("Armor Class ") << player->getArmorClass() << "\n";
+	ss << "    " << Formatter::magenta("Parry Chance ") << player->getParryChace() << "\n";
 	// Add the health and stamina conditions.
 	ss << "You " << Formatter::bold(player->getHealthCondition(true)) << ".\n";
 	ss << "You " << Formatter::bold(player->getStaminaCondition()) << ".\n";
@@ -438,21 +406,17 @@ bool DoStatistics(Character *character, ArgumentHandler & /*args*/)
 	ss << "You are " << Formatter::bold(player->posture.getAction()) << ".\n\n";
 	// [IF EXIST] Add the current action.
 	if (player->getAction() != ActionType::Wait) {
-		ss << "You are "
-		   << Formatter::bold(player->getAction()->getDescription()) << ".\n";
+		ss << "You are " << Formatter::bold(player->getAction()->getDescription()) << ".\n";
 	}
 	// [IF EXIST] Add the current opponent.
 	if (player->combatHandler.getPredefinedTarget() != nullptr) {
 		ss << "You are fighting with "
-		   << Formatter::bold(
-				  player->combatHandler.getPredefinedTarget()->getName())
-		   << ".\n";
+		   << Formatter::bold(player->combatHandler.getPredefinedTarget()->getName()) << ".\n";
 	}
 	// [IF EXIST] Add the current aimed opponent.
 	if (player->combatHandler.getAimedTarget() != nullptr) {
 		ss << "You are aiming at "
-		   << Formatter::bold(player->combatHandler.getAimedTarget()->getName())
-		   << ".\n";
+		   << Formatter::bold(player->combatHandler.getAimedTarget()->getName()) << ".\n";
 	}
 	player->sendMsg(ss.str());
 	return true;
@@ -529,8 +493,7 @@ bool DoSkills(Character *character, ArgumentHandler & /*args*/)
 	table.addColumn("Skill", align::left);
 	table.addColumn("Level", align::left);
 	for (const auto &skillData : player->skillManager.skills) {
-		table.addRow(
-			{ skillData->skill->name, skillData->getSkillRank().toString() });
+		table.addRow({ skillData->skill->name, skillData->getSkillRank().toString() });
 	}
 	character->sendMsg(table.getTable());
 	return true;
@@ -614,19 +577,15 @@ bool DoGenerateName(Character *character, ArgumentHandler &args)
 		help += "\tv - vowel\n";
 		help += "\tV - vowel or vowel combination\n";
 		help += "\tc - consonant\n";
-		help +=
-			"\tB - consonant or consonant combination suitable for beginning a word\n";
-		help +=
-			"\tC - consonant or consonant combination suitable anywhere in a word\n";
+		help += "\tB - consonant or consonant combination suitable for beginning a word\n";
+		help += "\tC - consonant or consonant combination suitable anywhere in a word\n";
 		help += "\ti - insult\n";
 		help += "\tm - mushy name\n";
 		help += "\tM - mushy name ending\n";
 		help += "\tD - consonant suited for a stupid person's name\n";
-		help +=
-			"\td - syllable suited for a stupid person's name (begins with a vowel)\n";
+		help += "\td - syllable suited for a stupid person's name (begins with a vowel)\n";
 		help += "\n";
-		help +=
-			"All characters between parenthesis () are emitted literally.\n";
+		help += "All characters between parenthesis () are emitted literally.\n";
 		help += "  For example, the pattern 's(dim)', emits a random generic\n";
 		help += "  syllable followed by 'dim'.\n";
 		help += "Characters between angle brackets <> emit patterns from\n";

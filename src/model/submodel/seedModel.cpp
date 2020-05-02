@@ -52,12 +52,10 @@ bool SeedModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 1) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Seed Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Seed Model (%s).", name);
 		return false;
 	}
-	this->seedType =
-		static_cast<SeedType>(ToNumber<unsigned int>(functionList[0]));
+	this->seedType = static_cast<SeedType>(ToNumber<unsigned int>(functionList[0]));
 	return true;
 }
 

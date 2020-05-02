@@ -32,11 +32,9 @@ bool DoGodInfo(Character *character, ArgumentHandler &args)
 	}
 	Character *target = Mud::instance().findPlayer(args[0].getContent());
 	if (target == nullptr) {
-		target = Mud::instance().findMobile(
-			ToNumber<unsigned int>(args[0].getContent()));
+		target = Mud::instance().findMobile(ToNumber<unsigned int>(args[0].getContent()));
 		if (target == nullptr) {
-			target = character->room->findCharacter(args[0].getContent(),
-													args[0].getIndex());
+			target = character->room->findCharacter(args[0].getContent(), args[0].getIndex());
 			if (target == nullptr) {
 				character->sendMsg("Character not found.\n");
 				return false;
@@ -75,8 +73,7 @@ bool DoTransfer(Character *character, ArgumentHandler &args)
 		auto roomVnum = ToNumber<unsigned int>(args[1].getContent());
 		destination = character->room->area->getRoom(roomVnum);
 		if (destination == nullptr) {
-			character->sendMsg("Can't find the room %s setting this room.\n",
-							   ToString(roomVnum));
+			character->sendMsg("Can't find the room %s setting this room.\n", ToString(roomVnum));
 			return false;
 		}
 	}
@@ -85,13 +82,10 @@ bool DoTransfer(Character *character, ArgumentHandler &args)
 	// Prepare messages.
 	// Move player.
 	MoveCharacterTo(target, destination,
-					target->getNameCapital() +
-						" is yanked away by unseen forces!",
+					target->getNameCapital() + " is yanked away by unseen forces!",
 					target->getNameCapital() + " appears breathlessly!",
-					"\n" + character->getNameCapital() +
-						" transfers you to another room!\n");
-	character->sendMsg("You transfer %s to room %s.\n", target->getName(),
-					   destination->name);
+					"\n" + character->getNameCapital() + " transfers you to another room!\n");
+	character->sendMsg("You transfer %s to room %s.\n", target->getName(), destination->name);
 	return true;
 }
 
@@ -101,8 +95,7 @@ bool DoHurt(Character *character, ArgumentHandler &args)
 		character->sendMsg("Who do you want to hurt?\n");
 		return false;
 	}
-	auto target = character->room->findCharacter(args[0].getContent(),
-												 args[0].getIndex());
+	auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex());
 	if (target == nullptr) {
 		character->sendMsg("Target not found.\n");
 		return false;
@@ -110,15 +103,13 @@ bool DoHurt(Character *character, ArgumentHandler &args)
 	// Set health to 1.
 	target->setHealth(1);
 	// Notify.
-	character->sendMsg("You point your finger, %s cries in pain.\n",
-					   target->getName());
+	character->sendMsg("You point your finger, %s cries in pain.\n", target->getName());
 	target->sendMsg("%s points the finger towards you, you cry in pain.\n",
 					character->getNameCapital());
 	// Send the message inside the room.
-	target->room->sendToAll(
-		"%s points the finger towards %s, %s cries in pain.\n",
-		{ character, target }, character->getNameCapital(), target->getName(),
-		target->getSubjectPronoun());
+	target->room->sendToAll("%s points the finger towards %s, %s cries in pain.\n",
+							{ character, target }, character->getNameCapital(), target->getName(),
+							target->getSubjectPronoun());
 	return true;
 }
 
@@ -148,8 +139,7 @@ bool DoFeast(Character *character, ArgumentHandler &args)
 		character->sendMsg("You must insert a valide target.\n");
 		return false;
 	}
-	auto target = character->room->findCharacter(args[0].getContent(),
-												 args[0].getIndex());
+	auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex());
 	if (target == nullptr) {
 		character->sendMsg("You must provide a valide target.\n");
 		return false;
@@ -158,10 +148,8 @@ bool DoFeast(Character *character, ArgumentHandler &args)
 	target->setStamina(target->getMaxStamina(), true);
 	target->thirst = 100;
 	target->hunger = 100;
-	target->sendMsg(
-		"%sA banquet with any kind of delicacy appears from nowhere!%s%s\n",
-		Formatter::magenta(), Formatter::reset(),
-		((target != character) ? "\n" : ""));
+	target->sendMsg("%sA banquet with any kind of delicacy appears from nowhere!%s%s\n",
+					Formatter::magenta(), Formatter::reset(), ((target != character) ? "\n" : ""));
 	return true;
 }
 
@@ -224,8 +212,7 @@ bool DoPlayerSetFlag(Character *character, ArgumentHandler &args)
 	}
 	auto target = Mud::instance().findPlayer(args[0].getContent());
 	if (target == nullptr) {
-		character->sendMsg("You can't find the player '%s'.\n",
-						   args[0].getContent());
+		character->sendMsg("You can't find the player '%s'.\n", args[0].getContent());
 		return false;
 	}
 	auto flag = static_cast<CharacterFlag>(ToNumber<int>(args[1].getContent()));
@@ -241,8 +228,8 @@ bool DoPlayerSetFlag(Character *character, ArgumentHandler &args)
 	// Set the flag.
 	SetFlag(target->flags, flag);
 	// Send confirmation to the player.
-	character->sendMsg("You set the flag '%s' for %s\n",
-					   GetCharacterFlagName(flag), target->getName());
+	character->sendMsg("You set the flag '%s' for %s\n", GetCharacterFlagName(flag),
+					   target->getName());
 	return true;
 }
 
@@ -254,8 +241,7 @@ bool DoPlayerClearFlag(Character *character, ArgumentHandler &args)
 	}
 	auto target = Mud::instance().findPlayer(args[0].getContent());
 	if (target == nullptr) {
-		character->sendMsg("You can't find the player '%s'.\n",
-						   args[0].getContent());
+		character->sendMsg("You can't find the player '%s'.\n", args[0].getContent());
 		return false;
 	}
 	auto flag = static_cast<CharacterFlag>(ToNumber<int>(args[1].getContent()));
@@ -271,8 +257,8 @@ bool DoPlayerClearFlag(Character *character, ArgumentHandler &args)
 	// Set the flag.
 	ClearFlag(target->flags, flag);
 	// Send confirmation to the player.
-	character->sendMsg("You clear the flag '%s' for %s\n",
-					   GetCharacterFlagName(flag), target->getName());
+	character->sendMsg("You clear the flag '%s' for %s\n", GetCharacterFlagName(flag),
+					   target->getName());
 	return true;
 }
 
@@ -282,14 +268,12 @@ bool DoPlayerModSkill(Character *character, ArgumentHandler &args)
 		character->sendMsg("Usage: [target] [#skill] [+/-VALUE]\n");
 		return false;
 	}
-	auto target =
-		character->room->findPlayer(args[0].getContent(), args[0].getIndex());
+	auto target = character->room->findPlayer(args[0].getContent(), args[0].getIndex());
 	if (target == nullptr) {
 		character->sendMsg("Target not found.\n");
 		return false;
 	}
-	auto skill =
-		Mud::instance().findSkill(ToNumber<unsigned int>(args[1].getContent()));
+	auto skill = Mud::instance().findSkill(ToNumber<unsigned int>(args[1].getContent()));
 	if (skill == nullptr) {
 		character->sendMsg("Cannot find the desired skill.\n");
 		return false;
@@ -301,14 +285,12 @@ bool DoPlayerModSkill(Character *character, ArgumentHandler &args)
 	}
 	auto skillData = target->skillManager.findSkill(skill->vnum);
 	if (skillData == nullptr) {
-		character->sendMsg("%s does not possess that skill.\n",
-						   target->getNameCapital());
+		character->sendMsg("%s does not possess that skill.\n", target->getNameCapital());
 		return false;
 	}
 	auto modified = static_cast<int>(skillData->skillLevel) + modifier;
 	if (modified <= 0) {
-		character->sendMsg("You cannot reduce the skill <= 0 (%s).\n",
-						   modified);
+		character->sendMsg("You cannot reduce the skill <= 0 (%s).\n", modified);
 		return false;
 	}
 	auto skillCap = SkillRank::getSkillCap();
@@ -320,8 +302,8 @@ bool DoPlayerModSkill(Character *character, ArgumentHandler &args)
 	// Notify.
 	character->sendMsg("You have successfully %s by %s the \"%s\" skill,"
 					   "the new level is %s.\n",
-					   ((modifier > 0) ? "increased " : "decreased"), modifier,
-					   skill->name, skillData->skillLevel);
+					   ((modifier > 0) ? "increased " : "decreased"), modifier, skill->name,
+					   skillData->skillLevel);
 	character->skillManager.updateSkillEffect(skillData);
 	character->skillManager.checkIfUnlockedSkills();
 	return true;
@@ -336,8 +318,7 @@ bool DoPlayerModAttr(Character *character, ArgumentHandler &args)
 		character->sendMsg("Usage: [target] [attribute] [+/-VALUE]\n");
 		return false;
 	}
-	auto target = character->room->findCharacter(args[0].getContent(),
-												 args[0].getIndex());
+	auto target = character->room->findCharacter(args[0].getContent(), args[0].getIndex());
 	if (target == nullptr) {
 		character->sendMsg("Target not found.\n");
 		return false;
@@ -368,13 +349,12 @@ bool DoPlayerModAttr(Character *character, ArgumentHandler &args)
 	if (result < 0) {
 		character->sendMsg("Attribute cannot go below 0.");
 		return false;
-	} else if (!target->setAbility(ability,
-								   static_cast<unsigned int>(result))) {
+	} else if (!target->setAbility(ability, static_cast<unsigned int>(result))) {
 		character->sendMsg("Attribute cannot go above 60.");
 		return false;
 	}
 	character->sendMsg("You have successfully %s by %s the %s of the target.",
-					   std::string((modifier > 0) ? "increased" : "decreased"),
-					   ToString(modifier), ability.toString());
+					   std::string((modifier > 0) ? "increased" : "decreased"), ToString(modifier),
+					   ability.toString());
 	return true;
 }

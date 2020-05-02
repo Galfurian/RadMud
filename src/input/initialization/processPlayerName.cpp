@@ -44,8 +44,7 @@ bool ProcessPlayerName::process(ArgumentHandler &args)
 		return true;
 	} else if (ToLower(input) == "quit") {
 		player->closeConnection();
-	} else if (input.find_first_not_of(VALID_CHARACTERS_NAME) !=
-			   std::string::npos) {
+	} else if (input.find_first_not_of(VALID_CHARACTERS_NAME) != std::string::npos) {
 		error = "That player name contains disallowed characters.";
 		this->advance();
 	} else if (Mud::instance().findPlayer(input)) {

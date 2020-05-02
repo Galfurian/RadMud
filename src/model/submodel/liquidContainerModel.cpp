@@ -52,8 +52,7 @@ bool LiquidContainerModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 2) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Liquid Container Model (%s).",
+		MudLog(LogLevel::Error, "Wrong number of parameters for Liquid Container Model (%s).",
 			   name);
 		return false;
 	}

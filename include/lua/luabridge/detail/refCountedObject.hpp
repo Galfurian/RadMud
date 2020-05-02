@@ -156,8 +156,7 @@ public:
 
      This will increment the object's reference-count if it is non-null.
      */
-	inline RefCountedObjectPtr(
-		ReferenceCountedObjectClass *const refCountedObject) :
+	inline RefCountedObjectPtr(ReferenceCountedObjectClass *const refCountedObject) :
 		referencedObject(refCountedObject)
 	{
 		if (refCountedObject != 0)
@@ -188,8 +187,7 @@ public:
      */
 	template <class DerivedClass>
 	inline RefCountedObjectPtr(const RefCountedObjectPtr<DerivedClass> &other) :
-		referencedObject(
-			static_cast<ReferenceCountedObjectClass *>(other.getObject()))
+		referencedObject(static_cast<ReferenceCountedObjectClass *>(other.getObject()))
 	{
 		if (referencedObject != 0)
 			referencedObject->incReferenceCount();
@@ -211,11 +209,9 @@ public:
      deleted if it hits zero. The new object's count is incremented.
      */
 	template <class DerivedClass>
-	RefCountedObjectPtr &
-	operator=(const RefCountedObjectPtr<DerivedClass> &other)
+	RefCountedObjectPtr &operator=(const RefCountedObjectPtr<DerivedClass> &other)
 	{
-		return operator=(
-			static_cast<ReferenceCountedObjectClass *>(other.getObject()));
+		return operator=(static_cast<ReferenceCountedObjectClass *>(other.getObject()));
 	}
 
 #if LUABRIDGE_COMPILER_SUPPORTS_MOVE_SEMANTICS
@@ -356,4 +352,4 @@ namespace luabridge
 
 #endif
 
-}
+} // namespace luabridge

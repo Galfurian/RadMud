@@ -30,10 +30,9 @@
 
 #include <cassert>
 
-BuildAction::BuildAction(
-	Character *_actor, const std::shared_ptr<Building> &_schematics,
-	Item *_building, ItemVector const &_tools,
-	std::vector<std::pair<Item *, unsigned int> > const &_ingredients) :
+BuildAction::BuildAction(Character *_actor, const std::shared_ptr<Building> &_schematics,
+						 Item *_building, ItemVector const &_tools,
+						 std::vector<std::pair<Item *, unsigned int> > const &_ingredients) :
 	GeneralAction(_actor),
 	schematics(_schematics),
 	building(_building),
@@ -159,8 +158,7 @@ ActionStatus BuildAction::perform()
 	}
 	// Send conclusion message.
 	actor->sendMsg("You have finished building %s.\n\n",
-				   Formatter::yellow() + schematics->buildingModel->getName() +
-					   Formatter::reset());
+				   Formatter::yellow() + schematics->buildingModel->getName() + Formatter::reset());
 	return ActionStatus::Finished;
 }
 
@@ -171,8 +169,7 @@ unsigned int BuildAction::getCooldown()
 	double requiredTime = schematics->time;
 	MudLog(LogLevel::Debug, "Base time  : %f", requiredTime);
 	for (auto const &knowledge : schematics->requiredKnowledge) {
-		requiredTime -=
-			(requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
+		requiredTime -= (requiredTime * actor->effectManager.getKnowledge(knowledge)) / 100;
 	}
 	MudLog(LogLevel::Debug, "With skill : %f", requiredTime);
 	return static_cast<unsigned int>(requiredTime);
@@ -187,7 +184,6 @@ unsigned int BuildAction::getConsumedStamina(Character *character)
 	unsigned int consumedStamina = 1;
 	consumedStamina -= character->getAbilityLog(Ability::Strength);
 	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->weight));
-	consumedStamina =
-		SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
+	consumedStamina = SafeSum(consumedStamina, SafeLog10(character->getCarryingWeight()));
 	return consumedStamina;
 }

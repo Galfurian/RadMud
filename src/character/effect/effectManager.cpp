@@ -38,9 +38,7 @@ void EffectManager::addEffect(Effect const &effect, bool immediate)
 	if (immediate) {
 		// Check if the effect is already active.
 		auto active = std::find_if(activeEffects.begin(), activeEffects.end(),
-								   [effect](Effect const &e) {
-									   return (effect.name == e.name);
-								   });
+								   [effect](Effect const &e) { return (effect.name == e.name); });
 		// If the same effect is already active, replace it.
 		if (active != activeEffects.end()) {
 			// Remove the modifiers due to the old effect.
@@ -85,10 +83,9 @@ void EffectManager::effectActivate()
 			continue;
 		}
 		// Check if there is the same effect already active.
-		if (std::find_if(activeEffects.begin(), activeEffects.end(),
-						 [it](Effect const &e) {
-							 return (it->name == e.name);
-						 }) != activeEffects.end()) {
+		if (std::find_if(activeEffects.begin(), activeEffects.end(), [it](Effect const &e) {
+				return (it->name == e.name);
+			}) != activeEffects.end()) {
 			// Remove the pending effect if already active.
 			it = pendingEffects.erase(it);
 			continue;

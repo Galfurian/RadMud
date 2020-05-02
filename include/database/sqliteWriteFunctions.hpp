@@ -47,8 +47,7 @@ bool SavePlayerLuaVariables(Player *player);
 
 /// @brief Allows to save the items posessed by the given player inside the
 /// database.
-bool SaveItemPlayer(Player *player, Item *item,
-					const unsigned int &bodyPartVnum);
+bool SaveItemPlayer(Player *player, Item *item, const unsigned int &bodyPartVnum);
 
 /// @brief Allows to save the information concerning the given shop inside
 /// the database.

@@ -25,8 +25,7 @@
 class ProcessNewName : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessNewName(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessNewName(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

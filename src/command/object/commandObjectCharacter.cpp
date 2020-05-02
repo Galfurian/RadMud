@@ -81,8 +81,7 @@ bool DoWield(Character *character, ArgumentHandler &args)
 		return false;
 	}
 	// Get the item.
-	auto item =
-		character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+	auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 	// If the room is not lit, check if the inventory contains a light.
 	if (!character->room->isLit()) {
 		// If the inventory is NOT lit and NOT empty, pick a random item.
@@ -138,8 +137,7 @@ bool DoWield(Character *character, ArgumentHandler &args)
 	character->sendMsg("You wield %s with %s.\n", item->getName(true), where);
 	// Send the message inside the room.
 	character->room->sendToAll("%s wields %s with %s.\n", { character },
-							   character->getNameCapital(), item->getName(true),
-							   whereOthers);
+							   character->getNameCapital(), item->getName(true), whereOthers);
 	return true;
 }
 
@@ -189,12 +187,10 @@ bool DoWear(Character *character, ArgumentHandler &args)
 		character->sendMsg("You have worn everything you could.\n");
 		// Send the message inside the room.
 		character->room->sendToAll("%s has worn all %s could.\n", { character },
-								   character->getNameCapital(),
-								   character->getSubjectPronoun());
+								   character->getNameCapital(), character->getSubjectPronoun());
 		return true;
 	}
-	auto item =
-		character->findInventoryItem(args[0].getContent(), args[0].getIndex());
+	auto item = character->findInventoryItem(args[0].getContent(), args[0].getIndex());
 	// If the room is not lit, check if the inventory contains a light.
 	if (!character->room->isLit()) {
 		// If the inventory is NOT lit and NOT empty, pick a random item.
@@ -249,9 +245,8 @@ bool DoWear(Character *character, ArgumentHandler &args)
 	// Notify to character.
 	character->sendMsg("You wear %s on your %s.\n", item->getName(true), where);
 	// Send the message inside the room.
-	character->room->sendToAll("%s wears %s on %s.\n", { character },
-							   character->getNameCapital(), item->getName(true),
-							   whereOthers);
+	character->room->sendToAll("%s wears %s on %s.\n", { character }, character->getNameCapital(),
+							   item->getName(true), whereOthers);
 	return true;
 }
 
@@ -288,22 +283,20 @@ bool DoRemove(Character *character, ArgumentHandler &args)
 		}
 		character->sendMsg("You have removed everything.\n");
 		// Send the message inside the room.
-		character->room->sendToAll("%s has undressed all he could.\n",
-								   { character }, character->getNameCapital());
+		character->room->sendToAll("%s has undressed all he could.\n", { character },
+								   character->getNameCapital());
 		// Check if we have just removed ALL the USED Ranged Weapons.
 		if (character->combatHandler.getAimedTarget() != nullptr) {
 			if (GetActiveWeapons<RangedWeaponItem>(character).empty()) {
-				character->sendMsg(
-					"You stop aiming %s.\n",
-					character->combatHandler.getAimedTarget()->getName());
+				character->sendMsg("You stop aiming %s.\n",
+								   character->combatHandler.getAimedTarget()->getName());
 				character->combatHandler.setAimedTarget(nullptr);
 			}
 		}
 		return false;
 	}
 	// Get the item.
-	auto item =
-		character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
+	auto item = character->findEquipmentItem(args[0].getContent(), args[0].getIndex());
 	// If the room is NOT lit and NOT empty, pick a random item.
 	if (!character->room->isLit() && !character->equipment.empty()) {
 		auto it = TRand<size_t>(0, character->equipment.size() - 1);
@@ -316,8 +309,7 @@ bool DoRemove(Character *character, ArgumentHandler &args)
 	}
 	// Prepare the message showing from the where the item has been removed.
 	std::string where, whereOthers;
-	for (auto it = item->occupiedBodyParts.begin();
-		 it != item->occupiedBodyParts.end();) {
+	for (auto it = item->occupiedBodyParts.begin(); it != item->occupiedBodyParts.end();) {
 		where += "your " + (*it)->getName();
 		whereOthers += character->getPossessivePronoun() + " ";
 		whereOthers += (*it)->getName();
@@ -335,14 +327,12 @@ bool DoRemove(Character *character, ArgumentHandler &args)
 	character->sendMsg("You remove %s from %s.\n", item->getName(true), where);
 	// Send the message inside the room.
 	character->room->sendToAll("%s removes %s from %s.\n", { character },
-							   character->getNameCapital(), item->getName(true),
-							   whereOthers);
+							   character->getNameCapital(), item->getName(true), whereOthers);
 	// Check if we have just removed ALL the USED Ranged Weapons.
 	if (character->combatHandler.getAimedTarget() != nullptr) {
 		if (GetActiveWeapons<RangedWeaponItem>(character).empty()) {
-			character->sendMsg(
-				"You stop aiming %s.\n",
-				character->combatHandler.getAimedTarget()->getName());
+			character->sendMsg("You stop aiming %s.\n",
+							   character->combatHandler.getAimedTarget()->getName());
 			character->combatHandler.setAimedTarget(nullptr);
 		}
 	}
@@ -385,14 +375,12 @@ bool DoInventory(Character *character, ArgumentHandler & /*args*/)
 	}
 	character->sendMsg(table.getTable() + "\n");
 	if (roomIsLit || inventoryIsLit) {
-		character->sendMsg(Formatter::yellow("Total carrying weight") +
-							   ": %s of %s %s.\n",
+		character->sendMsg(Formatter::yellow("Total carrying weight") + ": %s of %s %s.\n",
 						   ToString(character->getCarryingWeight()),
 						   ToString(character->getMaxCarryingWeight()),
 						   Mud::instance().getWeightMeasure());
 	} else {
-		character->sendMsg(
-			Formatter::red("You don't know how much you are carrying.\n"));
+		character->sendMsg(Formatter::red("You don't know how much you are carrying.\n"));
 	}
 	return true;
 }

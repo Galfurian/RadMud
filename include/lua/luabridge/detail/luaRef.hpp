@@ -114,9 +114,7 @@ private:
          The key is popped off the stack.
          */
 		Proxy(lua_State *L, int tableRef) :
-			m_L(L),
-			m_tableRef(tableRef),
-			m_keyRef(luaL_ref(L, LUA_REGISTRYINDEX))
+			m_L(L), m_tableRef(tableRef), m_keyRef(luaL_ref(L, LUA_REGISTRYINDEX))
 		{
 		}
 
@@ -447,8 +445,7 @@ private:
 			return LuaRef(m_L, FromStack());
 		}
 
-		template <class P1, class P2>
-		LuaRef const operator()(P1 p1, P2 p2) const
+		template <class P1, class P2> LuaRef const operator()(P1 p1, P2 p2) const
 		{
 			push(m_L);
 			Stack<P1>::push(m_L, p1);
@@ -457,8 +454,7 @@ private:
 			return LuaRef(m_L, FromStack());
 		}
 
-		template <class P1, class P2, class P3>
-		LuaRef const operator()(P1 p1, P2 p2, P3 p3) const
+		template <class P1, class P2, class P3> LuaRef const operator()(P1 p1, P2 p2, P3 p3) const
 		{
 			push(m_L);
 			Stack<P1>::push(m_L, p1);
@@ -507,10 +503,8 @@ private:
 			return LuaRef(m_L, FromStack());
 		}
 
-		template <class P1, class P2, class P3, class P4, class P5, class P6,
-				  class P7>
-		LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6,
-								P7 p7) const
+		template <class P1, class P2, class P3, class P4, class P5, class P6, class P7>
+		LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
 		{
 			push(m_L);
 			Stack<P1>::push(m_L, p1);
@@ -524,10 +518,8 @@ private:
 			return LuaRef(m_L, FromStack());
 		}
 
-		template <class P1, class P2, class P3, class P4, class P5, class P6,
-				  class P7, class P8>
-		LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7,
-								P8 p8) const
+		template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
+		LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
 		{
 			push(m_L);
 			Stack<P1>::push(m_L, p1);
@@ -1063,8 +1055,7 @@ public:
 		return LuaRef(m_L, FromStack());
 	}
 
-	template <class P1, class P2, class P3>
-	LuaRef const operator()(P1 p1, P2 p2, P3 p3) const
+	template <class P1, class P2, class P3> LuaRef const operator()(P1 p1, P2 p2, P3 p3) const
 	{
 		push(m_L);
 		Stack<P1>::push(m_L, p1);
@@ -1113,10 +1104,8 @@ public:
 		return LuaRef(m_L, FromStack());
 	}
 
-	template <class P1, class P2, class P3, class P4, class P5, class P6,
-			  class P7>
-	LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6,
-							P7 p7) const
+	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7>
+	LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) const
 	{
 		push(m_L);
 		Stack<P1>::push(m_L, p1);
@@ -1130,10 +1119,8 @@ public:
 		return LuaRef(m_L, FromStack());
 	}
 
-	template <class P1, class P2, class P3, class P4, class P5, class P6,
-			  class P7, class P8>
-	LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7,
-							P8 p8) const
+	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
+	LuaRef const operator()(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) const
 	{
 		push(m_L);
 		Stack<P1>::push(m_L, p1);

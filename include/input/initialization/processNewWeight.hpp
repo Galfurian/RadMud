@@ -25,8 +25,7 @@
 class ProcessNewWeight : public ProcessInitialization {
 public:
 	/// @brief Constructor.
-	explicit ProcessNewWeight(Character *_character) :
-		ProcessInitialization(_character)
+	explicit ProcessNewWeight(Character *_character) : ProcessInitialization(_character)
 	{
 		// Nothing to do.
 	}

@@ -52,8 +52,7 @@ bool RopeModel::setModel(const std::string &source)
 	}
 	std::vector<std::string> functionList = SplitString(source, " ");
 	if (functionList.size() != 2) {
-		MudLog(LogLevel::Error,
-			   "Wrong number of parameters for Rope Model (%s).", name);
+		MudLog(LogLevel::Error, "Wrong number of parameters for Rope Model (%s).", name);
 		return false;
 	}
 	this->difficulty = ToNumber<unsigned int>(functionList[0]);
