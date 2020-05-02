@@ -36,14 +36,14 @@
 #define CorrectAssert(e)                                                       \
 	((e) ? true :                                                              \
 		   (std::cerr << "Assertion :" #e << "\n",                             \
-			std::cerr << "File      :" << __FILE__ << "\n",       \
+			std::cerr << "File      :" << __FILE__ << "\n",                    \
 			std::cerr << "Line      :" << __LINE__ << "\n", false))
 
 /// Allows to define a non-aborting assertion for wrong guards.
 #define WrongAssert(e)                                                         \
 	((e) ? (std::cerr << "Assertion :" #e << "\n",                             \
-			std::cerr << "File      :" << __FILE__ << "\n",       \
-			std::cerr << "Line      :" << __LINE__ << "\n", true) :  \
+			std::cerr << "File      :" << __FILE__ << "\n",                    \
+			std::cerr << "Line      :" << __LINE__ << "\n", true) :            \
 		   false)
 
 #define Abs(x) ((x) < 0 ? -(x) : (x))
@@ -73,13 +73,15 @@ double SafeLog10(const double &source);
 /// @brief Allows to safely sum an unsigned value with another value.
 /// @param first  The first (unsigned) value.
 /// @param second The second value.
+/// @param dflt   The default value used if the sum is below zero.
 /// @return The sum of the two values.
 template <typename UnsignedType, typename SignedType>
-UnsignedType SafeSum(const UnsignedType &first, const SignedType &second)
+UnsignedType SafeSum(const UnsignedType &first, const SignedType &second,
+					 const UnsignedType &dflt = 0)
 {
 	SignedType signedFirst = static_cast<SignedType>(first);
 	if (signedFirst < second) {
-		return 0;
+		return dflt;
 	}
 	return static_cast<UnsignedType>(signedFirst + second);
 }
