@@ -28,17 +28,6 @@
 #include "character/characterUtilities.hpp"
 #include "utilities/formatter.hpp"
 
-void LoadCraftingCommands()
-{
-	Mud::instance().addCommand(std::make_shared<Command>(DoBuild, "build", "(item)",
-														 "Build something.", false, false, false));
-	Mud::instance().addCommand(std::make_shared<Command>(DoDeconstruct, "deconstruct", "(building)",
-														 "Deconstruct a building.", false, false,
-														 false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoRead, "read", "(item)", "Read an inscription from an item.", false, false, false));
-}
-
 bool DoProfession(Character *character, Profession *profession, ArgumentHandler &args)
 {
 	// Check if the character is sleeping.

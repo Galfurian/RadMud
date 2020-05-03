@@ -24,13 +24,6 @@
 #include "item/subitem/shopItem.hpp"
 #include "mud.hpp"
 
-void LoadManagerCommands()
-{
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoAssign, "assign", "(mobile) (building)", "Allows to assign a mobile to a task/building.",
-		false, false, false));
-}
-
 bool DoAssign(Character *character, ArgumentHandler &args)
 {
 	// Check if the character is sleeping.

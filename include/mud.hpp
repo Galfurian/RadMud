@@ -295,7 +295,9 @@ public:
 	bool addTravelPoint(Room *source, Room *target);
 
 	/// Add a command to the mud.
-	void addCommand(const std::shared_ptr<Command> &command);
+	void addCommand(std::function<bool(Character *character, ArgumentHandler &args)> _handler,
+					std::string _name, std::string _arguments, std::string _help, bool _gods,
+					bool _canUseInCombat, bool _typedCompletely);
 
 	/// Add a building to the mud.
 	bool addBuilding(const std::shared_ptr<Building> &building);
@@ -485,6 +487,10 @@ private:
 	/// @return <b>True</b> if there are no errors,<br>
 	///         <b>False</b> otherwise.
 	bool stopMud();
+
+	/// @brief Map all the command to the respective std::string that the
+	///         character can type (implementation in `command.cpp`).
+	bool initCommands();
 };
 
 /// @brief Here when a signal is raised.

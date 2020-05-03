@@ -24,9 +24,6 @@
 #include "input/argument.hpp"
 #include "character/character.hpp"
 
-/// Loads all the commands which allows to manage things.
-void LoadManagerCommands();
-
 /// @defgroup ComInterfaces Commands List Interface.
 /// @brief All the functions necessary to handle the commands that a player
 ///         can execute.

@@ -31,35 +31,6 @@
 #include "action/combat/flee.hpp"
 #include "structure/structureUtils.hpp"
 
-void LoadCombatCommands()
-{
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoKill, "kill", "(target)", "Engage in combat the desired target.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoFlee, "flee", "", "Try to flee from combat.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoScout, "scout", "", "Provides information about the surrounding area.", false, true,
-		false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoLoad, "load", "(magazine) (projectiles)", "Allows to load a magazine with projectiles.",
-		false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoUnload, "unload", "(magazine)", "Allows to unload an magazine.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoReload, "reload", "(firearm) (magazine)", "Allows to reload a firearm with a magazine.",
-		false, true, false));
-	Mud::instance().addCommand(
-		std::make_shared<Command>(DoAim, "aim", "(target)",
-								  "Allows to aim a target in sight.\n"
-								  "If the target is not inside the same room,"
-								  "you have first to scout the area.\n"
-								  "If no arguments is provided it lists the available targets.",
-								  false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoFire, "fire", "(firearm) (magazine)",
-		"Allows to fire with an equipped ranged weapon to an aimed target.", false, true, false));
-}
-
 bool DoKill(Character *character, ArgumentHandler &args)
 {
 	// Check if the character is sleeping.

@@ -1002,21 +1002,6 @@ void Character::luaAddEquipment(Item *item)
 	}
 }
 
-bool Character::luaRemEquipment(Item *item)
-{
-	return this->remEquipmentItem(item);
-}
-
-void Character::luaAddInventory(Item *item)
-{
-	this->addInventoryItem(item);
-}
-
-bool Character::luaRemInventory(Item *item)
-{
-	return this->remInventoryItem(item);
-}
-
 bool Character::operator<(const class Character &source) const
 {
 	return name < source.name;

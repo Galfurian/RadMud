@@ -26,9 +26,6 @@
 
 class Profession;
 
-/// Loads all the crafring commands.
-void LoadCraftingCommands();
-
 /// @defgroup ComInterfaces Commands List Interface.
 /// @brief All the functions necessary to handle the commands that a player
 ///         can execute.

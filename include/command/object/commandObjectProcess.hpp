@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "command/object/commandObject.hpp"
+#include "input/argument.hpp"
+#include "character/character.hpp"
 
 /// Allows to dismember a corpse.
 bool DoDismember(Character *character, ArgumentHandler &args);

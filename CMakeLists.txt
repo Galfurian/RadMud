@@ -137,7 +137,6 @@ set(PROJECT_SRC
     ${CMAKE_SOURCE_DIR}/src/command/manager.cpp
     ${CMAKE_SOURCE_DIR}/src/command/general.cpp
     ${CMAKE_SOURCE_DIR}/src/command/movement.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/god/commandGod.cpp
     ${CMAKE_SOURCE_DIR}/src/command/god/commandGodMud.cpp
     ${CMAKE_SOURCE_DIR}/src/command/god/commandGodItem.cpp
     ${CMAKE_SOURCE_DIR}/src/command/god/commandGodLiquid.cpp
@@ -153,7 +152,6 @@ set(PROJECT_SRC
     ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectProcess.cpp
     ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectShop.cpp
     ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectFood.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObject.cpp
     ${CMAKE_SOURCE_DIR}/src/creation/building.cpp
     ${CMAKE_SOURCE_DIR}/src/creation/production.cpp
     ${CMAKE_SOURCE_DIR}/src/creation/liquid.cpp

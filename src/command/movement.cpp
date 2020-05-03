@@ -25,32 +25,6 @@
 #include "action/moveAction.hpp"
 #include "mud.hpp"
 
-void LoadMovementCommands()
-{
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoTravel, "travel", "", "Allow the character to travel between areas.", false, true,
-		false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoStop, "stop", "", "Stop the current character action.", false, true, false));
-	Mud::instance().addCommand(
-		std::make_shared<Command>(DoStand, "stand", "", "Stand up.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoCrouch, "crouch", "",
-		"The character crouches down himself, it's a good stance for hiding.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoSit, "sit", "", "The player sits down, ideal for a quick break.", false, false, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoProne, "prone", "", "The player starts prone, a perfect position to shoot long distance.",
-		false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoRest, "rest", "", "The player lies down and begin to rest.", false, false, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoSleep, "sleep", "", "The player lies down, closes its eyes and sleep.", false, false,
-		false));
-	Mud::instance().addCommand(
-		std::make_shared<Command>(DoWake, "wake", "", "The player wake up.", false, false, false));
-}
-
 bool DoDirection(Character *character, Direction direction)
 {
 	// Stop any action the character is executing.

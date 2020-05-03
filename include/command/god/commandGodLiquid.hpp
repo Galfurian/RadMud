@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include "command/god/commandGod.hpp"
+#include "input/argument.hpp"
+#include "character/character.hpp"
 
 /// @addtogroup ComInterfaces
 /// @{

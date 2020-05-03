@@ -347,9 +347,12 @@ bool Mud::addTravelPoint(Room *source, Room *target)
 	return mudTravelPoints.insert(std::make_pair(source, target)).second;
 }
 
-void Mud::addCommand(const std::shared_ptr<Command> &command)
+void Mud::addCommand(std::function<bool(Character *character, ArgumentHandler &args)> _handler,
+					 std::string _name, std::string _arguments, std::string _help, bool _gods,
+					 bool _canUseInCombat, bool _typedCompletely)
 {
-	mudCommands.emplace_back(command);
+	mudCommands.emplace_back(std::make_shared<Command>(_handler, _name, _arguments, _help, _gods,
+													   _canUseInCombat, _typedCompletely));
 }
 
 bool Mud::addBuilding(const std::shared_ptr<Building> &building)
@@ -999,7 +1002,10 @@ bool Mud::startMud()
 	// Set the boot time.
 	time(&_bootTime);
 	MudLog(LogLevel::Global, "Initializing Commands...");
-	LoadCommands();
+	if (!this->initCommands()) {
+		MudLog(LogLevel::Error, "Something gone wrong during initialization of commands.");
+		return false;
+	}
 	MudLog(LogLevel::Global, "Initializing Database...");
 	if (!this->initDatabase()) {
 		MudLog(LogLevel::Error, "Something gone wrong during database initialization.");

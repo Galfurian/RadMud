@@ -504,15 +504,6 @@ public:
 	/// @brief Specific function used by lua to add an equipment item.
 	void luaAddEquipment(Item *item);
 
-	/// @brief Specific function used by lua to remove an equipment item.
-	bool luaRemEquipment(Item *item);
-
-	/// @brief Specific function used by lua to add an inventory item.
-	void luaAddInventory(Item *item);
-
-	/// @brief Specific function used by lua to remove an inventory item.
-	bool luaRemInventory(Item *item);
-
 	/// @brief Operator used to order the character based on their name.
 	bool operator<(const class Character &source) const;
 

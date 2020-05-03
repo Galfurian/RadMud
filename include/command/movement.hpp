@@ -24,9 +24,6 @@
 #include "input/argument.hpp"
 #include "character/character.hpp"
 
-/// Loads all the commands related to movement.
-void LoadMovementCommands();
-
 /// @defgroup MovementCommands Movement Commands.
 /// @brief All the movement related commands.
 /// @{

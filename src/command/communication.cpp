@@ -26,27 +26,6 @@
 #include "command/command.hpp"
 #include "mud.hpp"
 
-void LoadCommunicationCommands()
-{
-	Mud::instance().addCommand(std::make_shared<Command>(DoSay, "say", "[someone] (something)",
-														 "Talk to people in the current room.",
-														 false, true, false));
-	Mud::instance().addCommand(
-		std::make_shared<Command>(DoWhisper, "whisper", "(someone) (something)",
-								  "Whisper secretly to a single character.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoEmote, "emote", "(emotion)", "Express an emotion.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoBug, "bug", "(message)",
-		"Report a bug, your character's name, location and date will be saved.", false, true,
-		false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoIdea, "idea", "(message)", "Send an idea, try to be as clear as possible.", false, true,
-		false));
-	Mud::instance().addCommand(std::make_shared<Command>(DoTypo, "typo", "(message)",
-														 "Report a typo.", false, true, false));
-}
-
 bool DoSay(Character *character, ArgumentHandler &args)
 {
 	// Check if the character is sleeping.

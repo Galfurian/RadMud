@@ -27,42 +27,6 @@
 #include "utilities/namegen.hpp"
 #include "mud.hpp"
 
-void LoadGeneralCommands()
-{
-	Mud::instance().addCommand(
-		std::make_shared<Command>(DoQuit, "quit", "", "Leave the game.", false, false, true));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoWho, "who", "", "List all the character online.", false, false, false));
-	Mud::instance().addCommand(std::make_shared<Command>(DoSet, "set", "(setting) (value)",
-														 "Set some character texts(eg. descr).",
-														 false, false, false));
-	Mud::instance().addCommand(
-		std::make_shared<Command>(DoLook, "look", "[(something) or (someone)]",
-								  "Look at something or someone.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoHelp, "help", "(command)", "Show the list of commands or show help for a given command.",
-		false, true, false));
-	Mud::instance().addCommand(
-		std::make_shared<Command>(DoPrompt, "prompt", "(help)|(prompt definition)",
-								  "Modify your prompt.", false, false, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoTime, "time", "", "Give the current day phase.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoStatistics, "statistics", "", "Show player statistics.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoEffects, "effects", "", "Show player active effects.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoRent, "rent", "", "Allow player to rent and disconnect.", false, false, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoSkills, "skills", "", "Shows the playes skills and their level.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoActions, "actions", "", "Shows the list of actions.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoServer, "server", "", "Shows the server statistics.", false, true, false));
-	Mud::instance().addCommand(std::make_shared<Command>(
-		DoGenerateName, "generate_name", "", "Generates a random name.", false, true, false));
-}
-
 bool DoQuit(Character *character, ArgumentHandler & /*args*/)
 {
 	// Check if the character is a mobile.
