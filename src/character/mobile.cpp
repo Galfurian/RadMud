@@ -312,7 +312,7 @@ void Mobile::performBehaviour()
 	if (behaviourQueue.empty()) {
 		this->triggerEventMain();
 	}
-	if (this->checkBehaviourTimer()) {
+	else if (this->checkBehaviourTimer()) {
 		auto status = behaviourQueue.front()->perform();
 		if ((status == BehaviourStatus::Finished) || (status == BehaviourStatus::Error)) {
 			behaviourQueue.pop_front();

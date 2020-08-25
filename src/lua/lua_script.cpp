@@ -172,7 +172,7 @@ int SetLuaPath(lua_State *L, const char *path)
 	return 0;
 }
 
-void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
+bool LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 {
 	// -------------------------------------------------------------------------
 	// Open lua libraries.
@@ -639,5 +639,7 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 	if (luaL_dofile(L, path.c_str()) != LUABRIDGE_LUA_OK) {
 		MudLog(LogLevel::Error, "Can't open script %s.", scriptFile);
 		MudLog(LogLevel::Error, "Error :%s", lua_tostring(L, -1));
+		return false;
 	}
+	return true;
 }

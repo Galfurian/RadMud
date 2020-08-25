@@ -4,21 +4,12 @@ require("mud")
 -- Handle the actions when the character is created.
 EventInit = function(self)
     -- Put event code here.
-    local helm = mud.load_item(self, 1500, 10, mud.random(1, 5))
-    if (helm ~= nil) then
-        self:equipmentAdd(helm)
-    end
-    local cuirass = mud.load_item(self, 1501, 10, mud.random(1, 5))
-    if (cuirass ~= nil) then
-        self:equipmentAdd(cuirass)
-    end
-    local greave = mud.load_item(self, 1502, 10, mud.random(1, 5))
-    if (greave ~= nil) then
-        self:equipmentAdd(greave)
-    end
-    local boots = mud.load_item(self, 1503, 10, mud.random(1, 5))
-    if (boots ~= nil) then
-        self:equipmentAdd(boots)
+    local boot_equipment = {1500, 1501, 1502, 1503}
+    for i, vnum in ipairs(boot_equipment) do
+        local item = mud.load_item(self, vnum, 10, mud.random(1, 5))
+        if (item ~= nil) then
+            self:equipmentAdd(item)
+        end
     end
 end
 
