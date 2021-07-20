@@ -44,19 +44,18 @@ std::string MagazineModel::getTypeName() const
 	return "Magazine";
 }
 
-bool MagazineModel::setModel(const std::string &source)
+bool MagazineModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 2) {
+	if (source.size() != 2) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Magazine Model (%s).", name);
 		return false;
 	}
-	this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
-	this->maxAmount = ToNumber<unsigned int>(functionList[1]);
+	this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(source[0]));
+	this->maxAmount = ToNumber<unsigned int>(source[1]);
 	return true;
 }
 

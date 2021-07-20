@@ -45,19 +45,18 @@ std::string NodeModel::getTypeName() const
 	return "Node";
 }
 
-bool NodeModel::setModel(const std::string &source)
+bool NodeModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 1) {
+	if (source.size() != 1) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Node Model (%s).", name);
 		return false;
 	}
-	this->nodeType = static_cast<NodeType>(ToNumber<unsigned int>(functionList[0]));
-	//this->provides = ToNumber<unsigned int>(functionList[1]);
+	this->nodeType = static_cast<NodeType>(ToNumber<unsigned int>(source[0]));
+	//this->provides = ToNumber<unsigned int>(source[1]);
 	return true;
 }
 

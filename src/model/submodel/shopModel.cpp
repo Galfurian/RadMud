@@ -44,18 +44,17 @@ std::string ShopModel::getTypeName() const
 	return "Shop";
 }
 
-bool ShopModel::setModel(const std::string &source)
+bool ShopModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 1) {
+	if (source.size() != 1) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Shop Model (%s).", name);
 		return false;
 	}
-	this->maxWeight = ToNumber<unsigned int>(functionList[0]);
+	this->maxWeight = ToNumber<unsigned int>(source[0]);
 	return true;
 }
 

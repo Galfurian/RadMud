@@ -44,19 +44,18 @@ std::string ShieldModel::getTypeName() const
 	return "Shield";
 }
 
-bool ShieldModel::setModel(const std::string &source)
+bool ShieldModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 2) {
+	if (source.size() != 2) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Shield Model (%s).", name);
 		return false;
 	}
-	this->size = static_cast<ShieldSize>(ToNumber<unsigned int>(functionList[0]));
-	this->parryChance = ToNumber<unsigned int>(functionList[1]);
+	this->size = static_cast<ShieldSize>(ToNumber<unsigned int>(source[0]));
+	this->parryChance = ToNumber<unsigned int>(source[1]);
 	return true;
 }
 

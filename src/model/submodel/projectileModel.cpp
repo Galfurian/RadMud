@@ -44,20 +44,19 @@ std::string ProjectileModel::getTypeName() const
 	return "Projectile";
 }
 
-bool ProjectileModel::setModel(const std::string &source)
+bool ProjectileModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 3) {
+	if (source.size() != 3) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Projectile Model (%s).", name);
 		return false;
 	}
-	this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
-	this->damageBonus = ToNumber<unsigned int>(functionList[1]);
-	this->rangeBonus = ToNumber<int>(functionList[2]);
+	this->projectileType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(source[0]));
+	this->damageBonus = ToNumber<unsigned int>(source[1]);
+	this->rangeBonus = ToNumber<int>(source[2]);
 	return true;
 }
 

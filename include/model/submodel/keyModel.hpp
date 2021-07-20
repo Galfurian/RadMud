@@ -35,7 +35,7 @@ public:
 
 	std::string getTypeName() const override;
 
-	bool setModel(const std::string &source) override;
+	bool setModel(const std::vector<std::string> &source) override;
 
 	void getSheet(Table &sheet) const override;
 };

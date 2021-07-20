@@ -45,28 +45,26 @@ std::string MechanismModel::getTypeName() const
 	return "Mechanism";
 }
 
-bool MechanismModel::setModel(const std::string &source)
+bool MechanismModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 6) {
+	if (source.size() != 6) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Mechanism Model (%s).", name);
 		return false;
 	}
-	this->mechanismType = static_cast<MechanismType>(ToNumber<unsigned int>(functionList[0]));
-
+	this->mechanismType = static_cast<MechanismType>(ToNumber<unsigned int>(source[0]));
 	if ((this->mechanismType == MechanismType::Door) ||
 		(this->mechanismType == MechanismType::Lock)) {
-		this->key = ToNumber<unsigned int>(functionList[1]);
-		this->difficulty = ToNumber<unsigned int>(functionList[2]);
+		this->key = ToNumber<unsigned int>(source[1]);
+		this->difficulty = ToNumber<unsigned int>(source[2]);
 	} else if (this->mechanismType == MechanismType::Picklock) {
-		this->efficency = ToNumber<unsigned int>(functionList[3]);
+		this->efficency = ToNumber<unsigned int>(source[3]);
 	} else if (this->mechanismType == MechanismType::Lever) {
-		this->command = ToNumber<unsigned int>(functionList[4]);
-		this->target = ToNumber<unsigned int>(functionList[5]);
+		this->command = ToNumber<unsigned int>(source[4]);
+		this->target = ToNumber<unsigned int>(source[5]);
 	}
 	return true;
 }

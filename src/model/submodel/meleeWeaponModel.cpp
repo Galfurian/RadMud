@@ -44,21 +44,20 @@ std::string MeleeWeaponModel::getTypeName() const
 	return "Melee Weapon";
 }
 
-bool MeleeWeaponModel::setModel(const std::string &source)
+bool MeleeWeaponModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> lst = SplitString(source, " ");
-	if (lst.size() != 4) {
+	if (source.size() != 4) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Weapon Model (%s).", name);
 		return false;
 	}
-	meleeWeaponType = static_cast<MeleeWeaponType>(ToNumber<unsigned int>(lst[0]));
-	minDamage = ToNumber<unsigned int>(lst[1]);
-	maxDamage = ToNumber<unsigned int>(lst[2]);
-	range = ToNumber<int>(lst[3]);
+	meleeWeaponType = static_cast<MeleeWeaponType>(ToNumber<unsigned int>(source[0]));
+	minDamage = ToNumber<unsigned int>(source[1]);
+	maxDamage = ToNumber<unsigned int>(source[2]);
+	range = ToNumber<int>(source[3]);
 	return true;
 }
 

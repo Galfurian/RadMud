@@ -44,19 +44,18 @@ std::string FoodModel::getTypeName() const
 	return "Food";
 }
 
-bool FoodModel::setModel(const std::string &source)
+bool FoodModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 2) {
+	if (source.size() != 2) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Food Model (%s).", name);
 		return false;
 	}
-	nurishment = ToNumber<unsigned int>(functionList[0]);
-	foodFlags = ToNumber<unsigned int>(functionList[1]);
+	nurishment = ToNumber<unsigned int>(source[0]);
+	foodFlags = ToNumber<unsigned int>(source[1]);
 	return true;
 }
 

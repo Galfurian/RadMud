@@ -44,21 +44,20 @@ std::string ContainerModel::getTypeName() const
 	return "Container";
 }
 
-bool ContainerModel::setModel(const std::string &source)
+bool ContainerModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", this->name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 4) {
+	if (source.size() != 4) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Container Model (%s).", this->name);
 		return false;
 	}
-	this->maxWeight = ToNumber<unsigned int>(functionList[0]);
-	this->containerFlags = ToNumber<unsigned int>(functionList[1]);
-	this->keyVnum = ToNumber<unsigned int>(functionList[2]);
-	this->difficulty = ToNumber<unsigned int>(functionList[3]);
+	this->maxWeight = ToNumber<unsigned int>(source[0]);
+	this->containerFlags = ToNumber<unsigned int>(source[1]);
+	this->keyVnum = ToNumber<unsigned int>(source[2]);
+	this->difficulty = ToNumber<unsigned int>(source[3]);
 	return true;
 }
 

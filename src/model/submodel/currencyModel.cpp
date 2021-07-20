@@ -45,10 +45,9 @@ std::string CurrencyModel::getTypeName() const
 	return "Currency";
 }
 
-bool CurrencyModel::setModel(const std::string &source)
+bool CurrencyModel::setModel(const std::vector<std::string> &source)
 {
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 0) {
+	if (source.size() != 0) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Currency Model (%s).", name);
 		return false;
 	}

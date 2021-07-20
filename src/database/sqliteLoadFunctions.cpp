@@ -265,7 +265,7 @@ bool LoadModel(ResultSet *result)
 	itemModel->material = MaterialType(result->getNextUnsignedInteger());
 	itemModel->tileSet = result->getNextInteger();
 	itemModel->tileId = result->getNextInteger();
-	if (!itemModel->setModel(result->getNextString())) {
+	if (!itemModel->setModel(SplitString(result->getNextString(), " "))) {
 		throw SQLiteException("Error when setting the model.");
 	}
 	// Translate new_line.

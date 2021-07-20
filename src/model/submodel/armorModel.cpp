@@ -45,20 +45,19 @@ std::string ArmorModel::getTypeName() const
 	return "Armor";
 }
 
-bool ArmorModel::setModel(const std::string &source)
+bool ArmorModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 3) {
+	if (source.size() != 3) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Armor Model (%s).", name);
 		return false;
 	}
-	this->size = static_cast<ArmorSize>(ToNumber<unsigned int>(functionList[0]));
-	this->armorClass = ToNumber<unsigned int>(functionList[1]);
-	this->allowedAnatomy = ToNumber<unsigned int>(functionList[2]);
+	this->size = static_cast<ArmorSize>(ToNumber<unsigned int>(source[0]));
+	this->armorClass = ToNumber<unsigned int>(source[1]);
+	this->allowedAnatomy = ToNumber<unsigned int>(source[2]);
 	return true;
 }
 

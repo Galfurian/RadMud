@@ -45,14 +45,13 @@ std::string CorpseModel::getTypeName() const
 	return "Corpse";
 }
 
-bool CorpseModel::setModel(const std::string &source)
+bool CorpseModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (!functionList.empty()) {
+	if (!source.empty()) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Corpse Model (%s).", name);
 		return false;
 	}

@@ -44,10 +44,9 @@ std::string FurnitureModel::getTypeName() const
 	return "Furniture";
 }
 
-bool FurnitureModel::setModel(const std::string &source)
+bool FurnitureModel::setModel(const std::vector<std::string> &source)
 {
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 0) {
+	if (source.size() != 0) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Furniture Model (%s).", name);
 		return false;
 	}

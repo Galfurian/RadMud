@@ -159,7 +159,7 @@ public:
 	/// @param source The source string.
 	/// @return <b>True</b> if the information are correct,<br>
 	///         <b>False</b> otherwise.
-	virtual bool setModel(const std::string &source) = 0;
+	virtual bool setModel(const std::vector<std::string> &source) = 0;
 
 	/// @brief Fills the provided table with the information concerning
 	///         the model.

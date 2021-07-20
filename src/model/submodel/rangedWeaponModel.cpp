@@ -44,21 +44,20 @@ std::string RangedWeaponModel::getTypeName() const
 	return "Ranged Weapon";
 }
 
-bool RangedWeaponModel::setModel(const std::string &source)
+bool RangedWeaponModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	std::vector<std::string> functionList = SplitString(source, " ");
-	if (functionList.size() != 4) {
+	if (source.size() != 4) {
 		MudLog(LogLevel::Error, "Wrong number of parameters for Ranged Weapon Model (%s).", name);
 		return false;
 	}
-	this->rangedWeaponType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(functionList[0]));
-	this->minDamage = ToNumber<unsigned int>(functionList[1]);
-	this->maxDamage = ToNumber<unsigned int>(functionList[2]);
-	this->range = ToNumber<int>(functionList[3]);
+	this->rangedWeaponType = static_cast<RangedWeaponType>(ToNumber<unsigned int>(source[0]));
+	this->minDamage = ToNumber<unsigned int>(source[1]);
+	this->maxDamage = ToNumber<unsigned int>(source[2]);
+	this->range = ToNumber<int>(source[3]);
 	return true;
 }
 

@@ -44,22 +44,20 @@ std::string LightModel::getTypeName() const
 	return "Light";
 }
 
-bool LightModel::setModel(const std::string &source)
+bool LightModel::setModel(const std::vector<std::string> &source)
 {
 	if (source.empty()) {
 		MudLog(LogLevel::Error, "Function list is empty (%s).", name);
 		return false;
 	}
-	auto functionList = SplitString(source, " ");
-	if (functionList.size() != 4) {
-		MudLog(LogLevel::Error, "Wrong number of parameters for Light Model (%s)[%s].", name,
-			   source);
+	if (source.size() != 4) {
+		MudLog(LogLevel::Error, "Wrong number of parameters for Light Model (%s).", name);
 		return false;
 	}
-	fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));
-	radius = ToNumber<int>(functionList[1]);
-	maxWeight = ToNumber<double>(functionList[2]);
-	lightSourceFlags = ToNumber<unsigned int>(functionList[3]);
+	fuelType = ResourceType(ToNumber<unsigned int>(source[0]));
+	radius = ToNumber<int>(source[1]);
+	maxWeight = ToNumber<double>(source[2]);
+	lightSourceFlags = ToNumber<unsigned int>(source[3]);
 	return true;
 }
 
