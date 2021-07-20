@@ -37,7 +37,7 @@ public:
 	BaseEnumerator(const unsigned int &_value);
 
 	/// @brief Copy Constructor.
-	BaseEnumerator(const BaseEnumerator &other);
+	BaseEnumerator(const BaseEnumerator &other) = default;
 
 	/// @brief Constructor from uint.
 	virtual ~BaseEnumerator();
@@ -56,6 +56,9 @@ public:
 	{
 		return static_cast<T>(value);
 	}
+
+	/// @brief Assign operator.
+	BaseEnumerator &operator=(const BaseEnumerator &rhs) = default;
 
 	/// @brief Equality operator.
 	bool operator==(const BaseEnumerator &rhs) const

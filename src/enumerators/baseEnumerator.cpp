@@ -33,11 +33,6 @@ BaseEnumerator::BaseEnumerator(const unsigned int &_value) : value(_value)
 	// Nothing to do.
 }
 
-BaseEnumerator::BaseEnumerator(const BaseEnumerator &other) : value(other.value)
-{
-	// Nothing to do.
-}
-
 BaseEnumerator::~BaseEnumerator()
 {
 	// Nothing to do.
