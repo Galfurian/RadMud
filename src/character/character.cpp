@@ -318,7 +318,7 @@ bool Character::addHealth(const unsigned int &value, const bool &force)
 			return false;
 		}
 	}
-	this->health = result;
+	health = result;
 	return true;
 }
 
@@ -759,20 +759,20 @@ std::string Character::getHungerCondition() const
 
 void Character::updateHealth()
 {
-	auto constMod(this->getAbilityModifier(Ability::Constitution));
+	auto constMod(this->getAbility(Ability::Constitution));
 	auto regainMod(posture.getRegainModifier());
-	auto effectMod(
-		static_cast<unsigned int>(effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
+	auto effectMod(static_cast<unsigned int>(effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
+	MudLog(LogLevel::Debug, "%s.updateHealth : (%d * %d) + %d", name.c_str(), constMod, regainMod, effectMod);
 	this->addHealth((constMod * regainMod) + effectMod, true);
 }
 
 void Character::updateStamina()
 {
-	auto constMod(this->getAbilityModifier(Ability::Constitution));
+	auto constMod(this->getAbility(Ability::Constitution));
 	auto regainMod(posture.getRegainModifier());
-	auto effectMod(
-		static_cast<unsigned int>(effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
-	this->addHealth(((2 * constMod) * regainMod) + effectMod, true);
+	auto effectMod(static_cast<unsigned int>(effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
+	MudLog(LogLevel::Debug, "%s.updateStamina : (2 * %d * %d) + %d", name.c_str(), constMod, regainMod, effectMod);
+	this->addStamina((2 * constMod * regainMod) + effectMod, true);
 }
 
 void Character::updateHunger()

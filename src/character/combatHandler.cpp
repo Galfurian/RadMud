@@ -39,15 +39,13 @@ CombatHandler::~CombatHandler()
 bool CombatHandler::addOpponent(Character *character, unsigned int initAggro)
 {
 	if (!this->hasOpponent(character)) {
-		if (initAggro == 0) {
+		if (initAggro == 0)
 			initAggro = this->getInitialAggro(character);
-		}
 		// Add the aggressor.
 		opponents.push_back(std::make_shared<Aggression>(character, initAggro));
+		MudLog(LogLevel::Debug, "%s engage %s with %d.", owner->getNameCapital(), character->getName(), initAggro);
 		// Sort the list.
 		this->sortList();
-		MudLog(LogLevel::Debug, "%s engage %s with %d.", owner->getNameCapital(),
-			   character->getName(), initAggro);
 		this->printList();
 		return true;
 	}
@@ -62,43 +60,33 @@ bool CombatHandler::remOpponent(Character *character)
 			// Remove the opponent.
 			opponents.erase(it);
 			// Check if the opponent is currently the aimed character.
-			if (aimedCharacter != nullptr) {
-				if (aimedCharacter->name == aggression->aggressor->name) {
+			if (aimedCharacter)
+				if (aimedCharacter->name == aggression->aggressor->name)
 					aimedCharacter = nullptr;
-				}
-			}
 			// Check if the opponent is currently the predefined target.
-			if (predefinedTarget != nullptr) {
-				if (predefinedTarget->name == aggression->aggressor->name) {
+			if (predefinedTarget)
+				if (predefinedTarget->name == aggression->aggressor->name)
 					predefinedTarget = nullptr;
-				}
-			}
-			MudLog(LogLevel::Debug, "%s disengages %s", owner->getNameCapital(),
-				   character->getName());
+			MudLog(LogLevel::Debug, "%s disengages %s", owner->getNameCapital(), character->getName());
 			this->printList();
 			// If the list of opponents is empty, stop the fighting.
-			if (this->empty()) {
-				auto action = owner->getAction();
-				if (action->getType() == ActionType::Combat) {
-					auto combatAction = action->toCombatAction();
-					combatAction->handleStop();
-				}
+			if (opponents.empty()) {
+				if (owner->getAction()->getType() == ActionType::Combat)
+					owner->getAction()->toCombatAction()->handleStop();
 			}
 			return true;
 		}
 	}
-	MudLog(LogLevel::Debug, "Cannot find %s among the aggressors of %s", character->getName(),
-		   owner->getNameCapital());
+	MudLog(LogLevel::Debug, "Cannot find %s among the aggressors of %s", character->getName(), owner->getNameCapital());
 	this->printList();
 	return false;
 }
 
 bool CombatHandler::hasOpponent(Character *character)
 {
-	return std::find_if(opponents.begin(), opponents.end(),
-						[&](std::shared_ptr<Aggression> const &element) {
-							return element->aggressor->name == character->name;
-						}) != opponents.end();
+	return std::find_if(opponents.begin(), opponents.end(), [&](std::shared_ptr<Aggression> const &element) {
+			   return element->aggressor->name == character->name;
+		   }) != opponents.end();
 }
 
 void CombatHandler::updateCharactersInSight()
@@ -106,8 +94,8 @@ void CombatHandler::updateCharactersInSight()
 	// Get the characters in sight.
 	CharacterVector exceptions;
 	exceptions.emplace_back(owner);
-	charactersInSight = owner->room->area->getCharactersInSight(exceptions, owner->room->coord,
-																owner->getViewDistance());
+	charactersInSight =
+		owner->room->area->getCharactersInSight(exceptions, owner->room->coord, owner->getViewDistance());
 }
 
 void CombatHandler::setPredefinedTarget(Character *character)
@@ -132,11 +120,8 @@ Character *CombatHandler::getAimedTarget()
 
 bool CombatHandler::setAggro(Character *character, unsigned int newAggression)
 {
-	bool ret = false;
-	auto it =
-		std::find_if(opponents.begin(), opponents.end(), [&](std::shared_ptr<Aggression> const &p) {
-			return p->aggressor->name == character->name;
-		});
+	auto it = std::find_if(opponents.begin(), opponents.end(),
+						   [&](std::shared_ptr<Aggression> const &p) { return p->aggressor->name == character->name; });
 	if (it != opponents.end()) {
 		// Set the new aggro.
 		(*it)->aggression = newAggression;
@@ -144,44 +129,37 @@ bool CombatHandler::setAggro(Character *character, unsigned int newAggression)
 		this->sortList();
 		this->printList();
 		// Set return value to success.
-		ret = true;
+		return true;
 	}
-	return ret;
+	return false;
 }
 
 std::shared_ptr<CombatHandler::Aggression> CombatHandler::getTopAggro()
 {
-	if (opponents.empty()) {
+	if (opponents.empty())
 		return nullptr;
-	}
 	return opponents.front();
 }
 
 bool CombatHandler::moveToTopAggro(Character *character)
 {
 	// Check if the character is a valid opponent.
-	if (!this->hasOpponent(character)) {
+	if (!this->hasOpponent(character))
 		return false;
-	}
 	auto topAggressor = this->getTopAggro();
-	if (topAggressor == nullptr) {
+	if (topAggressor == nullptr)
 		return false;
-	}
 	// Check if the character is already the top aggro.
-	if (topAggressor->aggressor == character) {
+	if (topAggressor->aggressor == character)
 		return false;
-	}
 	// Retrieve the top aggro.
 	auto currentAggro = this->getAggro(character);
 	auto topAggro = currentAggro;
-	for (auto it : opponents) {
-		if (it->aggression > topAggro) {
+	for (const auto &it : opponents)
+		if (it->aggression > topAggro)
 			topAggro = it->aggression;
-		}
-	}
 	// Just set the aggro of the character enough to be put on the first place.
-	this->setAggro(character, topAggro + 1);
-	return true;
+	return this->setAggro(character, topAggro + 1);
 }
 
 unsigned int CombatHandler::getInitialAggro(Character *character)
@@ -194,7 +172,7 @@ unsigned int CombatHandler::getInitialAggro(Character *character)
 
 unsigned int CombatHandler::getAggro(Character *character)
 {
-	for (auto it : opponents) {
+	for (const auto &it : opponents) {
 		if (it->aggressor == character) {
 			return it->aggression;
 		}
@@ -215,31 +193,26 @@ bool CombatHandler::empty()
 void CombatHandler::checkList()
 {
 	auto temporaryList = opponents;
-	for (auto it = temporaryList.begin(); it != temporaryList.end(); ++it) {
-		// Check if the aggressor is null.
-		if ((*it)->aggressor == nullptr) {
-			this->remOpponent((*it)->aggressor);
-		}
-		// Check if the aggressor is nowhere.
-		else if ((*it)->aggressor->room == nullptr) {
-			this->remOpponent((*it)->aggressor);
-		}
+	for (const auto &opponent : temporaryList) {
+		if (opponent->aggressor == nullptr) // Check if the aggressor is null.
+			this->remOpponent(opponent->aggressor);
+		else if (opponent->aggressor->room == nullptr) // Check if the aggressor is nowhere.
+			this->remOpponent(opponent->aggressor);
 	}
 }
 
 void CombatHandler::resetList()
 {
-	for (auto it : opponents) {
+	for (const auto &it : opponents) {
 		if (it->aggressor == nullptr) {
 			MudLog(LogLevel::Error, "Found a nullptr aggressor.");
 		} else {
 			// Remove the owner from its list.
 			if (it->aggressor->combatHandler.remOpponent(owner)) {
-				MudLog(LogLevel::Debug, "%s disengages %s", owner->getNameCapital(),
-					   it->aggressor->getName());
+				MudLog(LogLevel::Debug, "%s disengages %s", owner->getNameCapital(), it->aggressor->getName());
 			} else {
-				MudLog(LogLevel::Error, "Could not remove %s from opponents of %s.",
-					   owner->getName(), it->aggressor->getName());
+				MudLog(LogLevel::Error, "Could not remove %s from opponents of %s.", owner->getName(),
+					   it->aggressor->getName());
 			}
 		}
 	}
@@ -271,7 +244,7 @@ void CombatHandler::sortList()
 void CombatHandler::printList()
 {
 	std::cout << "Aggro List:" << std::endl;
-	for (auto it : opponents) {
+	for (const auto &it : opponents) {
 		std::cout << "  [" + (*it).aggressor->name + "] " + ToString((*it).aggression) << std::endl;
 	}
 }

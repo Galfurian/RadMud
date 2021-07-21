@@ -98,7 +98,9 @@ ActionStatus BasicAttack::perform()
 	// Retrieve all the melee, ranged, and natural weapons.
 	auto meleeWeapons = GetActiveWeapons<MeleeWeaponItem>(actor);
 	auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(actor);
-	auto naturalWeapons = GetActiveNaturalWeapons(actor);
+	std::vector<std::shared_ptr<BodyPart::BodyWeapon> > naturalWeapons;
+	if (meleeWeapons.empty() && rangedWeapons.empty())
+		naturalWeapons = GetActiveNaturalWeapons(actor);
 
 	// Prepare iterators for each category of weapons.
 	auto melee_it = meleeWeapons.begin();
@@ -110,8 +112,7 @@ ActionStatus BasicAttack::perform()
 		   (natrl_it != naturalWeapons.end())) {
 		// If we cannot find a valid target, stop.
 		if (!this->setPredefinedTarget()) {
-			MudLog(LogLevel::Debug, "%s cannot set predefined target, break.",
-				   actor->getNameCapital());
+			MudLog(LogLevel::Debug, "%s cannot set predefined target, break.", actor->getNameCapital());
 			break;
 		}
 		// Get the predefined target.
@@ -119,57 +120,48 @@ ActionStatus BasicAttack::perform()
 		// If the actor and the pred-target are in the same room,
 		//  and there are still melee weapons to use, attack.
 		if (melee_it != meleeWeapons.end()) {
-			MudLog(LogLevel::Debug, "%s can MELEE attack with %s.", actor->getNameCapital(),
-				   (*melee_it)->getName());
+			MudLog(LogLevel::Debug, "%s can MELEE attack with %s.", actor->getNameCapital(), (*melee_it)->getName());
 			// Check if the target is at range of the weapon.
 			if (!actor->isAtRange(pred, (*melee_it)->getRange())) {
-				actor->sendMsg("You can't reach %s with %s.\n\n", pred->getName(),
-							   (*melee_it)->getName());
+				actor->sendMsg("You can't reach %s with %s.\n\n", pred->getName(), (*melee_it)->getName());
 				++melee_it;
 				continue;
 			}
 			// Increment the number of executed attacks.
 			++attacks;
 			// Perform the attack, if we kill the target, continue.
-			if (this->performAttack(pred, *melee_it++, nullptr, nullptr, attacks) ==
-				AttackStatus ::Killed) {
+			if (this->performAttack(pred, *melee_it++, nullptr, nullptr, attacks) == AttackStatus ::Killed) {
 				continue;
 			}
 		}
 		if (rangd_it != rangedWeapons.end()) {
-			MudLog(LogLevel::Debug, "%s can RANGED attack with %s.", actor->getNameCapital(),
-				   (*rangd_it)->getName());
+			MudLog(LogLevel::Debug, "%s can RANGED attack with %s.", actor->getNameCapital(), (*rangd_it)->getName());
 			// Check if the target is at range of the weapon.
 			if (!actor->isAtRange(pred, (*rangd_it)->getRange())) {
-				actor->sendMsg("You can't reach %s with %s.\n\n", pred->getName(),
-							   (*rangd_it)->getName());
+				actor->sendMsg("You can't reach %s with %s.\n\n", pred->getName(), (*rangd_it)->getName());
 				++rangd_it;
 				continue;
 			}
 			// Increment the number of executed attacks.
 			++attacks;
 			// Perform the attack, if we kill the target, continue.
-			if (this->performAttack(pred, nullptr, *rangd_it++, nullptr, attacks) ==
-				AttackStatus ::Killed) {
+			if (this->performAttack(pred, nullptr, *rangd_it++, nullptr, attacks) == AttackStatus ::Killed) {
 				continue;
 			}
 		}
 		// Perform the attack for each natural weapon.
 		if (natrl_it != naturalWeapons.end()) {
-			MudLog(LogLevel::Debug, "%s can NAT attack with %s.", actor->getNameCapital(),
-				   (*natrl_it)->getName());
+			MudLog(LogLevel::Debug, "%s can NAT attack with %s.", actor->getNameCapital(), (*natrl_it)->getName());
 			// Check if the target is at range of the weapon.
 			if (!actor->isAtRange(pred, (*natrl_it)->range)) {
-				actor->sendMsg("You can't reach %s with %s.\n\n", pred->getName(),
-							   (*natrl_it)->getName());
+				actor->sendMsg("You can't reach %s with %s.\n\n", pred->getName(), (*natrl_it)->getName());
 				++natrl_it;
 				continue;
 			}
 			// Increment the number of executed attacks.
 			++attacks;
 			// Perform the attack, if we kill the target, continue.
-			if (this->performAttack(pred, nullptr, nullptr, *natrl_it++, attacks) ==
-				AttackStatus ::Killed) {
+			if (this->performAttack(pred, nullptr, nullptr, *natrl_it++, attacks) == AttackStatus ::Killed) {
 				continue;
 			}
 		}
@@ -243,8 +235,7 @@ unsigned int BasicAttack::getConsumedStamina(Character *character, Item *weapon)
 	return consumedStamina;
 }
 
-unsigned int BasicAttack::getConsumedStamina(Character *character,
-											 const std::shared_ptr<BodyPart::BodyWeapon> &)
+unsigned int BasicAttack::getConsumedStamina(Character *character, const std::shared_ptr<BodyPart::BodyWeapon> &)
 {
 	// BASE     [+1.0]
 	// STRENGTH [-0.0 to -1.40]
@@ -290,12 +281,10 @@ bool BasicAttack::setPredefinedTarget()
 	if (actor->combatHandler.getPredefinedTarget() != nullptr) {
 		MudLog(LogLevel::Debug, "[%s] Has a predefined target.", actor->getNameCapital());
 		if (this->checkTarget(actor->combatHandler.getPredefinedTarget())) {
-			MudLog(LogLevel::Debug, "[%s] Predefined target is a valid target.",
-				   actor->getNameCapital());
+			MudLog(LogLevel::Debug, "[%s] Predefined target is a valid target.", actor->getNameCapital());
 			return true;
 		}
-		MudLog(LogLevel::Debug, "[%s] Predefined target is NOT a valid target.",
-			   actor->getNameCapital());
+		MudLog(LogLevel::Debug, "[%s] Predefined target is NOT a valid target.", actor->getNameCapital());
 	} else {
 		MudLog(LogLevel::Debug, "[%s] Has no predefined target.", actor->getNameCapital());
 	}
@@ -320,20 +309,17 @@ bool BasicAttack::checkTarget(Character *target)
 	}
 	// Check their rooms.
 	if ((actor->room == nullptr) || (target->room == nullptr)) {
-		MudLog(LogLevel::Debug, "[%s] Either the actor or the target are in a nullptr room.",
-			   actor->getNameCapital());
+		MudLog(LogLevel::Debug, "[%s] Either the actor or the target are in a nullptr room.", actor->getNameCapital());
 		return false;
 	}
 	// Check if they are at close range.
 	if (actor->room->coord == target->room->coord) {
-		MudLog(LogLevel::Debug, "[%s] The actor and the target are in the same room.",
-			   actor->getNameCapital());
+		MudLog(LogLevel::Debug, "[%s] The actor and the target are in the same room.", actor->getNameCapital());
 		return true;
 	}
 	// Check if there is no aimed character.
 	if (actor->combatHandler.getAimedTarget() == nullptr) {
-		MudLog(LogLevel::Debug,
-			   "[%s] The actor has no aimed character, so the target cannot be attacked.",
+		MudLog(LogLevel::Debug, "[%s] The actor has no aimed character, so the target cannot be attacked.",
 			   actor->getNameCapital());
 		return false;
 	}
@@ -345,8 +331,7 @@ bool BasicAttack::checkTarget(Character *target)
 		auto rangedWeapons = GetActiveWeapons<RangedWeaponItem>(actor);
 		// Check if the actor has no ranged weapon equipped.
 		if (rangedWeapons.empty()) {
-			MudLog(LogLevel::Debug, "[%s] The actor has no ranged weapon equipped.",
-				   actor->getNameCapital());
+			MudLog(LogLevel::Debug, "[%s] The actor has no ranged weapon equipped.", actor->getNameCapital());
 			return false;
 		}
 		// Just check if AT LEAST one of the equipped ranged weapons can be used
@@ -354,8 +339,8 @@ bool BasicAttack::checkTarget(Character *target)
 		// TODO: This does not check if the weapon is USABLE!
 		for (auto weapon : rangedWeapons) {
 			if (actor->isAtRange(target, weapon->getRange())) {
-				MudLog(LogLevel::Debug, "[%s] The target is at range with %s.",
-					   actor->getNameCapital(), weapon->getName(false));
+				MudLog(LogLevel::Debug, "[%s] The target is at range with %s.", actor->getNameCapital(),
+					   weapon->getName(false));
 				return true;
 			}
 		}
@@ -364,9 +349,10 @@ bool BasicAttack::checkTarget(Character *target)
 	return false;
 }
 
-BasicAttack::AttackStatus BasicAttack::performAttack(
-	Character *target, MeleeWeaponItem *weapon_melee, RangedWeaponItem *weapon_ranged,
-	const std::shared_ptr<BodyPart::BodyWeapon> &weapon_natural, int attackNumber)
+BasicAttack::AttackStatus BasicAttack::performAttack(Character *target, MeleeWeaponItem *weapon_melee,
+													 RangedWeaponItem *weapon_ranged,
+													 const std::shared_ptr<BodyPart::BodyWeapon> &weapon_natural,
+													 int attackNumber)
 {
 	// Prepare some variables, fro readability.
 	auto &effects = actor->effectManager;
@@ -470,8 +456,8 @@ BasicAttack::AttackStatus BasicAttack::performAttack(
 		// Proceed and remove the damage from the health of the target.
 		if (!target->remHealth(damage)) {
 			// Notify the others.
-			target->room->sendToAll("%s%s screams in pain and then die!%s\n", { target },
-									Formatter::red(), target->getNameCapital(), Formatter::reset());
+			target->room->sendToAll("%s%s screams in pain and then die!%s\n", { target }, Formatter::red(),
+									target->getNameCapital(), Formatter::reset());
 			// The target has received the damage and now it is dead.
 			target->kill();
 			// TODO: This is a solution in case the attack is a one-shot and
@@ -507,10 +493,8 @@ BasicAttack::AttackStatus BasicAttack::performAttack(
 	return AttackStatus::Success;
 }
 
-void BasicAttack::showAtkMsg(Character *target, MeleeWeaponItem *weapon_melee,
-							 RangedWeaponItem *weapon_ranged,
-							 const std::shared_ptr<BodyPart::BodyWeapon> &weapon_natural,
-							 const Attack &attack)
+void BasicAttack::showAtkMsg(Character *target, MeleeWeaponItem *weapon_melee, RangedWeaponItem *weapon_ranged,
+							 const std::shared_ptr<BodyPart::BodyWeapon> &weapon_natural, const Attack &attack)
 {
 	const bool has_hit = attack.is_hit();
 	// Get the name of the actor.
@@ -518,8 +502,8 @@ void BasicAttack::showAtkMsg(Character *target, MeleeWeaponItem *weapon_melee,
 	// Get the name of the target.
 	std::string name_tar = target->getName();
 	// Prepare the hit/miss messages.
-	std::string hit_miss = (has_hit) ? "hit" : "miss";
-	std::string hit_miss_3d = (has_hit) ? "hits" : "misses";
+	std::string hit_miss = (has_hit) ? Formatter::green("hit") : Formatter::red("miss");
+	std::string hit_miss_3d = (has_hit) ? Formatter::green("hits") : Formatter::red("misses");
 	// Prepare the string describing the rolls.
 	std::string rolls = std::to_string(attack.hit.base);
 	rolls += (attack.hit.multi_attack < 0 ? "" : "+") + std::to_string(attack.hit.multi_attack);
@@ -539,20 +523,19 @@ void BasicAttack::showAtkMsg(Character *target, MeleeWeaponItem *weapon_melee,
 		target->sendMsg("%s %s you with %s (%s).\n\n", name_act, hit_miss_3d, name_wpn, rolls);
 		target->room->funcSendToAll(
 			"%s %s %s with %s (%s).\n",
-			[&](Character *character) { return !((character == actor) || (character == target)); },
-			name_act, hit_miss_3d, name_tar, name_wpn, rolls);
+			[&](Character *character) { return !((character == actor) || (character == target)); }, name_act,
+			hit_miss_3d, name_tar, name_wpn, rolls);
 
 	} else if (weapon_natural) {
 		std::string name_wpn = weapon_natural->getName(true);
 		std::string pron = actor->getPossessivePronoun();
 
 		actor->sendMsg("You %s %s with your %s (%s).\n\n", hit_miss, name_tar, name_wpn, rolls);
-		target->sendMsg("%s %s you with %s %s (%s).\n\n", name_act, hit_miss_3d, pron, name_wpn,
-						rolls);
+		target->sendMsg("%s %s you with %s %s (%s).\n\n", name_act, hit_miss_3d, pron, name_wpn, rolls);
 		target->room->funcSendToAll(
 			"%s %s %s with %s %s (%s).\n",
-			[&](Character *character) { return !((character == actor) || (character == target)); },
-			name_act, hit_miss_3d, name_tar, pron, name_wpn, rolls);
+			[&](Character *character) { return !((character == actor) || (character == target)); }, name_act,
+			hit_miss_3d, name_tar, pron, name_wpn, rolls);
 	} else {
 		std::string name_wpn = weapon_ranged->getName(true);
 		// The actor receives the message.
@@ -561,8 +544,8 @@ void BasicAttack::showAtkMsg(Character *target, MeleeWeaponItem *weapon_melee,
 		//  currently focused on WHOM is shooting at him. Otherwise, he just know that something
 		//  hit him.
 		if ((actor->room == target->room) || (target->combatHandler.getAimedTarget() == actor)) {
-			target->sendMsg("%s fires a projectile with %s which %s you (%s).\n\n", name_act,
-							name_wpn, hit_miss_3d, rolls);
+			target->sendMsg("%s fires a projectile with %s which %s you (%s).\n\n", name_act, name_wpn, hit_miss_3d,
+							rolls);
 		} else {
 			target->sendMsg("Someone fires a projectile that %s you (%s).\n\n", hit_miss_3d, rolls);
 		}

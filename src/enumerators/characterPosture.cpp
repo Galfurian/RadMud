@@ -72,10 +72,10 @@ uint32_t CharacterPosture::getSpeed() const
 uint32_t CharacterPosture::getRegainModifier() const
 {
 	if (value == Sit)
-		return 1;
-	if (value == Rest)
 		return 2;
-	if (value == Sleep)
+	if (value == Rest)
 		return 4;
-	return 0;
+	if (value == Sleep)
+		return 6;
+	return 1;
 }

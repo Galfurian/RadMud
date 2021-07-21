@@ -43,8 +43,7 @@ void _mudlog(const char *file, int line, const LogLevel &level, const std::strin
 /// @param msg   The message to log.
 /// @param args  Packed arguments.
 template <typename... Args>
-void _mudlog(const char *file, int line, const LogLevel &level, std::string const &fmt,
-			 const Args &... args)
+void _mudlog(const char *file, int line, const LogLevel &level, std::string const &fmt, const Args &...args)
 {
 	std::stringstream ss;
 	tfm::format(ss, fmt.c_str(), args...);
@@ -52,3 +51,10 @@ void _mudlog(const char *file, int line, const LogLevel &level, std::string cons
 }
 
 #define MudLog(level, ...) _mudlog(__FILE__, __LINE__, level, __VA_ARGS__)
+#define _global(...) _mudlog(__FILE__, __LINE__, LogLevel::Global, __VA_ARGS__)
+#define _trace(...) _mudlog(__FILE__, __LINE__, LogLevel::Trace, __VA_ARGS__)
+#define _debug(...) _mudlog(__FILE__, __LINE__, LogLevel::Debug, __VA_ARGS__)
+#define _fatal(...) _mudlog(__FILE__, __LINE__, LogLevel::Fatal, __VA_ARGS__)
+#define _error(...) _mudlog(__FILE__, __LINE__, LogLevel::Error, __VA_ARGS__)
+#define _warning(...) _mudlog(__FILE__, __LINE__, LogLevel::Warning, __VA_ARGS__)
+#define _info(...) _mudlog(__FILE__, __LINE__, LogLevel::Info, __VA_ARGS__)
