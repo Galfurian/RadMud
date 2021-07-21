@@ -259,8 +259,8 @@ unsigned int BasicAttack::Attack::hit_compute() const
 unsigned int BasicAttack::Attack::dmg_compute() const
 {
 	unsigned int result = dmg.base;
-	result += dmg.ability;
-	result = SafeSum(result, dmg.effects, 1U);
+	result = SafeSum(result, dmg.ability, 0U);
+	result = SafeSum(result, dmg.effects, 0U);
 	// If the character has rolled a critical: multiply the damage by two.
 	result *= 2U - !this->is_critical();
 	return result;
@@ -369,8 +369,8 @@ BasicAttack::AttackStatus BasicAttack::performAttack(Character *target, MeleeWea
 	// Preamble: Evaluate all the values which are required by the function.
 	// -------------------------------------------------------------------------
 	// Get the strength modifier.
-	unsigned int str_mod = actor->getAbilityModifier(Ability::Strength);
-	unsigned int per_mod = actor->getAbilityModifier(Ability::Perception);
+	int str_mod = actor->getAbilityModifier(Ability::Strength);
+	int per_mod = actor->getAbilityModifier(Ability::Perception);
 	// Get the required stamina, and the type of modifier.
 	unsigned int consumedStamina = 0;
 	if (weapon_melee) {

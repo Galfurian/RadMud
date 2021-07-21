@@ -94,11 +94,11 @@ ActionStatus Flee::perform()
 		return ActionStatus::Error;
 	}
 	// Get the character chance of fleeing (D20).
-	size_t fleeChance = TRand<size_t>(0, 20) + actor->getAbilityModifier(Ability::Agility);
+	auto fleeChance = SafeSum(TRand<unsigned int>(0, 20), actor->getAbilityModifier(Ability::Agility), 0U);
 	// Get the required stamina.
 	auto consumedStamina = this->getConsumedStamina(actor);
 	// Base the escape level on how many enemies are surrounding the character.
-	if (fleeChance < static_cast<unsigned int>(actor->combatHandler.getSize())) {
+	if (fleeChance < actor->combatHandler.getSize()) {
 		actor->sendMsg("You were not able to escape from your attackers.\n");
 		// Consume half the stamina.
 		actor->remStamina(consumedStamina / 2, true);

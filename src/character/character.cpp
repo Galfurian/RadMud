@@ -127,25 +127,14 @@ void Character::getSheet(Table &sheet) const
 	sheet.addRow({ "Stamina", ToString(stamina) });
 	sheet.addRow({ "Hunger", ToString(hunger) });
 	sheet.addRow({ "Thirst", ToString(thirst) });
-	sheet.addRow({ "Strength", ToString(this->getAbility(Ability::Strength, false)) + " [" +
-								   ToString(effectManager.getAbilityMod(Ability::Strength)) + "][" +
-								   ToString(effectManager.getAbilityMod(Ability::Strength)) +
-								   "]" });
-	sheet.addRow({ "Agility", ToString(this->getAbility(Ability::Agility, false)) + " [" +
-								  ToString(effectManager.getAbilityMod(Ability::Agility)) + "][" +
-								  ToString(effectManager.getAbilityMod(Ability::Agility)) + "]" });
+	sheet.addRow({ "Strength", ToString(this->getAbility(Ability::Strength, false)) + " [" + ToString(effectManager.getAbilityMod(Ability::Strength)) + "][" + ToString(effectManager.getAbilityMod(Ability::Strength)) + "]" });
+	sheet.addRow({ "Agility", ToString(this->getAbility(Ability::Agility, false)) + " [" + ToString(effectManager.getAbilityMod(Ability::Agility)) + "][" + ToString(effectManager.getAbilityMod(Ability::Agility)) + "]" });
 	sheet.addRow(
-		{ "Perception", ToString(this->getAbility(Ability::Perception, false)) + " [" +
-							ToString(effectManager.getAbilityMod(Ability::Perception)) + "][" +
-							ToString(effectManager.getAbilityMod(Ability::Perception)) + "]" });
+		{ "Perception", ToString(this->getAbility(Ability::Perception, false)) + " [" + ToString(effectManager.getAbilityMod(Ability::Perception)) + "][" + ToString(effectManager.getAbilityMod(Ability::Perception)) + "]" });
 	sheet.addRow(
-		{ "Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " [" +
-							  ToString(effectManager.getAbilityMod(Ability::Constitution)) + "][" +
-							  ToString(effectManager.getAbilityMod(Ability::Constitution)) + "]" });
+		{ "Constitution", ToString(this->getAbility(Ability::Constitution, false)) + " [" + ToString(effectManager.getAbilityMod(Ability::Constitution)) + "][" + ToString(effectManager.getAbilityMod(Ability::Constitution)) + "]" });
 	sheet.addRow(
-		{ "Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " [" +
-							  ToString(effectManager.getAbilityMod(Ability::Intelligence)) + "][" +
-							  ToString(effectManager.getAbilityMod(Ability::Intelligence)) + "]" });
+		{ "Intelligence", ToString(this->getAbility(Ability::Intelligence, false)) + " [" + ToString(effectManager.getAbilityMod(Ability::Intelligence)) + "][" + ToString(effectManager.getAbilityMod(Ability::Intelligence)) + "]" });
 	sheet.addRow({ "## Skill", "## Points" });
 	for (const auto &skillData : skillManager.skills) {
 		sheet.addRow({ skillData->skill->name, ToString(skillData->skillLevel) });
@@ -262,7 +251,9 @@ unsigned int Character::getAbility(const Ability &ability, bool withEffects) con
 	auto overall = 0;
 	// Try to find the ability value.
 	auto it = abilities.find(ability);
-	if (it != abilities.end()) {
+	if (it == abilities.end()) {
+		_error("Can't find the ability %d in the list.", ability.toUInt());
+	} else {
 		overall = static_cast<int>(it->second);
 	}
 	// Add the effects if needed.
@@ -270,25 +261,20 @@ unsigned int Character::getAbility(const Ability &ability, bool withEffects) con
 		// Add the effects which increase the ability.
 		overall += effectManager.getAbilityMod(ability);
 		// Prune the value if exceed the boundaries.
-		if (overall < 0) {
-			overall = 0;
-		} else if (overall > 60) {
-			overall = 60;
-		}
+		overall = std::max(0, std::min(60, overall));
 	}
 	return static_cast<unsigned int>(overall);
 }
 
-unsigned int Character::getAbilityModifier(const Ability &ability, bool withEffects) const
+int Character::getAbilityModifier(const Ability &ability, bool withEffects) const
 {
 	return Ability::getModifier(this->getAbility(ability, withEffects));
 }
 
-unsigned int Character::getAbilityLog(const Ability &ability, const double &base,
-									  const double &multiplier, const bool &withEffects) const
+unsigned int Character::getAbilityLog(const Ability &ability, const double &base, const double &multiplier, const bool &withEffects) const
 {
-	auto mod = this->getAbilityModifier(ability, withEffects);
-	auto logMod = SafeLog10(mod);
+	// TODO: Remove this function.
+	auto logMod = SafeLog10(this->getAbilityModifier(ability, withEffects));
 	return static_cast<unsigned int>(base + logMod * multiplier);
 }
 
@@ -471,10 +457,10 @@ std::string Character::getStaminaCondition()
 
 int Character::getViewDistance() const
 {
-	// Value = 4 + LogMod(PER)
+	// Value = 4 + Mod(PER)
 	// MIN   = 4.0
 	// MAX   = 7.2
-	return 4 + static_cast<int>(this->getAbilityModifier(Ability::Perception));
+	return 4 + std::max(0, this->getAbilityModifier(Ability::Perception));
 }
 
 void Character::pushAction(const std::shared_ptr<GeneralAction> &_action)
@@ -529,20 +515,17 @@ void Character::resetActionQueue()
 	actionQueue.emplace_back(std::make_shared<GeneralAction>(this, true));
 }
 
-Item *Character::findInventoryItem(std::string const &key, unsigned int number,
-								   unsigned int *number_ptr)
+Item *Character::findInventoryItem(std::string const &key, unsigned int number, unsigned int *number_ptr)
 {
 	return ItemUtils::FindItemIn(inventory, key, number, number_ptr);
 }
 
-Item *Character::findEquipmentItem(std::string const &key, unsigned int number,
-								   unsigned int *number_ptr)
+Item *Character::findEquipmentItem(std::string const &key, unsigned int number, unsigned int *number_ptr)
 {
 	return ItemUtils::FindItemIn(equipment, key, number, number_ptr);
 }
 
-Item *Character::findPosessedItem(std::string const &key, unsigned int number,
-								  unsigned int *number_ptr)
+Item *Character::findPosessedItem(std::string const &key, unsigned int number, unsigned int *number_ptr)
 {
 	Item *item = ItemUtils::FindItemIn(equipment, key, number, number_ptr);
 	if (!item)
@@ -550,8 +533,7 @@ Item *Character::findPosessedItem(std::string const &key, unsigned int number,
 	return item;
 }
 
-Item *Character::findNearbyItem(std::string const &key, unsigned int number,
-								unsigned int *number_ptr)
+Item *Character::findNearbyItem(std::string const &key, unsigned int number, unsigned int *number_ptr)
 {
 	auto item = ItemUtils::FindItemIn(inventory, key, number, number_ptr);
 	if (item != nullptr)
@@ -647,7 +629,7 @@ double Character::getMaxCarryingWeight() const
 	// Value = 100 + (AbilMod(STR) * 10)
 	// MIN   = 100
 	// MAX   = 350
-	return 100 + (this->getAbilityModifier(Ability::Strength) * 10);
+	return 100 + (this->getAbilityModifier(Ability::Strength) * 5);
 }
 
 std::vector<std::shared_ptr<BodyPart> > Character::canWield(Item *item, std::string &error) const
@@ -869,14 +851,11 @@ unsigned int Character::getArmorClass() const
 {
 	unsigned int result = 10;
 	// + AGILITY MODIFIER
-	result += this->getAbilityModifier(Ability::Agility);
+	result = SafeSum(result, this->getAbilityModifier(Ability::Agility), 0U);
 	// + ARMOR BONUS
-	for (auto item : equipment) {
-		if (item->getType() == ModelType::Armor) {
-			// Cast the item to armor.
+	for (auto item : equipment)
+		if (item->getType() == ModelType::Armor)
 			result += static_cast<ArmorItem *>(item)->getArmorClass();
-		}
-	}
 	return result;
 }
 
@@ -891,7 +870,7 @@ unsigned int Character::getParryChace() const
 		if ((wielded = this->findItemAtBodyPart(bodyPart)) == nullptr)
 			continue;
 		if (wielded->getType() == ModelType::MeleeWeapon)
-			result += agilityMod;
+			result = SafeSum(result, agilityMod, 0U);
 		else if (wielded->getType() == ModelType::Shield)
 			result += wielded->model->to<ShieldModel>()->parryChance;
 	}

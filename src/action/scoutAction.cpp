@@ -27,7 +27,8 @@
 #include "structure/area.hpp"
 #include <cassert>
 
-ScoutAction::ScoutAction(Character *_actor) : GeneralAction(_actor)
+ScoutAction::ScoutAction(Character *_actor) :
+	GeneralAction(_actor)
 {
 	// Debugging message.
 	MudLog(LogLevel::Debug, "Created ScoutAction.");
@@ -110,8 +111,11 @@ ActionStatus ScoutAction::perform()
 	}
 	actor->sendMsg("\n");
 	// Add the effect.
-	unsigned int modifier = actor->getAbilityModifier(Ability::Perception);
-	actor->effectManager.addEffect(EffectFactory::clearTargets(actor, 2 + modifier), true);
+	actor->effectManager.addEffect(
+		EffectFactory::clearTargets(
+			actor,
+			SafeSum(2U, actor->getAbilityModifier(Ability::Perception), 2U)),
+		true);
 	return ActionStatus::Finished;
 }
 

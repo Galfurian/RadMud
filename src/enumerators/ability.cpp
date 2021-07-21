@@ -80,11 +80,3 @@ std::string Ability::getDescription() const
 	}
 	return "none";
 }
-
-unsigned int Ability::getModifier(const unsigned int &_value)
-{
-	if (_value <= 10) {
-		return 0;
-	}
-	return (_value - 10) / 2;
-}

@@ -28,23 +28,33 @@
 class Ability : public BaseEnumerator {
 public:
 	/// The possible abilities.
-	enum Enum { None, Strength, Agility, Perception, Constitution, Intelligence };
+	enum Enum {
+		None,
+		Strength,
+		Agility,
+		Perception,
+		Constitution,
+		Intelligence
+	};
 
 	/// @brief Constructor.
-	Ability() : BaseEnumerator()
+	Ability() :
+		BaseEnumerator()
 	{
 		// Nothing to do.
 	}
 
 	/// @brief Constructor from unsigned int.
-	explicit Ability(const unsigned int &_value) : BaseEnumerator(_value)
+	explicit Ability(const unsigned int &_value) :
+		BaseEnumerator(_value)
 	{
 		if (_value > Intelligence)
 			value = None;
 	}
 
 	/// @brief Constructor from enum.
-	Ability(const Enum &_value) : BaseEnumerator(_value)
+	Ability(const Enum &_value) :
+		BaseEnumerator(_value)
 	{
 		// Nothing to do.
 	}
@@ -61,7 +71,10 @@ public:
 	/// @brief Return the modifier of the given ability.
 	/// @param _value The total ability value.
 	/// @return The ability modifier.
-	static unsigned int getModifier(const unsigned int &_value);
+	static inline int getModifier(const unsigned int &_value)
+	{
+		return (static_cast<int>(_value) - 10) / 2;
+	}
 
 	inline Ability &operator++()
 	{

@@ -205,7 +205,7 @@ public:
 	///                     ability modifier without the contribution due
 	///                     to the active effects.
 	/// @return The overall ability modifer.
-	unsigned int getAbilityModifier(const Ability &ability, bool withEffects = true) const;
+	int getAbilityModifier(const Ability &ability, bool withEffects = true) const;
 
 	/// @brief Provides the base ten logarithm of the desired ability
 	///         modifier, multiplied by an optional multiplier. Also,

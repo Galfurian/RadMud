@@ -78,7 +78,7 @@ private:
 		} hit;
 		struct {
 			unsigned int base;
-			unsigned int ability;
+			int ability;
 			int effects;
 		} dmg;
 		struct {
