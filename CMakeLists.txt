@@ -81,7 +81,6 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Find the required packages.
 find_package(Lua REQUIRED)
-find_package(ZLIB REQUIRED)
 find_package(Sqlite3 REQUIRED)
 
 # -----------------------------------------------------------------------------
@@ -89,7 +88,6 @@ find_package(Sqlite3 REQUIRED)
 # -----------------------------------------------------------------------------
 include_directories(
     ${LUA_INCLUDE_DIR}
-    ${ZLIB_INCLUDE_DIR}
     ${SQLITE3_INCLUDE_DIR}
     ${CMAKE_SOURCE_DIR}/include
 )
