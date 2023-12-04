@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "generalAction.hpp"
-#include "character.hpp"
-#include "mobile.hpp"
-#include "logger.hpp"
+#include "action/generalAction.hpp"
+#include "character/character.hpp"
+#include "character/mobile.hpp"
+#include "utilities/logger.hpp"
 #include <lua.hpp>
 #include <cassert>
 

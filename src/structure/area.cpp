@@ -20,11 +20,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "area.hpp"
+#include "structure/area.hpp"
 
-#include "structureUtils.hpp"
-#include "logger.hpp"
-#include "room.hpp"
+#include "structure/structureUtils.hpp"
+#include "utilities/logger.hpp"
+#include "structure/room.hpp"
 
 Area::Area() :
     vnum(),

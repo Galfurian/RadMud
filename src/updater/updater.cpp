@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include <utilities/logger.hpp>
-#include "updater.hpp"
-#include "generalBehaviour.hpp"
+#include "utilities/logger.hpp"
+#include "updater/updater.hpp"
+#include "character/behaviour/generalBehaviour.hpp"
 #include "mud.hpp"
 
 // //////////////////////////////////////////////////////////

@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processNewAge.hpp"
-#include "player.hpp"
+#include "input/initialization/processNewAge.hpp"
+#include "character/player.hpp"
 #include "mud.hpp"
-#include "processNewDescription.hpp"
-#include "processNewGender.hpp"
+#include "input/initialization/processNewDescription.hpp"
+#include "input/initialization/processNewGender.hpp"
 
 bool ProcessNewAge::process(Character * character, ArgumentHandler & args)
 {

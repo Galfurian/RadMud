@@ -21,17 +21,57 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "lua_script.hpp"
-#include "structureUtils.hpp"
-#include "luaBridge.hpp"
-#include "armorItem.hpp"
-#include "corpseItem.hpp"
-#include "currencyItem.hpp"
-#include "toolModel.hpp"
-#include "shopItem.hpp"
-#include "logger.hpp"
-#include "aStar.hpp"
+#include "lua/lua_script.hpp"
+#include "structure/structureUtils.hpp"
+#include "item/subitem/armorItem.hpp"
+#include "item/subitem/corpseItem.hpp"
+#include "item/subitem/currencyItem.hpp"
+#include "model/submodel/toolModel.hpp"
+#include "item/subitem/shopItem.hpp"
+#include "utilities/logger.hpp"
+#include "structure/algorithms/AStar/aStar.hpp"
 #include "mud.hpp"
+
+#include <LuaBridge/Vector.h>
+
+namespace luabridge
+{
+
+    /// @brief Class used to register an enumerator inside the lua environment.
+    template <class T>
+    class EnumToLua
+    {
+    protected:
+        lua_State *const L;
+
+    public:
+        /// @brief Constructor.
+        EnumToLua(char const *name, lua_State *const L) : L(L)
+        {
+            // Get the entity inside the lua environment.
+            lua_getglobal(L, name);
+        }
+
+        /// @brief Add an enumerator.
+        template <class EnumValue>
+        EnumToLua<T> &addEnum(char const *name, EnumValue value)
+        {
+            // Push the name of the enum.
+            lua_pushstring(L, name);
+            // Push the value.
+            lua_pushinteger(L, value);
+            lua_rawset(L, -3);
+            return *this;
+        }
+    };
+
+    template <class T>
+    EnumToLua<T> beginEnum(char const *name, lua_State *const L)
+    {
+        return EnumToLua<T>(name, L);
+    }
+
+} // namespace luabridge
 
 void LuaLog(std::string message)
 {
@@ -51,10 +91,10 @@ void LuaStopScript()
     throw std::logic_error("Stopped Lua Script");
 }
 
-Item * LuaLoadItem(Character * character,
-                   int vnumModel,
-                   int vnumMaterial,
-                   unsigned int qualityValue)
+Item *LuaLoadItem(Character *character,
+                  int vnumModel,
+                  int vnumMaterial,
+                  unsigned int qualityValue)
 {
     auto model = Mud::instance().findItemModel(vnumModel);
     if (model == nullptr)
@@ -77,8 +117,8 @@ Item * LuaLoadItem(Character * character,
 }
 
 std::vector<Direction> LuaFindPath(
-    Character * character,
-    Room * destination)
+    Character *character,
+    Room *destination)
 {
     std::vector<Direction> path;
     if ((character == nullptr) || (destination == nullptr))
@@ -89,7 +129,7 @@ std::vector<Direction> LuaFindPath(
     {
         return path;
     }
-    auto RoomCheckFunction = [&](Room * from, Room * to)
+    auto RoomCheckFunction = [&](Room *from, Room *to)
     {
         // Preapre the options.
         MovementOptions options;
@@ -116,11 +156,13 @@ std::vector<Direction> LuaFindPath(
     return path;
 }
 
-std::vector<Room *> LuaGetRoomsInSight(Character * character)
+std::vector<Room *> LuaGetRoomsInSight(Character *character)
 {
     std::vector<Room *> result;
-    if (character == nullptr) return result;
-    if (character->room == nullptr) return result;
+    if (character == nullptr)
+        return result;
+    if (character->room == nullptr)
+        return result;
     auto validCoordinates =
         character->room->area->fov(
             character->room->coord,
@@ -132,11 +174,13 @@ std::vector<Room *> LuaGetRoomsInSight(Character * character)
     return result;
 }
 
-std::vector<Character *> LuaGetCharactersInSight(Character * character)
+std::vector<Character *> LuaGetCharactersInSight(Character *character)
 {
     std::vector<Character *> result;
-    if (character == nullptr) return result;
-    if (character->room == nullptr) return result;
+    if (character == nullptr)
+        return result;
+    if (character->room == nullptr)
+        return result;
     CharacterVector exceptions;
     exceptions.emplace_back_character(character);
     auto charactersInSight =
@@ -151,11 +195,13 @@ std::vector<Character *> LuaGetCharactersInSight(Character * character)
     return result;
 }
 
-std::vector<Item *> LuaGetItemsInSight(Character * character)
+std::vector<Item *> LuaGetItemsInSight(Character *character)
 {
     std::vector<Item *> result;
-    if (character == nullptr) return result;
-    if (character->room == nullptr) return result;
+    if (character == nullptr)
+        return result;
+    if (character->room == nullptr)
+        return result;
     ItemVector exceptions;
     auto itemsInSight =
         character->room->area->getItemsInSight(
@@ -169,7 +215,7 @@ std::vector<Item *> LuaGetItemsInSight(Character * character)
     return result;
 }
 
-void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
+void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 {
     // -------------------------------------------------------------------------
     // Open lua libraries.
@@ -189,31 +235,19 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .endNamespace();
     // -------------------------------------------------------------------------
     // Register all the STD structures.
-    luabridge::getGlobalNamespace(L)
-        .beginStdVector<Direction>("STDDirectionVector")
-        .endClass()
-        .beginStdVector<std::shared_ptr<Exit>>("STDExitVector")
-        .endClass()
-        .beginStdVector<Room *>("STDRoomVector")
-        .endClass()
-        .beginStdVector<Item *>("STDItemVector")
-        .endClass()
-        .beginStdVector<Character *>("STDCharacterVector")
-        .endClass()
-        .beginStdMap<std::string, std::string>("STDStringToStringMap")
-        .endClass();
-    // -------------------------------------------------------------------------
-    // CHARACTER_VECTOR derived from 'std::vector<Character *>'
-    luabridge::getGlobalNamespace(L)
-        .deriveClass<CharacterVector,
-                     std::vector<Character *>>("CharacterVector")
-        .endClass();
-    // -------------------------------------------------------------------------
-    // ITEM_VECTOR derived from 'std::vector<Item *>'
-    luabridge::getGlobalNamespace(L)
-        .deriveClass<ItemVector,
-                     std::vector<Item *>>("ItemVector")
-        .endClass();
+    // luabridge::getGlobalNamespace(L)
+    //     .beginStdVector<Direction>("STDDirectionVector")
+    //     .endClass()
+    //     .beginStdVector<std::shared_ptr<Exit>>("STDExitVector")
+    //     .endClass()
+    //     .beginStdVector<Room *>("STDRoomVector")
+    //     .endClass()
+    //     .beginStdVector<Item *>("STDItemVector")
+    //     .endClass()
+    //     .beginStdVector<Character *>("STDCharacterVector")
+    //     .endClass()
+    //     .beginStdMap<std::string, std::string>("STDStringToStringMap")
+    //     .endClass();
     // -------------------------------------------------------------------------
     // CHARACTER
     luabridge::getGlobalNamespace(L)
@@ -266,6 +300,11 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addFunction("isPlayer", &Player::isPlayer)
         .endClass();
     // -------------------------------------------------------------------------
+    // CHARACTER_VECTOR derived from 'std::vector<Character *>'
+    luabridge::getGlobalNamespace(L)
+        .beginClass<CharacterVector>("CharacterVector")
+        .endClass();
+    // -------------------------------------------------------------------------
     // AREA
     luabridge::getGlobalNamespace(L)
         .beginClass<Area>("Area")
@@ -286,60 +325,59 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
     // -------------------------------------------------------------------------
     // ITEM MODEL
     luabridge::getGlobalNamespace(L)
-        .beginWSPtrClass<ItemModel>("ItemModel")
+        .beginClass<ItemModel>("ItemModel")
         .addData("vnum", &ItemModel::vnum)
         .addData("condition", &ItemModel::condition)
         .addFunction("getType", &ItemModel::getType)
         .addFunction("toTool", &ItemModel::toTool)
         .endClass()
-        .deriveWSPtrClass<ToolModel, ItemModel>("ToolModel")
+        .deriveClass<ToolModel, ItemModel>("ToolModel")
         .addData("toolType", &ToolModel::toolType)
         .addFunction("getTypeName", &ToolModel::getTypeName)
         .endClass()
-        .deriveWSPtrClass<ArmorModel, ItemModel>("ArmorModel")
+        .deriveClass<ArmorModel, ItemModel>("ArmorModel")
         .endClass()
-        .deriveWSPtrClass<BookModel, ItemModel>("BookModel")
+        .deriveClass<BookModel, ItemModel>("BookModel")
         .endClass()
-        .deriveWSPtrClass<ContainerModel, ItemModel>("ContainerModel")
+        .deriveClass<ContainerModel, ItemModel>("ContainerModel")
         .endClass()
-        .deriveWSPtrClass<CorpseModel, ItemModel>("CorpseModel")
+        .deriveClass<CorpseModel, ItemModel>("CorpseModel")
         .endClass()
-        .deriveWSPtrClass<CurrencyModel, ItemModel>("CurrencyModel")
+        .deriveClass<CurrencyModel, ItemModel>("CurrencyModel")
         .endClass()
-        .deriveWSPtrClass<FoodModel, ItemModel>("FoodModel")
+        .deriveClass<FoodModel, ItemModel>("FoodModel")
         .endClass()
-        .deriveWSPtrClass<FurnitureModel, ItemModel>("FurnitureModel")
+        .deriveClass<FurnitureModel, ItemModel>("FurnitureModel")
         .endClass()
-        .deriveWSPtrClass<KeyModel, ItemModel>("KeyModel")
+        .deriveClass<KeyModel, ItemModel>("KeyModel")
         .endClass()
-        .deriveWSPtrClass<LightModel, ItemModel>("LightModel")
+        .deriveClass<LightModel, ItemModel>("LightModel")
         .endClass()
-        .deriveWSPtrClass<LiquidContainerModel, ItemModel>(
-            "LiquidContainerModel")
+        .deriveClass<LiquidContainerModel, ItemModel>("LiquidContainerModel")
         .endClass()
-        .deriveWSPtrClass<MagazineItem, ItemModel>("MagazineItem")
+        .deriveClass<MagazineItem, ItemModel>("MagazineItem")
         .endClass()
-        .deriveWSPtrClass<MechanismModel, ItemModel>("MechanismModel")
+        .deriveClass<MechanismModel, ItemModel>("MechanismModel")
         .endClass()
-        .deriveWSPtrClass<MeleeWeaponModel, ItemModel>("MeleeWeaponModel")
+        .deriveClass<MeleeWeaponModel, ItemModel>("MeleeWeaponModel")
         .endClass()
-        .deriveWSPtrClass<NodeModel, ItemModel>("NodeModel")
+        .deriveClass<NodeModel, ItemModel>("NodeModel")
         .endClass()
-        .deriveWSPtrClass<ProjectileModel, ItemModel>("ProjectileModel")
+        .deriveClass<ProjectileModel, ItemModel>("ProjectileModel")
         .endClass()
-        .deriveWSPtrClass<RangedWeaponModel, ItemModel>("RangedWeaponModel")
+        .deriveClass<RangedWeaponModel, ItemModel>("RangedWeaponModel")
         .endClass()
-        .deriveWSPtrClass<ResourceModel, ItemModel>("ResourceModel")
+        .deriveClass<ResourceModel, ItemModel>("ResourceModel")
         .endClass()
-        .deriveWSPtrClass<RopeModel, ItemModel>("RopeModel")
+        .deriveClass<RopeModel, ItemModel>("RopeModel")
         .endClass()
-        .deriveWSPtrClass<SeedModel, ItemModel>("SeedModel")
+        .deriveClass<SeedModel, ItemModel>("SeedModel")
         .endClass()
-        .deriveWSPtrClass<ShieldModel, ItemModel>("ShieldModel")
+        .deriveClass<ShieldModel, ItemModel>("ShieldModel")
         .endClass()
-        .deriveWSPtrClass<ShopModel, ItemModel>("ShopModel")
+        .deriveClass<ShopModel, ItemModel>("ShopModel")
         .endClass()
-        .deriveWSPtrClass<VehicleModel, ItemModel>("VehicleModel")
+        .deriveClass<VehicleModel, ItemModel>("VehicleModel")
         .endClass();
     // -------------------------------------------------------------------------
     // ITEM
@@ -374,6 +412,11 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .deriveClass<RangedWeaponItem, Item>("RangedWeaponItem")
         .endClass();
     // -------------------------------------------------------------------------
+    // ITEM_VECTOR derived from 'std::vector<Item *>'
+    luabridge::getGlobalNamespace(L)
+        .beginClass<ItemVector>("ItemVector")
+        .endClass();
+    // -------------------------------------------------------------------------
     // MATERIAL
     luabridge::getGlobalNamespace(L)
         .beginClass<Material>("Material")
@@ -405,7 +448,7 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
     // -------------------------------------------------------------------------
     // EXIT
     luabridge::getGlobalNamespace(L)
-        .beginWSPtrClass<Exit>("Exit")
+        .beginClass<Exit>("Exit")
         .addData("source", &Exit::source)
         .addData("destination", &Exit::destination)
         .addData("direction", &Exit::direction)
@@ -447,60 +490,57 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
     // ABILITY
     luabridge::getGlobalNamespace(L)
         .deriveClass<Ability, BaseEnumerator>("Ability")
-        .endClass()
-        .beginEnum<Ability>("Ability")
+        .endClass();
+    luabridge::beginEnum<Ability>("Ability", L)
         .addEnum("Strength", Ability::Strength)
         .addEnum("Agility", Ability::Agility)
         .addEnum("Perception", Ability::Perception)
         .addEnum("Constitution", Ability::Constitution)
-        .addEnum("Intelligence", Ability::Intelligence)
-        .endEnum();
+        .addEnum("Intelligence", Ability::Intelligence);
     // -------------------------------------------------------------------------
     // CHARACTER_POSTURE
     luabridge::getGlobalNamespace(L)
         .deriveClass<CharacterPosture, BaseEnumerator>("CharacterPosture")
-        .endClass()
-        .beginEnum<CharacterPosture>("CharacterPosture")
+        .endClass();
+    luabridge::beginEnum<CharacterPosture>("CharacterPosture", L)
         .addEnum("None", CharacterPosture::None)
         .addEnum("Stand", CharacterPosture::Stand)
         .addEnum("Crouch", CharacterPosture::Crouch)
         .addEnum("Sit", CharacterPosture::Sit)
         .addEnum("Prone", CharacterPosture::Prone)
         .addEnum("Rest", CharacterPosture::Rest)
-        .addEnum("Sleep", CharacterPosture::Sleep)
-        .endEnum();
+        .addEnum("Sleep", CharacterPosture::Sleep);
     // -------------------------------------------------------------------------
     // DIRECTION
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Direction, BaseEnumerator>("Direction").endClass()
-        .beginEnum<Direction>("Direction")
+        .deriveClass<Direction, BaseEnumerator>("Direction")
+        .endClass();
+    luabridge::beginEnum<Direction>("Direction", L)
         .addEnum("None", Direction::None)
         .addEnum("North", Direction::North)
         .addEnum("South", Direction::South)
         .addEnum("West", Direction::West)
         .addEnum("East", Direction::East)
         .addEnum("Up", Direction::Up)
-        .addEnum("Down", Direction::Down)
-        .endEnum();
+        .addEnum("Down", Direction::Down);
     // -------------------------------------------------------------------------
     // ITEM_QUALITY
     luabridge::getGlobalNamespace(L)
         .deriveClass<ItemQuality, BaseEnumerator>("ItemQuality")
-        .endClass()
-        .beginEnum<ItemQuality>("ItemQuality")
+        .endClass();
+    luabridge::beginEnum<ItemQuality>("ItemQuality", L)
         .addEnum("None", ItemQuality::None)
         .addEnum("Disastrous", ItemQuality::Disastrous)
         .addEnum("Poor", ItemQuality::Poor)
         .addEnum("Normal", ItemQuality::Normal)
         .addEnum("Fine", ItemQuality::Fine)
-        .addEnum("Masterful", ItemQuality::Masterful)
-        .endEnum();
+        .addEnum("Masterful", ItemQuality::Masterful);
     // -------------------------------------------------------------------------
     // KNOWLEDGE
     luabridge::getGlobalNamespace(L)
         .deriveClass<Knowledge, BaseEnumerator>("Knowledge")
-        .endClass()
-        .beginEnum<Knowledge>("Knowledge")
+        .endClass();
+    luabridge::beginEnum<Knowledge>("Knowledge", L)
         .addEnum("None", Knowledge::None)
         .addEnum("GatherHerbs", Knowledge::GatherHerbs)
         .addEnum("GatherPlant", Knowledge::GatherPlant)
@@ -521,25 +561,25 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addEnum("MetalArmorCrafting", Knowledge::MetalArmorCrafting)
         .addEnum("CraftSurvivalTool", Knowledge::CraftSurvivalTool)
         .addEnum("Scavenge", Knowledge::Scavenge)
-        .addEnum("BasicArmorProficiency", Knowledge::BasicArmorProficiency)
-        .endEnum();
+        .addEnum("BasicArmorProficiency", Knowledge::BasicArmorProficiency);
     // -------------------------------------------------------------------------
     // LIQUID_TYPE
     luabridge::getGlobalNamespace(L)
-        .deriveClass<LiquidType, BaseEnumerator>("LiquidType").endClass()
-        .beginEnum<LiquidType>("LiquidType")
+        .deriveClass<LiquidType, BaseEnumerator>("LiquidType")
+        .endClass();
+    luabridge::beginEnum<LiquidType>("LiquidType", L)
         .addEnum("None", LiquidType::None)
         .addEnum("Normal", LiquidType::Normal)
         .addEnum("Alcohol", LiquidType::Alcohol)
         .addEnum("Poison", LiquidType::Poison)
         .addEnum("Blood", LiquidType::Blood)
-        .addEnum("Lava", LiquidType::Lava)
-        .endEnum();
+        .addEnum("Lava", LiquidType::Lava);
     // -------------------------------------------------------------------------
     // MATERIAL_TYPE
     luabridge::getGlobalNamespace(L)
-        .deriveClass<MaterialType, BaseEnumerator>("MaterialType").endClass()
-        .beginEnum<MaterialType>("MaterialType")
+        .deriveClass<MaterialType, BaseEnumerator>("MaterialType")
+        .endClass();
+    luabridge::beginEnum<MaterialType>("MaterialType", L)
         .addEnum("None", MaterialType::None)
         .addEnum("Metal", MaterialType::Metal)
         .addEnum("Stone", MaterialType::Stone)
@@ -551,13 +591,13 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addEnum("Glass", MaterialType::Glass)
         .addEnum("Paper", MaterialType::Paper)
         .addEnum("Coal", MaterialType::Coal)
-        .addEnum("Bone", MaterialType::Bone)
-        .endEnum();
+        .addEnum("Bone", MaterialType::Bone);
     // -------------------------------------------------------------------------
     // MODEL_TYPE
     luabridge::getGlobalNamespace(L)
-        .deriveClass<ModelType, BaseEnumerator>("ModelType").endClass()
-        .beginEnum<ModelType>("ModelType")
+        .deriveClass<ModelType, BaseEnumerator>("ModelType")
+        .endClass();
+    luabridge::beginEnum<ModelType>("ModelType", L)
         .addEnum("None", ModelType::None)
         .addEnum("Corpse", ModelType::Corpse)
         .addEnum("MeleeWeapon", ModelType::MeleeWeapon)
@@ -581,13 +621,13 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addEnum("Mechanism", ModelType::Mechanism)
         .addEnum("Currency", ModelType::Currency)
         .addEnum("Shop", ModelType::Shop)
-        .addEnum("Magazine", ModelType::Magazine)
-        .endEnum();
+        .addEnum("Magazine", ModelType::Magazine);
     // -------------------------------------------------------------------------
     // RESOURCE_TYPE
     luabridge::getGlobalNamespace(L)
-        .deriveClass<ResourceType, BaseEnumerator>("ResourceType").endClass()
-        .beginEnum<ResourceType>("ResourceType")
+        .deriveClass<ResourceType, BaseEnumerator>("ResourceType")
+        .endClass();
+    luabridge::beginEnum<ResourceType>("ResourceType", L)
         .addEnum("None", ResourceType::None)
         .addEnum("Coal", ResourceType::Coal)
         .addEnum("Ore", ResourceType::Ore)
@@ -605,13 +645,13 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addEnum("Trash", ResourceType::Trash)
         .addEnum("Meat", ResourceType::Meat)
         .addEnum("Bone", ResourceType::Bone)
-        .addEnum("Skull", ResourceType::Skull)
-        .endEnum();
+        .addEnum("Skull", ResourceType::Skull);
     // -------------------------------------------------------------------------
     // TOOL_TYPE
     luabridge::getGlobalNamespace(L)
-        .deriveClass<ToolType, BaseEnumerator>("ToolType").endClass()
-        .beginEnum<ToolType>("ToolType")
+        .deriveClass<ToolType, BaseEnumerator>("ToolType")
+        .endClass();
+    luabridge::beginEnum<ToolType>("ToolType", L)
         .addEnum("None", ToolType::None)
         .addEnum("Pickaxe", ToolType::Pickaxe)
         .addEnum("WoodcutterAxe", ToolType::WoodcutterAxe)
@@ -624,8 +664,7 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
         .addEnum("BlacksmithHammer", ToolType::BlacksmithHammer)
         .addEnum("Bellows", ToolType::Bellows)
         .addEnum("Crucible", ToolType::Crucible)
-        .addEnum("Firelighter", ToolType::Firelighter)
-        .endEnum();
+        .addEnum("Firelighter", ToolType::Firelighter);
     // -------------------------------------------------------------------------
     // Load the script.
     auto path = Mud::instance().getMudSystemDirectory() + "lua/" + scriptFile;
@@ -635,7 +674,6 @@ void LoadLuaEnvironmet(lua_State * L, const std::string & scriptFile)
                     "Can't open script %s.", scriptFile);
         Logger::log(LogLevel::Error,
                     "Error :%s",
-                    std::string(lua_tostring(L, -1))
-                   );
+                    std::string(lua_tostring(L, -1)));
     }
 }

@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObjectContainer.hpp"
-#include "structureUtils.hpp"
-#include "command.hpp"
-#include "room.hpp"
+#include "command/object/commandObjectContainer.hpp"
+#include "structure/structureUtils.hpp"
+#include "command/command.hpp"
+#include "structure/room.hpp"
 
 bool DoOrganize(Character * character, ArgumentHandler & args)
 {

@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "dismemberAction.hpp"
-#include "resourceModel.hpp"
-#include "character.hpp"
-#include "logger.hpp"
-#include "room.hpp"
+#include "action/object/dismemberAction.hpp"
+#include "model/submodel/resourceModel.hpp"
+#include "character/character.hpp"
+#include "utilities/logger.hpp"
+#include "structure/room.hpp"
 
 #include <cassert>
 

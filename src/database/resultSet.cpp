@@ -20,7 +20,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "resultSet.hpp"
+#include "database/resultSet.hpp"
 
 ResultSet::ResultSet()
 {

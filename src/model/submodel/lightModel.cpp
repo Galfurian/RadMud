@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "lightModel.hpp"
+#include "model/submodel/lightModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 LightModel::LightModel() :
     fuelType(),

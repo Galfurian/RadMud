@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "item.hpp"
+#include "item/item.hpp"
 
 #include "mud.hpp"
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 Item::Item() :
     vnum(),

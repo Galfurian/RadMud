@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "coordinates.hpp"
-#include "direction.hpp"
-#include "utils.hpp"
+#include "structure/coordinates.hpp"
+#include "enumerators/direction.hpp"
+#include "utilities/utils.hpp"
 
 Coordinates::Coordinates() :
     x(),

@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "rangedWeaponItem.hpp"
-#include "rangedWeaponModel.hpp"
-#include "magazineModel.hpp"
-#include "projectileModel.hpp"
-#include "formatter.hpp"
+#include "item/subitem/rangedWeaponItem.hpp"
+#include "model/submodel/rangedWeaponModel.hpp"
+#include "model/submodel/magazineModel.hpp"
+#include "model/submodel/projectileModel.hpp"
+#include "utilities/formatter.hpp"
 
 RangedWeaponItem::RangedWeaponItem()
 {

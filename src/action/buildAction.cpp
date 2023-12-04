@@ -20,13 +20,13 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "buildAction.hpp"
+#include "action/buildAction.hpp"
 
-#include "resourceModel.hpp"
-#include "formatter.hpp"
-#include "updater.hpp"
-#include "logger.hpp"
-#include "room.hpp"
+#include "model/submodel/resourceModel.hpp"
+#include "utilities/formatter.hpp"
+#include "updater/updater.hpp"
+#include "utilities/logger.hpp"
+#include "structure/room.hpp"
 #include <cassert>
 
 BuildAction::BuildAction(Character * _actor,

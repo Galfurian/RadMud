@@ -19,12 +19,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "sqliteWriteFunctions.hpp"
-#include "sqliteDbms.hpp"
-#include "logger.hpp"
-#include "player.hpp"
-#include "area.hpp"
-#include "room.hpp"
+#include "database/sqliteWriteFunctions.hpp"
+#include "database/sqliteDbms.hpp"
+#include "utilities/logger.hpp"
+#include "character/player.hpp"
+#include "structure/area.hpp"
+#include "structure/room.hpp"
 
 bool SavePlayer(Player * player)
 {

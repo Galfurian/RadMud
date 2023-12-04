@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "race.hpp"
+#include "character/race/race.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 Race::Race() :

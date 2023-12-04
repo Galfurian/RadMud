@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "exit.hpp"
-#include "room.hpp"
-#include "logger.hpp"
+#include "structure/exit.hpp"
+#include "structure/room.hpp"
+#include "utilities/logger.hpp"
 
 Exit::Exit() :
     source(),

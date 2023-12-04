@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "liquidContainerItem.hpp"
-#include "liquidContainerModel.hpp"
-#include "sqliteDbms.hpp"
-#include "formatter.hpp"
+#include "item/subitem/liquidContainerItem.hpp"
+#include "model/submodel/liquidContainerModel.hpp"
+#include "database/sqliteDbms.hpp"
+#include "utilities/formatter.hpp"
 
 LiquidContainerItem::LiquidContainerItem() :
     liquidContent(),

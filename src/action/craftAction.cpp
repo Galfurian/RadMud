@@ -20,12 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "craftAction.hpp"
+#include "action/craftAction.hpp"
 
-#include "resourceModel.hpp"
-#include "updater.hpp"
-#include "logger.hpp"
-#include "room.hpp"
+#include "model/submodel/resourceModel.hpp"
+#include "updater/updater.hpp"
+#include "utilities/logger.hpp"
+#include "structure/room.hpp"
 #include <cassert>
 
 CraftAction::CraftAction(Character * _actor,

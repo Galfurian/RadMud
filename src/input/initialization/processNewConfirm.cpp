@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processNewConfirm.hpp"
-#include "player.hpp"
+#include "input/initialization/processNewConfirm.hpp"
+#include "character/player.hpp"
 #include "mud.hpp"
-#include "processNewWeight.hpp"
+#include "input/initialization/processNewWeight.hpp"
 
 bool ProcessNewConfirm::process(Character * character, ArgumentHandler & args)
 {

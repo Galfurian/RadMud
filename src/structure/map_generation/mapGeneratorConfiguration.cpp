@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "mapGeneratorConfiguration.hpp"
-#include "utils.hpp"
+#include "structure/map_generation/mapGeneratorConfiguration.hpp"
+#include "utilities/utils.hpp"
 
 MapGeneratorConfiguration::MapGeneratorConfiguration() :
     width(60),

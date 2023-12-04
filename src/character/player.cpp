@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "player.hpp"
+#include "character/player.hpp"
 
-#include "sqliteWriteFunctions.hpp"
-#include "logger.hpp"
+#include "database/sqliteWriteFunctions.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 Player::Player(const int & _socket,
@@ -380,8 +380,6 @@ void Player::processRead()
 
 void Player::processWrite()
 {
-    std::vector<unsigned char> uncompressed;
-    std::vector<unsigned char> compressed;
     //std::vector<unsigned char> check;
     // We will loop attempting to write all in buffer, until write blocks.
     while ((psocket != NO_SOCKET_COMMUNICATION) && !outbuf.empty())

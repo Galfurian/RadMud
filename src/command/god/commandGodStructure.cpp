@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandGodStructure.hpp"
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
-#include "aStar.hpp"
+#include "command/god/commandGodStructure.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
+#include "structure/algorithms/AStar/aStar.hpp"
 #include "mud.hpp"
 
 bool DoFindPath(Character * character, ArgumentHandler & args)

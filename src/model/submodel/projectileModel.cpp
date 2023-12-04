@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "projectileModel.hpp"
+#include "model/submodel/projectileModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 ProjectileModel::ProjectileModel() :
     projectileType(),

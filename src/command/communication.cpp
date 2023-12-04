@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "communication.hpp"
+#include "command/communication.hpp"
 
-#include "command.hpp"
+#include "command/command.hpp"
 #include "mud.hpp"
 
 void LoadCommunicationCommands()

@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processInput.hpp"
-#include "character.hpp"
-#include "crafting.hpp"
-#include "movement.hpp"
+#include "input/processInput.hpp"
+#include "character/character.hpp"
+#include "command/crafting.hpp"
+#include "command/movement.hpp"
 #include "mud.hpp"
 
 ProcessInput::ProcessInput()

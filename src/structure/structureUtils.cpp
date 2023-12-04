@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "structureUtils.hpp"
-#include "mechanismModel.hpp"
-#include "character.hpp"
-#include "area.hpp"
-#include "room.hpp"
+#include "structure/structureUtils.hpp"
+#include "model/submodel/mechanismModel.hpp"
+#include "character/character.hpp"
+#include "structure/area.hpp"
+#include "structure/room.hpp"
 
 namespace StructUtils
 {

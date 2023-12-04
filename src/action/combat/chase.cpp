@@ -20,16 +20,16 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "chase.hpp"
+#include "action/combat/chase.hpp"
 
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
-#include "effectFactory.hpp"
-#include "moveAction.hpp"
-#include "logger.hpp"
-#include "aStar.hpp"
-#include "area.hpp"
-#include "room.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
+#include "character/effect/effectFactory.hpp"
+#include "action/moveAction.hpp"
+#include "utilities/logger.hpp"
+#include "structure/algorithms/AStar/aStar.hpp"
+#include "structure/area.hpp"
+#include "structure/room.hpp"
 #include <queue>
 #include <cassert>
 

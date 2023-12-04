@@ -19,7 +19,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandGodItem.hpp"
+#include "command/god/commandGodItem.hpp"
 #include "mud.hpp"
 
 bool DoItemCreate(Character * character, ArgumentHandler & args)

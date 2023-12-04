@@ -19,7 +19,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "tableLoader.hpp"
+#include "database/tableLoader.hpp"
 
 TableLoader::TableLoader(std::string _table,
                          std::function<bool(ResultSet * result)> _loadFunction,

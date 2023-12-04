@@ -1,9 +1,39 @@
-.cproject
-.project
-.idea
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Project specific
 build
-build-clang
-Default
-cmake-build-debug/
-cmake-build-default/
-build-gcc/
+cmake-build-*
+.idea
+.vscode
+.cache

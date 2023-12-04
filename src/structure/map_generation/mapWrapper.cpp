@@ -19,9 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "mapWrapper.hpp"
-#include "sqliteWriteFunctions.hpp"
-#include "logger.hpp"
+#include "structure/map_generation/mapWrapper.hpp"
+#include "database/sqliteWriteFunctions.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 MapWrapper::MapWrapper() :

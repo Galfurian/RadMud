@@ -19,13 +19,13 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObjectLightSource.hpp"
-#include "sqliteDbms.hpp"
-#include "lightModel.hpp"
-#include "toolModel.hpp"
-#include "lightItem.hpp"
-#include "command.hpp"
-#include "room.hpp"
+#include "command/object/commandObjectLightSource.hpp"
+#include "database/sqliteDbms.hpp"
+#include "model/submodel/lightModel.hpp"
+#include "model/submodel/toolModel.hpp"
+#include "item/subitem/lightItem.hpp"
+#include "command/command.hpp"
+#include "structure/room.hpp"
 
 bool DoTurn(Character * character, ArgumentHandler & args)
 {

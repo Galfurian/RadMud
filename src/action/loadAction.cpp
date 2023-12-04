@@ -20,12 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "loadAction.hpp"
+#include "action/loadAction.hpp"
 
-#include "magazineModel.hpp"
-#include "sqliteDbms.hpp"
-#include "character.hpp"
-#include "logger.hpp"
+#include "model/submodel/magazineModel.hpp"
+#include "database/sqliteDbms.hpp"
+#include "character/character.hpp"
+#include "utilities/logger.hpp"
 
 #include <cassert>
 

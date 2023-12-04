@@ -19,15 +19,15 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObject.hpp"
+#include "command/object/commandObject.hpp"
 
-#include "commandObjectLightSource.hpp"
-#include "commandObjectManagement.hpp"
-#include "commandObjectContainer.hpp"
-#include "commandObjectCharacter.hpp"
-#include "commandObjectProcess.hpp"
-#include "commandObjectLiquids.hpp"
-#include "commandObjectShop.hpp"
+#include "command/object/commandObjectLightSource.hpp"
+#include "command/object/commandObjectManagement.hpp"
+#include "command/object/commandObjectContainer.hpp"
+#include "command/object/commandObjectCharacter.hpp"
+#include "command/object/commandObjectProcess.hpp"
+#include "command/object/commandObjectLiquids.hpp"
+#include "command/object/commandObjectShop.hpp"
 #include "mud.hpp"
 
 void LoadObjectCommands()

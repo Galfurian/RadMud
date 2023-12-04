@@ -3,31 +3,13 @@
 /// @author Enrico Fraccaroli
 /// @date   Feb 10 2017
 
-#include "nameGenerator.hpp"
-#include "utils.hpp"
+#include "utilities/name_generator/nameGenerator.hpp"
+#include "utilities/utils.hpp"
+
+#include <memory>
 
 namespace namegen
 {
-
-#ifdef HAVE_CXX14
-using std::make_unique;
-#else
-
-/// @brief Creates an unique pointer.
-/// @details The make_unique functions is not available in c++11, so we use
-/// this template function to maintain full c++11 compatibility;
-/// std::make_unique is part of C++14.
-/// @tparam T       The type of the new instance.
-/// @tparam Args    The list of arguments of the function.
-/// @param args     Arguments with which an instance of T will be constructed.
-/// @return The std::unique_ptr of an instance of type T.
-template<typename T, typename... Args>
-std::unique_ptr<T> make_unique(Args && ... args)
-{
-    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
-#endif
 
 // -----------------------------------------------------------------------------
 // NAME GENERATOR
@@ -42,7 +24,7 @@ NameGenerator::NameGenerator(const std::string & pattern, bool collapse_triples)
     std::unique_ptr<NameGenerator> last;
 
     std::stack<std::unique_ptr<Group>> stack;
-    std::unique_ptr<Group> top = make_unique<GroupSymbol>();
+    std::unique_ptr<Group> top = std::make_unique<GroupSymbol>();
 
     for (auto c : pattern)
     {
@@ -50,11 +32,11 @@ NameGenerator::NameGenerator(const std::string & pattern, bool collapse_triples)
         {
             case '<':
                 stack.push(std::move(top));
-                top = make_unique<GroupSymbol>();
+                top = std::make_unique<GroupSymbol>();
                 break;
             case '(':
                 stack.push(std::move(top));
-                top = make_unique<GroupLiteral>();
+                top = std::make_unique<GroupLiteral>();
                 break;
             case '>':
             case ')':
@@ -112,7 +94,7 @@ NameGenerator::NameGenerator(const std::string & pattern, bool collapse_triples)
     std::unique_ptr<NameGenerator> g = top->emit();
     if (collapse_triples)
     {
-        g = make_unique<Collapser>(std::move(g));
+        g = std::make_unique<Collapser>(std::move(g));
     }
     add(std::move(g));
 }
@@ -182,11 +164,11 @@ std::unique_ptr<NameGenerator> NameGenerator::Group::emit()
     switch (set.size())
     {
         case 0:
-            return make_unique<Literal>("");
+            return std::make_unique<Literal>("");
         case 1:
             return std::move(*set.begin());
         default:
-            return make_unique<Random>(std::move(set));
+            return std::make_unique<Random>(std::move(set));
     }
 }
 
@@ -194,9 +176,9 @@ void NameGenerator::Group::split()
 {
     if (set.empty())
     {
-        set.push_back(make_unique<Sequence>());
+        set.push_back(std::make_unique<Sequence>());
     }
-    set.push_back(make_unique<Sequence>());
+    set.push_back(std::make_unique<Sequence>());
 }
 
 void NameGenerator::Group::wrap(const Manipulator & manipulator)
@@ -210,25 +192,25 @@ void NameGenerator::Group::add(std::unique_ptr<NameGenerator> && g)
     {
         if (manipulators.top() == Manipulator::Reverse)
         {
-            g = make_unique<Reverser>(std::move(g));
+            g = std::make_unique<Reverser>(std::move(g));
         }
         else if (manipulators.top() == Manipulator::Capitalize)
         {
-            g = make_unique<Capitalizer>(std::move(g));
+            g = std::make_unique<Capitalizer>(std::move(g));
         }
         manipulators.pop();
     }
     if (set.empty())
     {
-        set.push_back(make_unique<Sequence>());
+        set.push_back(std::make_unique<Sequence>());
     }
     set.back()->add(std::move(g));
 }
 
 void NameGenerator::Group::add(char c)
 {
-    std::unique_ptr<NameGenerator> g = make_unique<Random>();
-    g->add(make_unique<Literal>(std::string(1, c)));
+    std::unique_ptr<NameGenerator> g = std::make_unique<Random>();
+    g->add(std::make_unique<Literal>(std::string(1, c)));
     Group::add(std::move(g));
 }
 
@@ -246,17 +228,17 @@ void NameGenerator::GroupSymbol::add(char c)
     // Transform the character into a string.
     std::string value(1, c);
     // Create a new
-    auto g = make_unique<Random>();
+    auto g = std::make_unique<Random>();
     try
     {
         static const auto & symbols = NameGenerator::getSymbolMap();
         for (const auto & s : symbols.at(value))
         {
-            g->add(make_unique<Literal>(s));
+            g->add(std::make_unique<Literal>(s));
         }
     } catch (const std::out_of_range &)
     {
-        g->add(make_unique<Literal>(value));
+        g->add(std::make_unique<Literal>(value));
     }
     Group::add(std::move(g));
 }

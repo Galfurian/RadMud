@@ -19,15 +19,15 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObjectShop.hpp"
+#include "command/object/commandObjectShop.hpp"
 
-#include "characterUtilities.hpp"
-#include "currencyModel.hpp"
-#include "sqliteDbms.hpp"
-#include "shopItem.hpp"
-#include "command.hpp"
-#include "updater.hpp"
-#include "room.hpp"
+#include "character/characterUtilities.hpp"
+#include "model/submodel/currencyModel.hpp"
+#include "database/sqliteDbms.hpp"
+#include "item/subitem/shopItem.hpp"
+#include "command/command.hpp"
+#include "updater/updater.hpp"
+#include "structure/room.hpp"
 
 bool DoDeposit(Character * character, ArgumentHandler & args)
 {

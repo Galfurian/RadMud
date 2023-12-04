@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandGodLiquid.hpp"
-#include "liquidContainerItem.hpp"
+#include "command/god/commandGodLiquid.hpp"
+#include "item/subitem/liquidContainerItem.hpp"
 #include "mud.hpp"
 
 bool DoLiquidInfo(Character * character, ArgumentHandler & args)

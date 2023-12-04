@@ -19,15 +19,15 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "sqliteLoadFunctions.hpp"
-#include "sqliteException.hpp"
+#include "database/sqliteLoadFunctions.hpp"
+#include "database/sqliteException.hpp"
 
-#include "liquidContainerItem.hpp"
-#include "currencyModel.hpp"
-#include "modelFactory.hpp"
-#include "itemFactory.hpp"
-#include "shopItem.hpp"
-#include "logger.hpp"
+#include "item/subitem/liquidContainerItem.hpp"
+#include "model/submodel/currencyModel.hpp"
+#include "model/modelFactory.hpp"
+#include "item/itemFactory.hpp"
+#include "item/subitem/shopItem.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 bool LoadBadName(ResultSet * result)

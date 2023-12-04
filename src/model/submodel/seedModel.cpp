@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "seedModel.hpp"
+#include "model/submodel/seedModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 SeedModel::SeedModel() :
     seedType()

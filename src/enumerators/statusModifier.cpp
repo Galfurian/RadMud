@@ -19,7 +19,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "statusModifier.hpp"
+#include "enumerators/statusModifier.hpp"
 
 std::string StatusModifier::toString() const
 {

@@ -20,11 +20,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "reloadAction.hpp"
+#include "action/reloadAction.hpp"
 
-#include "sqliteDbms.hpp"
-#include "character.hpp"
-#include "logger.hpp"
+#include "database/sqliteDbms.hpp"
+#include "character/character.hpp"
+#include "utilities/logger.hpp"
 #include <cassert>
 
 ReloadAction::ReloadAction(Character * _actor,

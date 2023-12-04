@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "currencyItem.hpp"
+#include "item/subitem/currencyItem.hpp"
 
-#include "currencyModel.hpp"
-#include "logger.hpp"
+#include "model/submodel/currencyModel.hpp"
+#include "utilities/logger.hpp"
 
 CurrencyItem::CurrencyItem()
 {

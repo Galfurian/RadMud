@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandGodCharacter.hpp"
-#include "characterUtilities.hpp"
+#include "command/god/commandGodCharacter.hpp"
+#include "character/characterUtilities.hpp"
 #include "mud.hpp"
 
 bool DoGodInfo(Character * character, ArgumentHandler & args)

@@ -20,12 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "scoutAction.hpp"
+#include "action/scoutAction.hpp"
 
-#include "effectFactory.hpp"
-#include "logger.hpp"
-#include "room.hpp"
-#include "area.hpp"
+#include "character/effect/effectFactory.hpp"
+#include "utilities/logger.hpp"
+#include "structure/room.hpp"
+#include "structure/area.hpp"
 #include <cassert>
 
 ScoutAction::ScoutAction(Character * _actor) :

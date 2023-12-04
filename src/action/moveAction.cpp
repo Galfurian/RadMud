@@ -20,14 +20,14 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "moveAction.hpp"
+#include "action/moveAction.hpp"
 
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
-#include "effectFactory.hpp"
-#include "character.hpp"
-#include "logger.hpp"
-#include "room.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
+#include "character/effect/effectFactory.hpp"
+#include "character/character.hpp"
+#include "utilities/logger.hpp"
+#include "structure/room.hpp"
 #include <cassert>
 
 MoveAction::MoveAction(Character * _actor,

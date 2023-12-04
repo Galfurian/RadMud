@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "effect.hpp"
+#include "character/effect/effect.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 Effect::Effect(Character * _affected,
                std::string _name,

@@ -19,11 +19,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "processPlayerName.hpp"
-#include "player.hpp"
+#include "input/initialization/processPlayerName.hpp"
+#include "character/player.hpp"
 #include "mud.hpp"
-#include "processNewName.hpp"
-#include "processPlayerPassword.hpp"
+#include "input/initialization/processNewName.hpp"
+#include "input/initialization/processPlayerPassword.hpp"
 
 bool ProcessPlayerName::process(Character * character, ArgumentHandler & args)
 {

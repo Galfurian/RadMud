@@ -20,16 +20,16 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandGod.hpp"
+#include "command/god/commandGod.hpp"
 
 #include "mud.hpp"
-#include "commandGodMud.hpp"
-#include "commandGodItem.hpp"
-#include "commandGodMobile.hpp"
-#include "commandGodLiquid.hpp"
-#include "commandGodCreation.hpp"
-#include "commandGodCharacter.hpp"
-#include "commandGodStructure.hpp"
+#include "command/god/commandGodMud.hpp"
+#include "command/god/commandGodItem.hpp"
+#include "command/god/commandGodMobile.hpp"
+#include "command/god/commandGodLiquid.hpp"
+#include "command/god/commandGodCreation.hpp"
+#include "command/god/commandGodCharacter.hpp"
+#include "command/god/commandGodStructure.hpp"
 
 void LoadGodCommands()
 {

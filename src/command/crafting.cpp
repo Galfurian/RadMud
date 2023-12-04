@@ -20,12 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "crafting.hpp"
+#include "command/crafting.hpp"
 
 #include "mud.hpp"
-#include "buildAction.hpp"
-#include "craftAction.hpp"
-#include "characterUtilities.hpp"
+#include "action/buildAction.hpp"
+#include "action/craftAction.hpp"
+#include "character/characterUtilities.hpp"
 
 void LoadCraftingCommands()
 {

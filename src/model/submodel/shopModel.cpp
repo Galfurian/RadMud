@@ -20,11 +20,11 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "shopModel.hpp"
+#include "model/submodel/shopModel.hpp"
 
 #include "mud.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 ShopModel::ShopModel() :
     maxWeight()

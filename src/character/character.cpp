@@ -20,14 +20,14 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "character.hpp"
+#include "character/character.hpp"
 
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
 
-#include "lightItem.hpp"
-#include "armorItem.hpp"
-#include "logger.hpp"
+#include "item/subitem/lightItem.hpp"
+#include "item/subitem/armorItem.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
 
 Character::Character() :

@@ -21,12 +21,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "flee.hpp"
+#include "action/combat/flee.hpp"
 
-#include "structureUtils.hpp"
-#include "characterUtilities.hpp"
-#include "logger.hpp"
-#include "room.hpp"
+#include "structure/structureUtils.hpp"
+#include "character/characterUtilities.hpp"
+#include "utilities/logger.hpp"
+#include "structure/room.hpp"
 #include <cassert>
 
 Flee::Flee(Character * _actor) :

@@ -19,9 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "bodyPart.hpp"
-#include "resourceModel.hpp"
-#include "formatter.hpp"
+#include "character/bodyPart.hpp"
+#include "model/submodel/resourceModel.hpp"
+#include "utilities/formatter.hpp"
 #include <cassert>
 
 BodyPart::BodyPart() :

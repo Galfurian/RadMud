@@ -25,10 +25,10 @@
 #include <unistd.h>
 #include <signal.h>
 
-#include "processPlayerName.hpp"
-#include "CMacroWrapper.hpp"
-#include "stopwatch.hpp"
-#include "logger.hpp"
+#include "input/initialization/processPlayerName.hpp"
+#include "utilities/CMacroWrapper.hpp"
+#include "utilities/stopwatch.hpp"
+#include "utilities/logger.hpp"
 
 /// Input file descriptor.
 static fd_set in_set;

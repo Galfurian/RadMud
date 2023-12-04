@@ -19,12 +19,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObjectProcess.hpp"
-#include "corpseItem.hpp"
-#include "command.hpp"
-#include "player.hpp"
-#include "room.hpp"
-#include "dismemberAction.hpp"
+#include "command/object/commandObjectProcess.hpp"
+#include "item/subitem/corpseItem.hpp"
+#include "command/command.hpp"
+#include "character/player.hpp"
+#include "structure/room.hpp"
+#include "action/object/dismemberAction.hpp"
 
 bool DoDismember(Character * character, ArgumentHandler & args)
 {

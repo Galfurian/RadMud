@@ -19,9 +19,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "argumentHandler.hpp"
-#include "utils.hpp"
-#include "logger.hpp"
+#include "input/argumentHandler.hpp"
+#include "utilities/utils.hpp"
+#include "utilities/logger.hpp"
 
 ArgumentHandler::ArgumentHandler(const std::string & _original) :
     original(_original),

@@ -19,10 +19,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "mapGenerator.hpp"
-#include "logger.hpp"
-#include "area.hpp"
-#include "structureUtils.hpp"
+#include "structure/map_generation/mapGenerator.hpp"
+#include "utilities/logger.hpp"
+#include "structure/area.hpp"
+#include "structure/structureUtils.hpp"
 
 MapGenerator::MapGenerator(const MapGeneratorConfiguration & _configuration,
                            const std::shared_ptr<HeightMap> & _heightMap) :

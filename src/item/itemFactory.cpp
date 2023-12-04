@@ -20,15 +20,15 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "itemFactory.hpp"
+#include "item/itemFactory.hpp"
 
-#include "shopItem.hpp"
-#include "armorItem.hpp"
-#include "lightItem.hpp"
-#include "corpseItem.hpp"
-#include "currencyItem.hpp"
-#include "resourceItem.hpp"
-#include "liquidContainerItem.hpp"
+#include "item/subitem/shopItem.hpp"
+#include "item/subitem/armorItem.hpp"
+#include "item/subitem/lightItem.hpp"
+#include "item/subitem/corpseItem.hpp"
+#include "item/subitem/currencyItem.hpp"
+#include "item/subitem/resourceItem.hpp"
+#include "item/subitem/liquidContainerItem.hpp"
 
 Item * ItemFactory::newItem(const ModelType & type)
 {

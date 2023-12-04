@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "mechanismModel.hpp"
+#include "model/submodel/mechanismModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 MechanismModel::MechanismModel() :
     mechanismType(),

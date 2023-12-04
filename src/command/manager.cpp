@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "manager.hpp"
+#include "command/manager.hpp"
 
 #include "mud.hpp"
-#include "shopItem.hpp"
+#include "item/subitem/shopItem.hpp"
 
 void LoadManagerCommands()
 {

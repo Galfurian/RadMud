@@ -19,7 +19,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "heightMap.hpp"
+#include "structure/map_generation/heightMap.hpp"
 
 HeightMap::HeightMap(const unsigned int & _vnum,
                      const std::string & _name,

@@ -18,16 +18,14 @@
 
 // Basic Include.
 
-#include "utils.hpp"
+#include "utilities/utils.hpp"
 
 #include <dirent.h>
-#include <zconf.h>
-#include <zlib.h>
 #include <ctime>
 #include <fstream>
 #include <iterator>
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 bool DoubleEquality(double a, double b)
 {
@@ -232,107 +230,3 @@ if ((err) != Z_OK) {\
     exit(1);\
 }\
 
-
-std::vector<uint8_t> DeflateStream(std::vector<uint8_t> & uncompressed)
-{
-    // ZLib compression stream.
-    z_stream c_stream;
-    // The error code returned from every call to zlib
-    int errmsg;
-
-    // Prepare a vector for the compressed data.
-    std::vector<uint8_t> compressed;
-
-    c_stream.zalloc = nullptr;
-    c_stream.zfree = nullptr;
-    c_stream.opaque = nullptr;
-
-    errmsg = deflateInit(&c_stream, Z_BEST_COMPRESSION);
-    ZCHECK_ERROR(errmsg, "deflateInit");
-
-    c_stream.next_in = &uncompressed[0];
-    c_stream.avail_in = static_cast<uint32_t>(uncompressed.size());
-
-    while (true)
-    {
-        uint8_t c_buffer[10] = {};
-        c_stream.next_out = &c_buffer[0];
-        c_stream.avail_out = 10;
-
-        errmsg = deflate(&c_stream, Z_FINISH);
-        if (errmsg == Z_STREAM_END)
-        {
-            for (unsigned int i = 0; i < (10 - c_stream.avail_out); i++)
-            {
-                compressed.push_back(c_buffer[i]);
-            }
-            break;
-        }
-        ZCHECK_ERROR(errmsg, "deflate");
-        for (unsigned int i = 0; i < (10 - c_stream.avail_out); i++)
-        {
-            compressed.push_back(c_buffer[i]);
-        }
-    }
-
-    errmsg = deflateEnd(&c_stream);
-    ZCHECK_ERROR(errmsg, "deflateReset");
-    return compressed;
-}
-
-// Creates decompressed strem of data.
-std::vector<uint8_t> InflateStream(std::vector<uint8_t> & compressed)
-{
-    // ZLib decompression stream.
-    z_stream d_stream;
-    // The error code returned from every call to zlib
-    int errmsg;
-
-    // Prepare a vector for the uncompressed data.
-    std::vector<uint8_t> uncompressed;
-
-    d_stream.zalloc = Z_NULL;
-    d_stream.zfree = Z_NULL;
-    d_stream.opaque = Z_NULL;
-    d_stream.avail_in = 0;
-    d_stream.next_in = Z_NULL;
-
-    errmsg = inflateInit(&d_stream);
-    ZCHECK_ERROR(errmsg, "inflateInit");
-
-    d_stream.avail_in = static_cast<uint32_t>(compressed.size());
-    d_stream.next_in = &compressed[0];
-
-    do
-    {
-        uint8_t d_buffer[10] = {};
-        d_stream.next_out = &d_buffer[0];
-        d_stream.avail_out = 10;
-
-        errmsg = inflate(&d_stream, Z_NO_FLUSH);
-        if (errmsg == Z_STREAM_END)
-        {
-            for (unsigned int i = 0; i < (10 - d_stream.avail_out); i++)
-            {
-                uncompressed.push_back(d_buffer[i]);
-            }
-            if (d_stream.avail_in == 0)
-            {
-                break;
-            }
-        }
-        else
-        {
-            ZCHECK_ERROR(errmsg, "inflate");
-        }
-
-        for (unsigned int i = 0; i < (10 - d_stream.avail_out); i++)
-        {
-            uncompressed.push_back(d_buffer[i]);
-        }
-    } while (d_stream.avail_out == 0);
-
-    errmsg = inflateEnd(&d_stream);
-    ZCHECK_ERROR(errmsg, "inflateEnd");
-    return uncompressed;
-}

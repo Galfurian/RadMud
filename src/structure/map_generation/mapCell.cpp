@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "mapCell.hpp"
-#include "logger.hpp"
+#include "structure/map_generation/mapCell.hpp"
+#include "utilities/logger.hpp"
 
 MapCell::MapCell() :
     room(),

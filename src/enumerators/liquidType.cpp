@@ -19,7 +19,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "liquidType.hpp"
+#include "enumerators/liquidType.hpp"
 
 std::string LiquidType::toString() const
 {

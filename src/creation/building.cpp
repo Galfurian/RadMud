@@ -20,12 +20,12 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "building.hpp"
+#include "creation/building.hpp"
 
-#include "resourceModel.hpp"
-#include "knowledge.hpp"
-#include "toolModel.hpp"
-#include "logger.hpp"
+#include "model/submodel/resourceModel.hpp"
+#include "enumerators/knowledge.hpp"
+#include "model/submodel/toolModel.hpp"
+#include "utilities/logger.hpp"
 
 Building::Building() :
     vnum(),

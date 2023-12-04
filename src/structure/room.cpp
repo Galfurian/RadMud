@@ -20,15 +20,15 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "room.hpp"
+#include "structure/room.hpp"
 
-#include "mechanismModel.hpp"
-#include "lightModel.hpp"
-#include "lightItem.hpp"
-#include "generator.hpp"
-#include "logger.hpp"
+#include "model/submodel/mechanismModel.hpp"
+#include "model/submodel/lightModel.hpp"
+#include "item/subitem/lightItem.hpp"
+#include "structure/generator.hpp"
+#include "utilities/logger.hpp"
 #include "mud.hpp"
-#include "structureUtils.hpp"
+#include "structure/structureUtils.hpp"
 
 Room::Room() :
     vnum(),

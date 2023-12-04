@@ -19,8 +19,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "meleeWeaponItem.hpp"
-#include "meleeWeaponModel.hpp"
+#include "item/subitem/meleeWeaponItem.hpp"
+#include "model/submodel/meleeWeaponModel.hpp"
 
 MeleeWeaponItem::MeleeWeaponItem()
 {

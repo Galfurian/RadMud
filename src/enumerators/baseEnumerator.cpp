@@ -19,7 +19,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "baseEnumerator.hpp"
+#include "enumerators/baseEnumerator.hpp"
 #include <sstream>
 
 /// @brief Constructor from uint.
@@ -31,12 +31,6 @@ BaseEnumerator::BaseEnumerator() :
 
 BaseEnumerator::BaseEnumerator(const unsigned int & _value) :
     value(_value)
-{
-    // Nothing to do.
-}
-
-BaseEnumerator::BaseEnumerator(const BaseEnumerator & other) :
-    value(other.value)
 {
     // Nothing to do.
 }

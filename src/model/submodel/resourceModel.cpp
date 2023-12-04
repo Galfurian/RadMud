@@ -20,9 +20,9 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "resourceModel.hpp"
+#include "model/submodel/resourceModel.hpp"
 
-#include "logger.hpp"
+#include "utilities/logger.hpp"
 
 ResourceModel::ResourceModel() :
     resourceType()

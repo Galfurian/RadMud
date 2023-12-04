@@ -19,14 +19,14 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "commandObjectLiquids.hpp"
-#include "liquidContainerModel.hpp"
-#include "liquidContainerItem.hpp"
-#include "lightModel.hpp"
-#include "lightItem.hpp"
-#include "formatter.hpp"
-#include "command.hpp"
-#include "room.hpp"
+#include "command/object/commandObjectLiquids.hpp"
+#include "model/submodel/liquidContainerModel.hpp"
+#include "item/subitem/liquidContainerItem.hpp"
+#include "model/submodel/lightModel.hpp"
+#include "item/subitem/lightItem.hpp"
+#include "utilities/formatter.hpp"
+#include "command/command.hpp"
+#include "structure/room.hpp"
 
 bool DoDrink(Character * character, ArgumentHandler & args)
 {

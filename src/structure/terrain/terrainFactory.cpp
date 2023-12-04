@@ -19,7 +19,7 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "terrainFactory.hpp"
+#include "structure/terrain/terrainFactory.hpp"
 
 std::shared_ptr<Terrain> TerrainFactory::getAir()
 {

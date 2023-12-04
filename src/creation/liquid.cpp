@@ -20,8 +20,8 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "liquid.hpp"
-#include "utils.hpp"
+#include "creation/liquid.hpp"
+#include "utilities/utils.hpp"
 
 Liquid::Liquid() :
     vnum(),

@@ -20,10 +20,10 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "sqliteWrapper.hpp"
-#include "sqliteException.hpp"
-#include "logger.hpp"
-#include "utils.hpp"
+#include "database/sqliteWrapper.hpp"
+#include "database/sqliteException.hpp"
+#include "utilities/logger.hpp"
+#include "utilities/utils.hpp"
 
 SQLiteWrapper::SQLiteWrapper() :
     dbDetails(),

@@ -16,8 +16,8 @@
 /// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 /// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-#include "table.hpp"
-#include "logger.hpp"
+#include "utilities/table.hpp"
+#include "utilities/logger.hpp"
 
 std::string Table::getTable(bool withoutHeaders,
                             bool withoutDividers)
