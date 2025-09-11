@@ -62,6 +62,9 @@ public:
     /// Returns the string from the given argument to the end.
     std::string substr(const size_t & startingArgument);
 
+    /// Return the current string
+    std::string str();
+
     /// Erase the argument at the given position.
     void erase(const size_t & position);
 
