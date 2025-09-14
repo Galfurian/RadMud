@@ -48,6 +48,7 @@ void ProcessInitialization::printChoices(Character * character)
     }
     preview += "\n";
     // PASSWORD
+    preview += "# Password     :";
     if (!player->password.empty())
     {
         for (unsigned int i = 0; i < player->password.size(); i++)

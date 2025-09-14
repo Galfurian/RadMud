@@ -109,13 +109,13 @@ bool DoSay(Character * character, ArgumentHandler & args)
     {
         character->sendMsg("You say \"%s\".\n",
                            Formatter::cyan() + Formatter::italic() +
-                           args.getOriginal() + Formatter::reset());
+                           args.str() + Formatter::reset());
         // Send the message inside the room.
         character->room->sendToAll("%s says \"%s\".\n",
                                    {character},
                                    character->getName(),
                                    Formatter::cyan() + Formatter::italic() +
-                                   args.getOriginal() + Formatter::reset());
+                                   args.str() + Formatter::reset());
     }
     return true;
 }

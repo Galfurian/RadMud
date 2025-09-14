@@ -9,6 +9,8 @@ cmake_minimum_required(VERSION 3.1...3.18)
 # Set the project name.
 project(radmud CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Set the default build type to Debug.
 if(NOT CMAKE_BUILD_TYPE)
     message(STATUS "Setting build type to 'Debug' as none was specified.")
