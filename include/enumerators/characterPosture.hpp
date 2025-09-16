@@ -23,6 +23,7 @@
 #pragma once
 
 #include "baseEnumerator.hpp"
+#include <cstdint>
 
 /// The postures of a character.
 class CharacterPosture : public BaseEnumerator {

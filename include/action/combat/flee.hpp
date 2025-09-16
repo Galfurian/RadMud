@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "combatAction.hpp"
+#include "action/combat/combatAction.hpp"
 
 /// @brief An action executed by characters when fleeing from combat.
 class Flee : public CombatAction {

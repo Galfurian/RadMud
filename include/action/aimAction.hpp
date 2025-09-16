@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "generalAction.hpp"
+#include "action/generalAction.hpp"
 
 /// @brief Allows to aim a target.
 class AimAction : public GeneralAction {
