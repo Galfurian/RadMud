@@ -967,20 +967,6 @@ Mobile *Character::toMobile()
 	return static_cast<Mobile *>(this);
 }
 
-void Character::luaAddEquipment(Item *item)
-{
-	std::string error;
-	auto occupiedBodyParts = this->canWear(item, error);
-	if (occupiedBodyParts.empty()) {
-		MudLog(LogLevel::Error, "The mobile %s cannot equip %s.", this->getName(), item->getName());
-		MudLog(LogLevel::Error, "Error: %s", error);
-		return;
-	} else {
-		item->setOccupiedBodyParts(occupiedBodyParts);
-		this->addEquipmentItem(item);
-	}
-}
-
 bool Character::operator<(const class Character &source) const
 {
 	return name < source.name;

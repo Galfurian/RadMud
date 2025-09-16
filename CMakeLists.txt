@@ -4,12 +4,15 @@
 # -----------------------------------------------------------------------------
 # Check CMAKE Version.
 # -----------------------------------------------------------------------------
-cmake_minimum_required(VERSION 2.8.4 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 # -----------------------------------------------------------------------------
 # Project INFORMATION
 # -----------------------------------------------------------------------------
 project(RadMud CXX)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 SET(PROJECT_NAME RadMud)
 SET(PROJECT_SOURCE_DIR src)
 
@@ -66,7 +69,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
 
 # Enable c++11
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 # If the compiler is GNU, disable noexcept-type warnings.
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -81,14 +84,42 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Find the required packages.
 find_package(Lua REQUIRED)
-find_package(Sqlite3 REQUIRED)
+find_package(SQLite3 REQUIRED)
+
+# -----------------------------------------------------------------------------
+# DEPENDENCY
+# -----------------------------------------------------------------------------
+
+# We need this in order to import external projects.
+include(FetchContent)
+# Retrieve the source.
+FetchContent_Declare(luabridge
+    GIT_REPOSITORY "https://github.com/kunitoki/LuaBridge3"
+    GIT_TAG master
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+)
+# Retrieve the properties related to the content.
+FetchContent_GetProperties(luabridge)
+# If not populated, make the content available.
+if(NOT luabridge_POPULATED)
+    message(STATUS "Retrieving `luabridge`...")
+    # Ensures the named dependencies have been populated.
+    FetchContent_MakeAvailable(luabridge)
+    # Hide fetchcontent variables, otherwise with ccmake it's a mess.
+    mark_as_advanced(FORCE FETCHCONTENT_UPDATES_DISCONNECTED_LUABRIDGE FETCHCONTENT_SOURCE_DIR_LUABRIDGE)
+endif()
 
 # -----------------------------------------------------------------------------
 # Project INCLUDES
 # -----------------------------------------------------------------------------
 include_directories(
-    ${LUA_INCLUDE_DIR}
-    ${SQLITE3_INCLUDE_DIR}
+    SYSTEM ${LUA_INCLUDE_DIR}
+    ${SQLite3_INCLUDE_DIRS}
+    ${luabridge_SOURCE_DIR}/Source
+)
+
+include_directories(
     ${CMAKE_SOURCE_DIR}/include
 )
 
@@ -250,7 +281,6 @@ set(PROJECT_SRC
     ${CMAKE_SOURCE_DIR}/src/utilities/CMacroWrapper.cpp
     ${CMAKE_SOURCE_DIR}/src/utilities/logger.cpp
     ${CMAKE_SOURCE_DIR}/src/utilities/utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/utilities/namegen.cpp
     )
 
 # -----------------------------------------------------------------------------
@@ -267,7 +297,7 @@ add_executable(
 target_link_libraries(
     ${PROJECT_NAME}
     ${LUA_LIBRARIES}
-    ${SQLITE3_LIBRARY}
+    ${SQLite3_LIBRARIES}
     pthread
     dl
     z

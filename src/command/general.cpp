@@ -24,7 +24,6 @@
 
 #include "character/characterUtilities.hpp"
 #include "utilities/formatter.hpp"
-#include "utilities/namegen.hpp"
 #include "mud.hpp"
 
 bool DoQuit(Character *character, ArgumentHandler & /*args*/)
@@ -573,8 +572,5 @@ bool DoGenerateName(Character *character, ArgumentHandler &args)
 		character->sendMsg(help + "\n");
 		return false;
 	}
-	namegen::NameGenerator nameGenerator(args[0].getContent());
-	character->sendMsg("Combinations : %s\n", nameGenerator.combinations());
-	character->sendMsg("Names : %s\n\n", nameGenerator.toString());
 	return true;
 }

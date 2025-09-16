@@ -43,6 +43,7 @@ void ProcessInitialization::printChoices()
 	ss << "# Name         :" << player->name << "\n";
 
 	// == PASSWORD ============================================================
+	ss << "# Password     :";
 	for (size_t i = 0; i < player->password.size(); ++i)
 		ss << "*";
 	ss << "\n";

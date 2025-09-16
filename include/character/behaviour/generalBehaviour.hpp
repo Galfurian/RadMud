@@ -25,7 +25,8 @@
 #include <memory>
 #include <chrono>
 
-#include "lua/luabridge/luaBridge.hpp"
+#include <lua5.4/lua.hpp>
+#include <LuaBridge/LuaBridge.h>
 
 /// The list of possible behaviours.
 enum class BehaviourStatus {
@@ -64,14 +65,13 @@ public:
 	virtual BehaviourStatus perform() = 0;
 
 protected:
-	inline BehaviourStatus handleReturn(const luabridge::LuaRef &result) const
+	inline BehaviourStatus handleReturn(const luabridge::LuaResult &result) const
 	{
-		if (result.isBool()) {
-			if (result.cast<bool>()) {
+		if (result.wasOk()) {
+			if (result) {
 				return BehaviourStatus::Finished;
-			} else {
-				return BehaviourStatus::Running;
 			}
+			return BehaviourStatus::Running;
 		}
 		return BehaviourStatus::Error;
 	}

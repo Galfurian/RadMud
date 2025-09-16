@@ -264,6 +264,9 @@ public:
 	/// Returns the string from the given argument to the end.
 	std::string substr(size_t _start, size_t _end = std::string::npos) const;
 
+	/// Return the current string
+	std::string str();
+
 	/// Erase the argument at the given position.
 	void erase(const size_t &position);
 

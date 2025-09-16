@@ -105,6 +105,11 @@ std::string ArgumentHandler::substr(size_t _start, size_t _end) const
 	return result;
 }
 
+std::string ArgumentHandler::str()
+{
+	return this->substr(0);
+}
+
 /// Erase the argument at the given position.
 void ArgumentHandler::erase(const size_t &position)
 {

@@ -501,9 +501,6 @@ public:
 	/// @return The mobile version of the character.
 	Mobile *toMobile();
 
-	/// @brief Specific function used by lua to add an equipment item.
-	void luaAddEquipment(Item *item);
-
 	/// @brief Operator used to order the character based on their name.
 	bool operator<(const class Character &source) const;
 
