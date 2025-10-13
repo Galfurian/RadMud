@@ -32,6 +32,7 @@
 #include "structure/algorithms/AStar/aStar.hpp"
 #include "mud.hpp"
 
+#include <lua.hpp>
 #include <LuaBridge/Vector.h>
 
 void LuaLog(std::string message)
@@ -199,14 +200,10 @@ bool LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
 		.endNamespace();
 	// -------------------------------------------------------------------------
 	// CHARACTER_VECTOR derived from 'std::vector<Character *>'
-	luabridge::getGlobalNamespace(L)
-		.beginClass<CharacterVector>("CharacterVector")
-		.endClass();
+	luabridge::getGlobalNamespace(L).beginClass<CharacterVector>("CharacterVector").endClass();
 	// -------------------------------------------------------------------------
 	// ITEM_VECTOR derived from 'std::vector<Item *>'
-	luabridge::getGlobalNamespace(L)
-		.beginClass<ItemVector>("ItemVector")
-		.endClass();
+	luabridge::getGlobalNamespace(L).beginClass<ItemVector>("ItemVector").endClass();
 	// -------------------------------------------------------------------------
 	// CHARACTER
 	luabridge::getGlobalNamespace(L)

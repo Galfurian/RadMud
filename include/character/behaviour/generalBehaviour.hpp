@@ -25,7 +25,7 @@
 #include <memory>
 #include <chrono>
 
-#include <lua5.4/lua.hpp>
+#include <lua.hpp>
 #include <LuaBridge/LuaBridge.h>
 
 /// The list of possible behaviours.

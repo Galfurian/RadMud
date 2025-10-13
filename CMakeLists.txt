@@ -4,7 +4,7 @@
 # -----------------------------------------------------------------------------
 
 # Set the minimum CMake version.
-cmake_minimum_required(VERSION 3.1...3.18)
+cmake_minimum_required(VERSION 3.18)
 
 # Set the project name.
 project(radmud CXX)
@@ -109,14 +109,14 @@ target_include_directories(
 target_include_directories(
     ${PROJECT_NAME} SYSTEM PUBLIC
     ${luabridge_SOURCE_DIR}/Source
-    ${LUA_INCLUDE_DIR}
     ${SQLite3_INCLUDE_DIRS}
+    ${LUA_INCLUDE_DIR}
 )
 # Link the required libraries.
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
-    ${LUA_LIBRARIES}
     ${SQLite3_LIBRARIES}
+    ${LUA_LIBRARIES}
     pthread
     dl
     z
@@ -124,7 +124,7 @@ target_link_libraries(
 # Set compiler flags.
 target_compile_features(
     ${PROJECT_NAME} PUBLIC
-    cxx_std_17
+    cxx_std_20
 )
 
 # -----------------------------------------------------------------------------

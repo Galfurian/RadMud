@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <lua5.4/lua.hpp>
+#include <lua.hpp>
 
 #include <string>
 #include <vector>

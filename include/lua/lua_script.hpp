@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include <lua5.4/lua.hpp>
+#include <lua.hpp>
 #include <LuaBridge/LuaBridge.h>
 
 struct lua_State;
