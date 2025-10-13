@@ -84,3 +84,9 @@ User: **asd**
 Pwd : **asd**
 
 I'm a lazy person...
+
+## Database Editor
+
+The RadMud Database Editor has been moved to its own repository for independent development and maintenance. It provides a graphical interface for editing the MUD's database, allowing administrators to manage game content more easily.
+
+You can find it at: [https://github.com/Galfurian/RadMudEditor](https://github.com/Galfurian/RadMudEditor)
