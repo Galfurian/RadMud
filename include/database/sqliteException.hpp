@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <string>
 #include <stdexcept>
 
 /// @brief A custom exception handler for the loading function used by the mud.
