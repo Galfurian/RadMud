@@ -40,10 +40,10 @@ jobs:
       uses: actions/checkout@v4
 
     # Step 2: Install Doxygen (and optional dependencies)
-    - name: Install Doxygen
+    - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y doxygen graphviz
+        sudo apt-get install -y doxygen graphviz lua5.4 liblua5.4-dev libsqlite3-dev zlib1g-dev
 
     # Step 3: Configure and Build Documentation
     - name: Generate Documentation
