@@ -39,6 +39,12 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    # Step: Install Dependencies
+    - name: Install Dependencies
+      run: |
+        brew update
+        brew install lua sqlite3 zlib
+
     # Step: Configure Project.
     - name: Configure Project
       run: |

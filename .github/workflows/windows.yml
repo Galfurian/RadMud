@@ -39,10 +39,19 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
+    # Step: Setup vcpkg
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v11
+
+    # Step: Install Dependencies
+    - name: Install Dependencies
+      run: |
+        vcpkg install lua sqlite3 zlib
+
     # Step: Configure Project.
     - name: Configure Project
       run: |
-        cmake -B build -DWARNINGS_AS_ERRORS=ON -DSTRICT_WARNINGS=ON
+        cmake -B build -DCMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake -DWARNINGS_AS_ERRORS=ON -DSTRICT_WARNINGS=ON
 
     # Step: Build Project.
     - name: Build Project
