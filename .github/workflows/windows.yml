@@ -39,11 +39,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    # Step: Setup vcpkg
+        # Step: Setup vcpkg
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v11
       with:
-        vcpkgGitCommitId: 'master'
+        vcpkgGitCommitId: 'main'
 
     # Step: Install Dependencies
     - name: Install Dependencies
