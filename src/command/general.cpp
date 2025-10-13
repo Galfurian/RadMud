@@ -485,9 +485,9 @@ bool DoServer(Character *character, ArgumentHandler & /*args*/)
 	std::string msg;
 	msg += "Mud         : RadMud.\n";
 	msg += "Version     : ";
-	msg += ToString(RADMUD_MAJOR_VERSION) + ".";
-	msg += ToString(RADMUD_MINOR_VERSION) + ".";
-	msg += ToString(RADMUD_VERSION) + "\n";
+	msg += std::to_string(RADMUD_MAJOR_VERSION) + ".";
+	msg += std::to_string(RADMUD_MINOR_VERSION) + ".";
+	msg += std::to_string(RADMUD_MICRO_VERSION) + "\n";
 	msg += "    Uptime      : ";
 	msg += ToString(Mud::instance().getUpTime()) + " s\n";
 	msg += "    Players     : ";

@@ -1,0 +1,83 @@
+name: Ubuntu
+
+# Trigger the workflow on push or pull requests for main and develop branches
+on:
+  push:
+    branches:
+    - main
+    - develop
+    paths:
+    - '**/*.c'
+    - '**/*.cpp'
+    - '**/*.h'
+    - '**/*.hpp'
+    - '**/CMakeLists.txt'
+    - '**/Makefile'
+    - '**/cmake/**'
+    - '.github/workflows/ubuntu.yml'
+  pull_request:
+    branches:
+    - main
+    - develop
+    paths:
+    - '**/*.c'
+    - '**/*.cpp'
+    - '**/*.h'
+    - '**/*.hpp'
+    - '**/CMakeLists.txt'
+    - '**/Makefile'
+    - '**/cmake/**'
+    - '.github/workflows/ubuntu.yml'
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ${{ matrix.os }}
+
+    # Define a matrix strategy to test multiple compiler and OS configurations
+    strategy:
+      # Continue running other matrix jobs even if one fails
+      fail-fast: false
+      matrix:
+        include:
+          [
+            # GCC
+            { pkgs: "gcc-12 g++-12", cc: gcc-12, cxx: g++-12, os: ubuntu-latest },
+            { pkgs: "gcc-13 g++-13", cc: gcc-13, cxx: g++-13, os: ubuntu-latest },
+            { pkgs: "gcc-14 g++-14", cc: gcc-14, cxx: g++-14, os: ubuntu-latest },
+            # Clang
+            { pkgs: "clang-17 clang++-17", cc: clang-17, cxx: clang++-17, os: ubuntu-latest },
+            { pkgs: "clang-18 clang++-18", cc: clang-18, cxx: clang++-18, os: ubuntu-latest },
+            { pkgs: "clang-19 clang++-19", cc: clang-19, cxx: clang++-19, os: ubuntu-latest }
+          ]
+
+    # Set environment variables for compiler executables
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+
+    steps:
+    # Step: Clone the project.
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # Step: Install the required compiler and dependencies.
+    - name: Install Compiler Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ${{ matrix.pkgs }}
+
+    # Step: Configure the project using CMake.
+    - name: Configure Project
+      run: |
+        cmake -B build -DCMAKE_C_COMPILER=${{ env.CC }} -DCMAKE_CXX_COMPILER=${{ env.CXX }} -DWARNINGS_AS_ERRORS=ON -DSTRICT_WARNINGS=ON
+
+    # Step: Build Project.
+    - name: Build Project
+      run: |
+        cmake --build build --config Debug --parallel 2
+
+    # Step: Run Tests.
+    - name: Run Tests
+      run: |
+        ctest --test-dir build --build-config Debug --verbose

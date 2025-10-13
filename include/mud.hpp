@@ -22,12 +22,11 @@
 
 #pragma once
 
-/// MUD Major Version.
-#define RADMUD_MAJOR_VERSION 1
-/// MUD Minor Version.
-#define RADMUD_MINOR_VERSION 0
-/// MUD Version.
-#define RADMUD_VERSION 0
+enum : unsigned char {
+    RADMUD_MAJOR_VERSION = 1, ///< Major version of the mud.
+    RADMUD_MINOR_VERSION = 0, ///< Minor version of the mud.
+    RADMUD_MICRO_VERSION = 0  ///< Micro version of the mud.
+};
 
 /// Indicator for no socket connected.
 #define NO_SOCKET_COMMUNICATION -1

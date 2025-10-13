@@ -98,6 +98,7 @@ inline void ApplyModifier(std::map<ModifierType, int> &receiver,
 	}
 }
 
+/// @brief This class manages the modifiers of a character.
 class ModifierManager {
 protected:
 	/// The overall ability modifier.

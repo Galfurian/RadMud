@@ -216,10 +216,8 @@ std::vector<std::string> GetAllFilesInFolder(const std::string &folder,
 	std::vector<std::string> files_name;
 	directory = opendir(folder.c_str());
 	if (directory != nullptr) {
-		int i = 0;
 		struct dirent *dir;
 		while ((dir = readdir(directory)) != nullptr) {
-			i++;
 			if (EndWith(dir->d_name, extension)) {
 				files_name.emplace_back(dir->d_name);
 			}

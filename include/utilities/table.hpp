@@ -48,6 +48,8 @@ public:
 		// Nothing to do.
 	}
 
+	virtual ~TableRow() = default;
+
 	virtual inline bool isDivider() const
 	{
 		return divider;

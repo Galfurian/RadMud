@@ -5,6 +5,7 @@
 
 #pragma once
 
+/// @brief This class generates Perlin noise values.
 class NoiseGenerator {
 public:
 	// Initialize with the reference values for the permutation vector

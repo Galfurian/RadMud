@@ -41,7 +41,7 @@ public:
 	}
 
 	/// @brief Destructor.
-	~ProcessInput() = default;
+	virtual ~ProcessInput() = default;
 
 	/// @brief Process the input with the given 'character'.
 	/// @param args      An argument handler which contains the input.

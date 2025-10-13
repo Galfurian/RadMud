@@ -1,90 +1,52 @@
 # -----------------------------------------------------------------------------
-# Author: Enrico Fraccaroli
-# Date  : 27/01/2018
+# @brief  : Root cmake file.
+# @author : Enrico Fraccaroli
 # -----------------------------------------------------------------------------
-# Check CMAKE Version.
-# -----------------------------------------------------------------------------
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
-# -----------------------------------------------------------------------------
-# Project INFORMATION
-# -----------------------------------------------------------------------------
-project(RadMud CXX)
+# Set the minimum CMake version.
+cmake_minimum_required(VERSION 3.1...3.18)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# Set the project name.
+project(radmud CXX)
 
-SET(PROJECT_NAME RadMud)
-SET(PROJECT_SOURCE_DIR src)
-
-# -----------------------------------------------------------------------------
-# Project compiler FLAGS
-# -----------------------------------------------------------------------------
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic-errors")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wconversion")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-align")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcast-qual")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wdisabled-optimization")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfloat-equal")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat=2")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat-nonliteral")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat-security")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wformat-y2k")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wimport")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winit-self")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winline")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Winvalid-pch")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-long-long")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-field-initializers")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-format-attribute")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wmissing-include-dirs")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpacked")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpointer-arith")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wredundant-decls")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wshadow")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstack-protector")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wstrict-aliasing=2")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-default")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wswitch-enum")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunreachable-code")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-function")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-label")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-parameter")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-value")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wunused-variable")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wvariadic-macros")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wwrite-strings")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-compare")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsign-conversion")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized")
-
-# Debugging flags.
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb")
-
-# Enable c++11
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-
-# If the compiler is GNU, disable noexcept-type warnings.
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-noexcept-type")
-endif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+# Set the default build type to Debug.
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Setting build type to 'Debug' as none was specified.")
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build." FORCE)
+endif()
 
 # -----------------------------------------------------------------------------
-# Project MODULES
+# ENABLE FETCH CONTENT
 # -----------------------------------------------------------------------------
-# Add cmake modules folder.
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+# We need this in order to import external projects.
+include(FetchContent)
+# Hide fetchcontent variables.
+mark_as_advanced(FORCE
+    FETCHCONTENT_QUIET
+    FETCHCONTENT_BASE_DIR
+    FETCHCONTENT_FULLY_DISCONNECTED
+    FETCHCONTENT_UPDATES_DISCONNECTED
+)
+
+# -----------------------------------------------------------------------------
+# OPTIONS
+# -----------------------------------------------------------------------------
+
+option(STRICT_WARNINGS "Enable strict compiler warnings" ON)
+option(WARNINGS_AS_ERRORS "Treat all warnings as errors" OFF)
+
+# -----------------------------------------------------------------------------
+# DEPENDENCY (SYSTEM LIBRARIES)
+# -----------------------------------------------------------------------------
 
 # Find the required packages.
 find_package(Lua REQUIRED)
 find_package(SQLite3 REQUIRED)
+
+# Find optional packages.
+find_package(Doxygen)
+find_program(CLANG_TIDY_EXE NAMES clang-tidy)
 
 # -----------------------------------------------------------------------------
 # DEPENDENCY
@@ -111,194 +73,204 @@ if(NOT luabridge_POPULATED)
 endif()
 
 # -----------------------------------------------------------------------------
-# Project INCLUDES
+# PROGRAM
 # -----------------------------------------------------------------------------
-include_directories(
-    SYSTEM ${LUA_INCLUDE_DIR}
-    ${SQLite3_INCLUDE_DIRS}
-    ${luabridge_SOURCE_DIR}/Source
+
+file(GLOB_RECURSE PROJECT_HEADERS
+    "${PROJECT_SOURCE_DIR}/include/**/*.hpp"
+    "${PROJECT_SOURCE_DIR}/include/**/*.hh"
+    "${PROJECT_SOURCE_DIR}/include/**/*.h"
+    "${PROJECT_SOURCE_DIR}/include/*.hpp"
+    "${PROJECT_SOURCE_DIR}/include/*.hh"
+    "${PROJECT_SOURCE_DIR}/include/*.h"
 )
 
-include_directories(
-    ${CMAKE_SOURCE_DIR}/include
+file(GLOB_RECURSE PROJECT_SOURCES
+    "${PROJECT_SOURCE_DIR}/src/**/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/**/*.cc"
+    "${PROJECT_SOURCE_DIR}/src/**/*.c"
+    "${PROJECT_SOURCE_DIR}/src/*.cpp"
+    "${PROJECT_SOURCE_DIR}/src/*.cc"
+    "${PROJECT_SOURCE_DIR}/src/*.c"
 )
+set(PROJECT_HEADERS_AND_SOURCES ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 
-# -----------------------------------------------------------------------------
-# Project SOURCES
-# -----------------------------------------------------------------------------
-set(PROJECT_SRC
-    ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/mud.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/generalAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/buildAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/craftAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/moveAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/scoutAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/reloadAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/loadAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/unloadAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/aimAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/combat/combatAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/combat/basicAttack.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/combat/chase.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/combat/flee.cpp
-    ${CMAKE_SOURCE_DIR}/src/action/object/dismemberAction.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/bodyPart.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/character.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/characterUtilities.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/characterVector.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/mobile.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/mobileModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/player.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/faction.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/combatHandler.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/effect/effect.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/effect/effectManager.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/effect/effectFactory.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/race/race.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/skill/skill.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/skill/skillData.cpp
-    ${CMAKE_SOURCE_DIR}/src/character/skill/skillManager.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/command.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/combat.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/communication.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/crafting.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/manager.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/general.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/movement.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/god/commandGodMud.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/god/commandGodItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/god/commandGodLiquid.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/god/commandGodMobile.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/god/commandGodCreation.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/god/commandGodCharacter.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/god/commandGodStructure.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectLightSource.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectManagement.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectContainer.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectCharacter.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectLiquids.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectProcess.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectShop.cpp
-    ${CMAKE_SOURCE_DIR}/src/command/object/commandObjectFood.cpp
-    ${CMAKE_SOURCE_DIR}/src/creation/building.cpp
-    ${CMAKE_SOURCE_DIR}/src/creation/production.cpp
-    ${CMAKE_SOURCE_DIR}/src/creation/liquid.cpp
-    ${CMAKE_SOURCE_DIR}/src/creation/material.cpp
-    ${CMAKE_SOURCE_DIR}/src/creation/profession.cpp
-    ${CMAKE_SOURCE_DIR}/src/database/resultSet.cpp
-    ${CMAKE_SOURCE_DIR}/src/database/sqliteDbms.cpp
-    ${CMAKE_SOURCE_DIR}/src/database/tableLoader.cpp
-    ${CMAKE_SOURCE_DIR}/src/database/sqliteWrapper.cpp
-    ${CMAKE_SOURCE_DIR}/src/database/sqliteException.cpp
-    ${CMAKE_SOURCE_DIR}/src/database/sqliteLoadFunctions.cpp
-    ${CMAKE_SOURCE_DIR}/src/database/sqliteWriteFunctions.cpp
-    ${CMAKE_SOURCE_DIR}/src/database/dbFunctionsPlayer.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/baseEnumerator.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/ability.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/toolType.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/knowledge.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/direction.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/modelType.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/skillRank.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/liquidType.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/telnetChar.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/itemQuality.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/materialType.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/resourceType.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/statusModifier.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/combatModifier.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/characterPosture.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/processInput.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/argument.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processInitialization.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewAge.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewAttributes.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewConfirm.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewDescription.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewGender.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewName.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewPassword.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewPasswordConfirm.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewRace.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewStory.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processNewWeight.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processPlayerName.cpp
-    ${CMAKE_SOURCE_DIR}/src/input/initialization/processPlayerPassword.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/item.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/writing.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/itemFactory.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/itemVector.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/itemUtils.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/shopItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/lightItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/armorItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/corpseItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/currencyItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/resourceItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/magazineItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/containerItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/meleeWeaponItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/rangedWeaponItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/item/subitem/liquidContainerItem.cpp
-    ${CMAKE_SOURCE_DIR}/src/lua/lua_script.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/itemModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/modelFactory.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/armorModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/bookModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/containerModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/corpseModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/currencyModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/foodModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/furnitureModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/keyModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/lightModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/liquidContainerModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/mechanismModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/nodeModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/projectileModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/resourceModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/ropeModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/seedModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/shieldModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/shopModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/toolModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/vehicleModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/magazineModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/meleeWeaponModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/model/submodel/rangedWeaponModel.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/exit.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/room.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/area.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/generator.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/coordinates.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/roomFactory.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/structureUtils.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/terrain/terrain.cpp
-    ${CMAKE_SOURCE_DIR}/src/structure/terrain/terrainFactory.cpp
-    ${CMAKE_SOURCE_DIR}/src/updater/updater.cpp
-    ${CMAKE_SOURCE_DIR}/src/updater/updateInterface.cpp
-    ${CMAKE_SOURCE_DIR}/src/utilities/CMacroWrapper.cpp
-    ${CMAKE_SOURCE_DIR}/src/utilities/logger.cpp
-    ${CMAKE_SOURCE_DIR}/src/utilities/utils.cpp
-    )
-
-# -----------------------------------------------------------------------------
-# Project EXECUTABLE
-# -----------------------------------------------------------------------------
+# Add the program
 add_executable(
     ${PROJECT_NAME}
-    ${PROJECT_SRC}
+    ${PROJECT_HEADERS}
+    ${PROJECT_SOURCES}
 )
-
-# -----------------------------------------------------------------------------
-# Link the Libraries
-# -----------------------------------------------------------------------------
+# Inlcude header directories and set the library.
+target_include_directories(
+    ${PROJECT_NAME} PUBLIC
+    ${PROJECT_SOURCE_DIR}/include
+)
+target_include_directories(
+    ${PROJECT_NAME} SYSTEM PUBLIC
+    ${luabridge_SOURCE_DIR}/Source
+    ${LUA_INCLUDE_DIR}
+    ${SQLite3_INCLUDE_DIRS}
+)
+# Link the required libraries.
 target_link_libraries(
-    ${PROJECT_NAME}
+    ${PROJECT_NAME} PUBLIC
     ${LUA_LIBRARIES}
     ${SQLite3_LIBRARIES}
     pthread
     dl
     z
 )
+# Set compiler flags.
+target_compile_features(
+    ${PROJECT_NAME} PUBLIC
+    cxx_std_17
+)
+
+# -----------------------------------------------------------------------------
+# COMPILATION FLAGS
+# -----------------------------------------------------------------------------
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    # Disable warnings for MSVC-specific "safe" functions like strcpy_s, etc.,
+    # which are not portable and may clutter warning logs.
+    target_compile_definitions(${PROJECT_NAME} PUBLIC _CRT_SECURE_NO_WARNINGS)
+
+    # Disable warning C4702: unreachable code.
+    add_compile_options(/wd4702)
+
+    if(WARNINGS_AS_ERRORS)
+        # Treat all warnings as errors to enforce stricter code quality.
+        target_compile_options(${PROJECT_NAME} PUBLIC /WX)
+    endif()
+
+    if(STRICT_WARNINGS)
+        # Enable external header management to suppress warnings in system and
+        # external headers, making it easier to focus on project-specific issues.
+        target_compile_options(${PROJECT_NAME} PUBLIC /experimental:external)
+        target_compile_options(${PROJECT_NAME} PUBLIC /external:I ${CMAKE_BINARY_DIR})
+        target_compile_options(${PROJECT_NAME} PUBLIC /external:anglebrackets)
+        target_compile_options(${PROJECT_NAME} PUBLIC /external:W0)
+
+        # Use a high warning level to catch as many potential issues as possible.
+        target_compile_options(${PROJECT_NAME} PUBLIC /W4)
+
+        # Enforce standards-compliant behavior to avoid relying on MSVC-specific extensions.
+        target_compile_options(${PROJECT_NAME} PUBLIC /permissive-)
+    endif()
+
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    if(WARNINGS_AS_ERRORS)
+        # Treat all warnings as errors to enforce stricter code quality.
+        target_compile_options(${PROJECT_NAME} PUBLIC -Werror)
+    endif()
+
+    if(STRICT_WARNINGS)
+        # Enable a broad set of warnings to catch common and subtle issues:
+        target_compile_options(${PROJECT_NAME} PUBLIC
+            -Wall # Enable most general-purpose warnings.
+            -Wextra # Enable extra warnings not included in -Wall.
+            -Wconversion # Warn about implicit type conversions that may lose data.
+            -pedantic # Enforce strict compliance with the C++ standard.
+            -Wshadow # Warn about variable shadowing, which can cause subtle bugs.
+            -Wnon-virtual-dtor # Warn when a class with virtual functions lacks a virtual destructor.
+            -Wnull-dereference # Warn about potential null pointer dereferences.
+            -Wformat=2 # Enable strict checks for printf/scanf format strings.
+            -Woverloaded-virtual # Warn when a derived class function hides a base class virtual function.
+            -Wfloat-equal # Warn about direct comparisons of floating-point values, which can be imprecise.
+        )
+
+    endif()
+endif()
+
+# -----------------------------------------------------------------------------
+# CODE ANALYSIS
+# -----------------------------------------------------------------------------
+
+if(CLANG_TIDY_EXE)
+    add_custom_target(
+        ${PROJECT_NAME}_clang_tidy
+        COMMAND ${CLANG_TIDY_EXE}
+        --p=${CMAKE_BINARY_DIR}
+        ${PROJECT_HEADERS_AND_SOURCES}
+        COMMENT "Running clang-tidy"
+        VERBATIM
+    )
+    add_custom_target(
+        ${PROJECT_NAME}_clang_tidy_fix
+        COMMAND ${CLANG_TIDY_EXE}
+        --fix --fix-errors
+        --p=${CMAKE_BINARY_DIR}
+        ${PROJECT_HEADERS_AND_SOURCES}
+        COMMENT "Running clang-tidy-fix"
+        VERBATIM
+    )
+endif()
+
+# -----------------------------------------------------------------------------
+# DOCUMENTATION
+# -----------------------------------------------------------------------------
+
+if(DOXYGEN_FOUND)
+
+    # FetchContent: Doxygen Awesome CSS
+    FetchContent_Declare(doxygenawesome
+        GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css
+        GIT_TAG main
+    )
+    FetchContent_MakeAvailable(doxygenawesome)
+
+    # Hide FetchContent variables to avoid clutter in ccmake.
+    mark_as_advanced(FORCE
+        FETCHCONTENT_UPDATES_DISCONNECTED_DOXYGENAWESOME
+        FETCHCONTENT_SOURCE_DIR_DOXYGENAWESOME
+    )
+
+    # Read the file with the version.
+    file(READ ${PROJECT_SOURCE_DIR}/include/mud.hpp version_file)
+    # Extract the version.
+    string(REGEX MATCH "RADMUD_MAJOR_VERSION ([0-9]*)" _ ${version_file})
+    set(RADMUD_MAJOR_VERSION ${CMAKE_MATCH_1})
+    string(REGEX MATCH "RADMUD_MINOR_VERSION ([0-9]*)" _ ${version_file})
+    set(RADMUD_MINOR_VERSION ${CMAKE_MATCH_1})
+    string(REGEX MATCH "RADMUD_MICRO_VERSION ([0-9]*)" _ ${version_file})
+    set(RADMUD_MICRO_VERSION ${CMAKE_MATCH_1})
+
+    # Customization: Doxygen Configuration
+    set(DOXYGEN_WARN_FORMAT "$file:$line:1: $text")
+    set(DOXYGEN_PROJECT_NAME RadMud)
+    set(DOXYGEN_PROJECT_BRIEF "A lightweight MUD engine written in C++.")
+    set(DOXYGEN_PROJECT_NUMBER "${RADMUD_MAJOR_VERSION}.${RADMUD_MINOR_VERSION}.${RADMUD_MICRO_VERSION}")
+    set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ${PROJECT_SOURCE_DIR}/README.md)
+    set(DOXYGEN_SHOW_INCLUDE_FILES NO)
+    set(DOXYGEN_GENERATE_TREEVIEW YES)
+    set(DOXYGEN_GENERATE_LATEX NO)
+    set(DOXYGEN_GENERATE_MAN NO)
+
+    # Styling and UX enhancements using Doxygen Awesome
+    set(DOXYGEN_HTML_HEADER ${doxygenawesome_SOURCE_DIR}/doxygen-custom/header.html)
+    set(DOXYGEN_HTML_EXTRA_STYLESHEET ${doxygenawesome_SOURCE_DIR}/doxygen-awesome.css)
+    set(DOXYGEN_HTML_EXTRA_FILES
+        ${doxygenawesome_SOURCE_DIR}/doxygen-awesome-fragment-copy-button.js
+        ${doxygenawesome_SOURCE_DIR}/doxygen-awesome-paragraph-link.js
+        ${doxygenawesome_SOURCE_DIR}/doxygen-awesome-darkmode-toggle.js
+    )
+
+    # Set stricter warnings for better documentation quality
+    set(DOXYGEN_WARN_IF_UNDOCUMENTED YES)
+    set(DOXYGEN_WARN_IF_DOC_ERROR YES)
+    set(DOXYGEN_WARN_NO_PARAMDOC YES)
+    set(DOXYGEN_WARN_AS_ERROR NO)
+
+    # Exclude certain files or directories from documentation (if needed)
+    set(DOXYGEN_EXCLUDE_PATTERNS "${PROJECT_SOURCE_DIR}/tests/*" "${PROJECT_SOURCE_DIR}/examples/*")
+
+    doxygen_add_docs(
+        radmud_documentation
+        ${PROJECT_SOURCE_DIR}/README.md
+        ${PROJECT_SOURCE_DIR}/LICENSE.md
+        ${PROJECT_HEADERS_AND_SOURCES}
+        COMMENT "Generating Doxygen documentation"
+    )
+
+endif()

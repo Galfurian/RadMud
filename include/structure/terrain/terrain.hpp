@@ -22,8 +22,9 @@
 
 #pragma once
 
+#include <lua5.4/lua.hpp>
+
 #include <string>
-#include <lua.hpp>
 #include <vector>
 
 class Liquid;

@@ -1,5 +1,5 @@
-/// @file signal
-/// @brief
+/// @file signal.hpp
+/// @brief Signal class for event handling.
 /// @date 8/20/19
 /// @author enrico
 

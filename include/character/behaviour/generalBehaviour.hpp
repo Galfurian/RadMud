@@ -77,6 +77,8 @@ protected:
 	}
 };
 
+/// @brief A behaviour with one parameter.
+/// @tparam P1 Type of the parameter.
 template <class P1> class BehaviourP1 : public GeneralBehaviour {
 private:
 	P1 p1;
@@ -97,6 +99,9 @@ public:
 	}
 };
 
+/// @brief A behaviour with two parameters.
+/// @tparam P1 Type of the first parameter.
+/// @tparam P2 Type of the second parameter.
 template <typename P1, typename P2> class BehaviourP2 : public GeneralBehaviour {
 private:
 	P1 p1;
@@ -118,6 +123,10 @@ public:
 	}
 };
 
+/// @brief A behaviour with three parameters.
+/// @tparam P1 The type of the first parameter.
+/// @tparam P2 The type of the second parameter.
+/// @tparam P3 The type of the third parameter.
 template <typename P1, typename P2, typename P3> class BehaviourP3 : public GeneralBehaviour {
 private:
 	P1 p1;

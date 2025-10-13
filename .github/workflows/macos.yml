@@ -1,0 +1,55 @@
+name: MacOS
+
+# Trigger the workflow on push or pull requests for main and develop branches
+on:
+  push:
+    branches:
+    - main
+    - develop
+    paths:
+    - '**/*.c'
+    - '**/*.cpp'
+    - '**/*.h'
+    - '**/*.hpp'
+    - '**/CMakeLists.txt'
+    - '**/Makefile'
+    - '**/cmake/**'
+    - '.github/workflows/macos.yml'
+  pull_request:
+    branches:
+    - main
+    - develop
+    paths:
+    - '**/*.c'
+    - '**/*.cpp'
+    - '**/*.h'
+    - '**/*.hpp'
+    - '**/CMakeLists.txt'
+    - '**/Makefile'
+    - '**/cmake/**'
+    - '.github/workflows/macos.yml'
+
+jobs:
+  build:
+    name: Build and Test (macOS)
+    runs-on: macos-latest
+
+    steps:
+    # Step: Clone the project.
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # Step: Configure Project.
+    - name: Configure Project
+      run: |
+        cmake -B build -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DWARNINGS_AS_ERRORS=ON -DSTRICT_WARNINGS=ON
+
+    # Step: Build Project.
+    - name: Build Project
+      run: |
+        cmake --build build --config Debug --parallel 2
+
+    # Step: Run Tests.
+    - name: Run Tests
+      run: |
+        ctest --test-dir build --build-config Debug --verbose

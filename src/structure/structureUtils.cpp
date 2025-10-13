@@ -1,4 +1,4 @@
-/// @file   roomUtilityFunctions.cpp
+/// @file   structureUtils.cpp
 /// @author Enrico Fraccaroli
 /// @date   Feb 11 2017
 /// @copyright
