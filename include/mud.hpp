@@ -23,9 +23,9 @@
 #pragma once
 
 enum : unsigned char {
-    RADMUD_MAJOR_VERSION = 1, ///< Major version of the mud.
-    RADMUD_MINOR_VERSION = 0, ///< Minor version of the mud.
-    RADMUD_MICRO_VERSION = 0  ///< Micro version of the mud.
+	RADMUD_MAJOR_VERSION = 1, ///< Major version of the mud.
+	RADMUD_MINOR_VERSION = 0, ///< Minor version of the mud.
+	RADMUD_MICRO_VERSION = 0 ///< Micro version of the mud.
 };
 
 /// Indicator for no socket connected.
@@ -52,9 +52,10 @@ class Direction;
 class HeightMap;
 class MobileModel;
 
+#include <unordered_set>
+
 #ifdef __linux__
 
-#include <unordered_set>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
