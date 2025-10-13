@@ -1,6 +1,10 @@
-# RadMud [![Build Status](https://travis-ci.org/Galfurian/RadMud.svg?branch=master)](https://travis-ci.org/Galfurian/RadMud)
+# RadMud
 
 ![logo](./doc/logo.png)
+
+[![Ubuntu](https://github.com/Galfurian/RadMud/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/Galfurian/RadMud/actions/workflows/ubuntu.yml)
+[![MacOS](https://github.com/Galfurian/RadMud/actions/workflows/macos.yml/badge.svg)](https://github.com/Galfurian/RadMud/actions/workflows/macos.yml)
+[![Documentation](https://github.com/Galfurian/RadMud/actions/workflows/documentation.yml/badge.svg)](https://github.com/Galfurian/RadMud/actions/workflows/documentation.yml)
 
 **Author**: Enrico Fraccaroli
 
