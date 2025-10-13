@@ -53,7 +53,7 @@ jobs:
     # Step: Configure Project.
     - name: Configure Project
       run: |
-        cmake -B build -DCMAKE_TOOLCHAIN_FILE=vcpkg\scripts\buildsystems\vcpkg.cmake -DWARNINGS_AS_ERRORS=ON -DSTRICT_WARNINGS=ON
+        cmake -B build -DCMAKE_TOOLCHAIN_FILE=.\vcpkg\scripts\buildsystems\vcpkg.cmake -DWARNINGS_AS_ERRORS=ON -DSTRICT_WARNINGS=ON
 
     # Step: Build Project.
     - name: Build Project
