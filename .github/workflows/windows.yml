@@ -41,9 +41,7 @@ jobs:
 
         # Step: Setup vcpkg
     - name: Setup vcpkg
-      uses: lukka/run-vcpkg@5e0cab206a5ea620130caf672fce3e4a6b5666a1
-      with:
-        vcpkgGitCommitId: '5e0cab206a5ea620130caf672fce3e4a6b5666a1'
+      uses: lukka/run-vcpkg@v11
 
     # Step: Install Dependencies
     - name: Install Dependencies
