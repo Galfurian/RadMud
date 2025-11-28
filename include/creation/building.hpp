@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "json/json.hpp"
 
 // Forward declarations.
 class ToolType;
@@ -75,4 +76,8 @@ public:
     /// @brief Return the name with the first letter capitalized.
     /// @return The name of the building capitalized.
     std::string getNameCapital();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Building &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Building &rhs);
 };

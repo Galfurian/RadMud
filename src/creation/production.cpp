@@ -24,6 +24,8 @@
 
 #include "model/itemModel.hpp"
 #include "character/character.hpp"
+#include "creation/profession.hpp"
+#include "mud.hpp"
 
 Production::Production() :
     vnum(-1),
@@ -80,4 +82,81 @@ std::string Production::getName()
 std::string Production::getNameCapital()
 {
     return name;
+}
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Production &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["name"] << rhs.name;
+    lhs["profession"] << rhs.profession->vnum;
+    lhs["difficulty"] << rhs.difficulty;
+    lhs["time"] << rhs.time;
+    lhs["assisted"] << rhs.assisted;
+    lhs["outcome"] << rhs.outcome->vnum;
+    lhs["quantity"] << rhs.quantity;
+    lhs["workbench"] << rhs.workbench.toUInt();
+    json::jnode_t tools_node;
+    tools_node.set_type(json::JTYPE_ARRAY);
+    for (auto const &it : rhs.tools) {
+        tools_node.add_element() << it.toUInt();
+    }
+    lhs["tools"] = tools_node;
+    json::jnode_t ingredients_node;
+    ingredients_node.set_type(json::JTYPE_OBJECT);
+    for (auto const &it : rhs.ingredients) {
+        ingredients_node[it.first.toString()] << it.second;
+    }
+    lhs["ingredients"] = ingredients_node;
+    json::jnode_t knowledge_node;
+    knowledge_node.set_type(json::JTYPE_ARRAY);
+    for (auto const &it : rhs.requiredKnowledge) {
+        knowledge_node.add_element() << it.toUInt();
+    }
+    lhs["required_knowledge"] = knowledge_node;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Production &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    lhs["name"] >> rhs.name;
+    unsigned int profession_vnum;
+    lhs["profession"] >> profession_vnum;
+    rhs.profession = Mud::instance().findProfession(profession_vnum);
+    lhs["difficulty"] >> rhs.difficulty;
+    lhs["time"] >> rhs.time;
+    lhs["assisted"] >> rhs.assisted;
+    int outcome_vnum;
+    lhs["outcome"] >> outcome_vnum;
+    rhs.outcome = Mud::instance().findItemModel(outcome_vnum);
+    lhs["quantity"] >> rhs.quantity;
+    unsigned int workbench;
+    lhs["workbench"] >> workbench;
+    rhs.workbench = ToolType(workbench);
+    if(lhs.has_property("tools")){
+        json::jnode_t tools_node = lhs["tools"];
+        for (auto it = tools_node.abegin(); it != tools_node.aend(); ++it) {
+            unsigned int tool;
+            (*it) >> tool;
+            rhs.tools.emplace_back(ToolType(tool));
+        }
+    }
+    if(lhs.has_property("ingredients")){
+        json::jnode_t ingredients_node = lhs["ingredients"];
+        for (auto it = ingredients_node.pbegin(); it != ingredients_node.pend(); ++it) {
+            unsigned int quantity;
+            it->second >> quantity;
+            rhs.ingredients[ResourceType(it->first)] = quantity;
+        }
+    }
+    if(lhs.has_property("required_knowledge")){
+        json::jnode_t knowledge_node = lhs["required_knowledge"];
+        for (auto it = knowledge_node.abegin(); it != knowledge_node.aend(); ++it) {
+            unsigned int knowledge;
+            (*it) >> knowledge;
+            rhs.requiredKnowledge.emplace_back(Knowledge(knowledge));
+        }
+    }
+    return lhs;
 }

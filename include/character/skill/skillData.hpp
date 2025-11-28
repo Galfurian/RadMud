@@ -21,8 +21,8 @@
 
 #pragma once
 
-#include "character/skill/skill.hpp"
 #include "character/effect/effect.hpp"
+#include "character/skill/skill.hpp"
 #include "enumerators/skillRank.hpp"
 #include "utilities/radMudTypes.hpp"
 
@@ -37,22 +37,19 @@ public:
     std::shared_ptr<Skill> skill;
 
     /// @brief Constructor.
-    SkillData(const VnumType & _skillVnum,
-              const unsigned int & _skillLevel,
-              std::shared_ptr<Skill> _skill) :
-        skillVnum(_skillVnum),
-        skillLevel(_skillLevel),
-        skill(std::move(_skill))
+    SkillData(const VnumType &_skillVnum, const unsigned int &_skillLevel, std::shared_ptr<Skill> _skill)
+        : skillVnum(_skillVnum)
+        , skillLevel(_skillLevel)
+        , skill(std::move(_skill))
     {
         // Nothing to do.
     }
 
     /// @brief Constructor.
-    SkillData(std::shared_ptr<Skill> _skill,
-              const unsigned int & _skillLevel) :
-        skillVnum(_skill->vnum),
-        skillLevel(_skillLevel),
-        skill(std::move(_skill))
+    SkillData(std::shared_ptr<Skill> _skill, const unsigned int &_skillLevel)
+        : skillVnum(_skill->vnum)
+        , skillLevel(_skillLevel)
+        , skill(std::move(_skill))
     {
         // Nothing to do.
     }
@@ -62,34 +59,34 @@ public:
         return SkillRank::getSkillRank(skillLevel);
     }
 
-    inline void improveSkill(const unsigned int & skillImprovement)
+    inline void improveSkill(const unsigned int &skillImprovement)
     {
         skillLevel += skillImprovement;
-        if (skillLevel > SkillRank::getSkillCap())
-        {
+        if (skillLevel > SkillRank::getSkillCap()) {
             skillLevel = SkillRank::getSkillCap();
         }
     }
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const SkillData &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, SkillData &rhs);
 };
 
-class SkillEffect :
-    public ModifierManager
+class SkillEffect : public ModifierManager
 {
 public:
     /// The character affected by the effect.
-    Character * affected;
+    Character *affected;
     /// Name of the modifier.
     std::string name;
     /// The skill which produces the effect.
     std::shared_ptr<SkillData> skillData;
 
     /// @brief Constructor.
-    SkillEffect(Character * _affected,
-                std::string _name,
-                std::shared_ptr<SkillData> _skillData) :
-        affected(_affected),
-        name(std::move(_name)),
-        skillData(std::move(_skillData))
+    SkillEffect(Character *_affected, std::string _name, std::shared_ptr<SkillData> _skillData)
+        : affected(_affected)
+        , name(std::move(_name))
+        , skillData(std::move(_skillData))
     {
         // Nothing to do.
     }

@@ -30,3 +30,13 @@ std::string LiquidType::toString() const
     if (value == Lava) return "Lava";
     return "None";
 }
+
+LiquidType::LiquidType(const std::string & _value)
+{
+    if (_value == "Normal") value = Normal;
+    else if (_value == "Alcohol") value = Alcohol;
+    else if (_value == "Poison") value = Poison;
+    else if (_value == "Blood") value = Blood;
+    else if (_value == "Lava") value = Lava;
+    else value = None;
+}

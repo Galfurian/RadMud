@@ -33,6 +33,7 @@
 #include "enumerators/knowledge.hpp"
 #include "utilities/radMudTypes.hpp"
 #include "character/effect/modifierManager.hpp"
+#include "json/json.hpp"
 
 class Character;
 
@@ -79,4 +80,8 @@ public:
     /// @return <b>True</b> if it has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Skill &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Skill &rhs);
 };

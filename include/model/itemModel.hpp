@@ -28,6 +28,7 @@
 #include "creation/material.hpp"
 #include "utilities/table.hpp"
 #include "utilities/utils.hpp"
+#include "json/json.hpp"
 
 #include <string>
 #include <vector>
@@ -299,6 +300,10 @@ public:
 
     /// @brief Returns the model <b>statically</b> casted to Magazine.
     std::shared_ptr<MagazineModel> toMagazine();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const ItemModel &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, std::shared_ptr<ItemModel> &rhs);
 };
 
 /// @defgroup FlagsToList Flags to List of Strings.

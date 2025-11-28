@@ -33,3 +33,12 @@ std::string StatusModifier::toString() const
         return "StaminaRegeneration";
     else return "None";
 }
+
+StatusModifier::StatusModifier(const std::string & _value)
+{
+    if (_value == "Health") value = Health;
+    else if (_value == "HealthRegeneration") value = HealthRegeneration;
+    else if (_value == "Stamina") value = Stamina;
+    else if (_value == "StaminaRegeneration") value = StaminaRegeneration;
+    else value = None;
+}

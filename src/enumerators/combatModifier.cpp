@@ -41,3 +41,16 @@ std::string CombatModifier::toString() const
         return "ArmorClass";
     else return "None";
 }
+
+CombatModifier::CombatModifier(const std::string & _value)
+{
+    if (_value == "UnarmedHitRoll") value = UnarmedHitRoll;
+    else if (_value == "UnarmedDamage") value = UnarmedDamage;
+    else if (_value == "MeleeWeaponHitRoll") value = MeleeWeaponHitRoll;
+    else if (_value == "MeleeWeaponDamage") value = MeleeWeaponDamage;
+    else if (_value == "RangedWeaponHitRoll") value = RangedWeaponHitRoll;
+    else if (_value == "RangedWeaponDamage") value = RangedWeaponDamage;
+    else if (_value == "RangedAimSpeed") value = RangedAimSpeed;
+    else if (_value == "ArmorClass") value = ArmorClass;
+    else value = None;
+}

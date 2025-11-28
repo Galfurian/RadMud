@@ -23,6 +23,7 @@
 #pragma once
 
 #include "model/itemModel.hpp"
+#include "enumerators/baseEnumerator.hpp" // Include BaseEnumerator
 
 /// Sizes of armor.
 using ArmorSize = enum class ArmorSize_t
@@ -56,6 +57,10 @@ public:
     bool setModel(const std::string & source) override;
 
     void getSheet(Table & sheet) const override;
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const ArmorModel &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, ArmorModel &rhs);
 };
 
 /// @addtogroup EnumToString

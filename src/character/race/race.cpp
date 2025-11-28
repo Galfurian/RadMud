@@ -86,3 +86,80 @@ std::string Race::getTile()
     }
     return "c";
 }
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Race &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["name"] << rhs.name;
+    lhs["description"] << rhs.description;
+    lhs["player_allow"] << rhs.player_allow;
+    lhs["tile_set"] << rhs.tileSet;
+    lhs["tile_id"] << rhs.tileId;
+    // Serialize the abilities.
+    json::jnode_t abilities_node;
+    abilities_node.set_type(json::JTYPE_OBJECT);
+    for (auto const &it : rhs.abilities) {
+        abilities_node[it.first.toString()] << it.second;
+    }
+    lhs["abilities"] = abilities_node;
+    // Serialize the body parts.
+    json::jnode_t bodyparts_node;
+    bodyparts_node.set_type(json::JTYPE_ARRAY);
+    for (auto const &it : rhs.bodyParts) {
+        bodyparts_node.add_element() << it->vnum;
+    }
+    lhs["body_parts"] = bodyparts_node;
+    // Serialize the skills.
+    json::jnode_t skills_node;
+    skills_node.set_type(json::JTYPE_ARRAY);
+    for (auto const &it : rhs.skills) {
+        json::jnode_t skill_node;
+        skill_node.set_type(json::JTYPE_OBJECT);
+        skill_node["vnum"] << it->skillVnum;
+        skill_node["level"] << it->skillLevel;
+        skills_node.add_element(skill_node);
+    }
+    lhs["skills"] = skills_node;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Race &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    lhs["name"] >> rhs.name;
+    lhs["description"] >> rhs.description;
+    lhs["player_allow"] >> rhs.player_allow;
+    lhs["tile_set"] >> rhs.tileSet;
+    lhs["tile_id"] >> rhs.tileId;
+    // Deserialize the abilities.
+    if(lhs.has_property("abilities")){
+        json::jnode_t abilities_node = lhs["abilities"];
+        for (auto it = abilities_node.pbegin(); it != abilities_node.pend(); ++it) {
+            unsigned int ability_vnum;
+            it->second >> ability_vnum;
+            rhs.abilities[Ability(it->first)] = ability_vnum;
+        }
+    }
+    // Deserialize the body parts.
+    if(lhs.has_property("body_parts")){
+        json::jnode_t bodyparts_node = lhs["body_parts"];
+        for (auto it = bodyparts_node.abegin(); it != bodyparts_node.aend(); ++it) {
+            unsigned int bodypart_vnum;
+            (*it) >> bodypart_vnum;
+            rhs.bodyParts.emplace_back(Mud::instance().findBodyPart(bodypart_vnum));
+        }
+    }
+    // Deserialize the skills.
+    if(lhs.has_property("skills")){
+        json::jnode_t skills_node = lhs["skills"];
+        for (auto it = skills_node.abegin(); it != skills_node.aend(); ++it) {
+            unsigned int skill_vnum;
+            unsigned int skill_level;
+            (*it)["vnum"] >> skill_vnum;
+            (*it)["level"] >> skill_level;
+            rhs.skills.emplace_back(std::make_shared<SkillData>(Mud::instance().findSkill(skill_vnum), skill_level));
+        }
+    }
+    return lhs;
+}

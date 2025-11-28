@@ -79,6 +79,8 @@ public:
         // Nothing to do.
     }
 
+    ModelType(const std::string &_value);
+
     /// @brief Returns the type of model as string.
     std::string toString() const override;
 };

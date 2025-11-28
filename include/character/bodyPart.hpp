@@ -21,19 +21,18 @@
 
 #pragma once
 
-#include "utilities/table.hpp"
 #include "creation/material.hpp"
+#include "utilities/table.hpp"
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 class ResourceModel;
 
 /// The flags of a body part.
-using BodyPartFlag = enum class BodyPartFlag_t
-{
-    None = 0,     ///< [0]   No flag.
-    CanWear = 1,  ///< [1]   The equipment can be worn on the the body part.
+using BodyPartFlag = enum class BodyPartFlag_t {
+    None     = 0, ///< [0]   No flag.
+    CanWear  = 1, ///< [1]   The equipment can be worn on the the body part.
     CanWield = 2, ///< [2]   The body part can be used to wield something.
     Internal = 4  ///< [4]   The body part is an internal part.
     ///< [8]
@@ -49,12 +48,11 @@ class BodyPart
 public:
     /// @brief A structure to hold information about the resources provided
     /// by a body part.
-    struct BodyResource
-    {
+    struct BodyResource {
         /// The provided resource.
         std::shared_ptr<ResourceModel> resource;
         /// The material of the resource.
-        Material * material;
+        Material *material;
         /// The quantity.
         int quantity;
         /// The difficulty (DC) associated with the resources.
@@ -63,8 +61,7 @@ public:
 
     /// @brief A structure which holds information about the attack which can
     /// be performed with a body part.
-    struct BodyWeapon
-    {
+    struct BodyWeapon {
         /// The name of the attack.
         std::string name;
         /// The article of the attack.
@@ -115,6 +112,9 @@ public:
 
     /// @brief Fills the provided table with the information concerning
     ///         the body part.
-    void getSheet(Table & sheet) const;
+    void getSheet(Table &sheet) const;
 
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const BodyPart &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, BodyPart &rhs);
 };

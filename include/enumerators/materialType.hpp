@@ -67,6 +67,8 @@ public:
         // Nothing to do.
     }
 
+    MaterialType(const std::string & _value);
+
     /// @brief Returns the material as string.
     std::string toString() const override;
 };

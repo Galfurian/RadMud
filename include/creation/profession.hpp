@@ -26,6 +26,7 @@
 #include <map>
 
 #include "enumerators/characterPosture.hpp"
+#include "json/json.hpp"
 
 /// @brief Holds details about a profession.
 class Profession
@@ -74,4 +75,8 @@ public:
     /// @return <b>True</b> if the profession has correct values,<br>
     ///         <b>False</b> otherwise.
     bool check();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Profession &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Profession &rhs);
 };

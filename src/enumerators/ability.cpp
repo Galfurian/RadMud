@@ -88,3 +88,13 @@ unsigned int Ability::getModifier(const unsigned int & _value)
     }
     return (_value - 10) / 2;
 }
+
+Ability::Ability(const std::string & _value)
+{
+    if (_value == "Strength") value = Strength;
+    else if (_value == "Agility") value = Agility;
+    else if (_value == "Perception") value = Perception;
+    else if (_value == "Constitution") value = Constitution;
+    else if (_value == "Intelligence") value = Intelligence;
+    else value = None;
+}

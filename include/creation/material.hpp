@@ -23,6 +23,7 @@
 #pragma once
 
 #include "enumerators/materialType.hpp"
+#include "json/json.hpp"
 
 /// @brief Holds details about a material.
 class Material
@@ -74,4 +75,8 @@ public:
 
     /// @brief Provides the modifier w.r.t. the material lightness value.
     double getLightnessModifier() const;
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Material &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Material &rhs);
 };

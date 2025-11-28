@@ -23,15 +23,16 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
-#include "character/skill/skillManager.hpp"
-#include "model/submodel/corpseModel.hpp"
-#include "enumerators/ability.hpp"
 #include "character/faction.hpp"
 #include "character/skill/skill.hpp"
+#include "character/skill/skillManager.hpp"
+#include "enumerators/ability.hpp"
+#include "model/submodel/corpseModel.hpp"
+#include "json/json.hpp"
 
 class Material;
 
@@ -73,10 +74,10 @@ public:
     Race(Race &&) = delete;
 
     /// @brief Disable Copy assign.
-    Race & operator=(Race const &) = delete;
+    Race &operator=(Race const &) = delete;
 
     /// @brief Disable Move assign.
-    Race & operator=(Race &&) = delete;
+    Race &operator=(Race &&) = delete;
 
     /// @brief Destructor.
     ~Race();
@@ -94,9 +95,13 @@ public:
     /// @brief Provides the value of the given ability.
     /// @param ability The ability to retrieve.
     /// @return The overall ability value.
-    unsigned int getAbility(const Ability & ability) const;
+    unsigned int getAbility(const Ability &ability) const;
 
     /// @brief Returns the tile of the race.
     /// @return The string which contains the code of the race's tile.
     std::string getTile();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Race &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Race &rhs);
 };

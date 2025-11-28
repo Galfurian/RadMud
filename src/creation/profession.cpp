@@ -59,3 +59,34 @@ bool Profession::check()
     if (notFoundMessage.empty()) return false;
     return true;
 }
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Profession &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["command"] << rhs.command;
+    lhs["action"] << rhs.action;
+    lhs["description"] << rhs.description;
+    lhs["start_message"] << rhs.startMessage;
+    lhs["finish_message"] << rhs.finishMessage;
+    lhs["success_message"] << rhs.successMessage;
+    lhs["failure_message"] << rhs.failureMessage;
+    lhs["interrupt_message"] << rhs.interruptMessage;
+    lhs["not_found_message"] << rhs.notFoundMessage;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Profession &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    lhs["command"] >> rhs.command;
+    lhs["action"] >> rhs.action;
+    lhs["description"] >> rhs.description;
+    lhs["start_message"] >> rhs.startMessage;
+    lhs["finish_message"] >> rhs.finishMessage;
+    lhs["success_message"] >> rhs.successMessage;
+    lhs["failure_message"] >> rhs.failureMessage;
+    lhs["interrupt_message"] >> rhs.interruptMessage;
+    lhs["not_found_message"] >> rhs.notFoundMessage;
+    return lhs;
+}

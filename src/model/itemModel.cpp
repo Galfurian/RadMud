@@ -46,6 +46,7 @@
 #include "item/itemFactory.hpp"
 #include "utilities/logger.hpp"
 #include "mud.hpp"
+#include "model/modelFactory.hpp"
 
 ItemModel::ItemModel() :
     vnum(),
@@ -454,6 +455,92 @@ std::string GetModelFlagString(unsigned int flags)
     if (HasFlag(flags, ModelFlag::CanBeStacked)) flagList += "|CanBeStacked";
     if (!flagList.empty()) flagList += "|";
     return flagList;
+}
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const ItemModel &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["name"] << rhs.name;
+    lhs["article"] << rhs.article;
+    lhs["shortdesc"] << rhs.shortdesc;
+    // Serialize keys
+    json::jnode_t keys_node;
+    keys_node.set_type(json::JTYPE_ARRAY);
+    for (const auto& key : rhs.keys) {
+        keys_node.add_element() << key;
+    }
+    lhs["keys"] = keys_node;
+    lhs["description"] << rhs.description;
+    // Serialize bodyParts vnums
+    json::jnode_t bodyparts_node;
+    bodyparts_node.set_type(json::JTYPE_ARRAY);
+    for (const auto& bp : rhs.bodyParts) {
+        bodyparts_node.add_element() << bp->vnum;
+    }
+    lhs["body_parts"] = bodyparts_node;
+    lhs["model_flags"] << rhs.modelFlags;
+    lhs["base_weight"] << rhs.baseWeight;
+    lhs["base_price"] << rhs.basePrice;
+    lhs["condition"] << rhs.condition;
+    lhs["material_type"] << rhs.material.toUInt();
+    lhs["tile_set"] << rhs.tileSet;
+    lhs["tile_id"] << rhs.tileId;
+    lhs["model_type"] << rhs.getType().toUInt();
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, std::shared_ptr<ItemModel> &rhs)
+{
+    unsigned int model_type_int;
+    lhs["model_type"] >> model_type_int;
+    ModelType model_type(model_type_int);
+
+    // Create the correct derived type if rhs is null or of a different type
+    if (!rhs || rhs->getType() != model_type) {
+        rhs = ModelFactory::newModel(model_type);
+    }
+
+    if (!rhs) {
+        // Handle error: could not create model
+        // Maybe throw an exception or log an error
+        return lhs;
+    }
+
+    lhs["vnum"] >> rhs->vnum;
+    lhs["name"] >> rhs->name;
+    lhs["article"] >> rhs->article;
+    lhs["shortdesc"] >> rhs->shortdesc;
+    // Deserialize keys
+    if (lhs.has_property("keys")) {
+        json::jnode_t keys_node = lhs["keys"];
+        for (auto it = keys_node.abegin(); it != keys_node.aend(); ++it) {
+            std::string key;
+            (*it) >> key;
+            rhs->keys.emplace_back(key);
+        }
+    }
+    lhs["description"] >> rhs->description;
+    // Deserialize bodyParts vnums
+    if (lhs.has_property("body_parts")) {
+        json::jnode_t bodyparts_node = lhs["body_parts"];
+        for (auto it = bodyparts_node.abegin(); it != bodyparts_node.aend(); ++it) {
+            unsigned int bp_vnum;
+            (*it) >> bp_vnum;
+            rhs->bodyParts.emplace_back(Mud::instance().findBodyPart(bp_vnum));
+        }
+    }
+    lhs["model_flags"] >> rhs->modelFlags;
+    lhs["base_weight"] >> rhs->baseWeight;
+    lhs["base_price"] >> rhs->basePrice;
+    lhs["condition"] >> rhs->condition;
+    unsigned int material_type_int;
+    lhs["material_type"] >> material_type_int;
+    rhs->material = MaterialType(material_type_int);
+    lhs["tile_set"] >> rhs->tileSet;
+    lhs["tile_id"] >> rhs->tileId;
+    // The specific members of the derived class will be handled by its own operator>> if called after this base one.
+    return lhs;
 }
 
 /*

@@ -61,3 +61,30 @@ std::string Liquid::getNameCapital()
 {
     return ToCapitals(name);
 }
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Liquid &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["type"] << rhs.type.toUInt();
+    lhs["name"] << rhs.name;
+    lhs["description"] << rhs.description;
+    lhs["flags"] << rhs.flags;
+    lhs["worth"] << rhs.worth;
+    lhs["quench"] << rhs.quench;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Liquid &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    unsigned int type;
+    lhs["type"] >> type;
+    rhs.type = LiquidType(type);
+    lhs["name"] >> rhs.name;
+    lhs["description"] >> rhs.description;
+    lhs["flags"] >> rhs.flags;
+    lhs["worth"] >> rhs.worth;
+    lhs["quench"] >> rhs.quench;
+    return lhs;
+}

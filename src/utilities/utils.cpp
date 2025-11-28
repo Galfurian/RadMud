@@ -20,8 +20,8 @@
 
 #include "utilities/utils.hpp"
 
-#include <dirent.h>
 #include <ctime>
+#include <dirent.h>
 #include <fstream>
 #include <iterator>
 
@@ -32,86 +32,73 @@ bool DoubleEquality(double a, double b)
     return std::fabs(a - b) < std::numeric_limits<double>::epsilon();
 }
 
-double SafeLog10(const double & source)
+double SafeLog10(const double &source)
 {
-    if (source > 0)
-    {
+    if (source > 0) {
         return log10(source);
     }
     return 0;
 }
 
-bool BeginWith(const std::string & source, const std::string & prefix)
+bool BeginWith(const std::string &source, const std::string &prefix)
 {
     return source.compare(0, prefix.size(), prefix) == 0;
 }
 
-bool EndWith(const std::string & source, const std::string & suffix)
+bool EndWith(const std::string &source, const std::string &suffix)
 {
     return (source.size() >= suffix.size()) &&
-           (source.compare(source.size() - suffix.size(),
-                           suffix.size(),
-                           suffix) == 0);
+           (source.compare(source.size() - suffix.size(), suffix.size(), suffix) == 0);
 }
 
-void FindAndReplace(std::string * source,
-                    const std::string & target,
-                    const std::string & replacement)
+void FindAndReplace(std::string *source, const std::string &target, const std::string &replacement)
 {
     size_t start_pos = 0;
-    while ((start_pos = source->find(target, start_pos)) != std::string::npos)
-    {
+    while ((start_pos = source->find(target, start_pos)) != std::string::npos) {
         source->replace(start_pos, target.length(), replacement);
         start_pos += replacement.length();
     }
 }
 
-std::string Trim(const std::string & source, const std::string & trim)
+std::string Trim(const std::string &source, const std::string &trim)
 {
-    std::string working = source;
+    std::string working      = source;
     std::string::size_type i = working.find_last_not_of(trim);
-    if (i == std::string::npos)
-    {
+    if (i == std::string::npos) {
         return "";
     }
     return working.erase(i + 1).erase(0, source.find_first_not_of(trim));
 }
 
-std::string ToLower(const std::string & source)
+std::string ToLower(const std::string &source)
 {
     std::string working = source;
     // Put all the letter to lower case.
-    for (unsigned int i = 0; i < working.length(); i++)
-    {
+    for (unsigned int i = 0; i < working.length(); i++) {
         working[i] = static_cast<char>(tolower(working[i]));
     }
     return working;
 }
 
-std::string ToCapitals(const std::string & source)
+std::string ToCapitals(const std::string &source)
 {
     std::string working = source;
     // First of all put all the letter to lower case.
-    for (auto & c : working)
-    {
+    for (auto &c : working) {
         c = static_cast<char>(tolower(c));
     }
     // Capitalize the first letter.
-    working[0] = static_cast<char>(toupper(working[0]));
+    working[0]            = static_cast<char>(toupper(working[0]));
     bool previousWasSpace = false;
     // Capitalize the rest of the std::string.
-    for (auto & c : working)
-    {
+    for (auto &c : working) {
         //prints next char providing not a space
-        if (c == ' ')
-        {
+        if (c == ' ') {
             previousWasSpace = true;
             continue;
-        }
-        else if (previousWasSpace)
-        {
+        } else if (previousWasSpace) {
             // Capitalize letter after space.
-            c = static_cast<char>(toupper(c));
+            c                = static_cast<char>(toupper(c));
             // Reset the flag.
             previousWasSpace = false;
         }
@@ -119,25 +106,22 @@ std::string ToCapitals(const std::string & source)
     return working;
 }
 
-std::vector<std::string> SplitString(const std::string & source,
-                                     const std::string & delimiter)
+std::vector<std::string> SplitString(const std::string &source, const std::string &delimiter)
 {
     std::vector<std::string> result;
-    size_t pos = 0;
+    size_t pos      = 0;
     std::string tmp = source;
-    while ((pos = tmp.find(delimiter)) != std::string::npos)
-    {
+    while ((pos = tmp.find(delimiter)) != std::string::npos) {
         result.push_back(tmp.substr(0, pos));
         tmp.erase(0, pos + delimiter.length());
     }
-    if (!tmp.empty())
-    {
+    if (!tmp.empty()) {
         result.push_back(tmp);
     }
     return result;
 }
 
-std::vector<std::string> GetWords(const std::string & source)
+std::vector<std::string> GetWords(const std::string &source)
 {
     std::istringstream iss(source);
     std::istream_iterator<std::string> begin(iss);
@@ -159,7 +143,7 @@ std::string GetFormattedTime()
 std::string GetDate()
 {
     time_t now = time(nullptr);
-    tm * ptm = localtime(&now);
+    tm *ptm    = localtime(&now);
     char buffer[32];
 
     // Format: %Y_%m_%d_%H-%M
@@ -168,21 +152,16 @@ std::string GetDate()
 }
 
 std::vector<std::string> GetAllFilesInFolder(
-    const std::string & folder,
-    const std::string & extension)
+    const std::string &folder,
+    const std::string &extension)
 {
-    DIR * directory;
+    DIR *directory;
     std::vector<std::string> files_name;
     directory = opendir(folder.c_str());
-    if (directory != nullptr)
-    {
-        int i = 0;
-        struct dirent * dir;
-        while ((dir = readdir(directory)) != nullptr)
-        {
-            i++;
-            if (EndWith(dir->d_name, extension))
-            {
+    if (directory != nullptr) {
+        struct dirent *dir;
+        while ((dir = readdir(directory)) != nullptr) {
+            if (EndWith(dir->d_name, extension)) {
                 files_name.emplace_back(dir->d_name);
             }
         }
@@ -191,27 +170,23 @@ std::vector<std::string> GetAllFilesInFolder(
     return files_name;
 }
 
-bool IsNumber(const std::string & source)
+bool IsNumber(const std::string &source)
 {
-    for (auto c : source)
-    {
-        if (isdigit(c) == 0)
-        {
+    for (auto c : source) {
+        if (isdigit(c) == 0) {
             return false;
         }
     }
     return true;
 }
 
-bool GetFileContents(const char * filename, std::string & contents)
+bool GetFileContents(const char *filename, std::string &contents)
 {
     std::ifstream in(filename, std::ios::in | std::ios::binary);
-    if (in.good())
-    {
+    if (in.good()) {
         in.seekg(0, std::ios::end);
         std::streamoff totalSize = in.tellg();
-        if (totalSize > 0)
-        {
+        if (totalSize > 0) {
             contents.resize(static_cast<std::size_t>(totalSize));
             in.seekg(0, std::ios::beg);
             in.read(&contents[0], totalSize);
@@ -224,9 +199,9 @@ bool GetFileContents(const char * filename, std::string & contents)
 }
 
 /// Check if the return code from Zlib is an error.
-#define ZCHECK_ERROR(err, msg)\
-if ((err) != Z_OK) {\
-    std::cerr << #msg" error: "#err"\n";\
-    exit(1);\
-}\
+#define ZCHECK_ERROR(err, msg)                  \
+    if ((err) != Z_OK) {                        \
+        std::cerr << #msg " error: " #err "\n"; \
+        exit(1);                                \
+    }
 

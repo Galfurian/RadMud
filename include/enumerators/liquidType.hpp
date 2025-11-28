@@ -60,6 +60,9 @@ public:
         // Nothing to do.
     }
 
+    /// @brief Constructor from string.
+    LiquidType(const std::string & _value);
+
     /// @brief Returns the type of model as string.
     std::string toString() const override;
 };

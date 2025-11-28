@@ -24,19 +24,18 @@
 #include <vector>
 
 #include "character/effect/effect.hpp"
+#include "character/effect/effectFactory.hpp"
+#include "character/effect/modifierManager.hpp"
 #include "character/skill/skillData.hpp"
 #include "utilities/radMudTypes.hpp"
-#include "character/effect/modifierManager.hpp"
-#include "character/effect/effectFactory.hpp"
 
 class Character;
 
-class SkillManager :
-    public ModifierManager
+class SkillManager : public ModifierManager
 {
 public:
     /// The owner of the manager.
-    Character * owner;
+    Character *owner;
     /// The player's list of skills.
     std::vector<std::shared_ptr<SkillData>> skills;
     /// The vector of effects related to the skills.
@@ -44,18 +43,16 @@ public:
 
     /// @brief Constructor.
     /// @param _owner The owner of the manager.
-    explicit SkillManager(Character * _owner);
+    explicit SkillManager(Character *_owner);
 
     /// @brief Add the given skill to the list of skills.
     /// @param skill        A pointer to the skill.
     /// @param skillLevel   The initial level of the skill.
     /// @return The outcome.
-    inline bool addSkill(const std::shared_ptr<Skill> & skill,
-                         const unsigned int & skillLevel = 1)
+    inline bool addSkill(const std::shared_ptr<Skill> &skill, const unsigned int &skillLevel = 1)
     {
         // Check if the skill is already present.
-        if (this->findSkill(skill->vnum) != nullptr)
-        {
+        if (this->findSkill(skill->vnum) != nullptr) {
             return false;
         }
         // Create a new skill data for the given skill.
@@ -70,12 +67,10 @@ public:
     /// @brief Finds the given skill data.
     /// @param vnum The vnum of the skill.
     /// @return A pointer to the skill data.
-    inline std::shared_ptr<SkillData> findSkill(const VnumType & vnum)
+    inline std::shared_ptr<SkillData> findSkill(const VnumType &vnum)
     {
-        for (auto skillData : skills)
-        {
-            if (skillData->skillVnum == vnum)
-            {
+        for (auto skillData : skills) {
+            if (skillData->skillVnum == vnum) {
                 return skillData;
             }
         }
@@ -86,29 +81,26 @@ public:
     void checkIfUnlockedSkills();
 
     /// @brief Activate the effects on the character based on the skill rank.
-    void updateSkillEffect(std::shared_ptr<SkillData> & skillData);
+    void updateSkillEffect(std::shared_ptr<SkillData> &skillData);
 
     /// @brief Improves the skills which provides the given ability modifier.
-    void improveAbility(const Ability & abilityModifier);
+    void improveAbility(const Ability &abilityModifier);
 
     /// @brief Improves the skills which provides the given status modifier.
-    void improveStatus(const StatusModifier & statusModifier);
+    void improveStatus(const StatusModifier &statusModifier);
 
     /// @brief Improves the skills which provides the given combat modifier.
-    void improveCombat(const CombatModifier & combatModifier);
+    void improveCombat(const CombatModifier &combatModifier);
 
     /// @brief Improves the skills which provides the given knowledge.
-    void improveKnowledge(const Knowledge & knowledge);
+    void improveKnowledge(const Knowledge &knowledge);
 
 private:
-
     inline std::shared_ptr<SkillEffect> getSkillEffect(
-        const std::shared_ptr<SkillData> & skillData)
+        const std::shared_ptr<SkillData> &skillData)
     {
-        for (const auto & it : skillEffects)
-        {
-            if (it->skillData == skillData)
-            {
+        for (const auto &it : skillEffects) {
+            if (it->skillData == skillData) {
                 return it;
             }
         }
@@ -116,14 +108,11 @@ private:
     }
 
     inline std::shared_ptr<SkillEffect> createSkillEffect(
-        const std::shared_ptr<SkillData> & skillData)
+        const std::shared_ptr<SkillData> &skillData)
     {
         auto skillEffect = this->getSkillEffect(skillData);
-        if (skillEffect == nullptr)
-        {
-            skillEffect = std::make_shared<SkillEffect>(owner,
-                                                        skillData->skill->name,
-                                                        skillData);
+        if (skillEffect == nullptr) {
+            skillEffect = std::make_shared<SkillEffect>(owner, skillData->skill->name, skillData);
             skillEffects.emplace_back(skillEffect);
         }
         return skillEffect;

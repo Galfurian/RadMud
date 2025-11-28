@@ -22,30 +22,106 @@
 
 #include "enumerators/modelType.hpp"
 
+ModelType::ModelType(const std::string &_value)
+    : BaseEnumerator()
+{
+    if (_value == "Corpse")
+        value = Corpse;
+    else if (_value == "MeleeWeapon")
+        value = MeleeWeapon;
+    else if (_value == "RangedWeapon")
+        value = RangedWeapon;
+    else if (_value == "Armor")
+        value = Armor;
+    else if (_value == "Shield")
+        value = Shield;
+    else if (_value == "Projectile")
+        value = Projectile;
+    else if (_value == "Container")
+        value = Container;
+    else if (_value == "LiquidContainer")
+        value = LiquidContainer;
+    else if (_value == "Tool")
+        value = Tool;
+    else if (_value == "Node")
+        value = Node;
+    else if (_value == "Resource")
+        value = Resource;
+    else if (_value == "Seed")
+        value = Seed;
+    else if (_value == "Key")
+        value = Key;
+    else if (_value == "Furniture")
+        value = Furniture;
+    else if (_value == "Food")
+        value = Food;
+    else if (_value == "Light")
+        value = Light;
+    else if (_value == "Vehicle")
+        value = Vehicle;
+    else if (_value == "Book")
+        value = Book;
+    else if (_value == "Rope")
+        value = Rope;
+    else if (_value == "Mechanism")
+        value = Mechanism;
+    else if (_value == "Currency")
+        value = Currency;
+    else if (_value == "Shop")
+        value = Shop;
+    else if (_value == "Magazine")
+        value = Magazine;
+    else
+        value = None;
+}
+
 std::string ModelType::toString() const
 {
-    if (value == Corpse) return "Corpse";
-    if (value == MeleeWeapon) return "MeleeWeapon";
-    if (value == RangedWeapon) return "RangedWeapon";
-    if (value == Armor) return "Armor";
-    if (value == Shield) return "Shield";
-    if (value == Projectile) return "Projectile";
-    if (value == Container) return "Container";
-    if (value == LiquidContainer) return "LiquidContainer";
-    if (value == Tool) return "Tool";
-    if (value == Node) return "Node";
-    if (value == Resource) return "Resource";
-    if (value == Seed) return "Seed";
-    if (value == Key) return "Key";
-    if (value == Furniture) return "Furniture";
-    if (value == Food) return "Food";
-    if (value == Light) return "Light";
-    if (value == Vehicle) return "Vehicle";
-    if (value == Book) return "Book";
-    if (value == Rope) return "Rope";
-    if (value == Mechanism) return "Mechanism";
-    if (value == Currency) return "Currency";
-    if (value == Shop) return "Shop";
-    if (value == Magazine) return "Magazine";
+    if (value == Corpse)
+        return "Corpse";
+    if (value == MeleeWeapon)
+        return "MeleeWeapon";
+    if (value == RangedWeapon)
+        return "RangedWeapon";
+    if (value == Armor)
+        return "Armor";
+    if (value == Shield)
+        return "Shield";
+    if (value == Projectile)
+        return "Projectile";
+    if (value == Container)
+        return "Container";
+    if (value == LiquidContainer)
+        return "LiquidContainer";
+    if (value == Tool)
+        return "Tool";
+    if (value == Node)
+        return "Node";
+    if (value == Resource)
+        return "Resource";
+    if (value == Seed)
+        return "Seed";
+    if (value == Key)
+        return "Key";
+    if (value == Furniture)
+        return "Furniture";
+    if (value == Food)
+        return "Food";
+    if (value == Light)
+        return "Light";
+    if (value == Vehicle)
+        return "Vehicle";
+    if (value == Book)
+        return "Book";
+    if (value == Rope)
+        return "Rope";
+    if (value == Mechanism)
+        return "Mechanism";
+    if (value == Currency)
+        return "Currency";
+    if (value == Shop)
+        return "Shop";
+    if (value == Magazine)
+        return "Magazine";
     return "None";
 }

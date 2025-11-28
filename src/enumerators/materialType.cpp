@@ -1,5 +1,5 @@
 /// @file   materialType.cpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   05/12/2016
 /// @copyright
@@ -22,18 +22,57 @@
 
 #include "enumerators/materialType.hpp"
 
+MaterialType::MaterialType(const std::string &_value)
+{
+    if (_value == "Metal")
+        value = MaterialType::Metal;
+    else if (_value == "Stone")
+        value = MaterialType::Stone;
+    else if (_value == "Wood")
+        value = MaterialType::Wood;
+    else if (_value == "Skin")
+        value = MaterialType::Skin;
+    else if (_value == "Cloth")
+        value = MaterialType::Cloth;
+    else if (_value == "Vegetable")
+        value = MaterialType::Vegetable;
+    else if (_value == "Meat")
+        value = MaterialType::Meat;
+    else if (_value == "Glass")
+        value = MaterialType::Glass;
+    else if (_value == "Paper")
+        value = MaterialType::Paper;
+    else if (_value == "Coal")
+        value = MaterialType::Coal;
+    else if (_value == "Bone")
+        value = MaterialType::Bone;
+    else
+        value = MaterialType::None;
+}
+
 std::string MaterialType::toString() const
 {
-    if (value == MaterialType::Metal) return "Metal";
-    if (value == MaterialType::Stone) return "Stone";
-    if (value == MaterialType::Wood) return "Wood";
-    if (value == MaterialType::Skin) return "Skin";
-    if (value == MaterialType::Cloth) return "Cloth";
-    if (value == MaterialType::Vegetable) return "Vegetable";
-    if (value == MaterialType::Meat) return "Meat";
-    if (value == MaterialType::Glass) return "Glass";
-    if (value == MaterialType::Paper) return "Paper";
-    if (value == MaterialType::Coal) return "Coal";
-    if (value == MaterialType::Bone) return "Bone";
+    if (value == MaterialType::Metal)
+        return "Metal";
+    if (value == MaterialType::Stone)
+        return "Stone";
+    if (value == MaterialType::Wood)
+        return "Wood";
+    if (value == MaterialType::Skin)
+        return "Skin";
+    if (value == MaterialType::Cloth)
+        return "Cloth";
+    if (value == MaterialType::Vegetable)
+        return "Vegetable";
+    if (value == MaterialType::Meat)
+        return "Meat";
+    if (value == MaterialType::Glass)
+        return "Glass";
+    if (value == MaterialType::Paper)
+        return "Paper";
+    if (value == MaterialType::Coal)
+        return "Coal";
+    if (value == MaterialType::Bone)
+        return "Bone";
     return "None";
 }

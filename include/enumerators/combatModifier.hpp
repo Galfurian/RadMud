@@ -63,6 +63,9 @@ public:
         // Nothing to do.
     }
 
+    /// @brief Constructor from string.
+    CombatModifier(const std::string & _value);
+
     /// @brief Returns the enumerator as string.
     std::string toString() const override;
 };

@@ -29,6 +29,7 @@
 #include <memory>
 
 #include "utilities/table.hpp"
+#include "json/json.hpp"
 
 class CurrencyModel;
 
@@ -79,4 +80,8 @@ public:
     /// @brief Return the name of the faction with the first letter capitalized.
     /// @return The name of the faction.
     std::string getNameCapital();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Faction &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Faction &rhs);
 };

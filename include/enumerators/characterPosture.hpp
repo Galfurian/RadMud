@@ -26,13 +26,11 @@
 #include <cstdint>
 
 /// The postures of a character.
-class CharacterPosture :
-    public BaseEnumerator
+class CharacterPosture : public BaseEnumerator
 {
 public:
     /// List of possible character's posture.
-    enum Enum
-    {
+    enum Enum {
         None,   ///< The character has no posture.
         Stand,  ///< The character it's standing.
         Crouch, ///< The character it's crouched.
@@ -43,25 +41,27 @@ public:
     };
 
     /// @brief Constructor.
-    CharacterPosture() :
-        BaseEnumerator()
+    CharacterPosture()
+        : BaseEnumerator()
     {
         // Nothing to do.
     }
 
     /// @brief Constructor from unsigned int.
-    CharacterPosture(const unsigned int & _value) :
-        BaseEnumerator(_value)
+    CharacterPosture(const unsigned int &_value)
+        : BaseEnumerator(_value)
     {
         // Nothing to do.
     }
 
     /// @brief Constructor from enum.
-    CharacterPosture(const Enum & _value) :
-        BaseEnumerator(_value)
+    CharacterPosture(const Enum &_value)
+        : BaseEnumerator(_value)
     {
         // Nothing to do.
     }
+
+    CharacterPosture(const std::string &_value);
 
     /// @brief Returns the character posture as string.
     std::string toString() const override;

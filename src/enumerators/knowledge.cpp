@@ -65,3 +65,28 @@ std::string Knowledge::toString() const
         return "BasicArmorProficiency";
     else return "None";
 }
+
+Knowledge::Knowledge(const std::string & _value)
+{
+    if (_value == "GatherHerbs") value = GatherHerbs;
+    else if (_value == "GatherPlant") value = GatherPlant;
+    else if (_value == "Butchery") value = Butchery;
+    else if (_value == "SkinAnimal") value = SkinAnimal;
+    else if (_value == "TanHide") value = TanHide;
+    else if (_value == "ReadBook") value = ReadBook;
+    else if (_value == "Climb") value = Climb;
+    else if (_value == "Run") value = Run;
+    else if (_value == "Dash") value = Dash;
+    else if (_value == "Woodcutting") value = Woodcutting;
+    else if (_value == "Carpentry") value = Carpentry;
+    else if (_value == "Woodcarving") value = Woodcarving;
+    else if (_value == "Mining") value = Mining;
+    else if (_value == "Smelting") value = Smelting;
+    else if (_value == "Blacksmithing") value = Blacksmithing;
+    else if (_value == "MetalWeaponCrafting") value = MetalWeaponCrafting;
+    else if (_value == "MetalArmorCrafting") value = MetalArmorCrafting;
+    else if (_value == "Scavenge") value = Scavenge;
+    else if (_value == "CraftSurvivalTool") value = CraftSurvivalTool;
+    else if (_value == "BasicArmorProficiency") value = BasicArmorProficiency;
+    else value = None;
+}

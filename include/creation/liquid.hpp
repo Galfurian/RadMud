@@ -23,6 +23,7 @@
 #pragma once
 
 #include "enumerators/liquidType.hpp"
+#include "json/json.hpp"
 
 /// Flags of a liquid.
 using LiquidFlags = enum class LiquidFlags_t
@@ -87,4 +88,8 @@ public:
     /// @brief Return the name of the liquid with the first letter capitalized.
     /// @return The name of the liquid.
     std::string getNameCapital();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Liquid &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Liquid &rhs);
 };

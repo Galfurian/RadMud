@@ -71,6 +71,21 @@ if(NOT luabridge_POPULATED)
     mark_as_advanced(FORCE FETCHCONTENT_UPDATES_DISCONNECTED_LUABRIDGE FETCHCONTENT_SOURCE_DIR_LUABRIDGE)
 endif()
 
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY "https://github.com/Galfurian/json.git"
+    GIT_SHALLOW    TRUE
+    GIT_PROGRESS   TRUE
+    GIT_TAG        main
+)
+FetchContent_GetProperties(json)
+if(NOT json_POPULATED)
+    message(STATUS "Retrieving `json`...")
+    FetchContent_MakeAvailable(json)
+    # Hide fetchcontent variables.
+    mark_as_advanced(FORCE FETCHCONTENT_UPDATES_DISCONNECTED_JSON FETCHCONTENT_SOURCE_DIR_JSON)
+endif()
+
 # -----------------------------------------------------------------------------
 # EXECUTABLE
 # -----------------------------------------------------------------------------
@@ -237,7 +252,6 @@ add_executable(
     ${CMAKE_SOURCE_DIR}/src/utilities/table.cpp
     ${CMAKE_SOURCE_DIR}/src/utilities/logger.cpp
     ${CMAKE_SOURCE_DIR}/src/utilities/utils.cpp
-    ${CMAKE_SOURCE_DIR}/src/utilities/name_generator/nameGenerator.cpp
 )
 # Include the directories.
 target_include_directories(
@@ -246,12 +260,14 @@ target_include_directories(
     ${LUA_INCLUDE_DIR}
     ${SQLite3_INCLUDE_DIRS}
     ${luabridge_SOURCE_DIR}/Source
+    ${json_SOURCE_DIR}/include
 )
 # Link the libraries.
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
     ${LUA_LIBRARIES}
     ${SQLite3_LIBRARIES}
+    json
     pthread
     dl
     z

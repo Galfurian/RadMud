@@ -22,22 +22,50 @@
 
 #include "enumerators/itemQuality.hpp"
 
+ItemQuality::ItemQuality(const std::string &_value)
+    : BaseEnumerator()
+{
+    if (_value == "Disastrous")
+        value = ItemQuality::Disastrous;
+    else if (_value == "Poor")
+        value = ItemQuality::Poor;
+    else if (_value == "Normal")
+        value = ItemQuality::Normal;
+    else if (_value == "Fine")
+        value = ItemQuality::Fine;
+    else if (_value == "Masterful")
+        value = ItemQuality::Masterful;
+    else
+        value = ItemQuality::None;
+}
+
 std::string ItemQuality::toString() const
 {
-    if (value == ItemQuality::Disastrous) return "Disastrous";
-    if (value == ItemQuality::Poor) return "Poor";
-    if (value == ItemQuality::Normal) return "Normal";
-    if (value == ItemQuality::Fine) return "Fine";
-    if (value == ItemQuality::Masterful) return "Masterful";
-    else return "None";
+    if (value == ItemQuality::Disastrous)
+        return "Disastrous";
+    if (value == ItemQuality::Poor)
+        return "Poor";
+    if (value == ItemQuality::Normal)
+        return "Normal";
+    if (value == ItemQuality::Fine)
+        return "Fine";
+    if (value == ItemQuality::Masterful)
+        return "Masterful";
+    else
+        return "None";
 }
 
 double ItemQuality::getModifier() const
 {
-    if (value == ItemQuality::Disastrous) return 0.5;
-    if (value == ItemQuality::Poor) return 0.75;
-    if (value == ItemQuality::Normal) return 1.0;
-    if (value == ItemQuality::Fine) return 1.50;
-    if (value == ItemQuality::Masterful) return 2.00;
+    if (value == ItemQuality::Disastrous)
+        return 0.5;
+    if (value == ItemQuality::Poor)
+        return 0.75;
+    if (value == ItemQuality::Normal)
+        return 1.0;
+    if (value == ItemQuality::Fine)
+        return 1.50;
+    if (value == ItemQuality::Masterful)
+        return 2.00;
     return 0.25;
 }

@@ -19,3 +19,18 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 #include "character/skill/skillData.hpp"
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const SkillData &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["skill_vnum"] << rhs.skillVnum;
+    lhs["skill_level"] << rhs.skillLevel;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, SkillData &rhs)
+{
+    lhs["skill_vnum"] >> rhs.skillVnum;
+    lhs["skill_level"] >> rhs.skillLevel;
+    return lhs;
+}

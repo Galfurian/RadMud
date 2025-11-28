@@ -25,13 +25,11 @@
 #include "baseEnumerator.hpp"
 
 /// @brief The list of character's abilities.
-class Ability :
-    public BaseEnumerator
+class Ability : public BaseEnumerator
 {
 public:
     /// The possible abilities.
-    enum Enum
-    {
+    enum Enum {
         None,
         Strength,
         Agility,
@@ -41,25 +39,28 @@ public:
     };
 
     /// @brief Constructor.
-    Ability() :
-        BaseEnumerator()
+    Ability()
+        : BaseEnumerator()
     {
         // Nothing to do.
     }
 
     /// @brief Constructor from unsigned int.
-    Ability(const unsigned int & _value) :
-        BaseEnumerator(_value)
+    Ability(const unsigned int &_value)
+        : BaseEnumerator(_value)
     {
         // Nothing to do.
     }
 
     /// @brief Constructor from enum.
-    Ability(const Enum & _value) :
-        BaseEnumerator(_value)
+    Ability(const Enum &_value)
+        : BaseEnumerator(_value)
     {
         // Nothing to do.
     }
+
+    /// @brief Constructor from string.
+    Ability(const std::string &_value);
 
     /// @brief Returns the ability as string.
     std::string toString() const override;
@@ -73,5 +74,5 @@ public:
     /// @brief Return the modifier of the given ability.
     /// @param _value The total ability value.
     /// @return The ability modifier.
-    static unsigned int getModifier(const unsigned int & _value);
+    static unsigned int getModifier(const unsigned int &_value);
 };

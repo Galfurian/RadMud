@@ -23,6 +23,7 @@
 #include "character/faction.hpp"
 #include "model/submodel/currencyModel.hpp"
 #include "utilities/logger.hpp"
+#include "mud.hpp"
 
 Faction::Faction() :
     vnum(),
@@ -73,4 +74,25 @@ std::string Faction::getName()
 std::string Faction::getNameCapital()
 {
     return name;
+}
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Faction &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["name"] << rhs.name;
+    lhs["description"] << rhs.description;
+    lhs["currency"] << rhs.currency->vnum;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Faction &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    lhs["name"] >> rhs.name;
+    lhs["description"] >> rhs.description;
+    int currency_vnum;
+    lhs["currency"] >> currency_vnum;
+    rhs.currency = Mud::instance().findItemModel(currency_vnum)->toCurrency();
+    return lhs;
 }

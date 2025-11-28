@@ -21,21 +21,70 @@
 
 #include "enumerators/skillRank.hpp"
 
+SkillRank::SkillRank(const std::string &_value)
+    : BaseEnumerator()
+{
+    if (_value == "Newbie")
+        value = Newbie;
+    else if (_value == "Novice")
+        value = Novice;
+    else if (_value == "Rookie")
+        value = Rookie;
+    else if (_value == "Beginner")
+        value = Beginner;
+    else if (_value == "Talented")
+        value = Talented;
+    else if (_value == "Skilled")
+        value = Skilled;
+    else if (_value == "Intermediate")
+        value = Intermediate;
+    else if (_value == "Seasoned")
+        value = Seasoned;
+    else if (_value == "Proficient")
+        value = Proficient;
+    else if (_value == "Experienced")
+        value = Experienced;
+    else if (_value == "Advanced")
+        value = Advanced;
+    else if (_value == "Expert")
+        value = Expert;
+    else if (_value == "Specialist")
+        value = Specialist;
+    else if (_value == "Master")
+        value = Master;
+    else
+        value = None;
+}
+
 std::string SkillRank::toString() const
 {
-    if (value == Newbie) return "Newbie";
-    if (value == Novice) return "Novice";
-    if (value == Rookie) return "Rookie";
-    if (value == Beginner) return "Beginner";
-    if (value == Talented) return "Talented";
-    if (value == Skilled) return "Skilled";
-    if (value == Intermediate) return "Intermediate";
-    if (value == Seasoned) return "Seasoned";
-    if (value == Proficient) return "Proficient";
-    if (value == Experienced) return "Experienced";
-    if (value == Advanced) return "Advanced";
-    if (value == Expert) return "Expert";
-    if (value == Specialist) return "Specialist";
-    if (value == Master) return "Master";
+    if (value == Newbie)
+        return "Newbie";
+    if (value == Novice)
+        return "Novice";
+    if (value == Rookie)
+        return "Rookie";
+    if (value == Beginner)
+        return "Beginner";
+    if (value == Talented)
+        return "Talented";
+    if (value == Skilled)
+        return "Skilled";
+    if (value == Intermediate)
+        return "Intermediate";
+    if (value == Seasoned)
+        return "Seasoned";
+    if (value == Proficient)
+        return "Proficient";
+    if (value == Experienced)
+        return "Experienced";
+    if (value == Advanced)
+        return "Advanced";
+    if (value == Expert)
+        return "Expert";
+    if (value == Specialist)
+        return "Specialist";
+    if (value == Master)
+        return "Master";
     return "None";
 }

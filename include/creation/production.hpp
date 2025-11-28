@@ -36,6 +36,7 @@ class ItemModel;
 #include <vector>
 #include <memory>
 #include <map>
+#include "json/json.hpp"
 
 /// @brief Holds details about a production.
 class Production
@@ -96,4 +97,8 @@ public:
     /// @brief Return the name with the first letter capitalized.
     /// @return The name of the production capitalized.
     std::string getNameCapital();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Production &rhs);
+
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Production &rhs);
 };

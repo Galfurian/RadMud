@@ -68,3 +68,30 @@ double Material::getLightnessModifier() const
 {
     return 1 + (0.1 * this->lightness);
 }
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Material &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["type"] << rhs.type.toUInt();
+    lhs["name"] << rhs.name;
+    lhs["article"] << rhs.article;
+    lhs["worth"] << rhs.worth;
+    lhs["hardness"] << rhs.hardness;
+    lhs["lightness"] << rhs.lightness;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Material &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    unsigned int type;
+    lhs["type"] >> type;
+    rhs.type = MaterialType(type);
+    lhs["name"] >> rhs.name;
+    lhs["article"] >> rhs.article;
+    lhs["worth"] >> rhs.worth;
+    lhs["hardness"] >> rhs.hardness;
+    lhs["lightness"] >> rhs.lightness;
+    return lhs;
+}
