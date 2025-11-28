@@ -312,7 +312,7 @@ unsigned int Character::getAbility(const Ability & ability,
 unsigned int Character::getAbilityModifier(const Ability & ability,
                                            bool withEffects) const
 {
-    return Ability::getModifier(this->getAbility(ability, withEffects));
+    return get_ability_modifier(this->getAbility(ability, withEffects));
 }
 
 unsigned int Character::getAbilityLog(

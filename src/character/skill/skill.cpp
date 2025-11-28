@@ -59,7 +59,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Skill &rhs)
     lhs["vnum"] << rhs.vnum;
     lhs["name"] << rhs.name;
     lhs["description"] << rhs.description;
-    lhs["ability"] << rhs.ability.toUInt();
+    lhs["ability"] << static_cast<unsigned int>(rhs.ability);
     lhs["stage"] << rhs.stage;
     // Serialize the required skills.
     json::jnode_t requiredSkillsNode;
@@ -82,7 +82,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Skill &rhs)
     json::jnode_t abilityModifiersNode;
     abilityModifiersNode.set_type(json::JTYPE_OBJECT);
     for (auto const &it : rhs.modifierManager->getAbilityMod()) {
-        abilityModifiersNode[it.first.toString()] << it.second;
+        abilityModifiersNode[ability_to_string(it.first)] << it.second;
     }
     modifierManagerNode["ability_modifiers"] = abilityModifiersNode;
     // Serialize the combat modifiers.
@@ -146,7 +146,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Skill &rhs)
             for (auto it = abilityModifiersNode.pbegin(); it != abilityModifiersNode.pend(); ++it) {
                 int modifier;
                 it->second >> modifier;
-                rhs.modifierManager->setAbilityMod(Ability(it->first), modifier);
+                rhs.modifierManager->setAbilityMod(string_to_ability(it->first), modifier);
             }
         }
         // Deserialize the combat modifiers.

@@ -77,15 +77,15 @@ ProcessNewAttributes::process(Character * character, ArgumentHandler & args)
         // Get the ability number.
         auto abilityNumber = ToNumber<unsigned int>(args[1].getContent());
         // Get and check the ability.
-        Ability ability = Ability(abilityNumber);
+        Ability ability = static_cast<Ability>(abilityNumber);
         if (ability == Ability::None)
         {
             this->advance(character, "Must select a valid attribute.");
             return false;
         }
         std::string help;
-        help += "Help about " + ability.toString() + ".\n";
-        help += Formatter::italic() + ability.getDescription() + "\n";
+        help += "Help about " + ability_to_string(ability) + ".\n";
+        help += Formatter::italic() + get_ability_description(ability) + "\n";
         this->advance(character, help);
         return true;
     }
@@ -123,14 +123,14 @@ ProcessNewAttributes::process(Character * character, ArgumentHandler & args)
             if (result < lowerBound)
             {
                 this->advance(character,
-                              ability.toString() + " can't go below " +
+                              ability_to_string(ability) + " can't go below " +
                               ToString(lowerBound) + ".");
                 return false;
             }
             else if (result > upperBound)
             {
                 this->advance(character,
-                              ability.toString() + " can't go above " +
+                              ability_to_string(ability) + " can't go above " +
                               ToString(upperBound) + ".");
             }
             // Decrease the remaining points.
@@ -166,10 +166,10 @@ ProcessNewAttributes::advance(Character * character, const std::string & error)
     msg += "# " + Bold("Character's Attributes.") + "\n";
     for (auto ability : player->abilities)
     {
-        msg += "#    [" + ToString(ability.first.toUInt()) + "]";
-        msg += Align(ability.first.toString(), align::left, 15);
+        msg += "#    [" + ToString(static_cast<unsigned int>(ability.first)) + "]";
+        msg += Align(ability_to_string(ability.first), align::left, 15);
         msg += " : ";
-        msg += ToString(player->getAbility(Ability::Strength, false));
+        msg += ToString(player->getAbility(ability.first, false));
     }
     msg += "#\n";
     msg += "# Remaining Points: ";

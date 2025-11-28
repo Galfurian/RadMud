@@ -157,7 +157,7 @@ bool DoSkillList(Character * character, ArgumentHandler & /*args*/)
         TableRow row;
         row.push_back(ToString(skill->vnum));
         row.push_back(skill->name);
-        row.push_back(skill->ability.toString());
+        row.push_back(ability_to_string(skill->ability));
         // Add the row to the table.
         table.addRow(row);
     }

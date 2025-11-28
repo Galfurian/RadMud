@@ -487,7 +487,7 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     // STRENGTH
     for (auto const & ability:player->abilities)
     {
-        msg += "    " + MAG(ability.first.getAbbreviation()) + "    ";
+        msg += "    " + MAG(get_ability_abbreviation(ability.first)) + "    ";
         msg += Align(player->getAbility(ability.first),
                            align::right, 5) + "(";
         msg += Align(player->getAbilityModifier(ability.first),
@@ -553,7 +553,7 @@ bool DoEffects(Character * character, ArgumentHandler &)
     for (auto const & it : character->effectManager.getAbilityMod())
     {
         msg += "\t";
-        msg += Align(it.first.getAbbreviation(), align::left, 30);
+        msg += Align(get_ability_abbreviation(it.first), align::left, 30);
         msg += Align(it.second, align::right, 5) + "\n";
     }
     msg += "Combat Modifiers\n";

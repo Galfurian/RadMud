@@ -1,5 +1,5 @@
 /// @file   ability.hpp
-/// @brief  Define the ability class.
+/// @brief  Define the ability enum.
 /// @author Enrico Fraccaroli
 /// @date   Nov 19 2016
 /// @copyright
@@ -22,57 +22,32 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+#include <string>
 
 /// @brief The list of character's abilities.
-class Ability : public BaseEnumerator
+enum class Ability
 {
-public:
-    /// The possible abilities.
-    enum Enum {
-        None,
-        Strength,
-        Agility,
-        Perception,
-        Constitution,
-        Intelligence
-    };
-
-    /// @brief Constructor.
-    Ability()
-        : BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    Ability(const unsigned int &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    Ability(const Enum &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from string.
-    Ability(const std::string &_value);
-
-    /// @brief Returns the ability as string.
-    std::string toString() const override;
-
-    /// @brief Returns the abbreviation of the ability name.
-    std::string getAbbreviation() const;
-
-    /// @brief Returns the description of the ability.
-    std::string getDescription() const;
-
-    /// @brief Return the modifier of the given ability.
-    /// @param _value The total ability value.
-    /// @return The ability modifier.
-    static unsigned int getModifier(const unsigned int &_value);
+    None,
+    Strength,
+    Agility,
+    Perception,
+    Constitution,
+    Intelligence
 };
+
+/// @brief Returns the ability as string.
+std::string ability_to_string(Ability ability);
+
+/// @brief Returns the ability from string.
+Ability string_to_ability(const std::string & value);
+
+/// @brief Returns the abbreviation of the ability name.
+std::string get_ability_abbreviation(Ability ability);
+
+/// @brief Returns the description of the ability.
+std::string get_ability_description(Ability ability);
+
+/// @brief Return the modifier of the given ability.
+/// @param value The total ability value.
+/// @return The ability modifier.
+unsigned int get_ability_modifier(unsigned int value);

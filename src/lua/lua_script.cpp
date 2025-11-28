@@ -22,61 +22,61 @@
 /// DEALINGS IN THE SOFTWARE.
 
 #include "lua/lua_script.hpp"
-#include "structure/structureUtils.hpp"
 #include "item/subitem/armorItem.hpp"
 #include "item/subitem/corpseItem.hpp"
 #include "item/subitem/currencyItem.hpp"
-#include "model/submodel/toolModel.hpp"
 #include "item/subitem/shopItem.hpp"
-#include "utilities/logger.hpp"
-#include "structure/algorithms/AStar/aStar.hpp"
+#include "model/submodel/toolModel.hpp"
 #include "mud.hpp"
+#include "structure/algorithms/AStar/aStar.hpp"
+#include "structure/structureUtils.hpp"
+#include "utilities/logger.hpp"
 
 #include <LuaBridge/Vector.h>
 
 namespace luabridge
 {
 
-    /// @brief Class used to register an enumerator inside the lua environment.
-    template <class T>
-    class EnumToLua
+/// @brief Class used to register an enumerator inside the lua environment.
+template <class T>
+class EnumToLua
+{
+protected:
+    lua_State *const L;
+
+public:
+    /// @brief Constructor.
+    EnumToLua(char const *name, lua_State *const L)
+        : L(L)
     {
-    protected:
-        lua_State *const L;
-
-    public:
-        /// @brief Constructor.
-        EnumToLua(char const *name, lua_State *const L) : L(L)
-        {
-            // Get the entity inside the lua environment.
-            lua_getglobal(L, name);
-        }
-
-        /// @brief Add an enumerator.
-        template <class EnumValue>
-        EnumToLua<T> &addEnum(char const *name, EnumValue value)
-        {
-            // Push the name of the enum.
-            lua_pushstring(L, name);
-            // Push the value.
-            lua_pushinteger(L, value);
-            lua_rawset(L, -3);
-            return *this;
-        }
-    };
-
-    template <class T>
-    EnumToLua<T> beginEnum(char const *name, lua_State *const L)
-    {
-        return EnumToLua<T>(name, L);
+        // Get the entity inside the lua environment.
+        lua_getglobal(L, name);
     }
+
+    /// @brief Add an enumerator.
+    template <class EnumValue>
+    EnumToLua<T> &addEnum(char const *name, EnumValue value)
+    {
+        // Push the name of the enum.
+        lua_pushstring(L, name);
+        // Push the value.
+        lua_pushinteger(L, value);
+        lua_rawset(L, -3);
+        return *this;
+    }
+};
+
+template <class T>
+EnumToLua<T> beginEnum(char const *name, lua_State *const L)
+{
+    return EnumToLua<T>(name, L);
+}
 
 } // namespace luabridge
 
 void LuaLog(std::string message)
 {
-    if (!message.empty())
-    {
+    if (!message.empty()) {
         Logger::log(LogLevel::Info, "[LUA]" + message);
     }
 }
@@ -91,28 +91,20 @@ void LuaStopScript()
     throw std::logic_error("Stopped Lua Script");
 }
 
-Item *LuaLoadItem(Character *character,
-                  int vnumModel,
-                  int vnumMaterial,
-                  unsigned int qualityValue)
+Item *LuaLoadItem(Character *character, int vnumModel, int vnumMaterial, unsigned int qualityValue)
 {
     auto model = Mud::instance().findItemModel(vnumModel);
-    if (model == nullptr)
-    {
+    if (model == nullptr) {
         Logger::log(LogLevel::Error, "Can't find model : %s", vnumModel);
         return nullptr;
     }
     auto composition = Mud::instance().findMaterial(vnumMaterial);
-    if (composition == nullptr)
-    {
+    if (composition == nullptr) {
         Logger::log(LogLevel::Error, "Can't find material :", vnumMaterial);
         return nullptr;
     }
     // Create the item.
-    auto item = model->createItem(character->getName(),
-                                  composition,
-                                  true,
-                                  ItemQuality(qualityValue));
+    auto item = model->createItem(character->getName(), composition, true, ItemQuality(qualityValue));
     return item;
 }
 
@@ -121,16 +113,13 @@ std::vector<Direction> LuaFindPath(
     Room *destination)
 {
     std::vector<Direction> path;
-    if ((character == nullptr) || (destination == nullptr))
-    {
+    if ((character == nullptr) || (destination == nullptr)) {
         return path;
     }
-    if (character->room == nullptr)
-    {
+    if (character->room == nullptr) {
         return path;
     }
-    auto RoomCheckFunction = [&](Room *from, Room *to)
-    {
+    auto RoomCheckFunction = [&](Room *from, Room *to) {
         // Preapre the options.
         MovementOptions options;
         options.character = character;
@@ -139,16 +128,11 @@ std::vector<Direction> LuaFindPath(
         return StructUtils::checkConnection(options, from, to, error);
     };
     // Find the path from the actor to the target.
-    AStar<Room *> aStar(RoomCheckFunction,
-                        StructUtils::getRoomDistance,
-                        StructUtils::roomsAreEqual,
-                        StructUtils::getNeighbours);
+    AStar<Room *> aStar(RoomCheckFunction, StructUtils::getRoomDistance, StructUtils::roomsAreEqual, StructUtils::getNeighbours);
     std::vector<Room *> visitedRooms;
-    if (aStar.findPath(character->room, destination, visitedRooms))
-    {
+    if (aStar.findPath(character->room, destination, visitedRooms)) {
         Coordinates previous = character->room->coord;
-        for (auto node : visitedRooms)
-        {
+        for (auto node : visitedRooms) {
             path.emplace_back(StructUtils::getDirection(previous, node->coord));
             previous = node->coord;
         }
@@ -167,8 +151,7 @@ std::vector<Room *> LuaGetRoomsInSight(Character *character)
         character->room->area->fov(
             character->room->coord,
             character->getViewDistance());
-    for (auto coordinates : validCoordinates)
-    {
+    for (auto coordinates : validCoordinates) {
         result.emplace_back(character->room->area->getRoom(coordinates));
     }
     return result;
@@ -188,8 +171,7 @@ std::vector<Character *> LuaGetCharactersInSight(Character *character)
             exceptions,
             character->room->coord,
             character->getViewDistance());
-    for (auto characterInSight : charactersInSight)
-    {
+    for (auto characterInSight : charactersInSight) {
         result.emplace_back(characterInSight);
     }
     return result;
@@ -208,8 +190,7 @@ std::vector<Item *> LuaGetItemsInSight(Character *character)
             exceptions,
             character->room->coord,
             character->getViewDistance());
-    for (auto itemInSight : itemsInSight)
-    {
+    for (auto itemInSight : itemsInSight) {
         result.emplace_back(itemInSight);
     }
     return result;
@@ -489,14 +470,14 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
     // -------------------------------------------------------------------------
     // ABILITY
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Ability, BaseEnumerator>("Ability")
-        .endClass();
-    luabridge::beginEnum<Ability>("Ability", L)
-        .addEnum("Strength", Ability::Strength)
-        .addEnum("Agility", Ability::Agility)
-        .addEnum("Perception", Ability::Perception)
-        .addEnum("Constitution", Ability::Constitution)
-        .addEnum("Intelligence", Ability::Intelligence);
+        .beginNamespace("Ability")
+        .addConstant("None", static_cast<int>(Ability::None))
+        .addConstant("Strength", static_cast<int>(Ability::Strength))
+        .addConstant("Agility", static_cast<int>(Ability::Agility))
+        .addConstant("Perception", static_cast<int>(Ability::Perception))
+        .addConstant("Constitution", static_cast<int>(Ability::Constitution))
+        .addConstant("Intelligence", static_cast<int>(Ability::Intelligence))
+        .endNamespace();
     // -------------------------------------------------------------------------
     // CHARACTER_POSTURE
     luabridge::getGlobalNamespace(L)
@@ -668,12 +649,8 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
     // -------------------------------------------------------------------------
     // Load the script.
     auto path = Mud::instance().getMudSystemDirectory() + "lua/" + scriptFile;
-    if (luaL_dofile(L, path.c_str()) != LUABRIDGE_LUA_OK)
-    {
-        Logger::log(LogLevel::Error,
-                    "Can't open script %s.", scriptFile);
-        Logger::log(LogLevel::Error,
-                    "Error :%s",
-                    std::string(lua_tostring(L, -1)));
+    if (luaL_dofile(L, path.c_str()) != LUABRIDGE_LUA_OK) {
+        Logger::log(LogLevel::Error, "Can't open script %s.", scriptFile);
+        Logger::log(LogLevel::Error, "Error :%s", std::string(lua_tostring(L, -1)));
     }
 }

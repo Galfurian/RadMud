@@ -132,7 +132,7 @@ bool LoadSkill(ResultSet * result)
     }
     Logger::log(LogLevel::Debug, "\t%s%s%s",
                 Align(skill->name, align::left, 25),
-                Align(skill->ability.toString(), align::left, 15),
+                Align(ability_to_string(skill->ability), align::left, 15),
                 skill->description);
     return true;
 }
@@ -184,7 +184,7 @@ bool LoadSkillAbilityModifier(ResultSet * result)
     // Log it.
     Logger::log(LogLevel::Debug, "\t%s%s%s",
                 Align(skill->name, align::left, 25),
-                Align(ability.toString(), align::left, 35),
+                Align(ability_to_string(ability), align::left, 35),
                 Align(modifier, align::left, 35));
     return true;
 }
@@ -252,7 +252,7 @@ bool LoadSkillKnowledge(ResultSet * result)
     }
     auto knowledgeNumber = result->getNextUnsignedInteger();
     auto knowledge = Knowledge(knowledgeNumber);
-    if (knowledge == Ability::None)
+    if (knowledge == Knowledge::None)
     {
         throw SQLiteException("Can't find the knowledge " +
                               ToString(knowledgeNumber));
@@ -485,7 +485,7 @@ bool LoadRaceBaseAbility(ResultSet * result)
     Logger::log(LogLevel::Debug,
                 "\t%s%s%s",
                 Align(race->name, align::left, 25),
-                Align(ability.toString(), align::left, 25),
+                Align(ability_to_string(ability), align::left, 25),
                 value);
     return true;
 }

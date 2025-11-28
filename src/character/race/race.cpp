@@ -100,7 +100,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Race &rhs)
     json::jnode_t abilities_node;
     abilities_node.set_type(json::JTYPE_OBJECT);
     for (auto const &it : rhs.abilities) {
-        abilities_node[it.first.toString()] << it.second;
+        abilities_node[ability_to_string(it.first)] << it.second;
     }
     lhs["abilities"] = abilities_node;
     // Serialize the body parts.
@@ -138,7 +138,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Race &rhs)
         for (auto it = abilities_node.pbegin(); it != abilities_node.pend(); ++it) {
             unsigned int ability_vnum;
             it->second >> ability_vnum;
-            rhs.abilities[Ability(it->first)] = ability_vnum;
+            rhs.abilities[string_to_ability(it->first)] = ability_vnum;
         }
     }
     // Deserialize the body parts.

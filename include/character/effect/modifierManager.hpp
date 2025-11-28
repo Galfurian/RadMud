@@ -280,7 +280,7 @@ public:
             for (auto const & it2 : modAbility)
             {
                 msg += "\t\t";
-                msg += Align(it2.first.getAbbreviation(),
+                msg += Align(get_ability_abbreviation(it2.first),
                              align::left, 30);
                 msg += Align(it2.second, align::right, 5) + "\n";
             }

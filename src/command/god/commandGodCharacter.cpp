@@ -451,6 +451,6 @@ bool DoPlayerModAttr(Character * character, ArgumentHandler & args)
     character->sendMsg("You have successfully %s by %s the %s of the target.",
                        std::string((modifier > 0) ? "increased" : "decreased"),
                        ToString(modifier),
-                       ability.toString());
+                       ability_to_string(ability));
     return true;
 }
