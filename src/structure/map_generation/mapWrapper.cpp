@@ -156,7 +156,7 @@ bool MapWrapper::buildMap(const std::string & mapName,
                 auto backward = std::make_shared<Exit>(
                     neighbour.second->room,
                     cell->room,
-                    neighbour.first.getOpposite(),
+                    get_opposite(neighbour.first),
                     0);
                 // Insert in both the rooms exits the connection.
                 if (cell->room->addExit(forward))

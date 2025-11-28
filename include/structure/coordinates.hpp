@@ -27,7 +27,7 @@
 
 #include <string>
 
-class Direction;
+#include "enumerators/direction.hpp"
 
 /// Used to create and manage a tridimensional coordinates.
 class Coordinates

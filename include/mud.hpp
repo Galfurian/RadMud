@@ -32,51 +32,50 @@
 /// Indicator for no socket connected.
 #define NO_SOCKET_COMMUNICATION -1
 
-#include "creation/building.hpp"
-#include "creation/production.hpp"
-#include "creation/profession.hpp"
-#include "character/skill/skill.hpp"
-#include "updater/updater.hpp"
-#include "item/writing.hpp"
-#include "creation/material.hpp"
-#include "structure/area.hpp"
-#include "structure/room.hpp"
+#include "character/bodyPart.hpp"
 #include "character/mobile.hpp"
 #include "character/player.hpp"
+#include "character/skill/skill.hpp"
 #include "command/command.hpp"
+#include "creation/building.hpp"
+#include "creation/material.hpp"
+#include "creation/production.hpp"
+#include "creation/profession.hpp"
 #include "database/sqliteDbms.hpp"
-#include "utilities/table.hpp"
-#include "utilities/formatter.hpp"
-#include "structure/terrain/terrain.hpp"
-#include "character/bodyPart.hpp"
+#include "enumerators/direction.hpp"
+#include "item/writing.hpp"
+#include "structure/area.hpp"
 #include "structure/map_generation/heightMap.hpp"
 #include "structure/map_generation/mapWrapper.hpp"
-
-class Direction;
+#include "structure/room.hpp"
+#include "structure/terrain/terrain.hpp"
+#include "updater/updater.hpp"
+#include "utilities/formatter.hpp"
+#include "utilities/table.hpp"
 
 #ifdef __linux__
 
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/in.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <fcntl.h>
 
 #elif __APPLE__
 
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/in.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <fcntl.h>
 
 #elif __CYGWIN__
 
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/in.h>
 #include <sys/select.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <fcntl.h>
 
 #elif _WIN32
 
@@ -147,14 +146,14 @@ public:
     Mud(Mud &&) = delete;
 
     /// @brief Disable Copy assign.
-    Mud & operator=(Mud const &) = delete;
+    Mud &operator=(Mud const &) = delete;
 
     /// @brief Disable Move assign.
-    Mud & operator=(Mud &&) = delete;
+    Mud &operator=(Mud &&) = delete;
 
     /// @brief Get the singleton istance of the Mud.
     /// @return The static and uniquie Mud variable.
-    static Mud & instance();
+    static Mud &instance();
 
     /// List of all connected players.
     std::list<Player *> mudPlayers;
@@ -195,7 +194,7 @@ public:
     /// Mud news.
     std::map<std::string, std::string> mudNews;
     /// List of commands (eg. look, quit, north etc.).
-    std::vector<std::shared_ptr<Command> > mudCommands;
+    std::vector<std::shared_ptr<Command>> mudCommands;
     /// Map of buildings schematic.
     std::map<int, std::shared_ptr<Building>> mudBuildings;
     /// Map of buildings schematic.
@@ -233,85 +232,85 @@ public:
     /// @{
 
     /// Add a player to the list of connected players.
-    void addPlayer(Player * player);
+    void addPlayer(Player *player);
 
     /// Remove a player from the list of connected players.
-    bool remPlayer(Player * player);
+    bool remPlayer(Player *player);
 
     /// Add the given mobile to the mud.
-    bool addMobile(Mobile * mobile);
+    bool addMobile(Mobile *mobile);
 
     /// Remove the given mobile from the mud.
-    bool remMobile(Mobile * mobile);
+    bool remMobile(Mobile *mobile);
 
     /// Add the given item to the mud.
-    bool addItem(Item * item);
+    bool addItem(Item *item);
 
     /// Remove the given item from the mud.
-    bool remItem(Item * item);
+    bool remItem(Item *item);
 
     /// Add the given room to the mud.
-    bool addRoom(Room * room);
+    bool addRoom(Room *room);
 
     /// Remove the given room from the mud.
-    bool remRoom(Room * room);
+    bool remRoom(Room *room);
 
     /// Add the given corpse to the mud.
-    bool addCorpse(Item * corpse);
+    bool addCorpse(Item *corpse);
 
     /// Remove the given corpse from the mud.
-    bool remCorpse(Item * corpse);
+    bool remCorpse(Item *corpse);
 
     /// Add the given item model to the mud.
     bool addItemModel(std::shared_ptr<ItemModel> model);
 
     /// Add the given area to the mud.
-    bool addArea(Area * area);
+    bool addArea(Area *area);
 
     /// Add the given race to the mud.
-    bool addRace(Race * race);
+    bool addRace(Race *race);
 
     /// Add the given faction to the mud.
-    bool addFaction(Faction * faction);
+    bool addFaction(Faction *faction);
 
     /// Add the given skill to the mud.
     bool addSkill(std::shared_ptr<Skill> skill);
 
     /// Add the given writing to the mud.
-    bool addWriting(Writing * writing);
+    bool addWriting(Writing *writing);
 
     /// Add the given material to the mud.
-    bool addMaterial(Material * material);
+    bool addMaterial(Material *material);
 
     /// Add the given profession to the mud.
-    bool addProfession(Profession * profession);
+    bool addProfession(Profession *profession);
 
     /// Add the given production to the mud.
-    bool addProduction(Production * production);
+    bool addProduction(Production *production);
 
     /// Add the given liquid to the mud.
-    bool addLiquid(Liquid * liquid);
+    bool addLiquid(Liquid *liquid);
 
     /// Add the given travel point to the mud.
-    bool addTravelPoint(Room * source, Room * target);
+    bool addTravelPoint(Room *source, Room *target);
 
     /// Add a command to the mud.
-    void addCommand(const std::shared_ptr<Command> & command);
+    void addCommand(const std::shared_ptr<Command> &command);
 
     /// Add a building to the mud.
-    bool addBuilding(const std::shared_ptr<Building> & building);
+    bool addBuilding(const std::shared_ptr<Building> &building);
 
     /// Add a terrain to the mud.
-    bool addTerrain(const std::shared_ptr<Terrain> & terrain);
+    bool addTerrain(const std::shared_ptr<Terrain> &terrain);
 
     /// Add a body part to the mud.
-    bool addBodyPart(const std::shared_ptr<BodyPart> & bodyPart);
+    bool addBodyPart(const std::shared_ptr<BodyPart> &bodyPart);
 
     /// @brief Add an height map.
-    bool addHeightMap(const std::shared_ptr<HeightMap> & heightMap);
+    bool addHeightMap(const std::shared_ptr<HeightMap> &heightMap);
 
     /// @brief Add a generated map.
-    bool addGeneratedMap(const std::shared_ptr<MapWrapper> & mapWrapper);
+    bool addGeneratedMap(const std::shared_ptr<MapWrapper> &mapWrapper);
     ///@}
 
     /// @defgroup GlobalFind Global Find Functions
@@ -320,64 +319,64 @@ public:
     /// @{
 
     /// Find an item given its vnum.
-    Item * findItem(int vnum);
+    Item *findItem(int vnum);
 
     /// Find an item model given its vnum.
     std::shared_ptr<ItemModel> findItemModel(int vnum);
 
     /// Find a mobile given his id.
-    Mobile * findMobile(std::string id);
+    Mobile *findMobile(std::string id);
 
     /// Find a player given his name.
-    Player * findPlayer(const std::string & name);
+    Player *findPlayer(const std::string &name);
 
     /// Find an area given its vnum.
-    Area * findArea(int vnum);
+    Area *findArea(int vnum);
 
     /// Find a room given its vnum.
-    Room * findRoom(int vnum);
+    Room *findRoom(int vnum);
 
     /// Find a race given its vnum.
-    Race * findRace(int vnum);
+    Race *findRace(int vnum);
 
     /// Find a race given its name.
-    Race * findRace(std::string name);
+    Race *findRace(std::string name);
 
     /// Find a faction given its vnum.
-    Faction * findFaction(int vnum);
+    Faction *findFaction(int vnum);
 
     /// Find a faction given its name.
-    Faction * findFaction(std::string name);
+    Faction *findFaction(std::string name);
 
     /// Find a skill given its vnum.
-    std::shared_ptr<Skill> findSkill(const VnumType & vnum);
+    std::shared_ptr<Skill> findSkill(const VnumType &vnum);
 
     /// Find a writing given its vnum.
-    Writing * findWriting(int vnum);
+    Writing *findWriting(int vnum);
 
     /// Find a corpse given its vnum.
-    Item * findCorpse(int vnum);
+    Item *findCorpse(int vnum);
 
     /// Find a material given its vnum.
-    Material * findMaterial(int vnum);
+    Material *findMaterial(int vnum);
 
     /// Find a profession given its vnum.
-    Profession * findProfession(unsigned int vnum);
+    Profession *findProfession(unsigned int vnum);
 
     /// Find a profession given its command.
-    Profession * findProfession(std::string command);
+    Profession *findProfession(std::string command);
 
     /// Find a production given its vnum.
-    Production * findProduction(int vnum);
+    Production *findProduction(int vnum);
 
     /// Find a production given its name.
-    Production * findProduction(std::string name);
+    Production *findProduction(std::string name);
 
     /// Find a liquid given its vnum.
-    Liquid * findLiquid(const unsigned int & vnum);
+    Liquid *findLiquid(const unsigned int &vnum);
 
     /// Find the destination room of a travel point, given its starting room.
-    Room * findTravelPoint(Room * room);
+    Room *findTravelPoint(Room *room);
 
     /// Find a building given its name.
     std::shared_ptr<Building> findBuilding(std::string name);
@@ -392,7 +391,7 @@ public:
     std::shared_ptr<BodyPart> findBodyPart(unsigned int vnum);
 
     /// Find a height map.
-    std::shared_ptr<HeightMap> findHeightMap(const unsigned int & vnum);
+    std::shared_ptr<HeightMap> findHeightMap(const unsigned int &vnum);
     ///@}
 
     /// @brief Main processing loop.
@@ -407,13 +406,13 @@ public:
     /// @param socket The socket that has to be checked.
     /// @return <b>True</b> if the socket is still open,<br>
     ///         <b>False</b> Otherwise.
-    bool checkSocket(const int & socket) const;
+    bool checkSocket(const int &socket) const;
 
     /// @brief Close a socket port.
     /// @param socket The port to close.
     /// @return <b>True</b> if the socket has been closed,<br>
     ///         <b>False</b> Otherwise.
-    bool closeSocket(const int & socket) const;
+    bool closeSocket(const int &socket) const;
 
     /// @brief Get the totale uptime.
     /// @return The uptime.
@@ -437,7 +436,7 @@ public:
     /// @brief Send message to all connected players.
     /// @param level   The level of the player: 0 normal, 1 admin.
     /// @param message Message to send.
-    void broadcastMsg(const int & level, const std::string & message) const;
+    void broadcastMsg(const int &level, const std::string &message) const;
 
     /// @brief Provides the name of the measure for weight.
     std::string getWeightMeasure() const;
@@ -458,10 +457,10 @@ private:
     bool processNewConnection();
 
     /// @brief Handle all the comunication descriptor, it's the socket value.
-    void setupDescriptor(Player * player);
+    void setupDescriptor(Player *player);
 
     /// @brief Process player communications.
-    void processDescriptor(Player * player);
+    void processDescriptor(Player *player);
 
     /// @brief Load data from the database.
     /// @return <b>True</b> if there are no errors,<br>

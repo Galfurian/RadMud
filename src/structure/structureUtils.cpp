@@ -284,9 +284,9 @@ std::vector<Room *> selectRooms(Area * area,
         {
             if (room->terrain->vnum != options.terrain->vnum) return;
         }
-        for (auto dir : Direction::getAllDirections())
+        for (auto dir : get_all_directions())
         {
-            auto next(area->getRoom(room->coord + dir));
+            auto next(area->getRoom(room->coord + get_coordinates(dir)));
             if (next)
             {
                 RecursiveSelectRooms(next);

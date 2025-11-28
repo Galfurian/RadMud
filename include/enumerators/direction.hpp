@@ -1,5 +1,5 @@
 /// @file   direction.hpp
-/// @brief  Define the direction class.
+/// @brief  Define the direction enum.
 /// @author Enrico Fraccaroli
 /// @date   Nov 19 2016
 /// @copyright
@@ -23,62 +23,33 @@
 #pragma once
 
 #include <vector>
-#include "baseEnumerator.hpp"
+#include <string>
 
 class Coordinates;
 
 /// Provides a complete control on directions.
-class Direction :
-    public BaseEnumerator
+enum class Direction
 {
-public:
-    /// The possible directions.
-    enum Enum
-    {
-        None,   ///< No direction.
-        North,  ///< North.
-        South,  ///< South.
-        West,   ///< West.
-        East,   ///< East.
-        Up,     ///< Up.
-        Down    ///< Down.
-    };
-
-    /// @brief Constructor.
-    Direction() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    Direction(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    Direction(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from string.
-    /// @param _direction The string representing the direction.
-    /// @param exact      If the string must be the exact name of the direction.
-    Direction(const std::string & _direction, const bool & exact = true);
-
-    /// @brief Returns the direction as string.
-    std::string toString() const override;
-
-    /// @brief Returns the opposite direction.
-    Direction getOpposite() const;
-
-    /// @brief Returns the direction in terms of coordinates.
-    Coordinates getCoordinates() const;
-
-    /// Vector with all the possible directions.
-    static std::vector<Direction> getAllDirections();
+    None,   ///< No direction.
+    North,  ///< North.
+    South,  ///< South.
+    West,   ///< West.
+    East,   ///< East.
+    Up,     ///< Up.
+    Down    ///< Down.
 };
+
+/// @brief Returns the direction as string.
+std::string direction_to_string(Direction direction);
+
+/// @brief Returns the direction from string.
+Direction string_to_direction(const std::string & value);
+
+/// @brief Returns the opposite direction.
+Direction get_opposite(Direction direction);
+
+/// @brief Returns the direction in terms of coordinates.
+Coordinates get_coordinates(Direction direction);
+
+/// Vector with all the possible directions.
+std::vector<Direction> get_all_directions();

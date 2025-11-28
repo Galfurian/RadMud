@@ -31,7 +31,7 @@ class Item;
 
 class Character;
 
-class Direction;
+#include "enumerators/direction.hpp"
 
 class Terrain;
 

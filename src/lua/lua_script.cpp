@@ -494,16 +494,15 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
     // -------------------------------------------------------------------------
     // DIRECTION
     luabridge::getGlobalNamespace(L)
-        .deriveClass<Direction, BaseEnumerator>("Direction")
-        .endClass();
-    luabridge::beginEnum<Direction>("Direction", L)
-        .addEnum("None", Direction::None)
-        .addEnum("North", Direction::North)
-        .addEnum("South", Direction::South)
-        .addEnum("West", Direction::West)
-        .addEnum("East", Direction::East)
-        .addEnum("Up", Direction::Up)
-        .addEnum("Down", Direction::Down);
+        .beginNamespace("Direction")
+        .addConstant("None", static_cast<int>(Direction::None))
+        .addConstant("North", static_cast<int>(Direction::North))
+        .addConstant("South", static_cast<int>(Direction::South))
+        .addConstant("West", static_cast<int>(Direction::West))
+        .addConstant("East", static_cast<int>(Direction::East))
+        .addConstant("Up", static_cast<int>(Direction::Up))
+        .addConstant("Down", static_cast<int>(Direction::Down))
+        .endNamespace();
     // -------------------------------------------------------------------------
     // ITEM_QUALITY
     luabridge::getGlobalNamespace(L)

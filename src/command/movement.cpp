@@ -98,17 +98,17 @@ bool DoDirection(Character * character, Direction direction)
         if (character->posture == CharacterPosture::Stand)
         {
             character->sendMsg("You start to go %s...\n",
-                               direction.toString());
+                               direction_to_string(direction));
         }
         else if (character->posture == CharacterPosture::Crouch)
         {
             character->sendMsg("You move crouching towards %s...\n",
-                               direction.toString());
+                               direction_to_string(direction));
         }
         else if (character->posture == CharacterPosture::Prone)
         {
             character->sendMsg("You begin to crawl to %s...\n",
-                               direction.toString());
+                               direction_to_string(direction));
         }
         return true;
     }

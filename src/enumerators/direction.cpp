@@ -1,5 +1,5 @@
 /// @file   direction.cpp
-/// @brief  Implements the direction class methods.
+/// @brief  Implements the direction functions.
 /// @author Enrico Fraccaroli
 /// @date   Nov 19 2016
 /// @copyright
@@ -24,83 +24,81 @@
 #include "structure/coordinates.hpp"
 #include "utilities/utils.hpp"
 
-Direction::Direction(const std::string & _direction, const bool & exact) :
-    BaseEnumerator()
+std::string direction_to_string(Direction direction)
 {
-    if ((exact && (_direction == "north")) ||
-        (!exact && BeginWith("north", _direction)))
+    switch (direction)
     {
-        value = North;
+        case Direction::North:
+            return "north";
+        case Direction::South:
+            return "south";
+        case Direction::West:
+            return "west";
+        case Direction::East:
+            return "east";
+        case Direction::Up:
+            return "up";
+        case Direction::Down:
+            return "down";
+        default:
+            return "none";
     }
-    else if ((exact && (_direction == "south")) ||
-             (!exact && BeginWith("south", _direction)))
-    {
-        value = South;
-    }
-    else if ((exact && (_direction == "west")) ||
-             (!exact && BeginWith("west", _direction)))
-    {
-        value = West;
-    }
-    else if ((exact && (_direction == "east")) ||
-             (!exact && BeginWith("east", _direction)))
-    {
-        value = East;
-    }
-    else if ((exact && (_direction == "up")) ||
-             (!exact && BeginWith("up", _direction)))
-    {
-        value = Up;
-    }
-    else if ((exact && (_direction == "down")) ||
-             (!exact && BeginWith("down", _direction)))
-    {
-        value = Down;
-    }
-    else value = None;
 }
 
-std::string Direction::toString() const
+Direction string_to_direction(const std::string & value)
 {
-    if (value == Direction::North) return "north";
-    if (value == Direction::South) return "south";
-    if (value == Direction::West) return "west";
-    if (value == Direction::East) return "east";
-    if (value == Direction::Up) return "up";
-    if (value == Direction::Down) return "down";
-    return "none";
+    if (value == "north") return Direction::North;
+    else if (value == "south") return Direction::South;
+    else if (value == "west") return Direction::West;
+    else if (value == "east") return Direction::East;
+    else if (value == "up") return Direction::Up;
+    else if (value == "down") return Direction::Down;
+    else return Direction::None;
 }
 
-Direction Direction::getOpposite() const
+Direction get_opposite(Direction direction)
 {
-    if (value == Direction::North) return Direction::South;
-    if (value == Direction::South) return Direction::North;
-    if (value == Direction::West) return Direction::East;
-    if (value == Direction::East) return Direction::West;
-    if (value == Direction::Up) return Direction::Down;
-    if (value == Direction::Down) return Direction::Up;
-    return Direction::None;
+    switch (direction)
+    {
+        case Direction::North:
+            return Direction::South;
+        case Direction::South:
+            return Direction::North;
+        case Direction::West:
+            return Direction::East;
+        case Direction::East:
+            return Direction::West;
+        case Direction::Up:
+            return Direction::Down;
+        case Direction::Down:
+            return Direction::Up;
+        default:
+            return Direction::None;
+    }
 }
 
-Coordinates Direction::getCoordinates() const
+Coordinates get_coordinates(Direction direction)
 {
-    if (value == Direction::North) return Coordinates(0, +1, 0);
-    if (value == Direction::South) return Coordinates(0, -1, 0);
-    if (value == Direction::West) return Coordinates(-1, 0, 0);
-    if (value == Direction::East) return Coordinates(+1, 0, 0);
-    if (value == Direction::Up) return Coordinates(0, 0, +1);
-    if (value == Direction::Down) return Coordinates(0, 0, -1);
-    return Coordinates(0, 0, 0);
+    switch (direction)
+    {
+        case Direction::North:
+            return Coordinates(0, +1, 0);
+        case Direction::South:
+            return Coordinates(0, -1, 0);
+        case Direction::West:
+            return Coordinates(-1, 0, 0);
+        case Direction::East:
+            return Coordinates(+1, 0, 0);
+        case Direction::Up:
+            return Coordinates(0, 0, +1);
+        case Direction::Down:
+            return Coordinates(0, 0, -1);
+        default:
+            return Coordinates(0, 0, 0);
+    }
 }
 
-std::vector<Direction> Direction::getAllDirections()
+std::vector<Direction> get_all_directions()
 {
-    std::vector<Direction> directions;
-    directions.emplace_back(Direction::North);
-    directions.emplace_back(Direction::South);
-    directions.emplace_back(Direction::West);
-    directions.emplace_back(Direction::East);
-    directions.emplace_back(Direction::Up);
-    directions.emplace_back(Direction::Down);
-    return directions;
+    return {Direction::North, Direction::South, Direction::West, Direction::East, Direction::Up, Direction::Down};
 }

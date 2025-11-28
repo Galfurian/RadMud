@@ -43,7 +43,7 @@ class ToolType;
 
 class Room;
 
-class Direction;
+#include "enumerators/direction.hpp"
 
 class Production;
 

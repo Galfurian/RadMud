@@ -124,7 +124,7 @@ bool DoOpen(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if the character want to open something in another direction.
-    auto direction = Direction(args[0].getContent(), false);
+    auto direction = string_to_direction(args[0].getContent());
     if (direction != Direction::None)
     {
         // If the room is NOT lit and HAS some exits, pick a random direction.
@@ -279,7 +279,7 @@ bool DoClose(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if the character want to open something in another direction.
-    auto direction = Direction(args[0].getContent(), false);
+    auto direction = string_to_direction(args[0].getContent());
     if (direction != Direction::None)
     {
         // If the room is NOT lit and HAS some exits, pick a random direction.

@@ -614,7 +614,7 @@ bool LoadExit(ResultSet * result)
         throw SQLiteException(
             "Can't find destination " + ToString(destinationVnum));
     }
-    Direction direction(directionValue);
+    Direction direction = static_cast<Direction>(directionValue);
     if (direction == Direction::None)
     {
         throw SQLiteException(

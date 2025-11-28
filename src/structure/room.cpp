@@ -692,7 +692,7 @@ bool ConnectRoom(Room * room)
     for (auto direction : directions)
     {
         // Get the coordinate modifier.
-        auto coordinates = room->coord + direction.getCoordinates();
+        auto coordinates = room->coord + get_coordinates(direction);
         // Get the room at the given coordinates.
         auto near = room->area->getRoom(coordinates);
         if (near != nullptr)
@@ -703,7 +703,7 @@ bool ConnectRoom(Room * room)
                                                   direction, 0);
             auto backward = std::make_shared<Exit>(near,
                                                    room,
-                                                   direction.getOpposite(),
+                                                   get_opposite(direction),
                                                    0);
             generatedExits.push_back(forward);
             generatedExits.push_back(backward);
@@ -720,7 +720,7 @@ bool ConnectRoom(Room * room)
             std::vector<std::string> arguments;
             arguments.push_back(ToString(forward->source->vnum));
             arguments.push_back(ToString(forward->destination->vnum));
-            arguments.push_back(ToString(forward->direction.toUInt()));
+            arguments.push_back(ToString(static_cast<int>(forward->direction)));
             arguments.push_back(ToString(forward->flags));
             if (!SQLiteDbms::instance().insertInto("Exit", arguments))
             {
@@ -731,7 +731,7 @@ bool ConnectRoom(Room * room)
             std::vector<std::string> arguments2;
             arguments2.push_back(ToString(backward->source->vnum));
             arguments2.push_back(ToString(backward->destination->vnum));
-            arguments2.push_back(ToString(backward->direction.toUInt()));
+            arguments2.push_back(ToString(static_cast<int>(backward->direction)));
             arguments2.push_back(ToString(backward->flags));
             if (!SQLiteDbms::instance().insertInto("Exit", arguments2))
             {

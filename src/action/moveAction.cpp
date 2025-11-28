@@ -125,9 +125,9 @@ ActionStatus MoveAction::perform()
     MoveCharacterTo(
         actor,
         destination,
-        actor->getNameCapital() + " goes " + direction.toString() + ".\n",
+        actor->getNameCapital() + " goes " + direction_to_string(direction) + ".\n",
         actor->getNameCapital() + " arrives from " +
-        direction.getOpposite().toString() + ".\n");
+        direction_to_string(get_opposite(direction)) + ".\n");
     return ActionStatus::Finished;
 }
 

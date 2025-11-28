@@ -251,7 +251,7 @@ bool SaveRoomExit(const std::shared_ptr<Exit> & roomExit)
     std::vector<std::string> args;
     args.push_back(ToString(roomExit->source->vnum));
     args.push_back(ToString(roomExit->destination->vnum));
-    args.push_back(ToString(roomExit->direction.toUInt()));
+    args.push_back(ToString(static_cast<int>(roomExit->direction)));
     args.push_back(ToString(roomExit->flags));
     // Start a transaction.
     SQLiteDbms::instance().beginTransaction();

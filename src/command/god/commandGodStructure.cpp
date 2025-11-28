@@ -64,7 +64,7 @@ bool DoFindPath(Character * character, ArgumentHandler & args)
     {
         auto direction = StructUtils::getDirection(previous, node->coord);
         previous = node->coord;
-        character->sendMsg("    %s\n", direction.toString());
+        character->sendMsg("    %s\n", direction_to_string(direction));
     }
     character->sendMsg("\n");
     return true;
@@ -89,14 +89,14 @@ bool DoRoomCreate(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if it's a direction.
-    auto direction = Direction(args[0].getContent(), true);
+    auto direction = string_to_direction(args[0].getContent());
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
         return false;
     }
     // Get the coordinate modifier.
-    auto targetCoord = currentRoom->coord + direction.getCoordinates();
+    auto targetCoord = currentRoom->coord + get_coordinates(direction);
     if (!currentArea->inBoundaries(targetCoord))
     {
         character->sendMsg("Its outside the boundaries.\n");
@@ -135,14 +135,14 @@ bool DoRoomDelete(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if it's a direction.
-    auto direction = Direction(args[0].getContent(), true);
+    auto direction = string_to_direction(args[0].getContent());
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
         return false;
     }
     // Get the coordinate modifier.
-    auto coord = character->room->coord + direction.getCoordinates();
+    auto coord = character->room->coord + get_coordinates(direction);
     if (!currentArea->inBoundaries(coord))
     {
         character->sendMsg("Outside the boundaries.\n");

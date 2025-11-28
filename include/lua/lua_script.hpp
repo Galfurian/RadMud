@@ -36,7 +36,7 @@ class Character;
 
 class Room;
 
-class Direction;
+#include "enumerators/direction.hpp"
 
 namespace luabridge
 {

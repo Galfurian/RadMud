@@ -223,9 +223,9 @@ bool Chase::moveTowardsTarget()
         actor,
         nextRoom,
         actor->getNameCapital() + " goes " +
-        direction.toString() + ".\n",
+        direction_to_string(direction) + ".\n",
         actor->getNameCapital() + " arrives from " +
-        direction.getOpposite().toString() + ".\n"))
+        direction_to_string(get_opposite(direction)) + ".\n"))
     {
         Logger::log(LogLevel::Debug, "Cannot move to the next room.");
         return false;

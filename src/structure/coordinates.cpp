@@ -82,7 +82,7 @@ Coordinates Coordinates::operator+(const Coordinates & right) const
 
 Coordinates Coordinates::operator+(const Direction & right) const
 {
-    return Coordinates(x, y, z) + right.getCoordinates();
+    return Coordinates(x, y, z) + get_coordinates(right);
 }
 
 int Coordinates::square() const

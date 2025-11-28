@@ -53,7 +53,7 @@ bool ProcessInput::process(Character * character, ArgumentHandler & args)
     // Erase the first element which is the command.
     args.erase(0);
     // Check if it's a direction.
-    auto direction = Direction(command, false);
+    auto direction = string_to_direction(command);
     if (direction != Direction::None)
     {
         DoDirection(character, direction);
