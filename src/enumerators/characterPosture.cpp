@@ -22,79 +22,92 @@
 
 #include "enumerators/characterPosture.hpp"
 
-CharacterPosture::CharacterPosture(const std::string &_value)
-    : BaseEnumerator()
+std::string character_posture_to_string(CharacterPosture posture)
 {
-    if (_value == "Stand")
-        value = Stand;
-    else if (_value == "Crouch")
-        value = Crouch;
-    else if (_value == "Prone")
-        value = Prone;
-    else if (_value == "Sit")
-        value = Sit;
-    else if (_value == "Rest")
-        value = Rest;
-    else if (_value == "Sleep")
-        value = Sleep;
+    switch (posture)
+    {
+        case CharacterPosture::Stand:
+            return "Stand";
+        case CharacterPosture::Crouch:
+            return "Crouch";
+        case CharacterPosture::Prone:
+            return "Prone";
+        case CharacterPosture::Sit:
+            return "Sit";
+        case CharacterPosture::Rest:
+            return "Rest";
+        case CharacterPosture::Sleep:
+            return "Sleep";
+        default:
+            return "None";
+    }
+}
+
+CharacterPosture string_to_character_posture(const std::string & value)
+{
+    if (value == "Stand")
+        return CharacterPosture::Stand;
+    else if (value == "Crouch")
+        return CharacterPosture::Crouch;
+    else if (value == "Prone")
+        return CharacterPosture::Prone;
+    else if (value == "Sit")
+        return CharacterPosture::Sit;
+    else if (value == "Rest")
+        return CharacterPosture::Rest;
+    else if (value == "Sleep")
+        return CharacterPosture::Sleep;
     else
-        value = None;
+        return CharacterPosture::None;
 }
 
-std::string CharacterPosture::toString() const
+std::string get_character_posture_action(CharacterPosture posture)
 {
-    if (value == Stand)
-        return "Stand";
-    else if (value == Crouch)
-        return "Crouch";
-    else if (value == Prone)
-        return "Prone";
-    else if (value == Sit)
-        return "Sit";
-    else if (value == Rest)
-        return "Rest";
-    else if (value == Sleep)
-        return "Sleep";
-    else
-        return "None";
+    switch (posture)
+    {
+        case CharacterPosture::Stand:
+            return "standing";
+        case CharacterPosture::Crouch:
+            return "crouched";
+        case CharacterPosture::Prone:
+            return "prone";
+        case CharacterPosture::Sit:
+            return "sitting";
+        case CharacterPosture::Rest:
+            return "resting";
+        case CharacterPosture::Sleep:
+            return "sleeping";
+        default:
+            return "none";
+    }
 }
 
-std::string CharacterPosture::getAction() const
+uint32_t get_character_posture_speed(CharacterPosture posture)
 {
-    if (value == Stand)
-        return "standing";
-    else if (value == Crouch)
-        return "crouched";
-    else if (value == Prone)
-        return "prone";
-    else if (value == Sit)
-        return "sitting";
-    else if (value == Rest)
-        return "resting";
-    else if (value == Sleep)
-        return "sleeping";
-    else
-        return "none";
+    switch (posture)
+    {
+        case CharacterPosture::Stand:
+            return 2;
+        case CharacterPosture::Crouch:
+            return 4;
+        case CharacterPosture::Prone:
+            return 6;
+        default:
+            return 0;
+    }
 }
 
-uint32_t CharacterPosture::getSpeed() const
+uint32_t get_character_posture_regain_modifier(CharacterPosture posture)
 {
-    if (value == Stand)
-        return 2;
-    if (value == Crouch)
-        return 4;
-    if (value == Prone)
-        return 6;
-    return 0;
-}
-
-uint32_t CharacterPosture::getRegainModifier() const
-{
-    if (value == Sit)
-        return 1;
-    if (value == Rest)
-        return 2;
-    if (value == Sleep)
-        return 4;
-    return 0;
+    switch (posture)
+    {
+        case CharacterPosture::Sit:
+            return 1;
+        case CharacterPosture::Rest:
+            return 2;
+        case CharacterPosture::Sleep:
+            return 4;
+        default:
+            return 0;
+    }
 }

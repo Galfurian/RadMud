@@ -510,7 +510,7 @@ bool DoStatistics(Character * character, ArgumentHandler & /*args*/)
     msg += "You " + BLD(player->getHungerCondition()) + ".\n";
     msg += "You " + BLD(player->getThirstCondition()) + ".\n";
     // Add the posture.
-    msg += "You are " + BLD(player->posture.getAction()) + ".\n\n";
+    msg += "You are " + BLD(get_character_posture_action(player->posture)) + ".\n\n";
     // [IF EXIST] Add the current action.
     if (player->getAction() != ActionType::Wait)
     {

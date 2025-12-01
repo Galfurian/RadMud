@@ -22,54 +22,32 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
 #include <cstdint>
+#include <string>
 
 /// The postures of a character.
-class CharacterPosture : public BaseEnumerator
+enum class CharacterPosture
 {
-public:
-    /// List of possible character's posture.
-    enum Enum {
-        None,   ///< The character has no posture.
-        Stand,  ///< The character it's standing.
-        Crouch, ///< The character it's crouched.
-        Prone,  ///< The character it's prone.
-        Sit,    ///< The character it's sitting.
-        Rest,   ///< The character it's lying down.
-        Sleep,  ///< The character is sleeping.
-    };
-
-    /// @brief Constructor.
-    CharacterPosture()
-        : BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    CharacterPosture(const unsigned int &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    CharacterPosture(const Enum &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    CharacterPosture(const std::string &_value);
-
-    /// @brief Returns the character posture as string.
-    std::string toString() const override;
-
-    /// @brief Returns the action describing the posture.
-    std::string getAction() const;
-
-    uint32_t getSpeed() const;
-
-    uint32_t getRegainModifier() const;
+    None,   ///< The character has no posture.
+    Stand,  ///< The character it's standing.
+    Crouch, ///< The character it's crouched.
+    Prone,  ///< The character it's prone.
+    Sit,    ///< The character it's sitting.
+    Rest,   ///< The character it's lying down.
+    Sleep,  ///< The character is sleeping.
 };
+
+/// @brief Returns the character posture as string.
+std::string character_posture_to_string(CharacterPosture posture);
+
+/// @brief Returns the character posture from string.
+CharacterPosture string_to_character_posture(const std::string & value);
+
+/// @brief Returns the action describing the posture.
+std::string get_character_posture_action(CharacterPosture posture);
+
+/// @brief Returns the speed modifier for the posture.
+uint32_t get_character_posture_speed(CharacterPosture posture);
+
+/// @brief Returns the regain modifier for the posture.
+uint32_t get_character_posture_regain_modifier(CharacterPosture posture);

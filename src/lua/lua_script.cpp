@@ -481,16 +481,15 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
     // -------------------------------------------------------------------------
     // CHARACTER_POSTURE
     luabridge::getGlobalNamespace(L)
-        .deriveClass<CharacterPosture, BaseEnumerator>("CharacterPosture")
-        .endClass();
-    luabridge::beginEnum<CharacterPosture>("CharacterPosture", L)
-        .addEnum("None", CharacterPosture::None)
-        .addEnum("Stand", CharacterPosture::Stand)
-        .addEnum("Crouch", CharacterPosture::Crouch)
-        .addEnum("Sit", CharacterPosture::Sit)
-        .addEnum("Prone", CharacterPosture::Prone)
-        .addEnum("Rest", CharacterPosture::Rest)
-        .addEnum("Sleep", CharacterPosture::Sleep);
+        .beginNamespace("CharacterPosture")
+        .addConstant("None", static_cast<int>(CharacterPosture::None))
+        .addConstant("Stand", static_cast<int>(CharacterPosture::Stand))
+        .addConstant("Crouch", static_cast<int>(CharacterPosture::Crouch))
+        .addConstant("Sit", static_cast<int>(CharacterPosture::Sit))
+        .addConstant("Prone", static_cast<int>(CharacterPosture::Prone))
+        .addConstant("Rest", static_cast<int>(CharacterPosture::Rest))
+        .addConstant("Sleep", static_cast<int>(CharacterPosture::Sleep))
+        .endNamespace();
     // -------------------------------------------------------------------------
     // DIRECTION
     luabridge::getGlobalNamespace(L)

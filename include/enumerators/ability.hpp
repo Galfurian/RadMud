@@ -22,11 +22,11 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 /// @brief The list of character's abilities.
-enum class Ability
-{
+enum class Ability : uint8_t {
     None,
     Strength,
     Agility,
@@ -39,7 +39,7 @@ enum class Ability
 std::string ability_to_string(Ability ability);
 
 /// @brief Returns the ability from string.
-Ability string_to_ability(const std::string & value);
+Ability string_to_ability(const std::string &value);
 
 /// @brief Returns the abbreviation of the ability name.
 std::string get_ability_abbreviation(Ability ability);

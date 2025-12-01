@@ -134,7 +134,7 @@ ActionStatus MoveAction::perform()
 unsigned int MoveAction::getCooldown()
 {
     assert(actor && "Actor is nullptr");
-    return actor->posture.getSpeed();
+    return get_character_posture_speed(actor->posture);
 }
 
 unsigned int MoveAction::getConsumedStamina(Character * character)

@@ -178,7 +178,7 @@ void Character::getSheet(Table & sheet) const
     {
         sheet.addRow({"Room", "NONE"});
     }
-    sheet.addRow({"Posture", posture.toString()});
+    sheet.addRow({"Posture", character_posture_to_string(posture)});
     sheet.addRow({"Action", this->getAction()->getDescription()});
     sheet.addDivider();
     sheet.addRow({"## Equipment", "## Inventory"});
@@ -238,7 +238,7 @@ std::string Character::getStaticDesc() const
     desc += " is";
     if (posture != CharacterPosture::Stand)
     {
-        desc += " " + posture.getAction();
+        desc += " " + get_character_posture_action(posture);
     }
     desc += " here";
     if (this->getAction() != ActionType::Wait)
@@ -819,7 +819,7 @@ std::string Character::getHungerCondition() const
 void Character::updateHealth()
 {
     auto constMod(this->getAbilityModifier(Ability::Constitution));
-    auto regainMod(posture.getRegainModifier());
+    auto regainMod(get_character_posture_regain_modifier(posture));
     auto effectMod(
         static_cast<unsigned int>(
             effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
@@ -829,7 +829,7 @@ void Character::updateHealth()
 void Character::updateStamina()
 {
     auto constMod(this->getAbilityModifier(Ability::Constitution));
-    auto regainMod(posture.getRegainModifier());
+    auto regainMod(get_character_posture_regain_modifier(posture));
     auto effectMod(
         static_cast<unsigned int>(
             effectManager.getStatusMod(StatusModifier::HealthRegeneration)));
