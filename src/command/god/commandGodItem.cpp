@@ -52,11 +52,12 @@ bool DoItemCreate(Character * character, ArgumentHandler & args)
         return false;
     }
     // Get the quality.
-    auto quality = ItemQuality(ItemQuality::Normal);
+    auto quality = ItemQuality::Normal;
     if (args.size() == 3)
     {
-        quality = ItemQuality(ToNumber<unsigned int>(args[2].getContent()));
-        if (quality == ItemQuality::None)
+        auto qualityValue = ToNumber<unsigned int>(args[2].getContent());
+        quality = static_cast<ItemQuality>(qualityValue);
+        if (quality == ItemQuality::None && qualityValue != 0)
         {
             character->sendMsg("Not a valid quality.\n");
             return false;

@@ -22,48 +22,25 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+#include <cstdint>
+#include <string>
 
 /// The quality of an item.
-class ItemQuality : public BaseEnumerator
+enum class ItemQuality : uint8_t
 {
-public:
-    /// List of possible quality values.
-    enum Enum {
-        None,       ///< No quality.
-        Disastrous, ///< Disastrous quality.
-        Poor,       ///< Poor quality.
-        Normal,     ///< Normal quality.
-        Fine,       ///< Fine quality.
-        Masterful   ///< Masterful quality.
-    };
-
-    /// @brief Constructor.
-    ItemQuality()
-        : BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    ItemQuality(const unsigned int &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    ItemQuality(const Enum &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    ItemQuality(const std::string &_value);
-
-    /// @brief Returns the quality as string.
-    std::string toString() const override;
-
-    /// @brief Returns the quality modifier.
-    double getModifier() const;
+    None,       ///< No quality.
+    Disastrous, ///< Disastrous quality.
+    Poor,       ///< Poor quality.
+    Normal,     ///< Normal quality.
+    Fine,       ///< Fine quality.
+    Masterful   ///< Masterful quality.
 };
+
+/// @brief Returns the item quality as string.
+std::string item_quality_to_string(ItemQuality quality);
+
+/// @brief Returns the item quality from string.
+ItemQuality string_to_item_quality(const std::string & value);
+
+/// @brief Returns the quality modifier.
+double get_item_quality_modifier(ItemQuality quality);

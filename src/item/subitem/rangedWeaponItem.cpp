@@ -74,7 +74,7 @@ unsigned int RangedWeaponItem::getMinDamage() const
     // Add the base value.
     auto valBase = this->model->toRangedWeapon()->minDamage;
     // Evaluate the modifier due to item's quality.
-    valBase = SafeSum(valBase, valBase * quality.getModifier());
+    valBase = SafeSum(valBase, valBase * get_item_quality_modifier(quality));
     // Evaluate the modifier due to item's condition.
     valBase = SafeSum(valBase, valBase * this->getConditionModifier());
     // Evaluate the mean.
@@ -95,7 +95,7 @@ unsigned int RangedWeaponItem::getMaxDamage() const
     // Add the base value.
     auto valBase = this->model->toRangedWeapon()->maxDamage;
     // Evaluate the modifier due to item's quality.
-    valBase = SafeSum(valBase, valBase * quality.getModifier());
+    valBase = SafeSum(valBase, valBase * get_item_quality_modifier(quality));
     // Evaluate the modifier due to item's condition.
     valBase = SafeSum(valBase, valBase * this->getConditionModifier());
     // Evaluate the mean.
@@ -116,7 +116,7 @@ int RangedWeaponItem::getRange() const
     // Add the base value.
     auto valBase = this->model->toRangedWeapon()->range;
     // Evaluate the modifier due to item's quality.
-    valBase += static_cast<int>(valBase * quality.getModifier());
+    valBase += static_cast<int>(valBase * get_item_quality_modifier(quality));
     // Evaluate the modifier due to item's condition.
     valBase += static_cast<int>(valBase * this->getConditionModifier());
     // Evaluate the mean.

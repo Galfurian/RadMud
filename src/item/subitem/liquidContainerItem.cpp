@@ -110,7 +110,7 @@ double LiquidContainerItem::getTotalSpace() const
     // The base space.
     double spaceBase = model->toLiquidContainer()->maxWeight;
     // Evaluate the result.
-    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
+    return ((spaceBase + (spaceBase * get_item_quality_modifier(quality))) / 2);
 }
 
 double LiquidContainerItem::getUsedSpace() const

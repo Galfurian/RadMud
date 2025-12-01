@@ -47,7 +47,7 @@ unsigned int ArmorItem::getArmorClass() const
     // Add the base armor class.
     auto acBase = this->model->toArmor()->armorClass;
     // Evaluate the modifier due to item's quality.
-    auto acQuality = static_cast<unsigned int>(acBase * quality.getModifier());
+    auto acQuality = static_cast<unsigned int>(acBase * get_item_quality_modifier(quality));
     // Evaluate the modifier due to item's condition.
     auto acCondition = static_cast<unsigned int>(acBase *
                                                  this->getConditionModifier());

@@ -25,21 +25,20 @@
 #include <string>
 
 /// @brief The list of combat modifiers.
-enum class CombatModifier : uint8_t
-{
+enum class CombatModifier : uint8_t {
     None,
-    UnarmedHitRoll,             ///< Unarmed Hit
-    UnarmedDamage,              ///< Unarmed Damage
-    MeleeWeaponHitRoll = 10,    ///< Melee Weapon Hit
-    MeleeWeaponDamage = 11,     ///< Melee Weapon Damage
-    RangedWeaponHitRoll = 20,   ///< Ranged Weapon Hit
-    RangedWeaponDamage = 21,    ///< Ranged Weapon Damage
-    RangedAimSpeed = 22,        ///< Ranged Weapon Aim Speed
-    ArmorClass = 30,            ///< Armor Class
+    UnarmedHitRoll,           ///< Unarmed Hit
+    UnarmedDamage,            ///< Unarmed Damage
+    MeleeWeaponHitRoll  = 10, ///< Melee Weapon Hit
+    MeleeWeaponDamage   = 11, ///< Melee Weapon Damage
+    RangedWeaponHitRoll = 20, ///< Ranged Weapon Hit
+    RangedWeaponDamage  = 21, ///< Ranged Weapon Damage
+    RangedAimSpeed      = 22, ///< Ranged Weapon Aim Speed
+    ArmorClass          = 30, ///< Armor Class
 };
 
 /// @brief Returns the combat modifier as string.
 std::string combat_modifier_to_string(CombatModifier modifier);
 
 /// @brief Returns the combat modifier from string.
-CombatModifier string_to_combat_modifier(const std::string & value);
+CombatModifier string_to_combat_modifier(const std::string &value);

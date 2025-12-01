@@ -22,50 +22,58 @@
 
 #include "enumerators/itemQuality.hpp"
 
-ItemQuality::ItemQuality(const std::string &_value)
-    : BaseEnumerator()
+std::string item_quality_to_string(ItemQuality quality)
 {
-    if (_value == "Disastrous")
-        value = ItemQuality::Disastrous;
-    else if (_value == "Poor")
-        value = ItemQuality::Poor;
-    else if (_value == "Normal")
-        value = ItemQuality::Normal;
-    else if (_value == "Fine")
-        value = ItemQuality::Fine;
-    else if (_value == "Masterful")
-        value = ItemQuality::Masterful;
-    else
-        value = ItemQuality::None;
-}
-
-std::string ItemQuality::toString() const
-{
-    if (value == ItemQuality::Disastrous)
+    switch (quality)
+    {
+    case ItemQuality::Disastrous:
         return "Disastrous";
-    if (value == ItemQuality::Poor)
+    case ItemQuality::Poor:
         return "Poor";
-    if (value == ItemQuality::Normal)
+    case ItemQuality::Normal:
         return "Normal";
-    if (value == ItemQuality::Fine)
+    case ItemQuality::Fine:
         return "Fine";
-    if (value == ItemQuality::Masterful)
+    case ItemQuality::Masterful:
         return "Masterful";
-    else
+    case ItemQuality::None:
+    default:
         return "None";
+    }
 }
 
-double ItemQuality::getModifier() const
+ItemQuality string_to_item_quality(const std::string & value)
 {
-    if (value == ItemQuality::Disastrous)
+    if (value == "Disastrous")
+        return ItemQuality::Disastrous;
+    else if (value == "Poor")
+        return ItemQuality::Poor;
+    else if (value == "Normal")
+        return ItemQuality::Normal;
+    else if (value == "Fine")
+        return ItemQuality::Fine;
+    else if (value == "Masterful")
+        return ItemQuality::Masterful;
+    else
+        return ItemQuality::None;
+}
+
+double get_item_quality_modifier(ItemQuality quality)
+{
+    switch (quality)
+    {
+    case ItemQuality::Disastrous:
         return 0.5;
-    if (value == ItemQuality::Poor)
+    case ItemQuality::Poor:
         return 0.75;
-    if (value == ItemQuality::Normal)
+    case ItemQuality::Normal:
         return 1.0;
-    if (value == ItemQuality::Fine)
+    case ItemQuality::Fine:
         return 1.50;
-    if (value == ItemQuality::Masterful)
+    case ItemQuality::Masterful:
         return 2.00;
-    return 0.25;
+    case ItemQuality::None:
+    default:
+        return 0.25;
+    }
 }

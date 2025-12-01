@@ -134,7 +134,7 @@ bool Item::updateOnDB()
     arguments.push_back(ToString(this->condition));
     arguments.push_back(ToString(this->maxCondition));
     arguments.push_back(ToString(this->composition->vnum));
-    arguments.push_back(ToString(this->quality.toUInt()));
+    arguments.push_back(ToString(static_cast<uint8_t>(this->quality)));
     arguments.push_back(ToString(this->flags));
     return SQLiteDbms::instance().insertInto("Item", arguments, false, true);
 }
@@ -176,7 +176,7 @@ void Item::getSheet(Table & sheet) const
     sheet.addRow({"condition", ToString(condition) + "/" +
                                ToString(maxCondition)});
     sheet.addRow({"Material", composition->name});
-    sheet.addRow({"Quality", quality.toString()});
+    sheet.addRow({"Quality", item_quality_to_string(quality)});
     sheet.addRow({"Weight", ToString(this->getWeight(true))});
     sheet.addRow({"Price", ToString(this->getPrice(true))});
     sheet.addRow({"Flags", ToString(flags)});
@@ -302,7 +302,7 @@ bool Item::hasKey(std::string key)
 double Item::getDecayRate() const
 {
     return (SafeLog10(maxCondition) / (composition->hardness * 10)) /
-           quality.getModifier();
+           get_item_quality_modifier(quality);
 }
 
 void Item::triggerDecay()

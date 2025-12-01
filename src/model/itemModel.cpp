@@ -159,7 +159,7 @@ Item * ItemModel::createItem(
         auto valBase = this->basePrice;
         // Evaluate the modifier due to item's quality.
         auto valQuality = static_cast<unsigned int>(valBase *
-                                                    itemQuality.getModifier());
+                                                    get_item_quality_modifier(itemQuality));
         // Evaluate the modifier due to item's material.
         auto valMaterial = static_cast<unsigned int>(valBase *
                                                      composition->getWorthModifier());
@@ -170,7 +170,7 @@ Item * ItemModel::createItem(
         // Evaluate the base value.
         auto valBase = this->baseWeight;
         // Evaluate the modifier due to item's quality.
-        auto valQuality = valBase * (1.0 / itemQuality.getModifier());
+        auto valQuality = valBase * (1.0 / get_item_quality_modifier(itemQuality));
         // Evaluate the modifier due to item's material.
         auto valMaterial = valBase * composition->getLightnessModifier();
         // Evaluate the result.
@@ -180,7 +180,7 @@ Item * ItemModel::createItem(
         // Evaluate the base value.
         auto valBase = this->condition;
         // Evaluate the modifier due to item's quality.
-        auto valQuality = valBase * itemQuality.getModifier();
+        auto valQuality = valBase * get_item_quality_modifier(itemQuality);
         // Evaluate the modifier due to item's material.
         auto valMaterial = valBase * composition->getHardnessModifier();
         // Evaluate the result.
@@ -258,7 +258,7 @@ bool ItemModel::replaceSymbols(
     if (itemQuality != ItemQuality::Normal)
     {
         modified = true;
-        FindAndReplace(&source, "&q", " " + ToLower(itemQuality.toString()));
+        FindAndReplace(&source, "&q", " " + ToLower(item_quality_to_string(itemQuality)));
     }
     else
     {

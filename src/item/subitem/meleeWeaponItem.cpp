@@ -55,7 +55,7 @@ unsigned int MeleeWeaponItem::getMinDamage() const
     auto valBase = this->model->toMeleeWeapon()->minDamage;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase *
-                                                quality.getModifier());
+                                                get_item_quality_modifier(quality));
     // Evaluate the modifier due to item's condition.
     auto valCondition = static_cast<unsigned int>(valBase *
                                                   this->getConditionModifier());
@@ -69,7 +69,7 @@ unsigned int MeleeWeaponItem::getMaxDamage() const
     auto valBase = this->model->toMeleeWeapon()->maxDamage;
     // Evaluate the modifier due to item's quality.
     auto valQuality = static_cast<unsigned int>(valBase *
-                                                quality.getModifier());
+                                                get_item_quality_modifier(quality));
     // Evaluate the modifier due to item's condition.
     auto valCondition = static_cast<unsigned int>(valBase *
                                                   this->getConditionModifier());

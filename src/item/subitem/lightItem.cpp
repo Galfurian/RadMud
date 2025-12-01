@@ -112,7 +112,7 @@ double LightItem::getTotalSpace() const
     // The base space.
     double spaceBase = model->toLight()->maxWeight;
     // Evaluate the result.
-    return ((spaceBase + (spaceBase * quality.getModifier())) / 2);
+    return ((spaceBase + (spaceBase * get_item_quality_modifier(quality))) / 2);
 }
 
 bool LightItem::isActive() const

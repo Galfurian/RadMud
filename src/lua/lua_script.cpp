@@ -519,15 +519,14 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
     // -------------------------------------------------------------------------
     // ITEM_QUALITY
     luabridge::getGlobalNamespace(L)
-        .deriveClass<ItemQuality, BaseEnumerator>("ItemQuality")
-        .endClass();
-    luabridge::beginEnum<ItemQuality>("ItemQuality", L)
-        .addEnum("None", ItemQuality::None)
-        .addEnum("Disastrous", ItemQuality::Disastrous)
-        .addEnum("Poor", ItemQuality::Poor)
-        .addEnum("Normal", ItemQuality::Normal)
-        .addEnum("Fine", ItemQuality::Fine)
-        .addEnum("Masterful", ItemQuality::Masterful);
+        .beginNamespace("ItemQuality")
+        .addConstant("None", static_cast<int>(ItemQuality::None))
+        .addConstant("Disastrous", static_cast<int>(ItemQuality::Disastrous))
+        .addConstant("Poor", static_cast<int>(ItemQuality::Poor))
+        .addConstant("Normal", static_cast<int>(ItemQuality::Normal))
+        .addConstant("Fine", static_cast<int>(ItemQuality::Fine))
+        .addConstant("Masterful", static_cast<int>(ItemQuality::Masterful))
+        .endNamespace();
     // -------------------------------------------------------------------------
     // KNOWLEDGE
     luabridge::getGlobalNamespace(L)

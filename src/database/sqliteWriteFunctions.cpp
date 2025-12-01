@@ -163,7 +163,7 @@ bool SaveItem(Item * item,
     args.push_back(ToString(item->condition));
     args.push_back(ToString(item->maxCondition));
     args.push_back(ToString(item->composition->vnum));
-    args.push_back(ToString(item->quality.toUInt()));
+    args.push_back(ToString(static_cast<uint8_t>(item->quality)));
     args.push_back(ToString(item->flags));
     if (!transaction)
     {
