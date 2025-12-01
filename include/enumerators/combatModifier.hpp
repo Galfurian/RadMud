@@ -41,4 +41,4 @@ enum class CombatModifier : uint8_t {
 std::string combat_modifier_to_string(CombatModifier modifier);
 
 /// @brief Returns the combat modifier from string.
-CombatModifier string_to_combat_modifier(const std::string &value);
+CombatModifier combat_modifier_from_string(const std::string &value);

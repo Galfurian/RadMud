@@ -40,7 +40,7 @@ enum class CharacterPosture : uint8_t {
 std::string character_posture_to_string(CharacterPosture posture);
 
 /// @brief Returns the character posture from string.
-CharacterPosture string_to_character_posture(const std::string &value);
+CharacterPosture character_posture_from_string(const std::string &value);
 
 /// @brief Returns the action describing the posture.
 std::string get_character_posture_action(CharacterPosture posture);

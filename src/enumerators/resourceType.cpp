@@ -51,7 +51,7 @@ std::string resource_type_to_string(ResourceType type)
     }
 }
 
-ResourceType string_to_resource_type(const std::string &str)
+ResourceType resource_type_from_string(const std::string &str)
 {
     std::string s = str;
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);

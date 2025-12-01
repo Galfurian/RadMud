@@ -43,7 +43,7 @@ enum class Direction : uint8_t {
 std::string direction_to_string(Direction direction);
 
 /// @brief Returns the direction from string.
-Direction string_to_direction(const std::string &value);
+Direction direction_from_string(const std::string &value);
 
 /// @brief Returns the opposite direction.
 Direction get_opposite(Direction direction);

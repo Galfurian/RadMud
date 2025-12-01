@@ -74,9 +74,9 @@ endif()
 FetchContent_Declare(
     json
     GIT_REPOSITORY "https://github.com/Galfurian/json.git"
-    GIT_SHALLOW    TRUE
-    GIT_PROGRESS   TRUE
-    GIT_TAG        main
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+    GIT_TAG main
 )
 FetchContent_GetProperties(json)
 if(NOT json_POPULATED)
@@ -159,7 +159,6 @@ add_executable(
     ${CMAKE_SOURCE_DIR}/src/database/sqliteLoadFunctions.cpp
     ${CMAKE_SOURCE_DIR}/src/database/sqliteWriteFunctions.cpp
     ${CMAKE_SOURCE_DIR}/src/database/dbFunctionsPlayer.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/baseEnumerator.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/ability.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/toolType.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/knowledge.cpp
@@ -167,7 +166,6 @@ add_executable(
     ${CMAKE_SOURCE_DIR}/src/enumerators/modelType.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/skillRank.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/liquidType.cpp
-
     ${CMAKE_SOURCE_DIR}/src/enumerators/itemQuality.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/materialType.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/resourceType.cpp

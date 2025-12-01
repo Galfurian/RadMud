@@ -24,88 +24,90 @@
 
 std::string ability_to_string(Ability ability)
 {
-    switch (ability)
-    {
-        case Ability::Strength:
-            return "Strength";
-        case Ability::Agility:
-            return "Agility";
-        case Ability::Perception:
-            return "Perception";
-        case Ability::Constitution:
-            return "Constitution";
-        case Ability::Intelligence:
-            return "Intelligence";
-        default:
-            return "none";
+    switch (ability) {
+    case Ability::Strength:
+        return "Strength";
+    case Ability::Agility:
+        return "Agility";
+    case Ability::Perception:
+        return "Perception";
+    case Ability::Constitution:
+        return "Constitution";
+    case Ability::Intelligence:
+        return "Intelligence";
+    default:
+        return "none";
     }
 }
 
-Ability string_to_ability(const std::string & value)
+Ability ability_from_string(const std::string &value)
 {
-    if (value == "Strength") return Ability::Strength;
-    else if (value == "Agility") return Ability::Agility;
-    else if (value == "Perception") return Ability::Perception;
-    else if (value == "Constitution") return Ability::Constitution;
-    else if (value == "Intelligence") return Ability::Intelligence;
-    else return Ability::None;
+    if (value == "Strength")
+        return Ability::Strength;
+    else if (value == "Agility")
+        return Ability::Agility;
+    else if (value == "Perception")
+        return Ability::Perception;
+    else if (value == "Constitution")
+        return Ability::Constitution;
+    else if (value == "Intelligence")
+        return Ability::Intelligence;
+    else
+        return Ability::None;
 }
 
 std::string get_ability_abbreviation(Ability ability)
 {
-    switch (ability)
-    {
-        case Ability::Strength:
-            return "Str";
-        case Ability::Agility:
-            return "Agi";
-        case Ability::Perception:
-            return "Per";
-        case Ability::Constitution:
-            return "Con";
-        case Ability::Intelligence:
-            return "Int";
-        default:
-            return "Nil";
+    switch (ability) {
+    case Ability::Strength:
+        return "Str";
+    case Ability::Agility:
+        return "Agi";
+    case Ability::Perception:
+        return "Per";
+    case Ability::Constitution:
+        return "Con";
+    case Ability::Intelligence:
+        return "Int";
+    default:
+        return "Nil";
     }
 }
 
 std::string get_ability_description(Ability ability)
 {
-    switch (ability)
-    {
-        case Ability::Strength:
-            return std::string() +
-                   "Strength is important for increasing the" +
-                   " Carrying Weight and satisfying the minimum" +
-                   " Strength requirements for some weapons and armors.";
-        case Ability::Agility:
-            return std::string() +
-                   "Besides increasing mobility in combat, it increases" +
-                   " the recharge speed of all the weapons, as well as" +
-                   " the ability to use light armor.";
-        case Ability::Perception:
-            return std::string() +
-                   "The ability to see, hear, taste and notice unusual" +
-                   " things. A high Perception is important for a" +
-                   " sharpshooter.";
-        case Ability::Constitution:
-            return std::string() +
-                   "Stamina and physical toughness. A character with" +
-                   " a high Endurance will survive where others may not.";
-        case Ability::Intelligence:
-            return std::string() +
-                   "Knowledge, wisdom and the value to think quickly," +
-                   " this attribute is important for any character.";
-        default:
-            return "none";
+    switch (ability) {
+    case Ability::Strength:
+        return std::string() +
+               "Strength is important for increasing the" +
+               " Carrying Weight and satisfying the minimum" +
+               " Strength requirements for some weapons and armors.";
+    case Ability::Agility:
+        return std::string() +
+               "Besides increasing mobility in combat, it increases" +
+               " the recharge speed of all the weapons, as well as" +
+               " the ability to use light armor.";
+    case Ability::Perception:
+        return std::string() +
+               "The ability to see, hear, taste and notice unusual" +
+               " things. A high Perception is important for a" +
+               " sharpshooter.";
+    case Ability::Constitution:
+        return std::string() +
+               "Stamina and physical toughness. A character with" +
+               " a high Endurance will survive where others may not.";
+    case Ability::Intelligence:
+        return std::string() +
+               "Knowledge, wisdom and the value to think quickly," +
+               " this attribute is important for any character.";
+    default:
+        return "none";
     }
 }
 
 unsigned int get_ability_modifier(unsigned int value)
 {
-    if (value <= 10)
-    {
+    if (value <= 10) {
         return 0;
     }
     return (value - 10) / 2;

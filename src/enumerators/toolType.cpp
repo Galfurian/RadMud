@@ -22,62 +22,61 @@
 
 #include "enumerators/toolType.hpp"
 
-ToolType::ToolType(const std::string &_value)
-    : BaseEnumerator()
+#include <string>
+#include <unordered_map>
+
+std::string tool_type_to_string(ToolType value)
 {
-    if (_value == "Pickaxe")
-        value = Pickaxe;
-    else if (_value == "WoodcutterAxe")
-        value = WoodcutterAxe;
-    else if (_value == "Saw")
-        value = Saw;
-    else if (_value == "PrecisionChisel")
-        value = PrecisionChisel;
-    else if (_value == "Hammer")
-        value = Hammer;
-    else if (_value == "PlaneChisel")
-        value = PlaneChisel;
-    else if (_value == "Forge")
-        value = Forge;
-    else if (_value == "Anvil")
-        value = Anvil;
-    else if (_value == "BlacksmithHammer")
-        value = BlacksmithHammer;
-    else if (_value == "Bellows")
-        value = Bellows;
-    else if (_value == "Crucible")
-        value = Crucible;
-    else if (_value == "Firelighter")
-        value = Firelighter;
-    else
-        value = None;
+    switch (value) {
+    case ToolType::Pickaxe:
+        return "Pickaxe";
+    case ToolType::WoodcutterAxe:
+        return "WoodcutterAxe";
+    case ToolType::Saw:
+        return "Saw";
+    case ToolType::PrecisionChisel:
+        return "PrecisionChisel";
+    case ToolType::Hammer:
+        return "Hammer";
+    case ToolType::PlaneChisel:
+        return "PlaneChisel";
+    case ToolType::Forge:
+        return "Forge";
+    case ToolType::Anvil:
+        return "Anvil";
+    case ToolType::BlacksmithHammer:
+        return "BlacksmithHammer";
+    case ToolType::Bellows:
+        return "Bellows";
+    case ToolType::Crucible:
+        return "Crucible";
+    case ToolType::Firelighter:
+        return "Firelighter";
+    case ToolType::None:
+        return "None";
+    default:
+        return "None";
+    }
 }
 
-std::string ToolType::toString() const
+ToolType tool_type_from_string(const std::string &str)
 {
-    if (value == Pickaxe)
-        return "Pickaxe";
-    if (value == WoodcutterAxe)
-        return "WoodcutterAxe";
-    if (value == Saw)
-        return "Saw";
-    if (value == PrecisionChisel)
-        return "PrecisionChisel";
-    if (value == Hammer)
-        return "Hammer";
-    if (value == PlaneChisel)
-        return "PlaneChisel";
-    if (value == Forge)
-        return "Forge";
-    if (value == Anvil)
-        return "Anvil";
-    if (value == BlacksmithHammer)
-        return "BlacksmithHammer";
-    if (value == Bellows)
-        return "Bellows";
-    if (value == Crucible)
-        return "Crucible";
-    if (value == Firelighter)
-        return "Firelighter";
-    return "None";
+    static const std::unordered_map<std::string, ToolType> map = {
+        {"Pickaxe", ToolType::Pickaxe},
+        {"WoodcutterAxe", ToolType::WoodcutterAxe},
+        {"Saw", ToolType::Saw},
+        {"PrecisionChisel", ToolType::PrecisionChisel},
+        {"Hammer", ToolType::Hammer},
+        {"PlaneChisel", ToolType::PlaneChisel},
+        {"Forge", ToolType::Forge},
+        {"Anvil", ToolType::Anvil},
+        {"BlacksmithHammer", ToolType::BlacksmithHammer},
+        {"Bellows", ToolType::Bellows},
+        {"Crucible", ToolType::Crucible},
+        {"Firelighter", ToolType::Firelighter},
+        {"None", ToolType::None}};
+    auto it = map.find(str);
+    if (it != map.end())
+        return it->second;
+    return ToolType::None;
 }

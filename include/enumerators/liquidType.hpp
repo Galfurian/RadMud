@@ -38,4 +38,4 @@ enum class LiquidType : uint8_t {
 std::string liquid_type_to_string(LiquidType type);
 
 /// @brief Returns the type of model from string.
-LiquidType string_to_liquid_type(const std::string &value);
+LiquidType liquid_type_from_string(const std::string &value);

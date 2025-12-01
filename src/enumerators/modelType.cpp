@@ -56,7 +56,7 @@ std::string model_type_to_string(ModelType type)
     }
 }
 
-ModelType string_to_model_type(const std::string &str)
+ModelType model_type_from_string(const std::string &str)
 {
     std::string s = str;
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);

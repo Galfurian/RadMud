@@ -138,7 +138,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Race &rhs)
         for (auto it = abilities_node.pbegin(); it != abilities_node.pend(); ++it) {
             unsigned int ability_vnum;
             it->second >> ability_vnum;
-            rhs.abilities[string_to_ability(it->first)] = ability_vnum;
+            rhs.abilities[ability_from_string(it->first)] = ability_vnum;
         }
     }
     // Deserialize the body parts.

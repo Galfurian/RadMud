@@ -89,7 +89,7 @@ bool DoRoomCreate(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if it's a direction.
-    auto direction = string_to_direction(args[0].getContent());
+    auto direction = direction_from_string(args[0].getContent());
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");
@@ -135,7 +135,7 @@ bool DoRoomDelete(Character * character, ArgumentHandler & args)
         return false;
     }
     // Check if it's a direction.
-    auto direction = string_to_direction(args[0].getContent());
+    auto direction = direction_from_string(args[0].getContent());
     if (direction == Direction::None)
     {
         character->sendMsg("You must insert a valid direction!\n");

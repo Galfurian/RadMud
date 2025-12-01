@@ -43,7 +43,7 @@ std::string material_type_to_string(MaterialType type)
     }
 }
 
-MaterialType string_to_material_type(const std::string & value)
+MaterialType material_type_from_string(const std::string & value)
 {
     if (value == "Metal") return MaterialType::Metal;
     else if (value == "Stone") return MaterialType::Stone;

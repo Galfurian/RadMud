@@ -27,11 +27,12 @@
 #include <vector>
 #include <map>
 #include "json/json.hpp"
+
 #include "enumerators/knowledge.hpp"
 #include "enumerators/resourceType.hpp"
+#include "enumerators/toolType.hpp"
 
-// Forward declarations.
-class ToolType;
+
 
 class ItemModel;
 

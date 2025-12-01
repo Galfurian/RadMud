@@ -23,38 +23,46 @@
 
 std::string combat_modifier_to_string(CombatModifier modifier)
 {
-    switch (modifier)
-    {
-        case CombatModifier::UnarmedHitRoll:
-            return "UnarmedHitRoll";
-        case CombatModifier::UnarmedDamage:
-            return "UnarmedDamage";
-        case CombatModifier::MeleeWeaponHitRoll:
-            return "MeleeWeaponHitRoll";
-        case CombatModifier::MeleeWeaponDamage:
-            return "MeleeWeaponDamage";
-        case CombatModifier::RangedWeaponHitRoll:
-            return "RangedWeaponHitRoll";
-        case CombatModifier::RangedWeaponDamage:
-            return "RangedWeaponDamage";
-        case CombatModifier::RangedAimSpeed:
-            return "RangedAimSpeed";
-        case CombatModifier::ArmorClass:
-            return "ArmorClass";
-        default:
-            return "None";
+    switch (modifier) {
+    case CombatModifier::UnarmedHitRoll:
+        return "UnarmedHitRoll";
+    case CombatModifier::UnarmedDamage:
+        return "UnarmedDamage";
+    case CombatModifier::MeleeWeaponHitRoll:
+        return "MeleeWeaponHitRoll";
+    case CombatModifier::MeleeWeaponDamage:
+        return "MeleeWeaponDamage";
+    case CombatModifier::RangedWeaponHitRoll:
+        return "RangedWeaponHitRoll";
+    case CombatModifier::RangedWeaponDamage:
+        return "RangedWeaponDamage";
+    case CombatModifier::RangedAimSpeed:
+        return "RangedAimSpeed";
+    case CombatModifier::ArmorClass:
+        return "ArmorClass";
+    default:
+        return "None";
     }
 }
 
-CombatModifier string_to_combat_modifier(const std::string & value)
+CombatModifier combat_modifier_from_string(const std::string &value)
 {
-    if (value == "UnarmedHitRoll") return CombatModifier::UnarmedHitRoll;
-    else if (value == "UnarmedDamage") return CombatModifier::UnarmedDamage;
-    else if (value == "MeleeWeaponHitRoll") return CombatModifier::MeleeWeaponHitRoll;
-    else if (value == "MeleeWeaponDamage") return CombatModifier::MeleeWeaponDamage;
-    else if (value == "RangedWeaponHitRoll") return CombatModifier::RangedWeaponHitRoll;
-    else if (value == "RangedWeaponDamage") return CombatModifier::RangedWeaponDamage;
-    else if (value == "RangedAimSpeed") return CombatModifier::RangedAimSpeed;
-    else if (value == "ArmorClass") return CombatModifier::ArmorClass;
-    else return CombatModifier::None;
+    if (value == "UnarmedHitRoll")
+        return CombatModifier::UnarmedHitRoll;
+    else if (value == "UnarmedDamage")
+        return CombatModifier::UnarmedDamage;
+    else if (value == "MeleeWeaponHitRoll")
+        return CombatModifier::MeleeWeaponHitRoll;
+    else if (value == "MeleeWeaponDamage")
+        return CombatModifier::MeleeWeaponDamage;
+    else if (value == "RangedWeaponHitRoll")
+        return CombatModifier::RangedWeaponHitRoll;
+    else if (value == "RangedWeaponDamage")
+        return CombatModifier::RangedWeaponDamage;
+    else if (value == "RangedAimSpeed")
+        return CombatModifier::RangedAimSpeed;
+    else if (value == "ArmorClass")
+        return CombatModifier::ArmorClass;
+    else
+        return CombatModifier::None;
 }

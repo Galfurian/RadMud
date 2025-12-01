@@ -36,7 +36,7 @@ std::string liquid_type_to_string(LiquidType type)
     }
 }
 
-LiquidType string_to_liquid_type(const std::string & value)
+LiquidType liquid_type_from_string(const std::string & value)
 {
     if (value == "Normal") return LiquidType::Normal;
     else if (value == "Alcohol") return LiquidType::Alcohol;

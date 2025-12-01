@@ -95,11 +95,11 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Production &rhs)
     lhs["assisted"] << rhs.assisted;
     lhs["outcome"] << rhs.outcome->vnum;
     lhs["quantity"] << rhs.quantity;
-    lhs["workbench"] << rhs.workbench.toUInt();
+    lhs["workbench"] << static_cast<uint8_t>(rhs.workbench);
     json::jnode_t tools_node;
     tools_node.set_type(json::JTYPE_ARRAY);
     for (auto const &it : rhs.tools) {
-        tools_node.add_element() << it.toUInt();
+        tools_node.add_element() << static_cast<uint8_t>(it);
     }
     lhs["tools"] = tools_node;
     json::jnode_t ingredients_node;
@@ -147,7 +147,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Production &rhs)
         for (auto it = ingredients_node.pbegin(); it != ingredients_node.pend(); ++it) {
             unsigned int quantity;
             it->second >> quantity;
-            rhs.ingredients[string_to_resource_type(it->first)] = quantity;
+            rhs.ingredients[resource_type_from_string(it->first)] = quantity;
         }
     }
     if(lhs.has_property("required_knowledge")){

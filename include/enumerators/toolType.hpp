@@ -22,52 +22,28 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+#include <cstdint>
+#include <string>
 
-/// @brief Used to determine the type of the tools.
-class ToolType : public BaseEnumerator
-{
-public:
-    /// The possible types of tools.
-    enum Enum {
-        None             = 0,
-        Pickaxe          = 1,
-        WoodcutterAxe    = 10,
-        Saw              = 11,
-        PrecisionChisel  = 12,
-        Hammer           = 20,
-        PlaneChisel      = 21,
-        Forge            = 30,
-        Anvil            = 31,
-        BlacksmithHammer = 32,
-        Bellows          = 33,
-        Crucible         = 34,
-        Firelighter      = 40
-    };
-
-    /// @brief Constructor.
-    ToolType()
-        : BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    ToolType(const unsigned int &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    ToolType(const Enum &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    ToolType(const std::string &_value);
-
-    /// @brief Returns the type of model as string.
-    std::string toString() const override;
+/// @brief Used to determine the type of the tools as enum class.
+enum class ToolType : uint8_t {
+    None             = 0,
+    Pickaxe          = 1,
+    WoodcutterAxe    = 10,
+    Saw              = 11,
+    PrecisionChisel  = 12,
+    Hammer           = 20,
+    PlaneChisel      = 21,
+    Forge            = 30,
+    Anvil            = 31,
+    BlacksmithHammer = 32,
+    Bellows          = 33,
+    Crucible         = 34,
+    Firelighter      = 40
 };
+
+/// @brief Converts a ToolType to its string representation.
+std::string tool_type_to_string(ToolType value);
+
+/// @brief Converts a string to ToolType. Returns ToolType::None if not found.
+ToolType tool_type_from_string(const std::string &str);

@@ -24,8 +24,9 @@
 
 #include "utilities/logger.hpp"
 
+
 ToolModel::ToolModel() :
-    toolType()
+    toolType(ToolType::None)
 {
     // Nothing to do.
 }
@@ -45,25 +46,29 @@ std::string ToolModel::getTypeName() const
     return "Tool";
 }
 
+
 bool ToolModel::setModel(const std::string & source)
 {
-    if (source.empty())
-    {
+    if (source.empty()) {
         Logger::log(LogLevel::Error,
                     "Function list is empty (%s).",
                     this->name);
         return false;
     }
     std::vector<std::string> functionList = SplitString(source, " ");
-    if (functionList.size() != 1)
-    {
+    if (functionList.size() != 1) {
         Logger::log(LogLevel::Error,
                     "Wrong number of parameters for Tool Model (%s).",
                     this->name);
         return false;
     }
-    this->toolType = static_cast<ToolType>(ToNumber<unsigned int>(
-        functionList[0]));
+    // Accept both numeric and string input for tool type.
+    try {
+        unsigned int val = ToNumber<unsigned int>(functionList[0]);
+        this->toolType = static_cast<ToolType>(val);
+    } catch (...) {
+        this->toolType = tool_type_from_string(functionList[0]);
+    }
     return true;
 }
 
@@ -77,19 +82,8 @@ void ToolModel::getSheet(Table & sheet) const
     sheet.addRow({"Tool Type", GetToolTypeName(this->toolType)});
 }
 
+
 std::string GetToolTypeName(ToolType type)
 {
-    if (type == ToolType::Pickaxe) return "Pickaxe";
-    if (type == ToolType::WoodcutterAxe) return "Woodcutter's Axe";
-    if (type == ToolType::Saw) return "Saw";
-    if (type == ToolType::PrecisionChisel) return "Precision Chisel";
-    if (type == ToolType::PlaneChisel) return "PickaPlane Chiselxe";
-    if (type == ToolType::Hammer) return "Hammer";
-    if (type == ToolType::Forge) return "Forge";
-    if (type == ToolType::Anvil) return "Anvil";
-    if (type == ToolType::BlacksmithHammer) return "Blacksmith Hammer";
-    if (type == ToolType::Bellows) return "Bellows";
-    if (type == ToolType::Crucible) return "Crucible";
-    if (type == ToolType::Firelighter) return "Firelighter";
-    return "No Tool Type";
+    return tool_type_to_string(type);
 }

@@ -70,7 +70,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Building &rhs)
     json::jnode_t tools_node;
     tools_node.set_type(json::JTYPE_ARRAY);
     for (auto const &it : rhs.tools) {
-        tools_node.add_element() << it.toUInt();
+        tools_node.add_element() << static_cast<uint8_t>(it);
     }
     lhs["tools"] = tools_node;
     // Serialize the ingredients.
@@ -115,7 +115,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Building &rhs)
         for (auto it = ingredients_node.pbegin(); it != ingredients_node.pend(); ++it) {
             unsigned int quantity;
             it->second >> quantity;
-            rhs.ingredients[string_to_resource_type(it->first)] = quantity;
+            rhs.ingredients[resource_type_from_string(it->first)] = quantity;
         }
     }
     // Deserialize the required knowledge.

@@ -59,8 +59,8 @@ public:
     {
         // Push the name of the enum.
         lua_pushstring(L, name);
-        // Push the value.
-        lua_pushinteger(L, value);
+        // Push the value as integer (cast for enum class).
+        lua_pushinteger(L, static_cast<lua_Integer>(value));
         lua_rawset(L, -3);
         return *this;
     }
@@ -461,12 +461,6 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
     // -------------------------------------------------------------------------
     // The Enumerators.
     // -------------------------------------------------------------------------
-    // BASE_ENUMERATOR
-    luabridge::getGlobalNamespace(L)
-        .beginClass<BaseEnumerator>("BaseEnumerator")
-        .addFunction("toUInt", &BaseEnumerator::toUInt)
-        .addFunction("toString", &BaseEnumerator::toString)
-        .endClass();
     // -------------------------------------------------------------------------
     // ABILITY
     luabridge::getGlobalNamespace(L)
@@ -477,6 +471,11 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("Perception", static_cast<int>(Ability::Perception))
         .addConstant("Constitution", static_cast<int>(Ability::Constitution))
         .addConstant("Intelligence", static_cast<int>(Ability::Intelligence))
+        .addFunction("toString", &ability_to_string)
+        .addFunction("fromString", &ability_from_string)
+        .addFunction("getAbbreviation", &get_ability_abbreviation)
+        .addFunction("getDescription", &get_ability_description)
+        .addFunction("getModifier", &get_ability_modifier)
         .endNamespace();
     // -------------------------------------------------------------------------
     // CHARACTER_POSTURE
@@ -489,6 +488,11 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("Prone", static_cast<int>(CharacterPosture::Prone))
         .addConstant("Rest", static_cast<int>(CharacterPosture::Rest))
         .addConstant("Sleep", static_cast<int>(CharacterPosture::Sleep))
+        .addFunction("toString", &character_posture_to_string)
+        .addFunction("fromString", &character_posture_from_string)
+        .addFunction("getAction", &get_character_posture_action)
+        .addFunction("getSpeed", &get_character_posture_speed)
+        .addFunction("getRegainModifier", &get_character_posture_regain_modifier)
         .endNamespace();
     // -------------------------------------------------------------------------
     // DIRECTION
@@ -501,6 +505,11 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("East", static_cast<int>(Direction::East))
         .addConstant("Up", static_cast<int>(Direction::Up))
         .addConstant("Down", static_cast<int>(Direction::Down))
+        .addFunction("toString", &direction_to_string)
+        .addFunction("fromString", &direction_from_string)
+        .addFunction("getOpposite", &get_opposite)
+        .addFunction("getCoordinates", &get_coordinates)
+        .addFunction("getAll", &get_all_directions)
         .endNamespace();
     // -------------------------------------------------------------------------
     // COMBAT_MODIFIER
@@ -515,6 +524,8 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("RangedWeaponDamage", static_cast<int>(CombatModifier::RangedWeaponDamage))
         .addConstant("RangedAimSpeed", static_cast<int>(CombatModifier::RangedAimSpeed))
         .addConstant("ArmorClass", static_cast<int>(CombatModifier::ArmorClass))
+        .addFunction("toString", &combat_modifier_to_string)
+        .addFunction("fromString", &combat_modifier_from_string)
         .endNamespace();
     // -------------------------------------------------------------------------
     // ITEM_QUALITY
@@ -526,6 +537,8 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("Normal", static_cast<int>(ItemQuality::Normal))
         .addConstant("Fine", static_cast<int>(ItemQuality::Fine))
         .addConstant("Masterful", static_cast<int>(ItemQuality::Masterful))
+        .addFunction("toString", &item_quality_to_string)
+        .addFunction("fromString", &item_quality_from_string)
         .endNamespace();
     // -------------------------------------------------------------------------
     // KNOWLEDGE
@@ -552,6 +565,8 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("CraftSurvivalTool", static_cast<int>(Knowledge::CraftSurvivalTool))
         .addConstant("Scavenge", static_cast<int>(Knowledge::Scavenge))
         .addConstant("BasicArmorProficiency", static_cast<int>(Knowledge::BasicArmorProficiency))
+        .addFunction("toString", &knowledge_to_string)
+        .addFunction("fromString", &knowledge_from_string)
         .endNamespace();
     // -------------------------------------------------------------------------
     // LIQUID_TYPE
@@ -564,6 +579,8 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("Poison", static_cast<int>(LiquidType::Poison))
         .addConstant("Blood", static_cast<int>(LiquidType::Blood))
         .addConstant("Lava", static_cast<int>(LiquidType::Lava))
+        .addFunction("toString", &liquid_type_to_string)
+        .addFunction("fromString", &liquid_type_from_string)
         .endNamespace();
     // -------------------------------------------------------------------------
     // MATERIAL_TYPE
@@ -581,83 +598,86 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("Paper", static_cast<int>(MaterialType::Paper))
         .addConstant("Coal", static_cast<int>(MaterialType::Coal))
         .addConstant("Bone", static_cast<int>(MaterialType::Bone))
+        .addFunction("toString", &material_type_to_string)
+        .addFunction("fromString", &material_type_from_string)
         .endNamespace();
     // -------------------------------------------------------------------------
     // MODEL_TYPE
     luabridge::getGlobalNamespace(L)
         .beginNamespace("ModelType")
-            .addConstant("None", static_cast<int>(ModelType::None))
-            .addConstant("Corpse", static_cast<int>(ModelType::Corpse))
-            .addConstant("MeleeWeapon", static_cast<int>(ModelType::MeleeWeapon))
-            .addConstant("RangedWeapon", static_cast<int>(ModelType::RangedWeapon))
-            .addConstant("Armor", static_cast<int>(ModelType::Armor))
-            .addConstant("Shield", static_cast<int>(ModelType::Shield))
-            .addConstant("Projectile", static_cast<int>(ModelType::Projectile))
-            .addConstant("Container", static_cast<int>(ModelType::Container))
-            .addConstant("LiquidContainer", static_cast<int>(ModelType::LiquidContainer))
-            .addConstant("Tool", static_cast<int>(ModelType::Tool))
-            .addConstant("Node", static_cast<int>(ModelType::Node))
-            .addConstant("Resource", static_cast<int>(ModelType::Resource))
-            .addConstant("Seed", static_cast<int>(ModelType::Seed))
-            .addConstant("Key", static_cast<int>(ModelType::Key))
-            .addConstant("Furniture", static_cast<int>(ModelType::Furniture))
-            .addConstant("Food", static_cast<int>(ModelType::Food))
-            .addConstant("Light", static_cast<int>(ModelType::Light))
-            .addConstant("Vehicle", static_cast<int>(ModelType::Vehicle))
-            .addConstant("Book", static_cast<int>(ModelType::Book))
-            .addConstant("Rope", static_cast<int>(ModelType::Rope))
-            .addConstant("Mechanism", static_cast<int>(ModelType::Mechanism))
-            .addConstant("Currency", static_cast<int>(ModelType::Currency))
-            .addConstant("Shop", static_cast<int>(ModelType::Shop))
-            .addConstant("Magazine", static_cast<int>(ModelType::Magazine))
-            .addFunction("toString", &model_type_to_string)
-            .addFunction("fromString", &string_to_model_type)
+        .addConstant("None", static_cast<int>(ModelType::None))
+        .addConstant("Corpse", static_cast<int>(ModelType::Corpse))
+        .addConstant("MeleeWeapon", static_cast<int>(ModelType::MeleeWeapon))
+        .addConstant("RangedWeapon", static_cast<int>(ModelType::RangedWeapon))
+        .addConstant("Armor", static_cast<int>(ModelType::Armor))
+        .addConstant("Shield", static_cast<int>(ModelType::Shield))
+        .addConstant("Projectile", static_cast<int>(ModelType::Projectile))
+        .addConstant("Container", static_cast<int>(ModelType::Container))
+        .addConstant("LiquidContainer", static_cast<int>(ModelType::LiquidContainer))
+        .addConstant("Tool", static_cast<int>(ModelType::Tool))
+        .addConstant("Node", static_cast<int>(ModelType::Node))
+        .addConstant("Resource", static_cast<int>(ModelType::Resource))
+        .addConstant("Seed", static_cast<int>(ModelType::Seed))
+        .addConstant("Key", static_cast<int>(ModelType::Key))
+        .addConstant("Furniture", static_cast<int>(ModelType::Furniture))
+        .addConstant("Food", static_cast<int>(ModelType::Food))
+        .addConstant("Light", static_cast<int>(ModelType::Light))
+        .addConstant("Vehicle", static_cast<int>(ModelType::Vehicle))
+        .addConstant("Book", static_cast<int>(ModelType::Book))
+        .addConstant("Rope", static_cast<int>(ModelType::Rope))
+        .addConstant("Mechanism", static_cast<int>(ModelType::Mechanism))
+        .addConstant("Currency", static_cast<int>(ModelType::Currency))
+        .addConstant("Shop", static_cast<int>(ModelType::Shop))
+        .addConstant("Magazine", static_cast<int>(ModelType::Magazine))
+        .addFunction("toString", &model_type_to_string)
+        .addFunction("fromString", &model_type_from_string)
         .endNamespace();
     // -------------------------------------------------------------------------
     // RESOURCE_TYPE
     luabridge::getGlobalNamespace(L)
         .beginNamespace("ResourceType")
-            .addConstant("None", static_cast<int>(ResourceType::None))
-            .addConstant("Coal", static_cast<int>(ResourceType::Coal))
-            .addConstant("Ore", static_cast<int>(ResourceType::Ore))
-            .addConstant("Bar", static_cast<int>(ResourceType::Bar))
-            .addConstant("Log", static_cast<int>(ResourceType::Log))
-            .addConstant("Plank", static_cast<int>(ResourceType::Plank))
-            .addConstant("Tree", static_cast<int>(ResourceType::Tree))
-            .addConstant("Fastener", static_cast<int>(ResourceType::Fastener))
-            .addConstant("Leather", static_cast<int>(ResourceType::Leather))
-            .addConstant("Cloth", static_cast<int>(ResourceType::Cloth))
-            .addConstant("StoneBlock", static_cast<int>(ResourceType::StoneBlock))
-            .addConstant("MetalVein", static_cast<int>(ResourceType::MetalVein))
-            .addConstant("StoneMonolith", static_cast<int>(ResourceType::StoneMonolith))
-            .addConstant("Pen", static_cast<int>(ResourceType::Pen))
-            .addConstant("Trash", static_cast<int>(ResourceType::Trash))
-            .addConstant("Meat", static_cast<int>(ResourceType::Meat))
-            .addConstant("Bone", static_cast<int>(ResourceType::Bone))
-            .addConstant("Skull", static_cast<int>(ResourceType::Skull))
-            .addConstant("Nail", static_cast<int>(ResourceType::Nail))
-            .addFunction("toString", &resource_type_to_string)
-            .addFunction("fromString", &string_to_resource_type)
+        .addConstant("None", static_cast<int>(ResourceType::None))
+        .addConstant("Coal", static_cast<int>(ResourceType::Coal))
+        .addConstant("Ore", static_cast<int>(ResourceType::Ore))
+        .addConstant("Bar", static_cast<int>(ResourceType::Bar))
+        .addConstant("Log", static_cast<int>(ResourceType::Log))
+        .addConstant("Plank", static_cast<int>(ResourceType::Plank))
+        .addConstant("Tree", static_cast<int>(ResourceType::Tree))
+        .addConstant("Fastener", static_cast<int>(ResourceType::Fastener))
+        .addConstant("Leather", static_cast<int>(ResourceType::Leather))
+        .addConstant("Cloth", static_cast<int>(ResourceType::Cloth))
+        .addConstant("StoneBlock", static_cast<int>(ResourceType::StoneBlock))
+        .addConstant("MetalVein", static_cast<int>(ResourceType::MetalVein))
+        .addConstant("StoneMonolith", static_cast<int>(ResourceType::StoneMonolith))
+        .addConstant("Pen", static_cast<int>(ResourceType::Pen))
+        .addConstant("Trash", static_cast<int>(ResourceType::Trash))
+        .addConstant("Meat", static_cast<int>(ResourceType::Meat))
+        .addConstant("Bone", static_cast<int>(ResourceType::Bone))
+        .addConstant("Skull", static_cast<int>(ResourceType::Skull))
+        .addConstant("Nail", static_cast<int>(ResourceType::Nail))
+        .addFunction("toString", &resource_type_to_string)
+        .addFunction("fromString", &resource_type_from_string)
         .endNamespace();
     // -------------------------------------------------------------------------
     // TOOL_TYPE
     luabridge::getGlobalNamespace(L)
-        .deriveClass<ToolType, BaseEnumerator>("ToolType")
-        .endClass();
-    luabridge::beginEnum<ToolType>("ToolType", L)
-        .addEnum("None", ToolType::None)
-        .addEnum("Pickaxe", ToolType::Pickaxe)
-        .addEnum("WoodcutterAxe", ToolType::WoodcutterAxe)
-        .addEnum("Saw", ToolType::Saw)
-        .addEnum("PrecisionChisel", ToolType::PrecisionChisel)
-        .addEnum("Hammer", ToolType::Hammer)
-        .addEnum("PlaneChisel", ToolType::PlaneChisel)
-        .addEnum("Forge", ToolType::Forge)
-        .addEnum("Anvil", ToolType::Anvil)
-        .addEnum("BlacksmithHammer", ToolType::BlacksmithHammer)
-        .addEnum("Bellows", ToolType::Bellows)
-        .addEnum("Crucible", ToolType::Crucible)
-        .addEnum("Firelighter", ToolType::Firelighter);
+        .beginNamespace("ToolType")
+        .addConstant("None", static_cast<int>(ToolType::None))
+        .addConstant("Pickaxe", static_cast<int>(ToolType::Pickaxe))
+        .addConstant("WoodcutterAxe", static_cast<int>(ToolType::WoodcutterAxe))
+        .addConstant("Saw", static_cast<int>(ToolType::Saw))
+        .addConstant("PrecisionChisel", static_cast<int>(ToolType::PrecisionChisel))
+        .addConstant("Hammer", static_cast<int>(ToolType::Hammer))
+        .addConstant("PlaneChisel", static_cast<int>(ToolType::PlaneChisel))
+        .addConstant("Forge", static_cast<int>(ToolType::Forge))
+        .addConstant("Anvil", static_cast<int>(ToolType::Anvil))
+        .addConstant("BlacksmithHammer", static_cast<int>(ToolType::BlacksmithHammer))
+        .addConstant("Bellows", static_cast<int>(ToolType::Bellows))
+        .addConstant("Crucible", static_cast<int>(ToolType::Crucible))
+        .addConstant("Firelighter", static_cast<int>(ToolType::Firelighter))
+        .addFunction("toString", &tool_type_to_string)
+        .addFunction("fromString", &tool_type_from_string)
+        .endNamespace();
     // -------------------------------------------------------------------------
     // Load the script.
     auto path = Mud::instance().getMudSystemDirectory() + "lua/" + scriptFile;

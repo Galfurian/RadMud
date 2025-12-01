@@ -58,4 +58,4 @@ enum class ModelType : uint8_t {
 std::string model_type_to_string(ModelType type);
 
 /// @brief Converts a string to a ModelType. Returns ModelType::None if not found.
-ModelType string_to_model_type(const std::string &str);
+ModelType model_type_from_string(const std::string &str);

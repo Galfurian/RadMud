@@ -24,26 +24,25 @@
 
 std::string character_posture_to_string(CharacterPosture posture)
 {
-    switch (posture)
-    {
-        case CharacterPosture::Stand:
-            return "Stand";
-        case CharacterPosture::Crouch:
-            return "Crouch";
-        case CharacterPosture::Prone:
-            return "Prone";
-        case CharacterPosture::Sit:
-            return "Sit";
-        case CharacterPosture::Rest:
-            return "Rest";
-        case CharacterPosture::Sleep:
-            return "Sleep";
-        default:
-            return "None";
+    switch (posture) {
+    case CharacterPosture::Stand:
+        return "Stand";
+    case CharacterPosture::Crouch:
+        return "Crouch";
+    case CharacterPosture::Prone:
+        return "Prone";
+    case CharacterPosture::Sit:
+        return "Sit";
+    case CharacterPosture::Rest:
+        return "Rest";
+    case CharacterPosture::Sleep:
+        return "Sleep";
+    default:
+        return "None";
     }
 }
 
-CharacterPosture string_to_character_posture(const std::string & value)
+CharacterPosture character_posture_from_string(const std::string &value)
 {
     if (value == "Stand")
         return CharacterPosture::Stand;
@@ -63,51 +62,48 @@ CharacterPosture string_to_character_posture(const std::string & value)
 
 std::string get_character_posture_action(CharacterPosture posture)
 {
-    switch (posture)
-    {
-        case CharacterPosture::Stand:
-            return "standing";
-        case CharacterPosture::Crouch:
-            return "crouched";
-        case CharacterPosture::Prone:
-            return "prone";
-        case CharacterPosture::Sit:
-            return "sitting";
-        case CharacterPosture::Rest:
-            return "resting";
-        case CharacterPosture::Sleep:
-            return "sleeping";
-        default:
-            return "none";
+    switch (posture) {
+    case CharacterPosture::Stand:
+        return "standing";
+    case CharacterPosture::Crouch:
+        return "crouched";
+    case CharacterPosture::Prone:
+        return "prone";
+    case CharacterPosture::Sit:
+        return "sitting";
+    case CharacterPosture::Rest:
+        return "resting";
+    case CharacterPosture::Sleep:
+        return "sleeping";
+    default:
+        return "none";
     }
 }
 
 uint32_t get_character_posture_speed(CharacterPosture posture)
 {
-    switch (posture)
-    {
-        case CharacterPosture::Stand:
-            return 2;
-        case CharacterPosture::Crouch:
-            return 4;
-        case CharacterPosture::Prone:
-            return 6;
-        default:
-            return 0;
+    switch (posture) {
+    case CharacterPosture::Stand:
+        return 2;
+    case CharacterPosture::Crouch:
+        return 4;
+    case CharacterPosture::Prone:
+        return 6;
+    default:
+        return 0;
     }
 }
 
 uint32_t get_character_posture_regain_modifier(CharacterPosture posture)
 {
-    switch (posture)
-    {
-        case CharacterPosture::Sit:
-            return 1;
-        case CharacterPosture::Rest:
-            return 2;
-        case CharacterPosture::Sleep:
-            return 4;
-        default:
-            return 0;
+    switch (posture) {
+    case CharacterPosture::Sit:
+        return 1;
+    case CharacterPosture::Rest:
+        return 2;
+    case CharacterPosture::Sleep:
+        return 4;
+    default:
+        return 0;
     }
 }

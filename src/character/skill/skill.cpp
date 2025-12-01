@@ -146,7 +146,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Skill &rhs)
             for (auto it = abilityModifiersNode.pbegin(); it != abilityModifiersNode.pend(); ++it) {
                 int modifier;
                 it->second >> modifier;
-                rhs.modifierManager->setAbilityMod(string_to_ability(it->first), modifier);
+                rhs.modifierManager->setAbilityMod(ability_from_string(it->first), modifier);
             }
         }
         // Deserialize the combat modifiers.
@@ -155,7 +155,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Skill &rhs)
             for (auto it = combatModifiersNode.pbegin(); it != combatModifiersNode.pend(); ++it) {
                 int modifier;
                 it->second >> modifier;
-                rhs.modifierManager->setCombatMod(string_to_combat_modifier(it->first), modifier);
+                rhs.modifierManager->setCombatMod(combat_modifier_from_string(it->first), modifier);
             }
         }
         // Deserialize the status modifiers.
@@ -173,7 +173,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Skill &rhs)
             for (auto it = knowledgeNode.pbegin(); it != knowledgeNode.pend(); ++it) {
                 int modifier;
                 it->second >> modifier;
-                rhs.modifierManager->setKnowledge(string_to_knowledge(it->first), modifier);
+                rhs.modifierManager->setKnowledge(knowledge_from_string(it->first), modifier);
             }
         }
     }

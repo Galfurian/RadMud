@@ -45,4 +45,4 @@ enum class MaterialType : uint8_t {
 std::string material_type_to_string(MaterialType type);
 
 /// @brief Returns the material from string.
-MaterialType string_to_material_type(const std::string &value);
+MaterialType material_type_from_string(const std::string &value);

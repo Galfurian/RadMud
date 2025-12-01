@@ -52,4 +52,4 @@ enum class ResourceType : uint8_t {
 std::string resource_type_to_string(ResourceType type);
 
 /// @brief Converts a string to a ResourceType. Returns ResourceType::None if not found.
-ResourceType string_to_resource_type(const std::string &str);
+ResourceType resource_type_from_string(const std::string &str);

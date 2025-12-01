@@ -23,7 +23,7 @@
 #pragma once
 
 #include "model/itemModel.hpp"
-#include "enumerators/baseEnumerator.hpp" // Include BaseEnumerator
+
 
 /// Sizes of armor.
 using ArmorSize = enum class ArmorSize_t

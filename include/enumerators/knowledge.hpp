@@ -53,4 +53,4 @@ enum class Knowledge : uint8_t {
 std::string knowledge_to_string(Knowledge knowledge);
 
 /// @brief Returns the knowledge from string.
-Knowledge string_to_knowledge(const std::string &value);
+Knowledge knowledge_from_string(const std::string &value);

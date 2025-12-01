@@ -45,7 +45,7 @@ std::string direction_to_string(Direction direction)
     }
 }
 
-Direction string_to_direction(const std::string & value)
+Direction direction_from_string(const std::string & value)
 {
     if (value == "north") return Direction::North;
     else if (value == "south") return Direction::South;

@@ -66,7 +66,7 @@ enum class TelnetChar : uint8_t {
 };
 
 /// @brief Converts a TelnetChar to its string representation.
-std::string to_string(TelnetChar value);
+std::string telnet_char_to_string(TelnetChar value);
 
 /// @brief Converts a string to TelnetChar. Returns TelnetChar::None if not found.
 TelnetChar telnet_char_from_string(const std::string &str);

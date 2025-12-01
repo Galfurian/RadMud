@@ -24,8 +24,7 @@
 
 std::string item_quality_to_string(ItemQuality quality)
 {
-    switch (quality)
-    {
+    switch (quality) {
     case ItemQuality::Disastrous:
         return "Disastrous";
     case ItemQuality::Poor:
@@ -42,7 +41,7 @@ std::string item_quality_to_string(ItemQuality quality)
     }
 }
 
-ItemQuality string_to_item_quality(const std::string & value)
+ItemQuality item_quality_from_string(const std::string &value)
 {
     if (value == "Disastrous")
         return ItemQuality::Disastrous;
@@ -60,8 +59,7 @@ ItemQuality string_to_item_quality(const std::string & value)
 
 double get_item_quality_modifier(ItemQuality quality)
 {
-    switch (quality)
-    {
+    switch (quality) {
     case ItemQuality::Disastrous:
         return 0.5;
     case ItemQuality::Poor:

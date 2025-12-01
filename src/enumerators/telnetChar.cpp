@@ -20,93 +20,131 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
+#include "enumerators/telnetChar.hpp"
 
 #include <unordered_map>
 
-using enum TelnetChar;
-
-std::string to_string(TelnetChar value) {
+std::string telnet_char_to_string(TelnetChar value)
+{
     switch (value) {
-        case MSDP_VAR: return "MSDP_VAR";
-        case MSDP_VAL: return "MSDP_VAL";
-        case MSDP_TABLE_OPEN: return "MSDP_TABLE_OPEN";
-        case MSDP_TABLE_CLOSE: return "MSDP_TABLE_CLOSE";
-        case MSDP_ARRAY_OPEN: return "MSDP_ARRAY_OPEN";
-        case MSDP_ARRAY_CLOSE: return "MSDP_ARRAY_CLOSE";
-        case TerminalType: return "TerminalType";
-        case NegotiateAboutWindowSize: return "NegotiateAboutWindowSize";
-        case TerminalSpeed: return "TerminalSpeed";
-        case RemoteFlowControl: return "RemoteFlowControl";
-        case LineMode: return "LineMode";
-        case EnvironmentVariables: return "EnvironmentVariables";
-        case NewEnvironmentOption: return "NewEnvironmentOption";
-        case MSDP: return "MSDP";
-        case MSSP: return "MSSP";
-        case MCCP: return "MCCP";
-        case DRAW_MAP: return "DRAW_MAP";
-        case CLR_MAP: return "CLR_MAP";
-        case FORMAT: return "FORMAT";
-        case SubNegotiationEnd: return "SubNegotiationEnd";
-        case NoOperation: return "NoOperation";
-        case DataMark: return "DataMark";
-        case Break: return "Break";
-        case InterruptProcess: return "InterruptProcess";
-        case AbortOutput: return "AbortOutput";
-        case AreYouThere: return "AreYouThere";
-        case EraseCharacter: return "EraseCharacter";
-        case EraseLine: return "EraseLine";
-        case GoAhead: return "GoAhead";
-        case SubnegotiationBegin: return "SubnegotiationBegin";
-        case WILL: return "WILL";
-        case WONT: return "WONT";
-        case DO: return "DO";
-        case DONT: return "DONT";
-        case IAC: return "IAC";
-        case None: return "NONE";
-        default: return "NONE";
+    case TelnetChar::MSDP_VAR:
+        return "MSDP_VAR";
+    case TelnetChar::MSDP_VAL:
+        return "MSDP_VAL";
+    case TelnetChar::MSDP_TABLE_OPEN:
+        return "MSDP_TABLE_OPEN";
+    case TelnetChar::MSDP_TABLE_CLOSE:
+        return "MSDP_TABLE_CLOSE";
+    case TelnetChar::MSDP_ARRAY_OPEN:
+        return "MSDP_ARRAY_OPEN";
+    case TelnetChar::MSDP_ARRAY_CLOSE:
+        return "MSDP_ARRAY_CLOSE";
+    case TelnetChar::TerminalType:
+        return "TerminalType";
+    case TelnetChar::NegotiateAboutWindowSize:
+        return "NegotiateAboutWindowSize";
+    case TelnetChar::TerminalSpeed:
+        return "TerminalSpeed";
+    case TelnetChar::RemoteFlowControl:
+        return "RemoteFlowControl";
+    case TelnetChar::LineMode:
+        return "LineMode";
+    case TelnetChar::EnvironmentVariables:
+        return "EnvironmentVariables";
+    case TelnetChar::NewEnvironmentOption:
+        return "NewEnvironmentOption";
+    case TelnetChar::MSDP:
+        return "MSDP";
+    case TelnetChar::MSSP:
+        return "MSSP";
+    case TelnetChar::MCCP:
+        return "MCCP";
+    case TelnetChar::DRAW_MAP:
+        return "DRAW_MAP";
+    case TelnetChar::CLR_MAP:
+        return "CLR_MAP";
+    case TelnetChar::FORMAT:
+        return "FORMAT";
+    case TelnetChar::SubNegotiationEnd:
+        return "SubNegotiationEnd";
+    case TelnetChar::NoOperation:
+        return "NoOperation";
+    case TelnetChar::DataMark:
+        return "DataMark";
+    case TelnetChar::Break:
+        return "Break";
+    case TelnetChar::InterruptProcess:
+        return "InterruptProcess";
+    case TelnetChar::AbortOutput:
+        return "AbortOutput";
+    case TelnetChar::AreYouThere:
+        return "AreYouThere";
+    case TelnetChar::EraseCharacter:
+        return "EraseCharacter";
+    case TelnetChar::EraseLine:
+        return "EraseLine";
+    case TelnetChar::GoAhead:
+        return "GoAhead";
+    case TelnetChar::SubnegotiationBegin:
+        return "SubnegotiationBegin";
+    case TelnetChar::WILL:
+        return "WILL";
+    case TelnetChar::WONT:
+        return "WONT";
+    case TelnetChar::DO:
+        return "DO";
+    case TelnetChar::DONT:
+        return "DONT";
+    case TelnetChar::IAC:
+        return "IAC";
+    case TelnetChar::None:
+        return "NONE";
+    default:
+        return "NONE";
     }
 }
 
-TelnetChar telnet_char_from_string(const std::string &str) {
+TelnetChar telnet_char_from_string(const std::string &str)
+{
     static const std::unordered_map<std::string, TelnetChar> map = {
-        {"MSDP_VAR", MSDP_VAR},
-        {"MSDP_VAL", MSDP_VAL},
-        {"MSDP_TABLE_OPEN", MSDP_TABLE_OPEN},
-        {"MSDP_TABLE_CLOSE", MSDP_TABLE_CLOSE},
-        {"MSDP_ARRAY_OPEN", MSDP_ARRAY_OPEN},
-        {"MSDP_ARRAY_CLOSE", MSDP_ARRAY_CLOSE},
-        {"TerminalType", TerminalType},
-        {"NegotiateAboutWindowSize", NegotiateAboutWindowSize},
-        {"TerminalSpeed", TerminalSpeed},
-        {"RemoteFlowControl", RemoteFlowControl},
-        {"LineMode", LineMode},
-        {"EnvironmentVariables", EnvironmentVariables},
-        {"NewEnvironmentOption", NewEnvironmentOption},
-        {"MSDP", MSDP},
-        {"MSSP", MSSP},
-        {"MCCP", MCCP},
-        {"DRAW_MAP", DRAW_MAP},
-        {"CLR_MAP", CLR_MAP},
-        {"FORMAT", FORMAT},
-        {"SubNegotiationEnd", SubNegotiationEnd},
-        {"NoOperation", NoOperation},
-        {"DataMark", DataMark},
-        {"Break", Break},
-        {"InterruptProcess", InterruptProcess},
-        {"AbortOutput", AbortOutput},
-        {"AreYouThere", AreYouThere},
-        {"EraseCharacter", EraseCharacter},
-        {"EraseLine", EraseLine},
-        {"GoAhead", GoAhead},
-        {"SubnegotiationBegin", SubnegotiationBegin},
-        {"WILL", WILL},
-        {"WONT", WONT},
-        {"DO", DO},
-        {"DONT", DONT},
-        {"IAC", IAC},
-        {"NONE", None}
-    };
+        {"MSDP_VAR", TelnetChar::MSDP_VAR},
+        {"MSDP_VAL", TelnetChar::MSDP_VAL},
+        {"MSDP_TABLE_OPEN", TelnetChar::MSDP_TABLE_OPEN},
+        {"MSDP_TABLE_CLOSE", TelnetChar::MSDP_TABLE_CLOSE},
+        {"MSDP_ARRAY_OPEN", TelnetChar::MSDP_ARRAY_OPEN},
+        {"MSDP_ARRAY_CLOSE", TelnetChar::MSDP_ARRAY_CLOSE},
+        {"TerminalType", TelnetChar::TerminalType},
+        {"NegotiateAboutWindowSize", TelnetChar::NegotiateAboutWindowSize},
+        {"TerminalSpeed", TelnetChar::TerminalSpeed},
+        {"RemoteFlowControl", TelnetChar::RemoteFlowControl},
+        {"LineMode", TelnetChar::LineMode},
+        {"EnvironmentVariables", TelnetChar::EnvironmentVariables},
+        {"NewEnvironmentOption", TelnetChar::NewEnvironmentOption},
+        {"MSDP", TelnetChar::MSDP},
+        {"MSSP", TelnetChar::MSSP},
+        {"MCCP", TelnetChar::MCCP},
+        {"DRAW_MAP", TelnetChar::DRAW_MAP},
+        {"CLR_MAP", TelnetChar::CLR_MAP},
+        {"FORMAT", TelnetChar::FORMAT},
+        {"SubNegotiationEnd", TelnetChar::SubNegotiationEnd},
+        {"NoOperation", TelnetChar::NoOperation},
+        {"DataMark", TelnetChar::DataMark},
+        {"Break", TelnetChar::Break},
+        {"InterruptProcess", TelnetChar::InterruptProcess},
+        {"AbortOutput", TelnetChar::AbortOutput},
+        {"AreYouThere", TelnetChar::AreYouThere},
+        {"EraseCharacter", TelnetChar::EraseCharacter},
+        {"EraseLine", TelnetChar::EraseLine},
+        {"GoAhead", TelnetChar::GoAhead},
+        {"SubnegotiationBegin", TelnetChar::SubnegotiationBegin},
+        {"WILL", TelnetChar::WILL},
+        {"WONT", TelnetChar::WONT},
+        {"DO", TelnetChar::DO},
+        {"DONT", TelnetChar::DONT},
+        {"IAC", TelnetChar::IAC},
+        {"NONE", TelnetChar::None}};
     auto it = map.find(str);
-    if (it != map.end()) return it->second;
-    return None;
+    if (it != map.end())
+        return it->second;
+    return TelnetChar::None;
 }

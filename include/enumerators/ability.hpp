@@ -39,7 +39,7 @@ enum class Ability : uint8_t {
 std::string ability_to_string(Ability ability);
 
 /// @brief Returns the ability from string.
-Ability string_to_ability(const std::string &value);
+Ability ability_from_string(const std::string &value);
 
 /// @brief Returns the abbreviation of the ability name.
 std::string get_ability_abbreviation(Ability ability);
