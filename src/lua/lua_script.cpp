@@ -555,16 +555,16 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .endNamespace();
     // -------------------------------------------------------------------------
     // LIQUID_TYPE
+    // Removed obsolete deriveClass for LiquidType (now enum class)
     luabridge::getGlobalNamespace(L)
-        .deriveClass<LiquidType, BaseEnumerator>("LiquidType")
-        .endClass();
-    luabridge::beginEnum<LiquidType>("LiquidType", L)
-        .addEnum("None", LiquidType::None)
-        .addEnum("Normal", LiquidType::Normal)
-        .addEnum("Alcohol", LiquidType::Alcohol)
-        .addEnum("Poison", LiquidType::Poison)
-        .addEnum("Blood", LiquidType::Blood)
-        .addEnum("Lava", LiquidType::Lava);
+        .beginNamespace("LiquidType")
+        .addConstant("None", static_cast<int>(LiquidType::None))
+        .addConstant("Normal", static_cast<int>(LiquidType::Normal))
+        .addConstant("Alcohol", static_cast<int>(LiquidType::Alcohol))
+        .addConstant("Poison", static_cast<int>(LiquidType::Poison))
+        .addConstant("Blood", static_cast<int>(LiquidType::Blood))
+        .addConstant("Lava", static_cast<int>(LiquidType::Lava))
+        .endNamespace();
     // -------------------------------------------------------------------------
     // MATERIAL_TYPE
     luabridge::getGlobalNamespace(L)

@@ -21,48 +21,23 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+
+#include <cstdint>
+#include <string>
+
 
 /// @brief Used to determine the type of the model.
-class LiquidType :
-    public BaseEnumerator
-{
-public:
-    /// The possible types of model.
-    enum Enum
-    {
-        None,       ///< [0] No type of liquid.
-        Normal,     ///< [1] Normal liquid.
-        Alcohol,    ///< [2] The liquid is alcohol.
-        Poison,     ///< [3] The liquid is poison.
-        Blood,      ///< [4] The liquid is blood.
-        Lava,       ///< [5] The liquid is laval.
-    };
-
-    /// @brief Constructor.
-    LiquidType() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    LiquidType(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    LiquidType(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from string.
-    LiquidType(const std::string & _value);
-
-    /// @brief Returns the type of model as string.
-    std::string toString() const override;
+enum class LiquidType : uint8_t {
+    None,       ///< [0] No type of liquid.
+    Normal,     ///< [1] Normal liquid.
+    Alcohol,    ///< [2] The liquid is alcohol.
+    Poison,     ///< [3] The liquid is poison.
+    Blood,      ///< [4] The liquid is blood.
+    Lava        ///< [5] The liquid is lava.
 };
+
+/// @brief Returns the type of model as string.
+std::string liquid_type_to_string(LiquidType type);
+
+/// @brief Returns the type of model from string.
+LiquidType string_to_liquid_type(const std::string & value);

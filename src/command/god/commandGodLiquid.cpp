@@ -39,7 +39,7 @@ bool DoLiquidInfo(Character * character, ArgumentHandler & args)
     }
     std::string msg;
     msg += "Vnum  : " + ToString(liquid->vnum) + "\n";
-    msg += "Type  : " + liquid->type.toString() + "\n";
+    msg += "Type  : " + liquid_type_to_string(liquid->type) + "\n";
     msg += "Name  : " + liquid->getNameCapital() + "\n";
     msg += "Descr : " + liquid->description + "\n";
     msg += "Worth : " + ToString(liquid->worth) + "\n";

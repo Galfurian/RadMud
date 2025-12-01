@@ -66,7 +66,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Liquid &rhs)
 {
     lhs.set_type(json::JTYPE_OBJECT);
     lhs["vnum"] << rhs.vnum;
-    lhs["type"] << rhs.type.toUInt();
+    lhs["type"] << static_cast<uint8_t>(rhs.type);
     lhs["name"] << rhs.name;
     lhs["description"] << rhs.description;
     lhs["flags"] << rhs.flags;

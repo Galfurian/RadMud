@@ -21,22 +21,27 @@
 
 #include "enumerators/liquidType.hpp"
 
-std::string LiquidType::toString() const
+
+std::string liquid_type_to_string(LiquidType type)
 {
-    if (value == Normal) return "Normal";
-    if (value == Alcohol) return "Alcohol";
-    if (value == Poison) return "Poison";
-    if (value == Blood) return "Blood";
-    if (value == Lava) return "Lava";
-    return "None";
+    switch (type) {
+    case LiquidType::Normal: return "Normal";
+    case LiquidType::Alcohol: return "Alcohol";
+    case LiquidType::Poison: return "Poison";
+    case LiquidType::Blood: return "Blood";
+    case LiquidType::Lava: return "Lava";
+    case LiquidType::None:
+    default:
+        return "None";
+    }
 }
 
-LiquidType::LiquidType(const std::string & _value)
+LiquidType string_to_liquid_type(const std::string & value)
 {
-    if (_value == "Normal") value = Normal;
-    else if (_value == "Alcohol") value = Alcohol;
-    else if (_value == "Poison") value = Poison;
-    else if (_value == "Blood") value = Blood;
-    else if (_value == "Lava") value = Lava;
-    else value = None;
+    if (value == "Normal") return LiquidType::Normal;
+    else if (value == "Alcohol") return LiquidType::Alcohol;
+    else if (value == "Poison") return LiquidType::Poison;
+    else if (value == "Blood") return LiquidType::Blood;
+    else if (value == "Lava") return LiquidType::Lava;
+    else return LiquidType::None;
 }
