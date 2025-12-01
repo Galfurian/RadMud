@@ -167,7 +167,7 @@ add_executable(
     ${CMAKE_SOURCE_DIR}/src/enumerators/modelType.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/skillRank.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/liquidType.cpp
-    ${CMAKE_SOURCE_DIR}/src/enumerators/telnetChar.cpp
+
     ${CMAKE_SOURCE_DIR}/src/enumerators/itemQuality.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/materialType.cpp
     ${CMAKE_SOURCE_DIR}/src/enumerators/resourceType.cpp

@@ -20,45 +20,93 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "enumerators/telnetChar.hpp"
 
-std::string TelnetChar::toString() const
-{
-    if (value == MSDP_VAR) return "MSDP_VAR";
-    if (value == MSDP_VAL) return "MSDP_VAL";
-    if (value == MSDP_TABLE_OPEN) return "MSDP_TABLE_OPEN";
-    if (value == MSDP_TABLE_CLOSE) return "MSDP_TABLE_CLOSE";
-    if (value == MSDP_ARRAY_OPEN) return "MSDP_ARRAY_OPEN";
-    if (value == MSDP_ARRAY_CLOSE) return "MSDP_ARRAY_CLOSE";
-    if (value == TerminalType) return "TerminalType";
-    if (value == NegotiateAboutWindowSize) return "NegotiateAboutWindowSize";
-    if (value == TerminalSpeed) return "TerminalSpeed";
-    if (value == RemoteFlowControl) return "RemoteFlowControl";
-    if (value == LineMode) return "LineMode";
-    if (value == EnvironmentVariables) return "EnvironmentVariables";
-    if (value == NewEnvironmentOption) return "NewEnvironmentOption";
-    //if (value == TTYPE) return "TTYPE";
-    if (value == MSDP) return "MSDP";
-    if (value == MSSP) return "MSSP";
-    if (value == MCCP) return "MCCP";
-    if (value == SubNegotiationEnd) return "SubNegotiationEnd";
-    if (value == NoOperation) return "NoOperation";
-    if (value == DataMark) return "DataMark";
-    if (value == Break) return "Break";
-    if (value == InterruptProcess) return "InterruptProcess";
-    if (value == AbortOutput) return "AbortOutput";
-    if (value == AreYouThere) return "AreYouThere";
-    if (value == EraseCharacter) return "EraseCharacter";
-    if (value == EraseLine) return "EraseLine";
-    if (value == GoAhead) return "GoAhead";
-    if (value == SubnegotiationBegin) return "SubnegotiationBegin";
-    if (value == WILL) return "WILL";
-    if (value == WONT) return "WONT";
-    if (value == DO) return "DO";
-    if (value == DONT) return "DONT";
-    if (value == IAC) return "IAC";
-    if (value == DRAW_MAP) return "DRAW_MAP";
-    if (value == DRAW_MAP) return "DRAW_MAP";
-    if (value == FORMAT) return "FORMAT";
-    return "NONE";
+#include <unordered_map>
+
+using enum TelnetChar;
+
+std::string to_string(TelnetChar value) {
+    switch (value) {
+        case MSDP_VAR: return "MSDP_VAR";
+        case MSDP_VAL: return "MSDP_VAL";
+        case MSDP_TABLE_OPEN: return "MSDP_TABLE_OPEN";
+        case MSDP_TABLE_CLOSE: return "MSDP_TABLE_CLOSE";
+        case MSDP_ARRAY_OPEN: return "MSDP_ARRAY_OPEN";
+        case MSDP_ARRAY_CLOSE: return "MSDP_ARRAY_CLOSE";
+        case TerminalType: return "TerminalType";
+        case NegotiateAboutWindowSize: return "NegotiateAboutWindowSize";
+        case TerminalSpeed: return "TerminalSpeed";
+        case RemoteFlowControl: return "RemoteFlowControl";
+        case LineMode: return "LineMode";
+        case EnvironmentVariables: return "EnvironmentVariables";
+        case NewEnvironmentOption: return "NewEnvironmentOption";
+        case MSDP: return "MSDP";
+        case MSSP: return "MSSP";
+        case MCCP: return "MCCP";
+        case DRAW_MAP: return "DRAW_MAP";
+        case CLR_MAP: return "CLR_MAP";
+        case FORMAT: return "FORMAT";
+        case SubNegotiationEnd: return "SubNegotiationEnd";
+        case NoOperation: return "NoOperation";
+        case DataMark: return "DataMark";
+        case Break: return "Break";
+        case InterruptProcess: return "InterruptProcess";
+        case AbortOutput: return "AbortOutput";
+        case AreYouThere: return "AreYouThere";
+        case EraseCharacter: return "EraseCharacter";
+        case EraseLine: return "EraseLine";
+        case GoAhead: return "GoAhead";
+        case SubnegotiationBegin: return "SubnegotiationBegin";
+        case WILL: return "WILL";
+        case WONT: return "WONT";
+        case DO: return "DO";
+        case DONT: return "DONT";
+        case IAC: return "IAC";
+        case None: return "NONE";
+        default: return "NONE";
+    }
+}
+
+TelnetChar telnet_char_from_string(const std::string &str) {
+    static const std::unordered_map<std::string, TelnetChar> map = {
+        {"MSDP_VAR", MSDP_VAR},
+        {"MSDP_VAL", MSDP_VAL},
+        {"MSDP_TABLE_OPEN", MSDP_TABLE_OPEN},
+        {"MSDP_TABLE_CLOSE", MSDP_TABLE_CLOSE},
+        {"MSDP_ARRAY_OPEN", MSDP_ARRAY_OPEN},
+        {"MSDP_ARRAY_CLOSE", MSDP_ARRAY_CLOSE},
+        {"TerminalType", TerminalType},
+        {"NegotiateAboutWindowSize", NegotiateAboutWindowSize},
+        {"TerminalSpeed", TerminalSpeed},
+        {"RemoteFlowControl", RemoteFlowControl},
+        {"LineMode", LineMode},
+        {"EnvironmentVariables", EnvironmentVariables},
+        {"NewEnvironmentOption", NewEnvironmentOption},
+        {"MSDP", MSDP},
+        {"MSSP", MSSP},
+        {"MCCP", MCCP},
+        {"DRAW_MAP", DRAW_MAP},
+        {"CLR_MAP", CLR_MAP},
+        {"FORMAT", FORMAT},
+        {"SubNegotiationEnd", SubNegotiationEnd},
+        {"NoOperation", NoOperation},
+        {"DataMark", DataMark},
+        {"Break", Break},
+        {"InterruptProcess", InterruptProcess},
+        {"AbortOutput", AbortOutput},
+        {"AreYouThere", AreYouThere},
+        {"EraseCharacter", EraseCharacter},
+        {"EraseLine", EraseLine},
+        {"GoAhead", GoAhead},
+        {"SubnegotiationBegin", SubnegotiationBegin},
+        {"WILL", WILL},
+        {"WONT", WONT},
+        {"DO", DO},
+        {"DONT", DONT},
+        {"IAC", IAC},
+        {"NONE", None}
+    };
+    auto it = map.find(str);
+    if (it != map.end()) return it->second;
+    return None;
 }
