@@ -21,63 +21,37 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+#include <cstdint>
+#include <string>
 
 /// @brief The list of notions a character can learn.
-class Knowledge :
-    public BaseEnumerator
+enum class Knowledge : uint8_t
 {
-public:
-    /// The possible notions a character can learn.
-    enum Enum
-    {
-        None,
-        GatherHerbs = 3,                /// < Gather Herbs
-        GatherPlant = 4,                /// < Gather Plant
-        Butchery = 5,                   /// < Butcher Animal
-        SkinAnimal = 6,                 /// < Skin Animal
-        TanHide = 7,                    /// < Tan Hide
-        ReadBook = 8,                   /// < Read Book
-        Climb = 10,                     /// < Climb
-        Run = 11,                       /// < Run
-        Dash = 12,                      /// < Dash
-        Woodcutting = 15,               /// < Woodcutting
-        Carpentry = 16,                 /// < Carpentry
-        Woodcarving = 17,               /// < Woodcarving
-        Mining = 20,                    /// < Mining
-        Smelting = 21,                  /// < Smelting
-        Blacksmithing = 22,             /// < Blacksmithing
-        MetalWeaponCrafting = 23,       /// < Metal Weapon Crafting
-        MetalArmorCrafting = 24,        /// < Metal Armor Crafting
-        CraftSurvivalTool = 30,         /// < Craft Survival Tool
-        Scavenge = 35,                  /// < Scavenge
-        BasicArmorProficiency = 40      /// < Basic Armor Proficiency
-    };
-
-    /// @brief Constructor.
-    Knowledge() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    Knowledge(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    Knowledge(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from string.
-    Knowledge(const std::string & _value);
-
-    /// @brief Returns the enumerator as string.
-    std::string toString() const override;
+    None,
+    GatherHerbs = 3,                /// < Gather Herbs
+    GatherPlant = 4,                /// < Gather Plant
+    Butchery = 5,                   /// < Butcher Animal
+    SkinAnimal = 6,                 /// < Skin Animal
+    TanHide = 7,                    /// < Tan Hide
+    ReadBook = 8,                   /// < Read Book
+    Climb = 10,                     /// < Climb
+    Run = 11,                       /// < Run
+    Dash = 12,                      /// < Dash
+    Woodcutting = 15,               /// < Woodcutting
+    Carpentry = 16,                 /// < Carpentry
+    Woodcarving = 17,               /// < Woodcarving
+    Mining = 20,                    /// < Mining
+    Smelting = 21,                  /// < Smelting
+    Blacksmithing = 22,             /// < Blacksmithing
+    MetalWeaponCrafting = 23,       /// < Metal Weapon Crafting
+    MetalArmorCrafting = 24,        /// < Metal Armor Crafting
+    CraftSurvivalTool = 30,         /// < Craft Survival Tool
+    Scavenge = 35,                  /// < Scavenge
+    BasicArmorProficiency = 40      /// < Basic Armor Proficiency
 };
+
+/// @brief Returns the knowledge as string.
+std::string knowledge_to_string(Knowledge knowledge);
+
+/// @brief Returns the knowledge from string.
+Knowledge string_to_knowledge(const std::string & value);

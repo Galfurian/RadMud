@@ -574,7 +574,7 @@ bool DoEffects(Character * character, ArgumentHandler &)
     for (auto const & it : character->effectManager.getKnowledge())
     {
         msg += "\t";
-        msg += Align(it.first.toString(), align::left, 30);
+        msg += Align(knowledge_to_string(it.first), align::left, 30);
         msg += Align(it.second, align::right, 5) + "\n";
     }
     character->sendMsg(msg);

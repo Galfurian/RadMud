@@ -251,7 +251,7 @@ bool LoadSkillKnowledge(ResultSet * result)
                               ToString(skillVnum));
     }
     auto knowledgeNumber = result->getNextUnsignedInteger();
-    auto knowledge = Knowledge(knowledgeNumber);
+    auto knowledge = static_cast<Knowledge>(knowledgeNumber);
     if (knowledge == Knowledge::None)
     {
         throw SQLiteException("Can't find the knowledge " +
@@ -261,7 +261,7 @@ bool LoadSkillKnowledge(ResultSet * result)
     // Log it.
     Logger::log(LogLevel::Debug, "\t%s%s",
                 Align(skill->name, align::left, 25),
-                Align(knowledge.toString(), align::left, 35));
+                Align(knowledge_to_string(knowledge), align::left, 35));
     return true;
 }
 
@@ -916,8 +916,8 @@ bool LoadProductionKnowledge(ResultSet * result)
             "Can't find the production " + ToString(productionVnum));
     }
     auto knowledgeNumber = result->getNextUnsignedInteger();
-    auto knowledge = Knowledge(knowledgeNumber);
-    if (knowledge == ResourceType::None)
+    auto knowledge = static_cast<Knowledge>(knowledgeNumber);
+    if (knowledge == Knowledge::None)
     {
         throw SQLiteException(
             "Can't find the ingredient " + ToString(knowledgeNumber));
@@ -927,7 +927,7 @@ bool LoadProductionKnowledge(ResultSet * result)
     Logger::log(LogLevel::Debug,
                 "\t%s%s",
                 Align(production->name, align::left, 25),
-                Align(knowledge.toString(),
+                Align(knowledge_to_string(knowledge),
                       align::left, 35));
     return true;
 }
@@ -1112,7 +1112,7 @@ bool LoadBuildingKnowledge(ResultSet * result)
             "Can't find the building: " + ToString(buildingVnum));
     }
     auto knowledgeId = result->getNextUnsignedInteger();
-    Knowledge knowledge(knowledgeId);
+    Knowledge knowledge = static_cast<Knowledge>(knowledgeId);
     if (knowledge == Knowledge::None)
     {
         throw SQLiteException(
@@ -1122,7 +1122,7 @@ bool LoadBuildingKnowledge(ResultSet * result)
     Logger::log(LogLevel::Debug,
                 "\t%s%s",
                 Align(building->name, align::left, 25),
-                Align(knowledge.toString(),
+                Align(knowledge_to_string(knowledge),
                       align::left, 35));
     return true;
 }

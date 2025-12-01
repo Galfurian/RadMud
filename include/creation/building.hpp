@@ -27,6 +27,7 @@
 #include <vector>
 #include <map>
 #include "json/json.hpp"
+#include "enumerators/knowledge.hpp"
 
 // Forward declarations.
 class ToolType;
@@ -34,8 +35,6 @@ class ToolType;
 class ItemModel;
 
 class ResourceType;
-
-class Knowledge;
 
 /// @brief Holds details about a building.
 class Building

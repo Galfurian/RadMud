@@ -84,7 +84,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Building &rhs)
     json::jnode_t knowledge_node;
     knowledge_node.set_type(json::JTYPE_ARRAY);
     for (auto const &it : rhs.requiredKnowledge) {
-        knowledge_node.add_element() << it.toUInt();
+        knowledge_node.add_element() << static_cast<uint8_t>(it);
     }
     lhs["required_knowledge"] = knowledge_node;
     return lhs;

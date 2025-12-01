@@ -21,72 +21,77 @@
 
 #include "enumerators/knowledge.hpp"
 
-std::string Knowledge::toString() const
+std::string knowledge_to_string(Knowledge knowledge)
 {
-    if (value == Knowledge::GatherHerbs)
+    switch (knowledge)
+    {
+    case Knowledge::GatherHerbs:
         return "GatherHerbs";
-    if (value == Knowledge::GatherPlant)
+    case Knowledge::GatherPlant:
         return "GatherPlant";
-    if (value == Knowledge::Butchery)
+    case Knowledge::Butchery:
         return "Butchery";
-    if (value == Knowledge::SkinAnimal)
+    case Knowledge::SkinAnimal:
         return "SkinAnimal";
-    if (value == Knowledge::TanHide)
+    case Knowledge::TanHide:
         return "TanHide";
-    if (value == Knowledge::ReadBook)
+    case Knowledge::ReadBook:
         return "ReadBook";
-    if (value == Knowledge::Climb)
+    case Knowledge::Climb:
         return "Climb";
-    if (value == Knowledge::Run)
+    case Knowledge::Run:
         return "Run";
-    if (value == Knowledge::Dash)
+    case Knowledge::Dash:
         return "Dash";
-    if (value == Knowledge::Woodcutting)
+    case Knowledge::Woodcutting:
         return "Woodcutting";
-    if (value == Knowledge::Carpentry)
+    case Knowledge::Carpentry:
         return "Carpentry";
-    if (value == Knowledge::Woodcarving)
+    case Knowledge::Woodcarving:
         return "Woodcarving";
-    if (value == Knowledge::Mining)
+    case Knowledge::Mining:
         return "Mining";
-    if (value == Knowledge::Smelting)
+    case Knowledge::Smelting:
         return "Smelting";
-    if (value == Knowledge::Blacksmithing)
+    case Knowledge::Blacksmithing:
         return "Blacksmithing";
-    if (value == Knowledge::MetalWeaponCrafting)
+    case Knowledge::MetalWeaponCrafting:
         return "MetalWeaponCrafting";
-    if (value == Knowledge::MetalArmorCrafting)
+    case Knowledge::MetalArmorCrafting:
         return "MetalArmorCrafting";
-    if (value == Knowledge::Scavenge)
-        return "Scavenge";
-    if (value == Knowledge::CraftSurvivalTool)
+    case Knowledge::CraftSurvivalTool:
         return "CraftSurvivalTool";
-    if (value == Knowledge::BasicArmorProficiency)
+    case Knowledge::Scavenge:
+        return "Scavenge";
+    case Knowledge::BasicArmorProficiency:
         return "BasicArmorProficiency";
-    else return "None";
+    case Knowledge::None:
+    default:
+        return "None";
+    }
 }
 
-Knowledge::Knowledge(const std::string & _value)
+Knowledge string_to_knowledge(const std::string & value)
 {
-    if (_value == "GatherHerbs") value = GatherHerbs;
-    else if (_value == "GatherPlant") value = GatherPlant;
-    else if (_value == "Butchery") value = Butchery;
-    else if (_value == "SkinAnimal") value = SkinAnimal;
-    else if (_value == "TanHide") value = TanHide;
-    else if (_value == "ReadBook") value = ReadBook;
-    else if (_value == "Climb") value = Climb;
-    else if (_value == "Run") value = Run;
-    else if (_value == "Dash") value = Dash;
-    else if (_value == "Woodcutting") value = Woodcutting;
-    else if (_value == "Carpentry") value = Carpentry;
-    else if (_value == "Woodcarving") value = Woodcarving;
-    else if (_value == "Mining") value = Mining;
-    else if (_value == "Smelting") value = Smelting;
-    else if (_value == "Blacksmithing") value = Blacksmithing;
-    else if (_value == "MetalWeaponCrafting") value = MetalWeaponCrafting;
-    else if (_value == "MetalArmorCrafting") value = MetalArmorCrafting;
-    else if (_value == "Scavenge") value = Scavenge;
-    else if (_value == "CraftSurvivalTool") value = CraftSurvivalTool;
-    else if (_value == "BasicArmorProficiency") value = BasicArmorProficiency;
-    else value = None;
+    if (value == "GatherHerbs") return Knowledge::GatherHerbs;
+    else if (value == "GatherPlant") return Knowledge::GatherPlant;
+    else if (value == "Butchery") return Knowledge::Butchery;
+    else if (value == "SkinAnimal") return Knowledge::SkinAnimal;
+    else if (value == "TanHide") return Knowledge::TanHide;
+    else if (value == "ReadBook") return Knowledge::ReadBook;
+    else if (value == "Climb") return Knowledge::Climb;
+    else if (value == "Run") return Knowledge::Run;
+    else if (value == "Dash") return Knowledge::Dash;
+    else if (value == "Woodcutting") return Knowledge::Woodcutting;
+    else if (value == "Carpentry") return Knowledge::Carpentry;
+    else if (value == "Woodcarving") return Knowledge::Woodcarving;
+    else if (value == "Mining") return Knowledge::Mining;
+    else if (value == "Smelting") return Knowledge::Smelting;
+    else if (value == "Blacksmithing") return Knowledge::Blacksmithing;
+    else if (value == "MetalWeaponCrafting") return Knowledge::MetalWeaponCrafting;
+    else if (value == "MetalArmorCrafting") return Knowledge::MetalArmorCrafting;
+    else if (value == "CraftSurvivalTool") return Knowledge::CraftSurvivalTool;
+    else if (value == "Scavenge") return Knowledge::Scavenge;
+    else if (value == "BasicArmorProficiency") return Knowledge::BasicArmorProficiency;
+    else return Knowledge::None;
 }

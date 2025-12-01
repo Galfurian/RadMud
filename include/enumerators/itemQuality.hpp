@@ -26,8 +26,7 @@
 #include <string>
 
 /// The quality of an item.
-enum class ItemQuality : uint8_t
-{
+enum class ItemQuality : uint8_t {
     None,       ///< No quality.
     Disastrous, ///< Disastrous quality.
     Poor,       ///< Poor quality.
@@ -40,7 +39,7 @@ enum class ItemQuality : uint8_t
 std::string item_quality_to_string(ItemQuality quality);
 
 /// @brief Returns the item quality from string.
-ItemQuality string_to_item_quality(const std::string & value);
+ItemQuality string_to_item_quality(const std::string &value);
 
 /// @brief Returns the quality modifier.
 double get_item_quality_modifier(ItemQuality quality);

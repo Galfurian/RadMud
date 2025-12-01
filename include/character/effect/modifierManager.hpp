@@ -311,7 +311,7 @@ public:
             for (auto const & it2 : modKnowledge)
             {
                 msg += "\t";
-                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(knowledge_to_string(it2.first), align::left, 30);
                 msg += Align(it2.second, align::right, 5) + "\n";
             }
         }

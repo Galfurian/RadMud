@@ -103,7 +103,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Skill &rhs)
     json::jnode_t knowledgeNode;
     knowledgeNode.set_type(json::JTYPE_OBJECT);
     for (auto const &it : rhs.modifierManager->getKnowledge()) {
-        knowledgeNode[it.first.toString()] << it.second;
+        knowledgeNode[knowledge_to_string(it.first)] << it.second;
     }
     modifierManagerNode["knowledge"] = knowledgeNode;
     lhs["modifier_manager"] = modifierManagerNode;
@@ -173,7 +173,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Skill &rhs)
             for (auto it = knowledgeNode.pbegin(); it != knowledgeNode.pend(); ++it) {
                 int modifier;
                 it->second >> modifier;
-                rhs.modifierManager->setKnowledge(Knowledge(it->first), modifier);
+                rhs.modifierManager->setKnowledge(string_to_knowledge(it->first), modifier);
             }
         }
     }
