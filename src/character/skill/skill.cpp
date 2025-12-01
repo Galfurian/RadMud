@@ -96,7 +96,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Skill &rhs)
     json::jnode_t statusModifiersNode;
     statusModifiersNode.set_type(json::JTYPE_OBJECT);
     for (auto const &it : rhs.modifierManager->getStatusMod()) {
-        statusModifiersNode[it.first.toString()] << it.second;
+        statusModifiersNode[status_modifier_to_string(it.first)] << it.second;
     }
     modifierManagerNode["status_modifiers"] = statusModifiersNode;
     // Serialize the knowledge.
@@ -164,7 +164,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Skill &rhs)
             for (auto it = statusModifiersNode.pbegin(); it != statusModifiersNode.pend(); ++it) {
                 int modifier;
                 it->second >> modifier;
-                rhs.modifierManager->setStatusMod(StatusModifier(it->first), modifier);
+                rhs.modifierManager->setStatusMod(string_to_status_modifier(it->first), modifier);
             }
         }
         // Deserialize the knowledge.

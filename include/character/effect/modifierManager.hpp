@@ -301,7 +301,7 @@ public:
             for (auto const & it2 : modStatus)
             {
                 msg += "\t";
-                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(status_modifier_to_string(it2.first), align::left, 30);
                 msg += Align(it2.second, align::right, 5) + "\n";
             }
         }

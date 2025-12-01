@@ -21,24 +21,30 @@
 
 #include "enumerators/statusModifier.hpp"
 
-std::string StatusModifier::toString() const
+
+#include <algorithm>
+#include <string>
+#include "enumerators/statusModifier.hpp"
+
+std::string status_modifier_to_string(StatusModifier type)
 {
-    if (value == StatusModifier::Health)
-        return "Health";
-    if (value == StatusModifier::HealthRegeneration)
-        return "HealthRegeneration";
-    if (value == StatusModifier::Stamina)
-        return "Stamina";
-    if (value == StatusModifier::StaminaRegeneration)
-        return "StaminaRegeneration";
-    else return "None";
+    switch (type) {
+        case StatusModifier::Health: return "Health";
+        case StatusModifier::HealthRegeneration: return "HealthRegeneration";
+        case StatusModifier::Stamina: return "Stamina";
+        case StatusModifier::StaminaRegeneration: return "StaminaRegeneration";
+        case StatusModifier::None:
+        default: return "None";
+    }
 }
 
-StatusModifier::StatusModifier(const std::string & _value)
+StatusModifier string_to_status_modifier(const std::string &str)
 {
-    if (_value == "Health") value = Health;
-    else if (_value == "HealthRegeneration") value = HealthRegeneration;
-    else if (_value == "Stamina") value = Stamina;
-    else if (_value == "StaminaRegeneration") value = StaminaRegeneration;
-    else value = None;
+    std::string s = str;
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    if (s == "health") return StatusModifier::Health;
+    if (s == "healthregeneration") return StatusModifier::HealthRegeneration;
+    if (s == "stamina") return StatusModifier::Stamina;
+    if (s == "staminaregeneration") return StatusModifier::StaminaRegeneration;
+    return StatusModifier::None;
 }

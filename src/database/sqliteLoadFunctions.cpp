@@ -199,7 +199,7 @@ bool LoadSkillStatusModifier(ResultSet * result)
                               ToString(skillVnum));
     }
     auto statusModifierNumber = result->getNextUnsignedInteger();
-    auto statusModifier = StatusModifier(statusModifierNumber);
+    auto statusModifier = static_cast<StatusModifier>(statusModifierNumber);
     if (statusModifier == StatusModifier::None)
     {
         throw SQLiteException("Can't find the status modifier " +
@@ -210,7 +210,7 @@ bool LoadSkillStatusModifier(ResultSet * result)
     // Log it.
     Logger::log(LogLevel::Debug, "\t%s%s%s",
                 Align(skill->name, align::left, 25),
-                Align(statusModifier.toString(), align::left, 35),
+                Align(status_modifier_to_string(statusModifier), align::left, 35),
                 Align(modifier, align::left, 35));
     return true;
 }

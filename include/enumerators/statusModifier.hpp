@@ -21,47 +21,20 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+#include <cstdint>
+#include <string>
 
 /// @brief The list of status modifiers.
-class StatusModifier :
-    public BaseEnumerator
-{
-public:
-    /// The possible status modifiers.
-    enum Enum
-    {
-        None,
-        Health,
-        HealthRegeneration,
-        Stamina,
-        StaminaRegeneration,
-    };
-
-    /// @brief Constructor.
-    StatusModifier() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    StatusModifier(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    StatusModifier(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from string.
-    StatusModifier(const std::string & _value);
-
-    /// @brief Returns the enumerator as string.
-    std::string toString() const override;
+enum class StatusModifier : uint8_t {
+    None,
+    Health,
+    HealthRegeneration,
+    Stamina,
+    StaminaRegeneration,
 };
+
+/// @brief Converts a StatusModifier to its string representation.
+std::string status_modifier_to_string(StatusModifier type);
+
+/// @brief Converts a string to a StatusModifier. Returns StatusModifier::None if not found.
+StatusModifier string_to_status_modifier(const std::string &str);
