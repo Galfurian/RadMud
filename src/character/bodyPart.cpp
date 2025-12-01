@@ -22,14 +22,16 @@
 #include "character/bodyPart.hpp"
 #include "model/submodel/resourceModel.hpp"
 #include "utilities/formatter.hpp"
-#include <cassert>
 
-BodyPart::BodyPart() :
-    vnum(),
-    name(),
-    description(),
-    flags(),
-    resources()
+#include <cassert>
+#include <json/json.hpp>
+
+BodyPart::BodyPart()
+    : vnum()
+    , name()
+    , description()
+    , flags()
+    , resources()
 {
     // Nothing to do.
 }
@@ -52,7 +54,7 @@ std::string BodyPart::getDescription(bool capital) const
     return (capital) ? ToCapitals(description) : description;
 }
 
-void BodyPart::getSheet(Table & sheet) const
+void BodyPart::getSheet(Table &sheet) const
 {
     // Add the columns.
     sheet.addColumn("Attribute", align::left);
@@ -62,12 +64,10 @@ void BodyPart::getSheet(Table & sheet) const
     sheet.addRow({"Name", name});
     sheet.addRow({"Description", description});
     sheet.addRow({"Flags", ToString(flags)});
-    if (!resources.empty())
-    {
+    if (!resources.empty()) {
         sheet.addDivider();
         sheet.addRow({"Resource", "Quantity"});
-        for (auto it : resources)
-        {
+        for (auto it : resources) {
             sheet.addRow({it.resource->name, ToString(it.quantity)});
         }
     }
@@ -75,8 +75,7 @@ void BodyPart::getSheet(Table & sheet) const
 
 std::string BodyPart::BodyWeapon::getName(bool colored) const
 {
-    if (colored)
-    {
+    if (colored) {
         return Formatter::cyan() + name + Formatter::reset();
     }
     return name;
@@ -85,4 +84,25 @@ std::string BodyPart::BodyWeapon::getName(bool colored) const
 unsigned int BodyPart::BodyWeapon::rollDamage() const
 {
     return TRand<unsigned int>(minDamage, maxDamage);
+}
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const BodyPart &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["name"] << rhs.name;
+    lhs["description"] << rhs.description;
+    lhs["flags"] << rhs.flags;
+    // Note: resources and weapon are not serialized here for simplicity.
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, BodyPart &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    lhs["name"] >> rhs.name;
+    lhs["description"] >> rhs.description;
+    lhs["flags"] >> rhs.flags;
+    // Note: resources and weapon are not deserialized here for simplicity.
+    return lhs;
 }

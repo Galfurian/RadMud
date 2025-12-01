@@ -155,6 +155,12 @@ public:
     /// @return The static and uniquie Mud variable.
     static Mud &instance();
 
+    /// @brief Dump all core data structures to separate JSON files.
+    /// This function should be called after all database info is loaded.
+    /// Each major data structure (players, items, rooms, etc.) will be dumped to its own JSON file.
+    /// Actual serialization logic will be implemented incrementally.
+    void dumpAllToJson() const;
+
     /// List of all connected players.
     std::list<Player *> mudPlayers;
     /// List all the mobile.
@@ -180,11 +186,11 @@ public:
     /// List of all the materials.
     std::map<int, Material *> mudMaterials;
     /// List of all the professions.
-    std::map<unsigned int, Profession *> mudProfessions;
+    std::map<int, Profession *> mudProfessions;
     /// List of all the productions.
     std::map<int, Production *> mudProductions;
     /// List of all the liquids.
-    std::map<unsigned int, Liquid *> mudLiquids;
+    std::map<int, Liquid *> mudLiquids;
     /// List of all the travelling points.
     std::map<Room *, Room *> mudTravelPoints;
     /// Blocked IP addresses.
@@ -198,13 +204,13 @@ public:
     /// Map of buildings schematic.
     std::map<int, std::shared_ptr<Building>> mudBuildings;
     /// Map of buildings schematic.
-    std::map<unsigned int, std::shared_ptr<Terrain>> mudTerrains;
+    std::map<int, std::shared_ptr<Terrain>> mudTerrains;
     /// List of all the bodyparts.
-    std::map<unsigned int, std::shared_ptr<BodyPart>> mudBodyParts;
+    std::map<int, std::shared_ptr<BodyPart>> mudBodyParts;
     /// List of all the bodyparts.
-    std::map<unsigned int, std::shared_ptr<HeightMap>> mudHeightMaps;
+    std::map<int, std::shared_ptr<HeightMap>> mudHeightMaps;
     /// List of generated maps.
-    std::map<unsigned int, std::shared_ptr<MapWrapper>> mudGeneratedMaps;
+    std::map<int, std::shared_ptr<MapWrapper>> mudGeneratedMaps;
 
     /// @brief Update all the player on the database.
     /// @return <b>True</b> if the operations succeeded,<br>

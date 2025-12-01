@@ -23,32 +23,39 @@
 #include "creation/liquid.hpp"
 #include "utilities/utils.hpp"
 
-Liquid::Liquid() :
-    vnum(),
-    type(),
-    name(),
-    description(),
-    worth(),
-    quench()
+#include <json/json.hpp>
+
+Liquid::Liquid()
+    : vnum()
+    , type()
+    , name()
+    , description()
+    , worth()
+    , quench()
 {
     // Nothing to do.
 }
 
 Liquid::~Liquid()
 {
-//    Logger::log(LogLevel::Debug,
-//                "Deleted liquid\t\t[%s]\t\t(%s)",
-//                ToString(this->vnum),
-//                this->name);
+    //    Logger::log(LogLevel::Debug,
+    //                "Deleted liquid\t\t[%s]\t\t(%s)",
+    //                ToString(this->vnum),
+    //                this->name);
 }
 
 bool Liquid::check()
 {
-    if (vnum <= 0) return false;
-    if (type == LiquidType::None) return false;
-    if (name.empty()) return false;
-    if (description.empty()) return false;
-    if (worth <= 0) return false;
+    if (vnum <= 0)
+        return false;
+    if (type == LiquidType::None)
+        return false;
+    if (name.empty())
+        return false;
+    if (description.empty())
+        return false;
+    if (worth <= 0)
+        return false;
     return true;
 }
 

@@ -21,11 +21,13 @@
 
 #include "item/writing.hpp"
 
-Writing::Writing() :
-    vnum(),
-    title(),
-    author(),
-    content()
+#include <json/json.hpp>
+
+Writing::Writing()
+    : vnum()
+    , title()
+    , author()
+    , content()
 {
     // Nothing to do.
 }
@@ -33,4 +35,23 @@ Writing::Writing() :
 Writing::~Writing()
 {
     // Nothing to do.
+}
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Writing &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["title"] << rhs.title;
+    lhs["author"] << rhs.author;
+    lhs["content"] << rhs.content;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Writing &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    lhs["title"] >> rhs.title;
+    lhs["author"] >> rhs.author;
+    lhs["content"] >> rhs.content;
+    return lhs;
 }

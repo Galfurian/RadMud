@@ -28,6 +28,10 @@
 #include <vector>
 
 class ResourceModel;
+namespace json
+{
+class jnode_t;
+}
 
 /// The flags of a body part.
 using BodyPartFlag = enum class BodyPartFlag_t {
@@ -113,6 +117,9 @@ public:
     /// @brief Fills the provided table with the information concerning
     ///         the body part.
     void getSheet(Table &sheet) const;
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const BodyPart &rhs);
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, BodyPart &rhs);
 
     friend json::jnode_t &operator<<(json::jnode_t &lhs, const BodyPart &rhs);
 

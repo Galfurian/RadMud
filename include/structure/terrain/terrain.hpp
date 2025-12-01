@@ -22,26 +22,28 @@
 
 #pragma once
 
-#include <string>
 #include <lua.hpp>
+#include <string>
 #include <vector>
 
 class Liquid;
+namespace json
+{
+class jnode_t;
+}
 
 /// Used to determine the flag of the terrain.
-using TerrainFlag = enum class TerrainFlags
-{
-    None = 0,           ///< No flag.
-    Indoor = 1,         ///< The terrain is indoor.
-    NaturalLight = 2    ///< There is natural light on this terrain.
+using TerrainFlag = enum class TerrainFlags {
+    None         = 0, ///< No flag.
+    Indoor       = 1, ///< The terrain is indoor.
+    NaturalLight = 2  ///< There is natural light on this terrain.
 };
 
 /// Used to determine the generation flag of the terrain.
-using TerrainGenerationFlag = enum class TerrainGenerationFlags
-{
-    None = 0,                   ///< No flag.
-    CanHostLiquidSource = 2,    ///< The terrain can host a liquid source.
-    CanHostForest = 4,          ///< The terrain can host a forest.
+using TerrainGenerationFlag = enum class TerrainGenerationFlags {
+    None                = 0, ///< No flag.
+    CanHostLiquidSource = 2, ///< The terrain can host a liquid source.
+    CanHostForest       = 4, ///< The terrain can host a forest.
     //8
 };
 
@@ -50,10 +52,9 @@ class Terrain
 {
 protected:
     /// The list of liquids which can generate from this terrain.
-    struct LiquidSource
-    {
+    struct LiquidSource {
         /// The liquid.
-        Liquid * liquid;
+        Liquid *liquid;
         /// The nominal probability.
         unsigned int assignedProbability;
         /// The complexive probability.
@@ -74,7 +75,7 @@ public:
     /// The symbol describing the terrain.
     std::string symbol;
     /// The lua_State associated with this terrain.
-    lua_State * L;
+    lua_State *L;
     /// The liquid which fills the terrain by default.
     std::pair<Liquid *, unsigned int> liquidContent;
     /// A list of liquid sources.
@@ -84,9 +85,14 @@ public:
     Terrain();
 
     /// @brief Adds a liquid source to the terrain.
-    void addLiquidSource(Liquid * _liquid,
-                         const unsigned int & _assignedProbability);
+    void addLiquidSource(Liquid *_liquid, const unsigned int &_assignedProbability);
 
     /// @brief Provides a random liquid source based on their probabilities.
-    Liquid * getRandomLiquidSource() const;
+    Liquid *getRandomLiquidSource() const;
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const LiquidSource &rhs);
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, LiquidSource &rhs);
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Terrain &rhs);
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Terrain &rhs);
 };

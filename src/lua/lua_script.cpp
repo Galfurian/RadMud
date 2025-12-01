@@ -33,47 +33,7 @@
 #include "utilities/logger.hpp"
 
 #include <LuaBridge/Vector.h>
-
-namespace luabridge
-{
-
-/// @brief Class used to register an enumerator inside the lua environment.
-template <class T>
-class EnumToLua
-{
-protected:
-    lua_State *const L;
-
-public:
-    /// @brief Constructor.
-    EnumToLua(char const *name, lua_State *const L)
-        : L(L)
-    {
-        // Get the entity inside the lua environment.
-        lua_getglobal(L, name);
-    }
-
-    /// @brief Add an enumerator.
-    template <class EnumValue>
-    EnumToLua<T> &addEnum(char const *name, EnumValue value)
-    {
-        // Push the name of the enum.
-        lua_pushstring(L, name);
-        // Push the value as integer (cast for enum class).
-        lua_pushinteger(L, static_cast<lua_Integer>(value));
-        lua_rawset(L, -3);
-        return *this;
-    }
-};
-
-template <class T>
-EnumToLua<T> beginEnum(char const *name, lua_State *const L)
-{
-    return EnumToLua<T>(name, L);
-}
-
-} // namespace luabridge
-
+    
 void LuaLog(std::string message)
 {
     if (!message.empty()) {

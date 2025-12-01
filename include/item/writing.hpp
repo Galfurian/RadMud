@@ -24,6 +24,11 @@
 
 #include <string>
 
+namespace json
+{
+class jnode_t;
+}
+
 /// @brief Holds details about a writing.
 class Writing
 {
@@ -42,4 +47,7 @@ public:
 
     /// @brief Destructor.
     ~Writing();
+
+    friend json::jnode_t &operator<<(json::jnode_t &lhs, const Writing &rhs);
+    friend const json::jnode_t &operator>>(const json::jnode_t &lhs, Writing &rhs);
 };

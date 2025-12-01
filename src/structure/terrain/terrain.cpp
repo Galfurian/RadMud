@@ -23,46 +23,88 @@
 #include "structure/terrain/terrain.hpp"
 #include "utilities/utils.hpp"
 
-Terrain::Terrain() :
-    vnum(),
-    name(),
-    flags(),
-    generationFlags(),
-    space(),
-    symbol(),
-    liquidContent(),
-    liquidSources()
+#include <json/json.hpp>
+
+Terrain::Terrain()
+    : vnum()
+    , name()
+    , flags()
+    , generationFlags()
+    , space()
+    , symbol()
+    , liquidContent()
+    , liquidSources()
 {
     // Nothing to do.
 }
 
-void Terrain::addLiquidSource(Liquid * _liquid,
-                              const unsigned int & _assignedProbability)
+void Terrain::addLiquidSource(Liquid *_liquid, const unsigned int &_assignedProbability)
 {
     LiquidSource ls;
-    ls.liquid = _liquid;
-    ls.assignedProbability = _assignedProbability;
+    ls.liquid                = _liquid;
+    ls.assignedProbability   = _assignedProbability;
     ls.cumulativeProbability = _assignedProbability;
-    if (!liquidSources.empty())
-    {
+    if (!liquidSources.empty()) {
         ls.cumulativeProbability += liquidSources.back().cumulativeProbability;
     }
     liquidSources.emplace_back(std::move(ls));
 }
 
-Liquid * Terrain::getRandomLiquidSource() const
+Liquid *Terrain::getRandomLiquidSource() const
 {
-    if (!liquidSources.empty())
-    {
+    if (!liquidSources.empty()) {
         auto pickedValue = TRand<unsigned int>(
             0, liquidSources.back().cumulativeProbability - 1);
-        for (auto liquidSource : liquidSources)
-        {
-            if (pickedValue <= liquidSource.cumulativeProbability)
-            {
+        for (auto liquidSource : liquidSources) {
+            if (pickedValue <= liquidSource.cumulativeProbability) {
                 return liquidSource.liquid;
             }
         }
     }
     return nullptr;
 }
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Terrain::LiquidSource &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["liquid"] << rhs.liquid;
+    lhs["assignedProbability"] << rhs.assignedProbability;
+    lhs["cumulativeProbability"] << rhs.cumulativeProbability;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Terrain::LiquidSource &rhs)
+{
+    lhs["liquid"] >> rhs.liquid;
+    lhs["assignedProbability"] >> rhs.assignedProbability;
+    lhs["cumulativeProbability"] >> rhs.cumulativeProbability;
+    return lhs;
+}
+
+json::jnode_t &operator<<(json::jnode_t &lhs, const Terrain &rhs)
+{
+    lhs.set_type(json::JTYPE_OBJECT);
+    lhs["vnum"] << rhs.vnum;
+    lhs["name"] << rhs.name;
+    lhs["flags"] << rhs.flags;
+    lhs["generationFlags"] << rhs.generationFlags;
+    lhs["space"] << rhs.space;
+    lhs["symbol"] << rhs.symbol;
+    lhs["liquidContent"] << rhs.liquidContent;
+    lhs["liquidSources"] << rhs.liquidSources;
+    return lhs;
+}
+
+const json::jnode_t &operator>>(const json::jnode_t &lhs, Terrain &rhs)
+{
+    lhs["vnum"] >> rhs.vnum;
+    lhs["name"] >> rhs.name;
+    lhs["flags"] >> rhs.flags;
+    lhs["generationFlags"] >> rhs.generationFlags;
+    lhs["space"] >> rhs.space;
+    lhs["symbol"] >> rhs.symbol;
+    lhs["liquidContent"] >> rhs.liquidContent;
+    lhs["liquidSources"] >> rhs.liquidSources;
+    return lhs;
+}
+

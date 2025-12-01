@@ -255,6 +255,9 @@ add_executable(
 target_include_directories(
     ${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/include
+)
+target_include_directories(
+    ${PROJECT_NAME} SYSTEM PUBLIC
     ${LUA_INCLUDE_DIR}
     ${SQLite3_INCLUDE_DIRS}
     ${luabridge_SOURCE_DIR}/Source
@@ -271,6 +274,6 @@ target_link_libraries(
     z
 )
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
 message(INFO ${luabridge_SOURCE_DIR})
