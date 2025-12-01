@@ -1,5 +1,5 @@
 /// @file   materialType.hpp
-/// @brief  
+/// @brief
 /// @author Enrico Fraccaroli
 /// @date   05/12/2016
 /// @copyright
@@ -22,53 +22,27 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+#include <cstdint>
+#include <string>
 
 /// Represents a type of material.
-class MaterialType :
-    public BaseEnumerator
-{
-public:
-    /// The possible type of materials.
-    enum Enum
-    {
-        None,       ///< [0] No type.
-        Metal,      ///< [1] Metal
-        Stone,      ///< [2] Stone
-        Wood,       ///< [3] Wood
-        Skin,       ///< [4] Skin
-        Cloth,      ///< [5] Cloth
-        Vegetable,  ///< [6] Vegetable
-        Meat,       ///< [7] Meat
-        Glass,      ///< [8] Glass
-        Paper,      ///< [9] Paper
-        Coal,       ///< [10] Coal
-        Bone        ///< [11] Coal
-    };
-
-    /// @brief Constructor.
-    MaterialType() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    MaterialType(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    MaterialType(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    MaterialType(const std::string & _value);
-
-    /// @brief Returns the material as string.
-    std::string toString() const override;
+enum class MaterialType : uint8_t {
+    None,      ///< [0] No type.
+    Metal,     ///< [1] Metal
+    Stone,     ///< [2] Stone
+    Wood,      ///< [3] Wood
+    Skin,      ///< [4] Skin
+    Cloth,     ///< [5] Cloth
+    Vegetable, ///< [6] Vegetable
+    Meat,      ///< [7] Meat
+    Glass,     ///< [8] Glass
+    Paper,     ///< [9] Paper
+    Coal,      ///< [10] Coal
+    Bone       ///< [11] Bone
 };
+
+/// @brief Returns the material as string.
+std::string material_type_to_string(MaterialType type);
+
+/// @brief Returns the material from string.
+MaterialType string_to_material_type(const std::string &value);

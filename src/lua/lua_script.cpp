@@ -568,21 +568,20 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
     // -------------------------------------------------------------------------
     // MATERIAL_TYPE
     luabridge::getGlobalNamespace(L)
-        .deriveClass<MaterialType, BaseEnumerator>("MaterialType")
-        .endClass();
-    luabridge::beginEnum<MaterialType>("MaterialType", L)
-        .addEnum("None", MaterialType::None)
-        .addEnum("Metal", MaterialType::Metal)
-        .addEnum("Stone", MaterialType::Stone)
-        .addEnum("Wood", MaterialType::Wood)
-        .addEnum("Skin", MaterialType::Skin)
-        .addEnum("Cloth", MaterialType::Cloth)
-        .addEnum("Vegetable", MaterialType::Vegetable)
-        .addEnum("Meat", MaterialType::Meat)
-        .addEnum("Glass", MaterialType::Glass)
-        .addEnum("Paper", MaterialType::Paper)
-        .addEnum("Coal", MaterialType::Coal)
-        .addEnum("Bone", MaterialType::Bone);
+        .beginNamespace("MaterialType")
+        .addConstant("None", static_cast<int>(MaterialType::None))
+        .addConstant("Metal", static_cast<int>(MaterialType::Metal))
+        .addConstant("Stone", static_cast<int>(MaterialType::Stone))
+        .addConstant("Wood", static_cast<int>(MaterialType::Wood))
+        .addConstant("Skin", static_cast<int>(MaterialType::Skin))
+        .addConstant("Cloth", static_cast<int>(MaterialType::Cloth))
+        .addConstant("Vegetable", static_cast<int>(MaterialType::Vegetable))
+        .addConstant("Meat", static_cast<int>(MaterialType::Meat))
+        .addConstant("Glass", static_cast<int>(MaterialType::Glass))
+        .addConstant("Paper", static_cast<int>(MaterialType::Paper))
+        .addConstant("Coal", static_cast<int>(MaterialType::Coal))
+        .addConstant("Bone", static_cast<int>(MaterialType::Bone))
+        .endNamespace();
     // -------------------------------------------------------------------------
     // MODEL_TYPE
     luabridge::getGlobalNamespace(L)

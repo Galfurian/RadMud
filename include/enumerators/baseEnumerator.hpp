@@ -31,12 +31,11 @@ protected:
     unsigned int value;
 
 public:
-
     /// @brief Constructor.
     BaseEnumerator();
 
     /// @brief Constructor from unsigned int.
-    BaseEnumerator(const unsigned int & _value);
+    BaseEnumerator(const unsigned int &_value);
 
     /// @brief Constructor from uint.
     virtual ~BaseEnumerator();
@@ -51,48 +50,48 @@ public:
     }
 
     /// @brief Returns the value as number.
-    template<typename T>
+    template <typename T>
     T to() const
     {
         return static_cast<T>(value);
     }
 
     /// @brief Equality operator.
-    bool operator==(const BaseEnumerator & rhs) const
+    bool operator==(const BaseEnumerator &rhs) const
     {
         return value == rhs.value;
     }
 
     /// @brief Inequality operator.
-    bool operator!=(const BaseEnumerator & rhs) const
+    bool operator!=(const BaseEnumerator &rhs) const
     {
         return value != rhs.value;
     }
 
     /// @brief Lesser operator.
-    bool operator<(const BaseEnumerator & rhs) const
+    bool operator<(const BaseEnumerator &rhs) const
     {
         return value < rhs.value;
     }
 
     /// @brief Greater operator.
-    bool operator>(const BaseEnumerator & rhs) const
+    bool operator>(const BaseEnumerator &rhs) const
     {
         return value > rhs.value;
     }
 
     /// @brief Lesser-Equal operator.
-    bool operator<=(const BaseEnumerator & rhs) const
+    bool operator<=(const BaseEnumerator &rhs) const
     {
         return value <= rhs.value;
     }
 
     /// @brief Greater-Equal operator.
-    bool operator>=(const BaseEnumerator & rhs) const
+    bool operator>=(const BaseEnumerator &rhs) const
     {
         return value >= rhs.value;
     }
 };
 
 /// @brief Operator which allows to print the base enumerator in a stream.
-std::ostream & operator<<(std::ostream & os, const BaseEnumerator & enumerator);
+std::ostream &operator<<(std::ostream &os, const BaseEnumerator &enumerator);

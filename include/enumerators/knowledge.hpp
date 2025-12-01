@@ -25,33 +25,32 @@
 #include <string>
 
 /// @brief The list of notions a character can learn.
-enum class Knowledge : uint8_t
-{
+enum class Knowledge : uint8_t {
     None,
-    GatherHerbs = 3,                /// < Gather Herbs
-    GatherPlant = 4,                /// < Gather Plant
-    Butchery = 5,                   /// < Butcher Animal
-    SkinAnimal = 6,                 /// < Skin Animal
-    TanHide = 7,                    /// < Tan Hide
-    ReadBook = 8,                   /// < Read Book
-    Climb = 10,                     /// < Climb
-    Run = 11,                       /// < Run
-    Dash = 12,                      /// < Dash
-    Woodcutting = 15,               /// < Woodcutting
-    Carpentry = 16,                 /// < Carpentry
-    Woodcarving = 17,               /// < Woodcarving
-    Mining = 20,                    /// < Mining
-    Smelting = 21,                  /// < Smelting
-    Blacksmithing = 22,             /// < Blacksmithing
-    MetalWeaponCrafting = 23,       /// < Metal Weapon Crafting
-    MetalArmorCrafting = 24,        /// < Metal Armor Crafting
-    CraftSurvivalTool = 30,         /// < Craft Survival Tool
-    Scavenge = 35,                  /// < Scavenge
-    BasicArmorProficiency = 40      /// < Basic Armor Proficiency
+    GatherHerbs           = 3,  /// < Gather Herbs
+    GatherPlant           = 4,  /// < Gather Plant
+    Butchery              = 5,  /// < Butcher Animal
+    SkinAnimal            = 6,  /// < Skin Animal
+    TanHide               = 7,  /// < Tan Hide
+    ReadBook              = 8,  /// < Read Book
+    Climb                 = 10, /// < Climb
+    Run                   = 11, /// < Run
+    Dash                  = 12, /// < Dash
+    Woodcutting           = 15, /// < Woodcutting
+    Carpentry             = 16, /// < Carpentry
+    Woodcarving           = 17, /// < Woodcarving
+    Mining                = 20, /// < Mining
+    Smelting              = 21, /// < Smelting
+    Blacksmithing         = 22, /// < Blacksmithing
+    MetalWeaponCrafting   = 23, /// < Metal Weapon Crafting
+    MetalArmorCrafting    = 24, /// < Metal Armor Crafting
+    CraftSurvivalTool     = 30, /// < Craft Survival Tool
+    Scavenge              = 35, /// < Scavenge
+    BasicArmorProficiency = 40  /// < Basic Armor Proficiency
 };
 
 /// @brief Returns the knowledge as string.
 std::string knowledge_to_string(Knowledge knowledge);
 
 /// @brief Returns the knowledge from string.
-Knowledge string_to_knowledge(const std::string & value);
+Knowledge string_to_knowledge(const std::string &value);

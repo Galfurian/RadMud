@@ -104,7 +104,7 @@ void ItemModel::getSheet(Table & sheet) const
     }
     sheet.addRow({"Flags", GetModelFlagString(this->modelFlags)});
     sheet.addRow({"Condition", ToString(this->condition)});
-    sheet.addRow({"Material", this->material.toString()});
+    sheet.addRow({"Material", material_type_to_string(this->material)});
     sheet.addRow({"Tile", ToString(this->condition)});
     sheet.addRow({"Condition", ToString(this->tileSet) + ":" +
                                ToString(this->tileId)});
@@ -483,7 +483,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const ItemModel &rhs)
     lhs["base_weight"] << rhs.baseWeight;
     lhs["base_price"] << rhs.basePrice;
     lhs["condition"] << rhs.condition;
-    lhs["material_type"] << rhs.material.toUInt();
+    lhs["material_type"] << static_cast<uint8_t>(rhs.material);
     lhs["tile_set"] << rhs.tileSet;
     lhs["tile_id"] << rhs.tileId;
     lhs["model_type"] << rhs.getType().toUInt();
