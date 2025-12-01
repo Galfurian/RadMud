@@ -105,7 +105,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const Production &rhs)
     json::jnode_t ingredients_node;
     ingredients_node.set_type(json::JTYPE_OBJECT);
     for (auto const &it : rhs.ingredients) {
-        ingredients_node[it.first.toString()] << it.second;
+        ingredients_node[resource_type_to_string(it.first)] << it.second;
     }
     lhs["ingredients"] = ingredients_node;
     json::jnode_t knowledge_node;
@@ -147,7 +147,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, Production &rhs)
         for (auto it = ingredients_node.pbegin(); it != ingredients_node.pend(); ++it) {
             unsigned int quantity;
             it->second >> quantity;
-            rhs.ingredients[ResourceType(it->first)] = quantity;
+            rhs.ingredients[string_to_resource_type(it->first)] = quantity;
         }
     }
     if(lhs.has_property("required_knowledge")){

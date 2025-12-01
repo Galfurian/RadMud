@@ -881,7 +881,7 @@ bool LoadProductionIngredient(ResultSet * result)
             "Can't find the production " + ToString(productionVnum));
     }
     auto ingredientNumber = result->getNextUnsignedInteger();
-    auto ingredient = ResourceType(ingredientNumber);
+    auto ingredient = static_cast<ResourceType>(ingredientNumber);
     if (ingredient == ResourceType::None)
     {
         throw SQLiteException(
@@ -900,7 +900,7 @@ bool LoadProductionIngredient(ResultSet * result)
     Logger::log(LogLevel::Debug,
                 "\t%s%s%s",
                 Align(production->name, align::left, 25),
-                Align(ingredient.toString(), align::left,
+                Align(resource_type_to_string(ingredient), align::left,
                       35),
                 Align(quantity, align::left, 35));
     return true;
@@ -1084,7 +1084,7 @@ bool LoadBuildingIngredient(ResultSet * result)
             "Can't find the building: " + ToString(buildingVnum));
     }
     auto ingredientId = result->getNextUnsignedInteger();
-    ResourceType ingredient(ingredientId);
+    ResourceType ingredient = static_cast<ResourceType>(ingredientId);
     if (ingredient == ResourceType::None)
     {
         throw SQLiteException(
@@ -1096,7 +1096,7 @@ bool LoadBuildingIngredient(ResultSet * result)
     Logger::log(LogLevel::Debug,
                 "\t%s%s%s",
                 Align(building->name, align::left, 25),
-                Align(ingredient.toString(),
+                Align(resource_type_to_string(ingredient),
                       align::left, 35),
                 Align(quantity, align::left, 35));
     return true;

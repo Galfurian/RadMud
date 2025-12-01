@@ -63,7 +63,7 @@ bool LightModel::setModel(const std::string & source)
                     name, source);
         return false;
     }
-    fuelType = ResourceType(ToNumber<unsigned int>(functionList[0]));
+    fuelType = static_cast<ResourceType>(ToNumber<uint8_t>(functionList[0]));
     radius = ToNumber<int>(functionList[1]);
     maxWeight = ToNumber<double>(functionList[2]);
     lightSourceFlags = ToNumber<unsigned int>(functionList[3]);
@@ -77,7 +77,7 @@ void LightModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Fuel Type", fuelType.toString()});
+    sheet.addRow({"Fuel Type", resource_type_to_string(fuelType)});
     sheet.addRow({"Radius", ToString(radius)});
     sheet.addRow({"Max Weight", ToString(maxWeight)});
     sheet.addRow({"Flags", ToString(lightSourceFlags)});

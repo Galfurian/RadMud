@@ -37,8 +37,6 @@ class RangedWeaponItem;
 
 class Character;
 
-class ResourceType;
-
 class ToolType;
 
 class Room;

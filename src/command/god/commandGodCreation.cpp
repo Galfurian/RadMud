@@ -105,7 +105,7 @@ bool DoBuildingInfo(Character * character, ArgumentHandler & args)
     msg += "Ingredients :\n";
     for (auto iterator : building->ingredients)
     {
-        msg += "    " + iterator.first.toString();
+        msg += "    " + resource_type_to_string(iterator.first);
         msg += "(" + ToString(iterator.second) + ")\n";
     }
     character->sendMsg(msg);
@@ -212,7 +212,7 @@ bool DoProductionInfo(Character * character, ArgumentHandler & args)
     msg += "Ingredients :\n";
     for (auto iterator : production->ingredients)
     {
-        msg += "    " + iterator.first.toString();
+        msg += "    " + resource_type_to_string(iterator.first);
         msg += "(" + ToString(iterator.second) + ")\n";
     }
     msg += "Workbench   :" + GetToolTypeName(production->workbench) + "\n";

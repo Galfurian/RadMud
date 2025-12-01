@@ -28,13 +28,12 @@
 #include <map>
 #include "json/json.hpp"
 #include "enumerators/knowledge.hpp"
+#include "enumerators/resourceType.hpp"
 
 // Forward declarations.
 class ToolType;
 
 class ItemModel;
-
-class ResourceType;
 
 /// @brief Holds details about a building.
 class Building

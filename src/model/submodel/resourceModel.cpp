@@ -62,7 +62,7 @@ bool ResourceModel::setModel(const std::string & source)
                     this->name);
         return false;
     }
-    this->resourceType = ResourceType(ToNumber<unsigned int>(functionList[0]));
+    this->resourceType = static_cast<ResourceType>(ToNumber<uint8_t>(functionList[0]));
     if (this->resourceType == ResourceType::None)
     {
         Logger::log(LogLevel::Error,
@@ -80,5 +80,5 @@ void ResourceModel::getSheet(Table & sheet) const
     // Add a divider.
     sheet.addDivider();
     // Set the values.
-    sheet.addRow({"Resource Type", resourceType.toString()});
+    sheet.addRow({"Resource Type", resource_type_to_string(resourceType)});
 }

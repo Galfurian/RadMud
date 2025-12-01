@@ -22,85 +22,56 @@
 
 #include "enumerators/resourceType.hpp"
 
-ResourceType::ResourceType(const std::string &_value)
+#include <string>
+#include <algorithm>
+
+std::string resource_type_to_string(ResourceType type)
 {
-    if (_value == "Coal" || _value == "Natural Coal")
-        value = ResourceType::Coal;
-    else if (_value == "Ore" || _value == "Metal Ore")
-        value = ResourceType::Ore;
-    else if (_value == "Bar" || _value == "Metal Bar")
-        value = ResourceType::Bar;
-    else if (_value == "Log" || _value == "Wood Log")
-        value = ResourceType::Log;
-    else if (_value == "Plank" || _value == "Wood Plank")
-        value = ResourceType::Plank;
-    else if (_value == "Tree")
-        value = ResourceType::Tree;
-    else if (_value == "Fastener")
-        value = ResourceType::Fastener;
-    else if (_value == "Leather")
-        value = ResourceType::Leather;
-    else if (_value == "Cloth")
-        value = ResourceType::Cloth;
-    else if (_value == "Stone Block")
-        value = ResourceType::StoneBlock;
-    else if (_value == "Metal Vein")
-        value = ResourceType::MetalVein;
-    else if (_value == "Stone Monolith")
-        value = ResourceType::StoneMonolith;
-    else if (_value == "Pen")
-        value = ResourceType::Pen;
-    else if (_value == "Trash")
-        value = ResourceType::Trash;
-    else if (_value == "Meat")
-        value = ResourceType::Meat;
-    else if (_value == "Bone")
-        value = ResourceType::Bone;
-    else if (_value == "Skull")
-        value = ResourceType::Skull;
-    else if (_value == "Nail")
-        value = ResourceType::Nail;
-    else
-        value = ResourceType::None;
+    switch (type) {
+        case ResourceType::Coal:          return "Coal";
+        case ResourceType::Ore:           return "Ore";
+        case ResourceType::Bar:           return "Bar";
+        case ResourceType::Log:           return "Log";
+        case ResourceType::Plank:         return "Plank";
+        case ResourceType::Tree:          return "Tree";
+        case ResourceType::Fastener:      return "Fastener";
+        case ResourceType::Leather:       return "Leather";
+        case ResourceType::Cloth:         return "Cloth";
+        case ResourceType::StoneBlock:    return "StoneBlock";
+        case ResourceType::MetalVein:     return "MetalVein";
+        case ResourceType::StoneMonolith: return "StoneMonolith";
+        case ResourceType::Pen:           return "Pen";
+        case ResourceType::Trash:         return "Trash";
+        case ResourceType::Meat:          return "Meat";
+        case ResourceType::Bone:          return "Bone";
+        case ResourceType::Skull:         return "Skull";
+        case ResourceType::Nail:          return "Nail";
+        case ResourceType::None:
+        default:                        return "None";
+    }
 }
 
-std::string ResourceType::toString() const
+ResourceType string_to_resource_type(const std::string &str)
 {
-    if (value == ResourceType::Coal)
-        return "Natural Coal";
-    if (value == ResourceType::Ore)
-        return "Metal Ore";
-    if (value == ResourceType::Bar)
-        return "Metal Bar";
-    if (value == ResourceType::Log)
-        return "Wood Log";
-    if (value == ResourceType::Plank)
-        return "Wood Plank";
-    if (value == ResourceType::Tree)
-        return "Tree";
-    if (value == ResourceType::Fastener)
-        return "Fastener";
-    if (value == ResourceType::Leather)
-        return "Leather";
-    if (value == ResourceType::Cloth)
-        return "Cloth";
-    if (value == ResourceType::StoneBlock)
-        return "Stone Block";
-    if (value == ResourceType::MetalVein)
-        return "Metal Vein";
-    if (value == ResourceType::StoneMonolith)
-        return "Stone Monolith";
-    if (value == ResourceType::Pen)
-        return "Pen";
-    if (value == ResourceType::Trash)
-        return "Trash";
-    if (value == ResourceType::Meat)
-        return "Meat";
-    if (value == ResourceType::Bone)
-        return "Bone";
-    if (value == ResourceType::Skull)
-        return "Skull";
-    if (value == ResourceType::Nail)
-        return "Nail";
-    return "None";
+    std::string s = str;
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    if (s == "coal")           return ResourceType::Coal;
+    if (s == "ore")            return ResourceType::Ore;
+    if (s == "bar")            return ResourceType::Bar;
+    if (s == "log")            return ResourceType::Log;
+    if (s == "plank")          return ResourceType::Plank;
+    if (s == "tree")           return ResourceType::Tree;
+    if (s == "fastener")       return ResourceType::Fastener;
+    if (s == "leather")        return ResourceType::Leather;
+    if (s == "cloth")          return ResourceType::Cloth;
+    if (s == "stoneblock")     return ResourceType::StoneBlock;
+    if (s == "metalvein")      return ResourceType::MetalVein;
+    if (s == "stonemonolith")  return ResourceType::StoneMonolith;
+    if (s == "pen")            return ResourceType::Pen;
+    if (s == "trash")          return ResourceType::Trash;
+    if (s == "meat")           return ResourceType::Meat;
+    if (s == "bone")           return ResourceType::Bone;
+    if (s == "skull")          return ResourceType::Skull;
+    if (s == "nail")           return ResourceType::Nail;
+    return ResourceType::None;
 }

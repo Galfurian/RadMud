@@ -22,58 +22,34 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+#include <cstdint>
+#include <string>
 
-/// Represents a type of resource.
-class ResourceType : public BaseEnumerator
-{
-public:
-    /// The possible type of resources.
-    enum Enum {
-        None,
-        Coal,          ///< [1] COAL
-        Ore,           ///< [2] ORE
-        Bar,           ///< [3] BAR
-        Log,           ///< [4] LOG
-        Plank,         ///< [5] PLANK
-        Tree,          ///< [6] TREE
-        Fastener,      ///< [7] FASTENER
-        Leather,       ///< [8] LEATHER
-        Cloth,         ///< [9] CLOTH
-        StoneBlock,    ///< [10] STONE_BLOCK
-        MetalVein,     ///< [11] METAL_VEIN
-        StoneMonolith, ///< [12] STONE_MONOLITH
-        Pen,           ///< [13] Pen
-        Trash,         ///< [14] Trash (Anything which has no specific use)
-        Meat,          ///< [15] MEAT
-        Bone,          ///< [16] BONE
-        Skull,         ///< [17] SKULL
-        Nail           ///< [18] NAIL
-    };
-
-    /// @brief Constructor.
-    ResourceType()
-        : BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    ResourceType(const unsigned int &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    ResourceType(const Enum &_value)
-        : BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    ResourceType(const std::string &_value);
-
-    /// @brief Returns the resource as string.
-    std::string toString() const override;
+/// @brief Used to determine the type of resource.
+enum class ResourceType : uint8_t {
+    None,          ///< [0] No type.
+    Coal,          ///< [1] COAL
+    Ore,           ///< [2] ORE
+    Bar,           ///< [3] BAR
+    Log,           ///< [4] LOG
+    Plank,         ///< [5] PLANK
+    Tree,          ///< [6] TREE
+    Fastener,      ///< [7] FASTENER
+    Leather,       ///< [8] LEATHER
+    Cloth,         ///< [9] CLOTH
+    StoneBlock,    ///< [10] STONE_BLOCK
+    MetalVein,     ///< [11] METAL_VEIN
+    StoneMonolith, ///< [12] STONE_MONOLITH
+    Pen,           ///< [13] Pen
+    Trash,         ///< [14] Trash (Anything which has no specific use)
+    Meat,          ///< [15] MEAT
+    Bone,          ///< [16] BONE
+    Skull,         ///< [17] SKULL
+    Nail           ///< [18] NAIL
 };
+
+/// @brief Converts a ResourceType to its string representation.
+std::string resource_type_to_string(ResourceType type);
+
+/// @brief Converts a string to a ResourceType. Returns ResourceType::None if not found.
+ResourceType string_to_resource_type(const std::string &str);
