@@ -367,7 +367,7 @@ bool DoPlayerModSkill(Character * character, ArgumentHandler & args)
                            modified);
         return false;
     }
-    auto skillCap = SkillRank::getSkillCap();
+    auto skillCap = get_skill_cap();
     if (modified >= static_cast<int>(skillCap))
     {
         modified = static_cast<int>(skillCap);

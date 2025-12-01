@@ -79,7 +79,7 @@ void SkillManager::updateSkillEffect(std::shared_ptr<SkillData> & skillData)
     // Get the skill.
     const auto & skill = skillData->skill;
     // Save the skill rank.
-    auto skillRank = skillData->getSkillRank().to<int>();
+    auto skillRank = static_cast<int>(skillData->getSkillRank());
     // Try to find the skill effect.
     auto skillEffect = this->getSkillEffect(skillData);
     if (skillEffect == nullptr)

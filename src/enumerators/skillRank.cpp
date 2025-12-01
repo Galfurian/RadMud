@@ -21,70 +21,100 @@
 
 #include "enumerators/skillRank.hpp"
 
-SkillRank::SkillRank(const std::string &_value)
-    : BaseEnumerator()
+#include <string>
+#include <algorithm>
+
+std::string skill_rank_to_string(SkillRank type)
 {
-    if (_value == "Newbie")
-        value = Newbie;
-    else if (_value == "Novice")
-        value = Novice;
-    else if (_value == "Rookie")
-        value = Rookie;
-    else if (_value == "Beginner")
-        value = Beginner;
-    else if (_value == "Talented")
-        value = Talented;
-    else if (_value == "Skilled")
-        value = Skilled;
-    else if (_value == "Intermediate")
-        value = Intermediate;
-    else if (_value == "Seasoned")
-        value = Seasoned;
-    else if (_value == "Proficient")
-        value = Proficient;
-    else if (_value == "Experienced")
-        value = Experienced;
-    else if (_value == "Advanced")
-        value = Advanced;
-    else if (_value == "Expert")
-        value = Expert;
-    else if (_value == "Specialist")
-        value = Specialist;
-    else if (_value == "Master")
-        value = Master;
-    else
-        value = None;
+    switch (type) {
+        case SkillRank::Newbie:       return "Newbie";
+        case SkillRank::Novice:       return "Novice";
+        case SkillRank::Rookie:       return "Rookie";
+        case SkillRank::Beginner:     return "Beginner";
+        case SkillRank::Talented:     return "Talented";
+        case SkillRank::Skilled:      return "Skilled";
+        case SkillRank::Intermediate: return "Intermediate";
+        case SkillRank::Seasoned:     return "Seasoned";
+        case SkillRank::Proficient:   return "Proficient";
+        case SkillRank::Experienced:  return "Experienced";
+        case SkillRank::Advanced:     return "Advanced";
+        case SkillRank::Expert:       return "Expert";
+        case SkillRank::Specialist:   return "Specialist";
+        case SkillRank::Master:       return "Master";
+        case SkillRank::None:
+        default:                     return "None";
+    }
 }
 
-std::string SkillRank::toString() const
+SkillRank string_to_skill_rank(const std::string &str)
 {
-    if (value == Newbie)
-        return "Newbie";
-    if (value == Novice)
-        return "Novice";
-    if (value == Rookie)
-        return "Rookie";
-    if (value == Beginner)
-        return "Beginner";
-    if (value == Talented)
-        return "Talented";
-    if (value == Skilled)
-        return "Skilled";
-    if (value == Intermediate)
-        return "Intermediate";
-    if (value == Seasoned)
-        return "Seasoned";
-    if (value == Proficient)
-        return "Proficient";
-    if (value == Experienced)
-        return "Experienced";
-    if (value == Advanced)
-        return "Advanced";
-    if (value == Expert)
-        return "Expert";
-    if (value == Specialist)
-        return "Specialist";
-    if (value == Master)
-        return "Master";
-    return "None";
+    std::string s = str;
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    if (s == "newbie")       return SkillRank::Newbie;
+    if (s == "novice")       return SkillRank::Novice;
+    if (s == "rookie")       return SkillRank::Rookie;
+    if (s == "beginner")     return SkillRank::Beginner;
+    if (s == "talented")     return SkillRank::Talented;
+    if (s == "skilled")      return SkillRank::Skilled;
+    if (s == "intermediate") return SkillRank::Intermediate;
+    if (s == "seasoned")     return SkillRank::Seasoned;
+    if (s == "proficient")   return SkillRank::Proficient;
+    if (s == "experienced")  return SkillRank::Experienced;
+    if (s == "advanced")     return SkillRank::Advanced;
+    if (s == "expert")       return SkillRank::Expert;
+    if (s == "specialist")   return SkillRank::Specialist;
+    if (s == "master")       return SkillRank::Master;
+    return SkillRank::None;
+}
+
+SkillRank get_skill_rank(unsigned int value)
+{
+    unsigned int rankThreshold = (1000 + (1000 * static_cast<unsigned int>(SkillRank::Newbie)));
+    if (value <= rankThreshold)
+        return SkillRank::Newbie; // 2000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Novice)));
+    if (value <= rankThreshold)
+        return SkillRank::Novice; // 5000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Rookie)));
+    if (value <= rankThreshold)
+        return SkillRank::Rookie; // 9000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Beginner)));
+    if (value <= rankThreshold)
+        return SkillRank::Beginner; // 14000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Talented)));
+    if (value <= rankThreshold)
+        return SkillRank::Talented; // 20000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Skilled)));
+    if (value <= rankThreshold)
+        return SkillRank::Skilled; // 27000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Intermediate)));
+    if (value <= rankThreshold)
+        return SkillRank::Intermediate; // 35000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Seasoned)));
+    if (value <= rankThreshold)
+        return SkillRank::Seasoned; // 44000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Proficient)));
+    if (value <= rankThreshold)
+        return SkillRank::Proficient; // 54000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Experienced)));
+    if (value <= rankThreshold)
+        return SkillRank::Experienced; // 65000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Advanced)));
+    if (value <= rankThreshold)
+        return SkillRank::Advanced; // 77000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Expert)));
+    if (value <= rankThreshold)
+        return SkillRank::Expert; // 90000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Specialist)));
+    if (value <= rankThreshold)
+        return SkillRank::Specialist; // 104000
+    rankThreshold += (1000 + (1000 * static_cast<unsigned int>(SkillRank::Master)));
+    if (value <= rankThreshold)
+        return SkillRank::Master; // 119000
+    return SkillRank::Newbie;
+}
+
+unsigned int get_skill_cap()
+{
+    return 119000;
 }

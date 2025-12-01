@@ -624,7 +624,7 @@ bool DoSkills(Character * character, ArgumentHandler & /*args*/)
     for (const auto & skillData : player->skillManager.skills)
     {
         table.addRow({skillData->skill->name,
-                      skillData->getSkillRank().toString()});
+                      skill_rank_to_string(skillData->getSkillRank())});
     }
     character->sendMsg(table.getTable());
     return true;
