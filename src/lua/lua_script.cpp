@@ -503,6 +503,20 @@ void LoadLuaEnvironmet(lua_State *L, const std::string &scriptFile)
         .addConstant("Down", static_cast<int>(Direction::Down))
         .endNamespace();
     // -------------------------------------------------------------------------
+    // COMBAT_MODIFIER
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("CombatModifier")
+        .addConstant("None", static_cast<int>(CombatModifier::None))
+        .addConstant("UnarmedHitRoll", static_cast<int>(CombatModifier::UnarmedHitRoll))
+        .addConstant("UnarmedDamage", static_cast<int>(CombatModifier::UnarmedDamage))
+        .addConstant("MeleeWeaponHitRoll", static_cast<int>(CombatModifier::MeleeWeaponHitRoll))
+        .addConstant("MeleeWeaponDamage", static_cast<int>(CombatModifier::MeleeWeaponDamage))
+        .addConstant("RangedWeaponHitRoll", static_cast<int>(CombatModifier::RangedWeaponHitRoll))
+        .addConstant("RangedWeaponDamage", static_cast<int>(CombatModifier::RangedWeaponDamage))
+        .addConstant("RangedAimSpeed", static_cast<int>(CombatModifier::RangedAimSpeed))
+        .addConstant("ArmorClass", static_cast<int>(CombatModifier::ArmorClass))
+        .endNamespace();
+    // -------------------------------------------------------------------------
     // ITEM_QUALITY
     luabridge::getGlobalNamespace(L)
         .deriveClass<ItemQuality, BaseEnumerator>("ItemQuality")

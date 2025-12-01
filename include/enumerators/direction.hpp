@@ -22,28 +22,28 @@
 
 #pragma once
 
-#include <vector>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 class Coordinates;
 
 /// Provides a complete control on directions.
-enum class Direction
-{
-    None,   ///< No direction.
-    North,  ///< North.
-    South,  ///< South.
-    West,   ///< West.
-    East,   ///< East.
-    Up,     ///< Up.
-    Down    ///< Down.
+enum class Direction : uint8_t {
+    None,  ///< No direction.
+    North, ///< North.
+    South, ///< South.
+    West,  ///< West.
+    East,  ///< East.
+    Up,    ///< Up.
+    Down   ///< Down.
 };
 
 /// @brief Returns the direction as string.
 std::string direction_to_string(Direction direction);
 
 /// @brief Returns the direction from string.
-Direction string_to_direction(const std::string & value);
+Direction string_to_direction(const std::string &value);
 
 /// @brief Returns the opposite direction.
 Direction get_opposite(Direction direction);

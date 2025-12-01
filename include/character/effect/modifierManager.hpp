@@ -291,7 +291,7 @@ public:
             for (auto const & it2 : modCombat)
             {
                 msg += "\t";
-                msg += Align(it2.first.toString(), align::left, 30);
+                msg += Align(combat_modifier_to_string(it2.first), align::left, 30);
                 msg += Align(it2.second, align::right, 5) + "\n";
             }
         }

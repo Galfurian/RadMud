@@ -26,8 +26,7 @@
 #include <string>
 
 /// The postures of a character.
-enum class CharacterPosture
-{
+enum class CharacterPosture : uint8_t {
     None,   ///< The character has no posture.
     Stand,  ///< The character it's standing.
     Crouch, ///< The character it's crouched.
@@ -41,7 +40,7 @@ enum class CharacterPosture
 std::string character_posture_to_string(CharacterPosture posture);
 
 /// @brief Returns the character posture from string.
-CharacterPosture string_to_character_posture(const std::string & value);
+CharacterPosture string_to_character_posture(const std::string &value);
 
 /// @brief Returns the action describing the posture.
 std::string get_character_posture_action(CharacterPosture posture);

@@ -225,7 +225,7 @@ bool LoadSkillCombatModifier(ResultSet * result)
                               ToString(skillVnum));
     }
     auto combatModifierNumber = result->getNextUnsignedInteger();
-    auto combatModifier = CombatModifier(combatModifierNumber);
+    auto combatModifier = static_cast<CombatModifier>(combatModifierNumber);
     if (combatModifier == CombatModifier::None)
     {
         throw SQLiteException("Can't find the combat modifier " +
@@ -236,7 +236,7 @@ bool LoadSkillCombatModifier(ResultSet * result)
     // Log it.
     Logger::log(LogLevel::Debug, "\t%s%s%s",
                 Align(skill->name, align::left, 25),
-                Align(combatModifier.toString(), align::left, 35),
+                Align(combat_modifier_to_string(combatModifier), align::left, 35),
                 Align(modifier, align::left, 35));
     return true;
 }

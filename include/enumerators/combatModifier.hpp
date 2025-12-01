@@ -21,51 +21,25 @@
 
 #pragma once
 
-#include "baseEnumerator.hpp"
+#include <cstdint>
+#include <string>
 
 /// @brief The list of combat modifiers.
-class CombatModifier :
-    public BaseEnumerator
+enum class CombatModifier : uint8_t
 {
-public:
-    /// The possible combat modifiers.
-    enum Enum
-    {
-        None,
-        UnarmedHitRoll,             /// < Unarmed Hit
-        UnarmedDamage,              /// < Unarmed Damage
-        MeleeWeaponHitRoll = 10,    /// < Melee Weapon Hit
-        MeleeWeaponDamage = 11,     /// < Melee Weapon Damage
-        RangedWeaponHitRoll = 20,   /// < Ranged Weapon Hit
-        RangedWeaponDamage = 21,    /// < Ranged Weapon Damage
-        RangedAimSpeed = 22,        /// < Ranged Weapon Aim Speed
-        ArmorClass = 30,            /// < Armor Class
-    };
-
-    /// @brief Constructor.
-    CombatModifier() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    CombatModifier(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    CombatModifier(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from string.
-    CombatModifier(const std::string & _value);
-
-    /// @brief Returns the enumerator as string.
-    std::string toString() const override;
+    None,
+    UnarmedHitRoll,             ///< Unarmed Hit
+    UnarmedDamage,              ///< Unarmed Damage
+    MeleeWeaponHitRoll = 10,    ///< Melee Weapon Hit
+    MeleeWeaponDamage = 11,     ///< Melee Weapon Damage
+    RangedWeaponHitRoll = 20,   ///< Ranged Weapon Hit
+    RangedWeaponDamage = 21,    ///< Ranged Weapon Damage
+    RangedAimSpeed = 22,        ///< Ranged Weapon Aim Speed
+    ArmorClass = 30,            ///< Armor Class
 };
+
+/// @brief Returns the combat modifier as string.
+std::string combat_modifier_to_string(CombatModifier modifier);
+
+/// @brief Returns the combat modifier from string.
+CombatModifier string_to_combat_modifier(const std::string & value);
