@@ -20,108 +20,68 @@
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 /// DEALINGS IN THE SOFTWARE.
 
-#include "enumerators/modelType.hpp"
 
-ModelType::ModelType(const std::string &_value)
-    : BaseEnumerator()
+#include "enumerators/modelType.hpp"
+#include <string>
+#include <algorithm>
+
+std::string model_type_to_string(ModelType type)
 {
-    if (_value == "Corpse")
-        value = Corpse;
-    else if (_value == "MeleeWeapon")
-        value = MeleeWeapon;
-    else if (_value == "RangedWeapon")
-        value = RangedWeapon;
-    else if (_value == "Armor")
-        value = Armor;
-    else if (_value == "Shield")
-        value = Shield;
-    else if (_value == "Projectile")
-        value = Projectile;
-    else if (_value == "Container")
-        value = Container;
-    else if (_value == "LiquidContainer")
-        value = LiquidContainer;
-    else if (_value == "Tool")
-        value = Tool;
-    else if (_value == "Node")
-        value = Node;
-    else if (_value == "Resource")
-        value = Resource;
-    else if (_value == "Seed")
-        value = Seed;
-    else if (_value == "Key")
-        value = Key;
-    else if (_value == "Furniture")
-        value = Furniture;
-    else if (_value == "Food")
-        value = Food;
-    else if (_value == "Light")
-        value = Light;
-    else if (_value == "Vehicle")
-        value = Vehicle;
-    else if (_value == "Book")
-        value = Book;
-    else if (_value == "Rope")
-        value = Rope;
-    else if (_value == "Mechanism")
-        value = Mechanism;
-    else if (_value == "Currency")
-        value = Currency;
-    else if (_value == "Shop")
-        value = Shop;
-    else if (_value == "Magazine")
-        value = Magazine;
-    else
-        value = None;
+    switch (type) {
+        case ModelType::Corpse:          return "Corpse";
+        case ModelType::MeleeWeapon:     return "MeleeWeapon";
+        case ModelType::RangedWeapon:    return "RangedWeapon";
+        case ModelType::Armor:           return "Armor";
+        case ModelType::Shield:          return "Shield";
+        case ModelType::Projectile:      return "Projectile";
+        case ModelType::Container:       return "Container";
+        case ModelType::LiquidContainer: return "LiquidContainer";
+        case ModelType::Tool:            return "Tool";
+        case ModelType::Node:            return "Node";
+        case ModelType::Resource:        return "Resource";
+        case ModelType::Seed:            return "Seed";
+        case ModelType::Key:             return "Key";
+        case ModelType::Furniture:       return "Furniture";
+        case ModelType::Food:            return "Food";
+        case ModelType::Light:           return "Light";
+        case ModelType::Vehicle:         return "Vehicle";
+        case ModelType::Book:            return "Book";
+        case ModelType::Rope:            return "Rope";
+        case ModelType::Mechanism:       return "Mechanism";
+        case ModelType::Currency:        return "Currency";
+        case ModelType::Shop:            return "Shop";
+        case ModelType::Magazine:        return "Magazine";
+        case ModelType::None:
+        default:                        return "None";
+    }
 }
 
-std::string ModelType::toString() const
+ModelType string_to_model_type(const std::string &str)
 {
-    if (value == Corpse)
-        return "Corpse";
-    if (value == MeleeWeapon)
-        return "MeleeWeapon";
-    if (value == RangedWeapon)
-        return "RangedWeapon";
-    if (value == Armor)
-        return "Armor";
-    if (value == Shield)
-        return "Shield";
-    if (value == Projectile)
-        return "Projectile";
-    if (value == Container)
-        return "Container";
-    if (value == LiquidContainer)
-        return "LiquidContainer";
-    if (value == Tool)
-        return "Tool";
-    if (value == Node)
-        return "Node";
-    if (value == Resource)
-        return "Resource";
-    if (value == Seed)
-        return "Seed";
-    if (value == Key)
-        return "Key";
-    if (value == Furniture)
-        return "Furniture";
-    if (value == Food)
-        return "Food";
-    if (value == Light)
-        return "Light";
-    if (value == Vehicle)
-        return "Vehicle";
-    if (value == Book)
-        return "Book";
-    if (value == Rope)
-        return "Rope";
-    if (value == Mechanism)
-        return "Mechanism";
-    if (value == Currency)
-        return "Currency";
-    if (value == Shop)
-        return "Shop";
-    if (value == Magazine)
-        return "Magazine";
-    return "None";
+    std::string s = str;
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+    if (s == "corpse")           return ModelType::Corpse;
+    if (s == "meleeweapon")      return ModelType::MeleeWeapon;
+    if (s == "rangedweapon")     return ModelType::RangedWeapon;
+    if (s == "armor")            return ModelType::Armor;
+    if (s == "shield")           return ModelType::Shield;
+    if (s == "projectile")       return ModelType::Projectile;
+    if (s == "container")        return ModelType::Container;
+    if (s == "liquidcontainer")  return ModelType::LiquidContainer;
+    if (s == "tool")             return ModelType::Tool;
+    if (s == "node")             return ModelType::Node;
+    if (s == "resource")         return ModelType::Resource;
+    if (s == "seed")             return ModelType::Seed;
+    if (s == "key")              return ModelType::Key;
+    if (s == "furniture")        return ModelType::Furniture;
+    if (s == "food")             return ModelType::Food;
+    if (s == "light")            return ModelType::Light;
+    if (s == "vehicle")          return ModelType::Vehicle;
+    if (s == "book")             return ModelType::Book;
+    if (s == "rope")             return ModelType::Rope;
+    if (s == "mechanism")        return ModelType::Mechanism;
+    if (s == "currency")         return ModelType::Currency;
+    if (s == "shop")             return ModelType::Shop;
+    if (s == "magazine")         return ModelType::Magazine;
+    return ModelType::None;
 }

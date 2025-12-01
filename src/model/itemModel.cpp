@@ -486,7 +486,7 @@ json::jnode_t &operator<<(json::jnode_t &lhs, const ItemModel &rhs)
     lhs["material_type"] << static_cast<uint8_t>(rhs.material);
     lhs["tile_set"] << rhs.tileSet;
     lhs["tile_id"] << rhs.tileId;
-    lhs["model_type"] << rhs.getType().toUInt();
+    lhs["model_type"] << static_cast<uint8_t>(rhs.getType());
     return lhs;
 }
 
@@ -494,7 +494,7 @@ const json::jnode_t &operator>>(const json::jnode_t &lhs, std::shared_ptr<ItemMo
 {
     unsigned int model_type_int;
     lhs["model_type"] >> model_type_int;
-    ModelType model_type(model_type_int);
+    ModelType model_type = static_cast<ModelType>(model_type_int);
 
     // Create the correct derived type if rhs is null or of a different type
     if (!rhs || rhs->getType() != model_type) {

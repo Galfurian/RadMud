@@ -45,7 +45,7 @@
 #include "model/submodel/magazineModel.hpp"
 #include "model/submodel/meleeWeaponModel.hpp"
 
-std::shared_ptr<ItemModel> ModelFactory::newModel(const ModelType & type)
+std::shared_ptr<ItemModel> ModelFactory::newModel(ModelType type)
 {
     if (type == ModelType::Corpse)
     {

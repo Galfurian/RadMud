@@ -18,69 +18,44 @@
 /// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 /// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 /// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+
 /// DEALINGS IN THE SOFTWARE.
+
+#include <cstdint>
+#include <string>
 
 #pragma once
 
-#include "baseEnumerator.hpp"
-
 /// @brief Used to determine the type of the model.
-class ModelType :
-    public BaseEnumerator
-{
-public:
-    /// The possible types of model.
-    enum Enum
-    {
-        None,            ///< [0] No type.
-        Corpse,          ///< [1] A corpse.
-        MeleeWeapon,     ///< [2] Any melee weapon.
-        RangedWeapon,    ///< [3] Any ranged weapon.
-        Armor,           ///< [4] Any armor.
-        Shield,          ///< [5] A shield.
-        Projectile,      ///< [6] Projectiles.
-        Container,       ///< [7] A container for items.
-        LiquidContainer, ///< [8] A container for liquids.
-        Tool,            ///< [9] Any tool.
-        Node,            ///< [10] Any node of resources.
-        Resource,        ///< [11] A resource.
-        Seed,            ///< [12] Any kind of seed.
-        Key,             ///< [13] A key.
-        Furniture,       ///< [14] A furniture (eg. chair, bed, painting, table and so on).
-        Food,            ///< [15] A food.
-        Light,           ///< [16] A source of light ((eg. torch, lamp, candle and so on).
-        Vehicle,         ///< [17] Any kind of vehicle.
-        Book,            ///< [18] Container of parchments.
-        Rope,            ///< [19] A generic rope.
-        Mechanism,       ///< [20] Any kind of mechanism.
-        Currency,        ///< [21] Any kind of currency.
-        Shop,            ///< [22] A shop.
-        Magazine         ///< [23] A magazine for ammunitions.
-    };
-
-    /// @brief Constructor.
-    ModelType() :
-        BaseEnumerator()
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from unsigned int.
-    ModelType(const unsigned int & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    /// @brief Constructor from enum.
-    ModelType(const Enum & _value) :
-        BaseEnumerator(_value)
-    {
-        // Nothing to do.
-    }
-
-    ModelType(const std::string &_value);
-
-    /// @brief Returns the type of model as string.
-    std::string toString() const override;
+enum class ModelType : uint8_t {
+    None,            ///< [0] No type.
+    Corpse,          ///< [1] A corpse.
+    MeleeWeapon,     ///< [2] Any melee weapon.
+    RangedWeapon,    ///< [3] Any ranged weapon.
+    Armor,           ///< [4] Any armor.
+    Shield,          ///< [5] A shield.
+    Projectile,      ///< [6] Projectiles.
+    Container,       ///< [7] A container for items.
+    LiquidContainer, ///< [8] A container for liquids.
+    Tool,            ///< [9] Any tool.
+    Node,            ///< [10] Any node of resources.
+    Resource,        ///< [11] A resource.
+    Seed,            ///< [12] Any kind of seed.
+    Key,             ///< [13] A key.
+    Furniture,       ///< [14] A furniture (eg. chair, bed, painting, table and so on).
+    Food,            ///< [15] A food.
+    Light,           ///< [16] A source of light (eg. torch, lamp, candle and so on).
+    Vehicle,         ///< [17] Any kind of vehicle.
+    Book,            ///< [18] Container of parchments.
+    Rope,            ///< [19] A generic rope.
+    Mechanism,       ///< [20] Any kind of mechanism.
+    Currency,        ///< [21] Any kind of currency.
+    Shop,            ///< [22] A shop.
+    Magazine         ///< [23] A magazine for ammunitions.
 };
+
+/// @brief Converts a ModelType to its string representation.
+std::string model_type_to_string(ModelType type);
+
+/// @brief Converts a string to a ModelType. Returns ModelType::None if not found.
+ModelType string_to_model_type(const std::string &str);
